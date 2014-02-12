@@ -1,0 +1,121 @@
+%\VignetteIndexEntry{Seqnames:Introduction to Seqnames}
+%\VignetteDepends{}
+%\VignetteKeywords{organism, Seqnames}
+%\VignettePackage{Seqnames}
+%\VignetteEngine{knitr::knitr}
+\documentclass{article}
+
+<<style, eval=TRUE, echo=FALSE, results="asis">>=
+BiocStyle::latex()
+@
+
+\title{An Introduction to \Biocpkg{Seqnames}}
+\author{Martin Morgan, Herve Pages, Marc Carlson, Sonali Arora}
+\date{Modified: 17 January, 2014. Compiled: \today}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+<<preliminaries, echo=FALSE, message=FALSE>>=
+library(Seqnames)
+@ 
+
+\section{Introduction}
+
+The \Biocpkg{Seqnames} provides an interface to access SeqnameStyles (such as
+UCSC, NCBI, Ensembl) and their supported mappings for organisms. 
+For instance, for Homo sapiens, SeqnameStyle "UCSC" maps to "chr1", "chr2", ...
+, "chrX","chrY". The section below introduces these functions with examples.
+
+\section{Seqname Functionality for all exsiting organisms}
+ 
+
+\subsection{supportedStyles}      
+The \Rfunction{supportedStyles} lists out for each organism, the 
+SeqnameStyles and their mappings.
+<<supportedStyles1>>=
+seqmap <- supportedStyles()
+head(seqmap,n=2)
+@ 
+%% 
+
+If one knows the organism one is interested in, then we can directly access 
+the information for the given organism along. Each function accepts an 
+argument called species which as "genus species", the default 
+is "Homo sapiens". In the following example we list out only the first five 
+entries returned by the code snippet.
+
+<<supportedStyles2>>=
+head(supportedStyles("Homo sapiens"),5)
+@ 
+%% 
+
+
+\subsection{extractSeqnameSet}
+We can also extract the desired SeqnameStyle from a given organism using
+the \Rfunction{extractSeqnameSet}
+<<extractSeqnameSet>>=
+extractSeqnameSet(species="Arabidopsis thaliana", style="NCBI")
+@ 
+%%
+
+\subsection{extractSeqnameSetByGroup}
+We can also extract the desired SeqnameStyle from a given organism based on 
+a group ( Group - 'auto' denotes autosomes, 'linear' denotes linear chromosomes
+and 'sex' denotes sex chromosomes; the default is all chromosomes are returned).
+<<extractSeqnameSetgroup>>=
+extractSeqnameSetByGroup(species="Arabidopsis thaliana", style="NCBI",
+                         group="auto")
+@ 
+%%
+
+\subsection{seqnameStyle}
+We can find the seqname Style for a given character vector by using the 
+\Rfunction{seqnameStyle}
+<<seqnameStyle>>=
+seqnameStyle(paste0("chr",c(1:30)))
+seqnameStyle(c("2L","2R","X","Xhet"))
+@
+%%
+
+\subsection{seqnamesInGroup}
+We can also subset a given character vector containing seqnames  using the
+\Rfunction{seqnamesInGroup}.
+We currently support 3 groups: 'auto' for autosomes, 'sex' for allosomes/sex 
+chromosomes and linear for 'linear' chromosomes.
+The user can also prvoide the style and species they are working with.
+In the following example, we extract the sex chromosomes for Homo sapiens
+
+<<keepChr-txdb>>=
+newchr <- paste0("chr",c(1:22,"X","Y","M","1_gl000192_random","4_ctg9_hap1"))
+seqnamesInGroup(newchr, group="sex")
+seqnamesInGroup(newchr, group="auto")
+seqnamesInGroup(newchr, group="linear")
+seqnamesInGroup(newchr, group="sex","Homo sapiens","UCSC")
+@
+%%
+
+\subsection{seqnamesOrder}
+The \Rfunction{seqnamesOrder} can return the order of a given character vector 
+which contains seqnames.In the following example, we show how you can find the 
+order for a given seqnames character vector.
+<<seqnamesOrder>>=
+seqnames <- c("chr1","chr9", "chr2", "chr3", "chr10")
+seqnamesOrder(seqnames)
+@
+%%
+
+\subsection{findSequenceRenamingMaps}
+Returns a matrix with 1 column per supplied sequence name and 1 row per 
+sequence renaming map compatible with the specified style.  If \Rcode{best.only}
+is \Rcode{TRUE} (the default), only the "best" renaming maps (i.e. the rows with
+less NAs) are returned.
+<<find>>=
+findSequenceRenamingMaps(c("chrII", "chrIII", "chrM"), "NCBI")
+@ 
+%%
+
+\end{document}

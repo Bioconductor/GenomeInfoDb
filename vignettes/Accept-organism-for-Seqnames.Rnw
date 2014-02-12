@@ -1,0 +1,72 @@
+%\VignetteIndexEntry{Seqnames: Submitting your organism to Seqnames}
+%\VignetteDepends{}
+%\VignetteKeywords{organism, Seqnames}
+%\VignettePackage{Seqnames}
+%\VignetteEngine{knitr::knitr}
+\documentclass{article}
+
+<<style, eval=TRUE, echo=FALSE, results="asis">>=
+BiocStyle::latex()
+@
+
+\title{Submitting your organism to \Biocpkg{Seqnames}}
+\author{Sonali Arora}
+\date{Modified: 16 January, 2013. Compiled: \today}
+
+\begin{document}
+
+
+\maketitle
+
+\tableofcontents
+
+This document is meant for package developers wanting to submit an organism
+which does not already exist in \Biocpkg{Seqnames}, to be a part of 
+\Biocpkg{Seqnames}. 
+
+\section{Background}
+
+\Biocpkg{Seqnames} provides a multitude of functions to subset and access 
+seqName mappings and styles associated with an organism. One can use 
+the supplementary manual "Seqnames.pdf" to see such functions. Alternately 
+if there is no support for an organism for one's choice, one can submit a tab
+delimited file (as detailed by the sections below) to request their favorite
+organism to become a part of Seqnames package.
+
+\section{Support for existing organisms}
+Seqnames already provides support for a multitude of organisms, to see a
+detailed list of organism and the supported seqname styles associated with 
+those organism, one can simply run :
+
+<<verbatim, message=FALSE>>=
+library(Seqnames)
+names(supportedStyles())
+@
+
+\section{File format for new organism}
+If your favorite organism does not exist in the above list, one can submit 
+a tab-delimited file in the following format and request for your organism
+to be added to \Biocpkg{Seqnames}
+
+\begin{enumerate}
+\item The file name should be in the following format:
+   \file{genus\_{}species.txt}
+\item The columns should be tab-delimited in the following order
+\begin{itemize}
+ \item linear 
+ \item auto
+ \item sex
+ \item 1 column per seqname style and 1 row per chromosome 
+    name (not all chromosomes of a given organism necessarily belong to 
+    the mapping)
+    where linear denotes all the linear chromosomes, auto denotes all the 
+    autosomes and sex denotes all the allosomes or sex chromosomes. 
+\end{itemize}
+\item The entries should be in T/F format for columns linear, auto and sex.
+\end{enumerate}
+
+\section{Example File}
+One can look at existing organism files under Seqnames/extdata/dataFiles
+in their R/library to get a further idea about the format of files. 
+
+\end{document}

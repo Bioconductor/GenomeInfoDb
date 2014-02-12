@@ -1,0 +1,64 @@
+CHANGES IN VERSION 0.99.1
+------------------------------
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+The Seqnames package will have functions which will be moved from 
+AnnotationDbi , GenomicRanges
+
+   o List of 9 functions moved from AnnotationDbi
+     supportedSeqnameMappings, findSequenceRenamingMaps, 
+     supportedSeqnameStyles,  supportedSeqnames, 
+     extractSeqnameSet, testSeqnames, isSupportedSeqnamesStyle,
+     listAllSupportedStylesBySpecies, listAllSupportedSeqnameStyles.
+        
+   o makeSeqnameIds moved from GenomicRanges
+     
+   o keepStandardChromosomes moved from GenomicRanges 
+     
+   o rename:
+     keepStandardChromosomes -> keepChromosomes 
+
+NEW FEATURES
+ 
+   o added new functions:
+     supportedOrganisms()  
+     supportedSeqnameMappingsWithGroup()  
+     extractSeqnameSetByGroup() 
+
+CHANGES IN VERSION 0.99.6 
+----------------------------------
+NEW FEATURES
+   o add new functions()
+     seqnamesInGroup which will take a character vector of chromosomes and 
+     return the chromosomes specified by the group parameter supplied by the 
+     user. The user can also give the species and the style.
+     seqnamesOrder() internally calls Herve's function makeSeqnameIds()
+   o add seqnameStyles generic and method from GenomicRanges
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+   o rename:
+     testSeqnames -> isSupportedSeqnames
+
+   o move SeqnamesStyle generic from GenomicRanges and define a new method which
+     works on a character vector.
+         
+DEPRECATED AND DEFUNCT
+   o deprecate listAllSupportedStylesBySpecies(), 
+     listAllSupportedSeqnameStyles(), supportedOrganisms()
+     supportedSeqnameMappingsWithGroup()
+       
+DEPRECATED AND USED INTERNALLY(NOT EXPORTED)
+   o deprecate supportedSeqnameMappings(), supportedSeqnameStyles(), 
+     isSupportedSeqnamesStyle(),issupportedSeqnames()
+
+CHANGES IN VERSION 0.99.7
+----------------------------------
+SIGNIFICANT USER-VISIBLE CHANGES
+
+   o rename:
+     isSupportedSeqnames -> .isSupportedSeqnames
+     supportedSeqnameStyles -> .supportedSeqnameStyles
+     supportedSeqnameMappings -> .supportedSeqnameMappings
+     isSupportedSeqnamesStyle -> .isSupportedSeqnamesStyle

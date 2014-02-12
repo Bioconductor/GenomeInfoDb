@@ -1,0 +1,8 @@
+linear	auto	sex	NCBI	UCSC	Ensembl
+T	T	F	I	chrI	I
+T	T	F	II	chrII	II
+T	T	F	III	chrIII	III
+T	T	F	IV	chrIV	IV
+T	T	F	V	chrV	V
+T	F	T	X	chrX	X
+F	T	F	MT	chrM	MtDNA

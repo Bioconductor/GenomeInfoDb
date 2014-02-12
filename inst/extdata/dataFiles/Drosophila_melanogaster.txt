@@ -1,0 +1,16 @@
+linear	sex	auto	NCBI	UCSC	Ensembl
+T	F	T	2L	chr2L	2L
+T	F	T	2R	chr2R	2R
+T	F	T	3L	chr3L	3L
+T	F	T	3R	chr3R	3R
+T	F	T	4	chr4	4
+T	T	F	X	chrX	X
+F	F	F	MT	chrM	dmel_mitochondrion_genome
+F	F	F	2LHet	chr2LHet	2LHet
+F	F	F	2Rhet	chr2RHet	2RHet
+F	F	F	3LHet	chr3LHet	3LHet
+F	F	F	3RHet	chr3RHet	3RHet
+F	F	F	Xhet	chrXHet	XHet
+F	F	F	Yhet	chrYHet	YHet
+F	F	F	Un	chrU	U
+F	F	F	NA	chrUextra	Uextra

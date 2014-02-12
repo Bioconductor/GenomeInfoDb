@@ -1,0 +1,9 @@
+export(
+    supportedStyles,
+    seqnamesOrder,
+    extractSeqnameSet,
+    extractSeqnameSetByGroup,
+    findSequenceRenamingMaps,
+    seqnamesInGroup,
+    seqnameStyle, "seqnameStyle<-"
+)
