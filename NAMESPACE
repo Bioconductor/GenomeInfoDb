@@ -1,12 +1,12 @@
 export(
-    supportedStyles,
+    genomeStyles,
     
     orderSeqlevels,
     rankSeqlevels,
     
-    extractSeqnameSet,
-    extractSeqnameSetByGroup,
-    findSequenceRenamingMaps,
-    seqnamesInGroup,
-    seqnameStyle, "seqnameStyle<-"
+    extractSeqlevels,
+    extractSeqlevelsByGroup,
+    mapSeqlevels,
+    seqlevelsInGroup,
+    seqlevelsStyle, "seqlevelsStyle<-"
 )

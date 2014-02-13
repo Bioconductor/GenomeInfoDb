@@ -1,4 +1,4 @@
-supportedStyles <-
+genomeStyles <-
     function(species)
 {
     if (missing(species))
@@ -9,7 +9,7 @@ supportedStyles <-
 }
 
 
-extractSeqnameSet <- 
+extractSeqlevels <- 
     function(species, style)
 {
     if (missing(species) || missing(style))
@@ -26,7 +26,7 @@ extractSeqnameSet <-
     result
 }
 
-extractSeqnameSetByGroup <- 
+extractSeqlevelsByGroup <- 
     function(species, style, group)
 {
     if (missing(species) || missing(style) || missing(group))
@@ -49,7 +49,7 @@ extractSeqnameSetByGroup <-
     result
 }
 
-findSequenceRenamingMaps <- 
+mapSeqlevels <- 
     function(seqnames, style, best.only=TRUE, drop=TRUE)
 {
     if (!is.character(seqnames))
@@ -92,7 +92,7 @@ findSequenceRenamingMaps <-
     ans        
 }
 
-seqnamesInGroup <- 
+seqlevelsInGroup <- 
     function(seqnames, group=c("all", "auto", "sex", "linear"),
              species, style)
 {
@@ -105,7 +105,7 @@ seqnamesInGroup <-
     }
     
     if (.isSupportedSeqnamesStyle(species, style)) {
-        seqvec <- extractSeqnameSetByGroup( species, style, group)
+        seqvec <- extractSeqlevelsByGroup( species, style, group)
         seqvec[na.omit(match(seqnames, seqvec))]
     } else {
         txt <- paste0( "The style specified by ", sQuote(style),
@@ -117,27 +117,27 @@ seqnamesInGroup <-
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### seqnameStyle() getter and setter
+### seqlevelsStyle() getter and setter
 ###
 
-setGeneric("seqnameStyle", 
-    function(x) standardGeneric("seqnameStyle"))
+setGeneric("seqlevelsStyle", 
+    function(x) standardGeneric("seqlevelsStyle"))
 
-### Default "seqnameStyle" method works on any object 'x' with a working
+### Default "seqlevelsStyle" method works on any object 'x' with a working
 ### "seqinfo" method; defined in GenomicRanges.
 
-setMethod("seqnameStyle", "character",
+setMethod("seqlevelsStyle", "character",
     function(x) 
 {
-    ## implement seqnameStyle,character-method
+    ## implement seqlevelsStyle,character-method
     seqnames <- unique(x)      
     ans <- .guessSpeciesStyle(seqnames)
     ans[2]
 })
 
-setGeneric("seqnameStyle<-", signature="x",
-    function(x, value) standardGeneric("seqnameStyle<-")
+setGeneric("seqlevelsStyle<-", signature="x",
+    function(x, value) standardGeneric("seqlevelsStyle<-")
 )
 
-### Default "seqnameStyle<-" method works on any object 'x' with working
+### Default "seqlevelsStyle<-" method works on any object 'x' with working
 ### "seqinfo" and "seqinfo<-" methods; defined in GenomicRanges.
