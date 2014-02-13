@@ -275,5 +275,5 @@ orderSeqlevels <-
   {
     if (missing(seqnames))
       seqnames <- character()
-    order(makeSeqnameIds(seqnames, X.is.sexchrom))
+    order(rankSeqlevels(seqnames, X.is.sexchrom))
   }   

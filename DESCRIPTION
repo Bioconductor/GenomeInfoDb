@@ -1,7 +1,7 @@
 Package: GenomeInfoDb
 Type: Package
 Title: Utilities for manipulating chromosome and other 'seqname' identifiers
-Version: 0.99.13
+Version: 0.99.14
 Author: Sonali Arora, H. Pages,  Marc Carlson, Martin Morgan
 Maintainer: Sonali Arora <sarora@fhcrc.org>
 Depends: R (>= 3.1)
@@ -14,7 +14,7 @@ Description: The Seqnames package contains data and functions that
         their natural, rather than lexicographic, order.
 License: Artistic-2.0
 biocViews: Genetics, DataRepresentation, Annotation
-Collate: seqnames.R
-        seqnames-helpers.R 
-        makeSeqnameIds.R   
+Collate: seqlevels.R
+        seqlevels-helpers.R 
+        rankSeqlevels.R   
 VignetteBuilder: knitr

@@ -1,17 +1,17 @@
-\name{seqname-helpers}
+\name{GenomeInfoDb-helpers}
 
-\alias{seqname-helpers}
-\alias{supportedStyles}
-\alias{seqnamesOrder}
-\alias{extractSeqnameSet}
-\alias{extractSeqnameSetByGroup}
-\alias{findSequenceRenamingMaps}
-\alias{seqnamesInGroup}
+\alias{GenomeInfoDb-helpers}
+\alias{genomeStyles}
+\alias{orderSeqlevels}
+\alias{extractSeqlevels}
+\alias{extractSeqlevelsByGroup}
+\alias{mapSeqlevels}
+\alias{seqlevelsInGroup}
 
-\alias{seqnameStyle}
-\alias{seqnameStyle,character-method}
-\alias{seqnameStyle<-}
-\alias{seqnameStyle<-,character-method}
+\alias{seqlevelsStyle}
+\alias{seqlevelsStyle,character-method}
+\alias{seqlevelsStyle<-}
+\alias{seqlevelsStyle<-,character-method}
 
 
 \title{
@@ -21,14 +21,14 @@ List the supported seqname styles for all supported organisms
 List the supported seqname styles for all supported organisms
 }
 \usage{
-supportedStyles(species)
-extractSeqnameSet(species, style)
-extractSeqnameSetByGroup(species, style, group)
-seqnamesOrder(seqnames, X.is.sexchrom = NA)
-findSequenceRenamingMaps(seqnames, style, best.only=TRUE, drop=TRUE)
-seqnamesInGroup(seqnames, group, species, style)
-seqnameStyle(x)
-seqnameStyle(x) <- value
+genomeStyles(species)
+extractSeqlevels(species, style)
+extractSeqlevelsByGroup(species, style, group)
+orderSeqlevels(seqnames, X.is.sexchrom = NA)
+mapSeqlevels(seqnames, style, best.only=TRUE, drop=TRUE)
+seqlevelsInGroup(seqnames, group, species, style)
+seqlevelsStyle(x)
+seqlevelsStyle(x) <- value
 
 }
 \arguments{
@@ -66,45 +66,46 @@ seqnameStyle(x) <- value
       setters.}
 }
 \details{
-    \code{supportedStyles}:
+    \code{genomeStyles}:
     Different organizations have different naming conventions for how they
     name the biologically defined sequence elements (usually chromosomes)
     for each organism they support.  The Seqnames package contains a
     database that defines these different conventions.
     
-    supportedStyles() returns the list of all supported seqname mappings, 
+    genomeStyles() returns the list of all supported seqname mappings, 
     one per supported organism. Each mapping is represented as a data frame 
     with 1 column     per seqname style and 1 row per chromosome name 
     (not all chromosomes of a given organism necessarily belong to the mapping).
     
-    supportedStyles(species) returns a data.frame only for the given organism 
+    genomeStyles(species) returns a data.frame only for the given organism 
     with all its supported seqname mappings. 
       
-    \code{extractSeqnameSet}:
+    \code{extractSeqlevels}:
     Extracts the seqnames for a single style and species.
     
-    \code{extractSeqnameSetByGroup}:
+    \code{extractSeqlevelsByGroup}:
     Extracts the seqnames for a single style and species by group. Group can 
     be 'auto' for autosomes, 'sex' for sex chromosomes/allosomes, 'linear' for 
     linear chromosomes. The default is 'all' which returns all the chromosomes. 
     
-    \code{seqnamesOrder}:
+    \code{orderSeqlevels}:
     Attempt to provide the \dQuote{natural} order of seqnames, e.g.,
     \code{chr1}, \code{chr2}, \code{chr3}, \ldots
     
-    \code{findSequenceRenamingMaps}:
+    \code{mapSeqlevels}:
     Returns a matrix with 1 column per supplied sequence name and 1 row
     per sequence renaming map compatible with the specified style.
     If \code{best.only} is \code{TRUE} (the default), only the "best"
     renaming maps (i.e. the rows with less NAs) are returned.
     
-    \code{seqnamesInGroup}:
+    \code{seqlevelsInGroup}:
     It takes a charactervector along with a group and optional style and species
     If group is not specified , it returns "all" or standard/top level seqnames.
     Returns a character vector of seqnames after subsetting for the group 
     specified by the user. See examples for more details.
     
-    \code{seqnameStyle(x)}: finds the seqnameStyle for a given character vector.
+    \code{seqlevelsStyle(x)}: finds the seqlevelsStyle for a given character 
+    vector.
 }
 \value{
   A character list containing character vectors with the names of all
@@ -116,33 +117,33 @@ seqnameStyle(x) <- value
 }
 \examples{
 
-supportedStyles()
-supportedStyles("Homo sapiens")
+genomeStyles()
+genomeStyles("Homo sapiens")
 
 ## List the supported seqname style for the given species and the given style
-extractSeqnameSet(species="Drosophila melanogaster" , style="Ensembl")
+extractSeqlevels(species="Drosophila melanogaster" , style="Ensembl")
 
 ## List all sex chromosomes for Homo sapiens using style UCSC
 ## 3 groups are supported: 'auto' for autosomes, 'sex' for allosomes 
 ## and 'linear' for linear chromosomes  
-extractSeqnameSetByGroup(species="Homo sapiens", style="UCSC", group="sex")
+extractSeqlevelsByGroup(species="Homo sapiens", style="UCSC", group="sex")
 
 ## find whether the seqnames belong to a given group
 newchr <- paste0("chr",c(1:22,"X","Y","M","1_gl000192_random","4_ctg9_hap1"))
-seqnamesInGroup(newchr, group="sex")
+seqlevelsInGroup(newchr, group="sex")
 
 newchr <- as.character(c(1:22,"X","Y","MT"))
-seqnamesInGroup(newchr, group="all","Homo sapiens","NCBI")
+seqlevelsInGroup(newchr, group="all","Homo sapiens","NCBI")
 
 ## find the seqname Style for a given character vector 
-seqnameStyle(paste0("chr",c(1:30)))
+seqlevelsStyle(paste0("chr",c(1:30)))
 
 ## order a character vector of seqnames
 seqnames <- c("chr1","chr9", "chr2", "chr3", "chr10")
-seqnames[seqnamesOrder(seqnames)]
+seqnames[orderSeqlevels(seqnames)]
 
-## find mapped seqnamestyles for exsiting seqnames
-findSequenceRenamingMaps(c("chrII", "chrIII", "chrM"), "NCBI")
-findSequenceRenamingMaps(c("chrII", "chrIII", "chrM"), "Ensembl")
+## find mapped seqlevelsStyles for exsiting seqnames
+mapSeqlevels(c("chrII", "chrIII", "chrM"), "NCBI")
+mapSeqlevels(c("chrII", "chrIII", "chrM"), "Ensembl")
 
 }

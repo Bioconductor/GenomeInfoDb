@@ -1,17 +1,17 @@
-\name{makeSeqnameIds}
+\name{rankSeqlevels}
 
-\alias{makeSeqnameIds}
+\alias{rankSeqlevels}
 
 \title{Assign sequence IDs to sequence names}
 
 \description{
-  \code{makeSeqnameIds} assigns a unique ID to each unique sequence name
+  \code{rankSeqlevels} assigns a unique ID to each unique sequence name
   in the input vector. The returned IDs span 1:N where N is the number of
   unique sequence names in the input vector.
 }
 
 \usage{
-makeSeqnameIds(seqnames, X.is.sexchrom=NA)
+rankSeqlevels(seqnames, X.is.sexchrom=NA)
 }
 
 \arguments{
@@ -20,7 +20,7 @@ makeSeqnameIds(seqnames, X.is.sexchrom=NA)
   }
   \item{X.is.sexchrom}{
     A logical indicating whether X refers to the sexual chromosome 
-    or to chromosome with Roman Numeral X. If \code{NA}, \code{makeSeqnameIds}
+    or to chromosome with Roman Numeral X. If \code{NA}, \code{rankSeqlevels}
     does its best to "guess".
   }
 }
@@ -44,8 +44,8 @@ makeSeqnameIds(seqnames, X.is.sexchrom=NA)
 
 \examples{
 library(BSgenome.Scerevisiae.UCSC.sacCer2)
-makeSeqnameIds(seqnames(Scerevisiae))
-makeSeqnameIds(seqnames(Scerevisiae)[c(1:5,5:1)])
+rankSeqlevels(seqnames(Scerevisiae))
+rankSeqlevels(seqnames(Scerevisiae)[c(1:5,5:1)])
 }
 
 \keyword{manip}

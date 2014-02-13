@@ -1,7 +1,7 @@
-%\VignetteIndexEntry{Seqnames: Submitting your organism to Seqnames}
+%\VignetteIndexEntry{GenomeInfoDb: Submitting your organism to GenomeInfoDb}
 %\VignetteDepends{}
-%\VignetteKeywords{organism, Seqnames}
-%\VignettePackage{Seqnames}
+%\VignetteKeywords{organism, GenomeInfoDb}
+%\VignettePackage{GenomeInfoDb}
 %\VignetteEngine{knitr::knitr}
 \documentclass{article}
 
@@ -9,7 +9,7 @@
 BiocStyle::latex()
 @
 
-\title{Submitting your organism to \Biocpkg{Seqnames}}
+\title{Submitting your organism to \Biocpkg{GenomeInfoDb}}
 \author{Sonali Arora}
 \date{Modified: 16 January, 2013. Compiled: \today}
 
@@ -21,32 +21,32 @@ BiocStyle::latex()
 \tableofcontents
 
 This document is meant for package developers wanting to submit an organism
-which does not already exist in \Biocpkg{Seqnames}, to be a part of 
-\Biocpkg{Seqnames}. 
+which does not already exist in \Biocpkg{GenomeInfoDb}, to be a part of 
+\Biocpkg{GenomeInfoDb}. 
 
 \section{Background}
 
-\Biocpkg{Seqnames} provides a multitude of functions to subset and access 
+\Biocpkg{GenomeInfoDb} provides a multitude of functions to subset and access 
 seqName mappings and styles associated with an organism. One can use 
-the supplementary manual "Seqnames.pdf" to see such functions. Alternately 
+the supplementary manual "GenomeInfoDb.pdf" to see such functions. Alternately 
 if there is no support for an organism for one's choice, one can submit a tab
 delimited file (as detailed by the sections below) to request their favorite
-organism to become a part of Seqnames package.
+organism to become a part of GenomeInfoDb package.
 
 \section{Support for existing organisms}
-Seqnames already provides support for a multitude of organisms, to see a
+GenomeInfoDb already provides support for a multitude of organisms, to see a
 detailed list of organism and the supported seqname styles associated with 
 those organism, one can simply run :
 
 <<verbatim, message=FALSE>>=
-library(Seqnames)
-names(supportedStyles())
+library(GenomeInfoDb)
+names(genomeStyles())
 @
 
 \section{File format for new organism}
 If your favorite organism does not exist in the above list, one can submit 
 a tab-delimited file in the following format and request for your organism
-to be added to \Biocpkg{Seqnames}
+to be added to \Biocpkg{GenomeInfoDb}
 
 \begin{enumerate}
 \item The file name should be in the following format:
@@ -66,7 +66,7 @@ to be added to \Biocpkg{Seqnames}
 \end{enumerate}
 
 \section{Example File}
-One can look at existing organism files under Seqnames/extdata/dataFiles
+One can look at existing organism files under GenomeInfoDb/extdata/dataFiles
 in their R/library to get a further idea about the format of files. 
 
 \end{document}
