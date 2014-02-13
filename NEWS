@@ -62,3 +62,22 @@ SIGNIFICANT USER-VISIBLE CHANGES
      supportedSeqnameStyles -> .supportedSeqnameStyles
      supportedSeqnameMappings -> .supportedSeqnameMappings
      isSupportedSeqnamesStyle -> .isSupportedSeqnamesStyle
+
+CHANGES IN VERSION 0.99.14
+----------------------------------
+SIGNIFICANT USER-VISIBLE CHANGES
+
+   o rename:
+     package: Seqnames --> GenomeInfoDb
+
+     supportedStyles -> genomeStyles
+
+     makeSeqnameIds --> rankSeqlevels   (add to export)
+     seqnamesOrder --> orderSeqlevels
+
+     extractSeqnameSet -> extractSeqlevels
+     extractSeqnameSetByGroup -> extractSeqlevelsByGroup
+     findSequenceRenamingMaps --> mapSeqlevels
+     seqnamesInGroup --> seqlevelsInGroup
+     seqnamesStyle --> seqlevelsStyle
+     "seqnameStyle<-" --> "seqlevelsStyle<-" 
