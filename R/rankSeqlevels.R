@@ -1,5 +1,5 @@
 ### =========================================================================
-### makeSeqnameIds()
+### rankSeqlevels()
 ### -------------------------------------------------------------------------
 ###
 ### Assign a unique ID to each unique sequence name passed in 'seqnames'.
@@ -59,7 +59,7 @@
 ### to 'seq_along(seqlevels(Hsapiens)))'.
 ### TODO: Add unit test for makeSeqnameIds().
 
-makeSeqnameIds <- function(seqnames, X.is.sexchrom=NA)
+rankSeqlevels <- function(seqnames, X.is.sexchrom=NA)
 {
     if (is.character(seqnames))
         seqnames <- factor(seqnames)
@@ -268,3 +268,12 @@ makeSeqnameIds <- function(seqnames, X.is.sexchrom=NA)
     ## Seqname ids.
     seqlevel_ids[as.integer(seqnames)]
 }
+
+
+orderSeqlevels <- 
+  function(seqnames, X.is.sexchrom=NA)
+  {
+    if (missing(seqnames))
+      seqnames <- character()
+    order(makeSeqnameIds(seqnames, X.is.sexchrom))
+  }   

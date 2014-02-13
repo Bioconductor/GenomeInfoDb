@@ -49,14 +49,6 @@ extractSeqnameSetByGroup <-
     result
 }
 
-seqnamesOrder <- 
-    function(seqnames, X.is.sexchrom=NA)
-{
-    if (missing(seqnames))
-        seqnames <- character()
-    order(makeSeqnameIds(seqnames, X.is.sexchrom))
-}   
-
 findSequenceRenamingMaps <- 
     function(seqnames, style, best.only=TRUE, drop=TRUE)
 {

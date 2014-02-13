@@ -1,6 +1,9 @@
 export(
     supportedStyles,
-    seqnamesOrder,
+    
+    orderSeqlevels,
+    rankSeqlevels,
+    
     extractSeqnameSet,
     extractSeqnameSetByGroup,
     findSequenceRenamingMaps,
