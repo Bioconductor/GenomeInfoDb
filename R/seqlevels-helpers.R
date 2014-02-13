@@ -65,7 +65,7 @@
     if (missing(species) || missing(style) || missing(seqnames))
         stop("'species', 'style' or 'seqnames' missing")    
     
-    trueSeq <- extractSeqnameSet(species=species,style=style)
+    trueSeq <- extractSeqlevels(species=species,style=style)
     all(trueSeq %in% seqnames)
 }
 
