@@ -1,7 +1,7 @@
 .getDatadir <-
     function()
 {
-    system.file(package = "Seqnames","extdata","dataFiles")    
+    system.file(package = "GenomeInfoDb","extdata","dataFiles")    
 }        
 
 .getNamedFiles <-
@@ -21,7 +21,7 @@
     if (file.exists(filename)) {
         read.table(filename, header=TRUE, sep="\t", stringsAsFactors=FALSE)
     } else {
-        stop("The species, " ,name, "is not supported by Seqnames.")
+        stop("The species, " ,name, " is not supported by GenomeInfoDb")
     }
     
 }  
@@ -88,7 +88,7 @@
     if (max(unlistgot2) == 0) {
         txt <- "The style does not have a compatible entry for the
     species supported by Seqname. Please see
-    supportedStyles() for supported species/style"
+    genomeStyles() for supported species/style"
         stop(paste(strwrap(txt, exdent=2), collapse="\n"))
     }
     
