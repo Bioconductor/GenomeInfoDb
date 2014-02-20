@@ -1,7 +1,7 @@
 test_basic <- 
     function()
 {
-    filename <- system.file(package="Seqnames",  "extdata",
+    filename <- system.file(package="GenomeInfoDb",  "extdata",
                             "dataFiles", "Homo_sapiens.txt")
     checkTrue(file.exists(filename))
    
