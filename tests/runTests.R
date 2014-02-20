@@ -1,1 +1,1 @@
-BiocGenerics:::testPackage("Seqnames")
+BiocGenerics:::testPackage("GenomeInfoDb")
