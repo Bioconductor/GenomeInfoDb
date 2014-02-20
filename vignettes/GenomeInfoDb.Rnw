@@ -1,7 +1,7 @@
-%\VignetteIndexEntry{Seqnames:Introduction to Seqnames}
+%\VignetteIndexEntry{GenomeInfoDb :Introduction to GenomeInfoDb}
 %\VignetteDepends{}
-%\VignetteKeywords{organism, Seqnames}
-%\VignettePackage{Seqnames}
+%\VignetteKeywords{organism, GenomeInfoDb}
+%\VignettePackage{GenomeInfoDb}
 %\VignetteEngine{knitr::knitr}
 \documentclass{article}
 
