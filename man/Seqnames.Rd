@@ -117,10 +117,12 @@ seqlevelsStyle(x) <- value
 }
 \examples{
 
-genomeStyles()
-genomeStyles("Homo sapiens")
+names(genomeStyles())
+genomeStyles("Homo_sapiens")
+"UCSC" %in% names(genomeStyles("Homo_sapiens"))
 
-## List the supported seqname style for the given species and the given style
+## List the supported seqname style for the given species and the given
+## style
 extractSeqlevels(species="Drosophila melanogaster" , style="Ensembl")
 
 ## List all sex chromosomes for Homo sapiens using style UCSC
@@ -129,7 +131,7 @@ extractSeqlevels(species="Drosophila melanogaster" , style="Ensembl")
 extractSeqlevelsByGroup(species="Homo sapiens", style="UCSC", group="sex")
 
 ## find whether the seqnames belong to a given group
-newchr <- paste0("chr",c(1:22,"X","Y","M","1_gl000192_random","4_ctg9_hap1"))
+newchr <- paste0("chr",c(1:22,"X","Y","M","1_gl000192_random","4_ctg9"))
 seqlevelsInGroup(newchr, group="sex")
 
 newchr <- as.character(c(1:22,"X","Y","MT"))
@@ -141,6 +143,7 @@ seqlevelsStyle(paste0("chr",c(1:30)))
 ## order a character vector of seqnames
 seqnames <- c("chr1","chr9", "chr2", "chr3", "chr10")
 seqnames[orderSeqlevels(seqnames)]
+all(seqnames %in% extractSeqlevels("Homo_sapiens", "UCSC"))
 
 ## find mapped seqlevelsStyles for exsiting seqnames
 mapSeqlevels(c("chrII", "chrIII", "chrM"), "NCBI")
