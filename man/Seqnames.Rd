@@ -143,7 +143,7 @@ seqlevelsStyle(paste0("chr",c(1:30)))
 ## order a character vector of seqnames
 seqnames <- c("chr1","chr9", "chr2", "chr3", "chr10")
 seqnames[orderSeqlevels(seqnames)]
-all(seqnames %in% extractSeqlevels("Homo_sapiens", "UCSC"))
+all(seqnames \%in\% extractSeqlevels("Homo_sapiens", "UCSC"))
 
 ## find mapped seqlevelsStyles for exsiting seqnames
 mapSeqlevels(c("chrII", "chrIII", "chrM"), "NCBI")
