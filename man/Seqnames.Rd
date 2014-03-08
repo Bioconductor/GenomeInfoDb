@@ -123,19 +123,19 @@ genomeStyles("Homo_sapiens")
 
 ## List the supported seqname style for the given species and the given
 ## style
-extractSeqlevels(species="Drosophila melanogaster" , style="Ensembl")
+extractSeqlevels(species="Drosophila_melanogaster" , style="Ensembl")
 
 ## List all sex chromosomes for Homo sapiens using style UCSC
 ## 3 groups are supported: 'auto' for autosomes, 'sex' for allosomes 
 ## and 'linear' for linear chromosomes  
-extractSeqlevelsByGroup(species="Homo sapiens", style="UCSC", group="sex")
+extractSeqlevelsByGroup(species="Homo_sapiens", style="UCSC", group="sex")
 
 ## find whether the seqnames belong to a given group
 newchr <- paste0("chr",c(1:22,"X","Y","M","1_gl000192_random","4_ctg9"))
 seqlevelsInGroup(newchr, group="sex")
 
 newchr <- as.character(c(1:22,"X","Y","MT"))
-seqlevelsInGroup(newchr, group="all","Homo sapiens","NCBI")
+seqlevelsInGroup(newchr, group="all","Homo_sapiens","NCBI")
 
 ## find the seqname Style for a given character vector 
 seqlevelsStyle(paste0("chr",c(1:30)))
@@ -143,7 +143,10 @@ seqlevelsStyle(paste0("chr",c(1:30)))
 ## order a character vector of seqnames
 seqnames <- c("chr1","chr9", "chr2", "chr3", "chr10")
 seqnames[orderSeqlevels(seqnames)]
-all(seqnames \%in\% extractSeqlevels("Homo_sapiens", "UCSC"))
+
+## if we have a vector conatining seqnames and we want to verify the
+## species and style for them , we can use:
+all(seqnames %in% extractSeqlevels("Homo_sapiens", "UCSC"))
 
 ## find mapped seqlevelsStyles for exsiting seqnames
 mapSeqlevels(c("chrII", "chrIII", "chrM"), "NCBI")
