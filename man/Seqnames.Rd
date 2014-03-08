@@ -146,7 +146,7 @@ seqnames[orderSeqlevels(seqnames)]
 
 ## if we have a vector conatining seqnames and we want to verify the
 ## species and style for them , we can use:
-all(seqnames %in% extractSeqlevels("Homo_sapiens", "UCSC"))
+all(seqnames \%in\% extractSeqlevels("Homo_sapiens", "UCSC"))
 
 ## find mapped seqlevelsStyles for exsiting seqnames
 mapSeqlevels(c("chrII", "chrIII", "chrM"), "NCBI")
