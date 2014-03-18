@@ -92,11 +92,25 @@
         stop(paste(strwrap(txt, exdent=2), collapse="\n"))
     }
     
+    vec <- names(which( unlistgot2 == max(unlistgot2) )) 
+    
+    if(length(vec)>1)
+    {
+      txt <- paste0( "The style specified is matched across
+                     multiple species. Evaluate each seqlevel separately
+                     using sapply(seqnames,seqlevelStyles)")
+      stop(paste(strwrap(txt, exdent=2), collapse="\n"))
+    }
+    .splitname(vec)
+}     
+
+.splitname <- 
+  function(vec)
+{
     ##vec is in format "Homo_sapiens.UCSC"
-    vec <- names(which.max(unlistgot2))  
     species <- sub("_", " ",unlist(strsplit(vec,"[.]")),fixed=TRUE)[[1]]
-    style <- unlist(strsplit(vec,"[.]"))[[2]]      
-    c(species,style)
-}        
+    style <- unlist(strsplit(vec,"[.]"))[[2]] 
+    c( species,style)
+}
 
 

@@ -119,7 +119,7 @@ seqlevelsStyle(x) <- value
 
 names(genomeStyles())
 genomeStyles("Homo_sapiens")
-"UCSC" %in% names(genomeStyles("Homo_sapiens"))
+"UCSC" \%in\% names(genomeStyles("Homo_sapiens"))
 
 ## List the supported seqname style for the given species and the given
 ## style
