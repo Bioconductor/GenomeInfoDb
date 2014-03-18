@@ -2,12 +2,11 @@
 
 \alias{GenomeInfoDb-helpers}
 \alias{genomeStyles}
-\alias{orderSeqlevels}
 \alias{extractSeqlevels}
 \alias{extractSeqlevelsByGroup}
+\alias{orderSeqlevels}
 \alias{mapSeqlevels}
 \alias{seqlevelsInGroup}
-
 \alias{seqlevelsStyle}
 \alias{seqlevelsStyle,character-method}
 \alias{seqlevelsStyle<-}
@@ -65,6 +64,25 @@ seqlevelsStyle(x) <- value
       A vector containing the sequence information to store for the other
       setters.}
 }
+\value{
+  For \code{extractSeqlevels} , \code{extractSeqlevelsByGroup} and 
+  \code{seqlevelsInGroup} returns a character vector of seqlevels 
+  for given supported species and group.
+    
+  For \code{mapSeqlevels} returns a matrix with 1 column per supplied sequence 
+  name and 1 row per sequence renaming map compatible with the specified style
+  
+  For \code{seqlevelsStyle} returns a character containing the style of the
+  seqlevels supplied. 
+  
+  For \code{genomeStyle} : If species is specified returns a data.frame 
+  containg the seqlevel style and its mapping for a given organism. If species
+  is not specified, a list is returned with one list per species containing
+  the seqlevel style with the corresponding mappings.
+  
+  For \code{orderSeqlevels} returns an integer vector with indices of seqlevels
+  in their natural order. 
+}
 \details{
     \code{genomeStyles}:
     Different organizations have different naming conventions for how they
@@ -81,16 +99,17 @@ seqlevelsStyle(x) <- value
     with all its supported seqname mappings. 
       
     \code{extractSeqlevels}:
-    Extracts the seqnames for a single style and species.
+    Returns a character vector of the seqnames for a single style and species.
     
     \code{extractSeqlevelsByGroup}:
-    Extracts the seqnames for a single style and species by group. Group can 
-    be 'auto' for autosomes, 'sex' for sex chromosomes/allosomes, 'linear' for 
-    linear chromosomes. The default is 'all' which returns all the chromosomes. 
+    Returns a character vector of the seqnames for a single style and species 
+    by group. Group can be 'auto' for autosomes, 'sex' for sex chromosomes/
+    allosomes, 'linear' for linear chromosomes. The default is 'all' which 
+    returns all the chromosomes. 
     
     \code{orderSeqlevels}:
-    Attempt to provide the \dQuote{natural} order of seqnames, e.g.,
-    \code{chr1}, \code{chr2}, \code{chr3}, \ldots
+    Returns an integer vector while attempting to provide the \dQuote{natural} 
+    order of seqnames, e.g.,\code{chr1}, \code{chr2}, \code{chr3}, \ldots
     
     \code{mapSeqlevels}:
     Returns a matrix with 1 column per supplied sequence name and 1 row
@@ -99,18 +118,14 @@ seqlevelsStyle(x) <- value
     renaming maps (i.e. the rows with less NAs) are returned.
     
     \code{seqlevelsInGroup}:
-    It takes a charactervector along with a group and optional style and species
-    If group is not specified , it returns "all" or standard/top level seqnames.
+    It takes a character vector along with a group and optional style and 
+    species.If group is not specified , it returns "all" or standard/top level 
+    seqnames.
     Returns a character vector of seqnames after subsetting for the group 
     specified by the user. See examples for more details.
     
     \code{seqlevelsStyle(x)}: finds the seqlevelsStyle for a given character 
     vector.
-}
-\value{
-  A character list containing character vectors with the names of all
-  seqname styles for each supported species.  The names of the list
-  are the species names for each supported organism.
 }
 \author{
     H. Pages, Marc Carlson, Sonali Arora \email{sarora@fhcrc.org}

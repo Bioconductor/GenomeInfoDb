@@ -46,6 +46,11 @@ rankSeqlevels(seqnames, X.is.sexchrom=NA)
 library(BSgenome.Scerevisiae.UCSC.sacCer2)
 rankSeqlevels(seqnames(Scerevisiae))
 rankSeqlevels(seqnames(Scerevisiae)[c(1:5,5:1)])
+
+newchr <- paste0("chr",c(1:3,6:15,4:5,16:22))
+newchr
+orderSeqlevels(newchr)
+rankSeqlevels(newchr)
 }
 
 \keyword{manip}
