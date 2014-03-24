@@ -128,7 +128,8 @@ seqlevelsStyle(x) <- value
     vector.
 }
 \author{
-    H. Pages, Marc Carlson, Sonali Arora \email{sarora@fhcrc.org}
+    Sonali Arora \email{sarora@fhcrc.org}, Martin Morgan , Marc Carlson, 
+    H. Pages
 }
 \examples{
 

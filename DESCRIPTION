@@ -1,8 +1,8 @@
 Package: GenomeInfoDb
 Type: Package
 Title: Utilities for manipulating chromosome and other 'seqname' identifiers
-Version: 0.99.23
-Author: Sonali Arora, H. Pages,  Marc Carlson, Martin Morgan
+Version: 0.99.24
+Author:  Sonali Arora, Martin Morgan, Marc Carlson, H. Pages
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 Depends: R (>= 3.1)
 Suggests: RUnit, BiocGenerics, BiocStyle, knitr,
