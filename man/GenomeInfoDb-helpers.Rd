@@ -59,7 +59,7 @@ seqlevelsStyle(x) <- value
    \item{x}{
       The object from/on which to get/set the sequence information.}
    \item{value}{
-      A character vector that sets the seqnameStyle for \code{x}.}
+      A single character string that sets the seqnameStyle for \code{x}.}
 }
 \value{
   For \code{extractSeqlevels} , \code{extractSeqlevelsByGroup} and 
@@ -69,11 +69,10 @@ seqlevelsStyle(x) <- value
   For \code{mapSeqlevels} returns a matrix with 1 column per supplied sequence 
   name and 1 row per sequence renaming map compatible with the specified style
   
-  For \code{seqlevelsStyle} returns a character containing the style of the
-  seqlevels supplied. Note that this information is not stored in \code{x}
-   but inferred by looking up a seqlevel style database stored inside
-   GenomeInfoDb.
-
+  For \code{seqlevelsStyle} returns a single character string containing the 
+  style of the seqlevels supplied. Note that this information is not stored in 
+  \code{x} but inferred by looking up a seqlevel style database stored inside
+  GenomeInfoDb.
   
   For \code{genomeStyle} : If species is specified returns a data.frame 
   containg the seqlevel style and its mapping for a given organism. If species
