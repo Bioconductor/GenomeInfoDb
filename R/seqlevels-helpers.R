@@ -56,7 +56,7 @@
     possible <- lapply(.getNamedFiles(), scan, nlines=1, what=character(),
                        quiet=TRUE)
     availStyles <- possible[[species]]
-    style %in% availStyles
+    style %in% availStyles[-which(availStyles %in% c("linear","auto","sex"))]
 }
 
 .isSupportedSeqnames <- 

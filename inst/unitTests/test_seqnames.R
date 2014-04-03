@@ -54,6 +54,7 @@ test_extractSeqlevelsByGroup <-
     
     checkException(extractSeqlevelsByGroup("aaa","Homo sapiens"))
     checkException(extractSeqlevelsByGroup("Drosophila melanogaster"))
+    checkException(extractSeqlevelsByGroup("Homo sapiens","auto","NCBI"))
 }
 
 test_seqlevelsInGroup <-
