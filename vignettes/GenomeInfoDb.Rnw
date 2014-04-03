@@ -149,4 +149,45 @@ mapSeqlevels(c("chrII", "chrIII", "chrM"), "NCBI")
 @ 
 %%
 
+\section{Examples}
+
+\subsection{converting seqlevel styles (eg:UCSC to NCBI)}
+
+Suppose we read in a Bam file or a BED file and the resulting GRanges have a lot
+of seqlevels which are not required by your analysis or you want to rename
+the seqlevels from the current style to your own style (eg:USCS to NCBI), we can 
+use the functionality provided by GenomeInfoDb to do that.
+<<sequence-eg-1,echo=FALSE>>=
+sequence <- c(paste0("chr",c(1, 10 ,11,12,13,14,15,16,17,
+  "17_gl000205_random", 18, 19,"19_gl000208_random", "1_gl000192_random",
+  2,20,21,22,3,4,5,6,7,"7_gl000195_random", 8,9, "9_gl000199_random",
+  "M", "Un_gl000212","Un_gl000216","Un_gl000219", "Un_gl000224",
+  "Un_gl000225","Un_gl000226" ,"Un_gl000229","Un_gl000231",
+ "Un_gl000241","X","Y")))
+@
+Let us say that we have extracted the seqlevels of the Seqinfo object(say 
+GRanges from a BED file) in "sequence". 
+<<sequence, eval=FALSE>>=
+sequence <- seqlevels(x) 
+@
+
+<<sequence-show>>=
+sequence
+@
+
+sequence is in UCSC format and we want NCBI style , we can use:
+
+<<mapSeqlevels-example>>=
+newStyle <- mapSeqlevels(sequence,"NCBI")
+newStyle
+@
+We can then remove the NA's and this named character vector can be used to 
+subset our Granges object to get only GRanges including chrmosomes from 
+1:22,X,Y and M
+
+<<keepSeqlevels, eval=FALSE>>=
+newStyle <- newStyle[complete.cases(newStyle)] # removing NA cases.
+keepSeqlevels(x, newStyle)
+@
+
 \end{document}
