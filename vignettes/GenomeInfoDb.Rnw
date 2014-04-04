@@ -160,7 +160,7 @@ seqlevels in UCSC style, we want to convert them to NCBI
 <<quick-style>>=
 txdb <- TxDb.Dmelanogaster.UCSC.dm3.ensGene
 seqlevels(txdb)
-genomeStyles("Drosophila Melanogaster")
+genomeStyles("Drosophila melanogaster")
 mapSeqlevels(seqlevels(txdb), "NCBI")
 @
 
