@@ -1,12 +1,14 @@
 Package: GenomeInfoDb
 Type: Package
 Title: Utilities for manipulating chromosome and other 'seqname' identifiers
-Version: 0.99.30
+Version: 0.99.31
 Author:  Sonali Arora, Martin Morgan, Marc Carlson, H. Pages
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 Depends: R (>= 3.1)
-Suggests: RUnit, BiocGenerics, BiocStyle, knitr,
-        BSgenome.Scerevisiae.UCSC.sacCer2, TxDb.Dmelanogaster.UCSC.dm3.ensGene
+Suggests: BiocGenerics, IRanges,
+        BSgenome.Scerevisiae.UCSC.sacCer2,
+        TxDb.Dmelanogaster.UCSC.dm3.ensGene,
+        RUnit, BiocStyle, knitr
 Description: The Seqnames package contains data and functions that
         define and allow translation between different chromosome
         sequence naming conventions (e.g., "chr1" versus "1"),
@@ -14,7 +16,8 @@ Description: The Seqnames package contains data and functions that
         their natural, rather than lexicographic, order.
 License: Artistic-2.0
 biocViews: Genetics, DataRepresentation, Annotation
-Collate: seqlevels.R
+Collate: utils.R
+        seqlevels.R
         seqlevels-helpers.R 
         rankSeqlevels.R   
 VignetteBuilder: knitr
