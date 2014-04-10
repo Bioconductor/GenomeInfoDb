@@ -106,7 +106,7 @@
 ###   (a) a RefSeq Assembly ID (e.g. "GCF_000001405.26"), in which case it's
 ###       returned as is;
 ###   (b) a GenBank Assembly ID (e.g. "GCA_000001405.15");
-###   (c) an assembly name (e.g. "GRCh38").
+###   (c) an NCBI assembly name (e.g. "GRCh38").
 .lookup_refseq_assembly_id <- function(assembly)
 {
     if (!.isSingleString(assembly))
@@ -220,19 +220,24 @@ fetch_GenBankAccn2seqlevel_for_GRCh38 <- function()
     ans
 }
 
-fetch_GenBankAccn2seqlevel_for_hg38 <- function(GRCh38_accn2seqlevel)
+.fetch_chrominfo_for_hg38 <- function()
 {
-    suppressMessages(require(IRanges, quietly=TRUE))  # for elementLengths()
     hg38_chrominfo_url <- paste(
         "http://hgdownload.soe.ucsc.edu/goldenPath",
         "hg38/database/chromInfo.txt.gz", sep="/")
     destfile <- tempfile()
     download.file(hg38_chrominfo_url, destfile, quiet=TRUE)
     colnames <- c("chrom", "size", "fileName")
-    chrominfo <- read.table(destfile, sep="\t", quote="",
-                            col.names=colnames, comment.char="",
-                            stringsAsFactors=FALSE)
-    hg38_seqlevels <- chrominfo$chrom
+    read.table(destfile, sep="\t", quote="",
+                         col.names=colnames, comment.char="",
+                         stringsAsFactors=FALSE)
+}
+
+.make_GenBankAccn2seqlevel_for_hg38 <- function(hg38_chrominfo,
+                                                GRCh38_accn2seqlevel)
+{
+    suppressMessages(require(IRanges, quietly=TRUE))  # for elementLengths()
+    hg38_seqlevels <- hg38_chrominfo$chrom
     tmp <- lapply(names(GRCh38_accn2seqlevel), grep, hg38_seqlevels)
     idx1 <- which(elementLengths(tmp) == 1L)
     tmp[idx1] <- as.list(hg38_seqlevels[unlist(tmp[idx1], use.names=FALSE)])
@@ -247,14 +252,53 @@ fetch_GenBankAccn2seqlevel_for_hg38 <- function(GRCh38_accn2seqlevel)
     ans
 }
 
-fetch_GRCh38_hg38_seqlevels <- function()
+fetch_seq_dict_for_hg38 <- function()
 {
     GRCh38_accn2seqlevel <- fetch_GenBankAccn2seqlevel_for_GRCh38()
-    hg38_accn2seqlevel <-
-        fetch_GenBankAccn2seqlevel_for_hg38(GRCh38_accn2seqlevel)
+    hg38_chrominfo <- .fetch_chrominfo_for_hg38()
+    hg38_accn2seqlevel <- .make_GenBankAccn2seqlevel_for_hg38(
+                              hg38_chrominfo,
+                              GRCh38_accn2seqlevel)
+    GRCh38_seqlevels <- unname(GRCh38_accn2seqlevel)
+    hg38_seqlevels <- unname(hg38_accn2seqlevel)
+    seqlengths <- hg38_chrominfo$size[match(hg38_seqlevels,
+                                            hg38_chrominfo$chrom)]
     data.frame(accn=names(GRCh38_accn2seqlevel),
-               GRCh38_seqlevel=unname(GRCh38_accn2seqlevel),
-               hg38_seqlevel=unname(hg38_accn2seqlevel),
+               GRCh38_seqlevels=GRCh38_seqlevels,
+               hg38_seqlevels=hg38_seqlevels,
+               seqlengths=seqlengths,
                stringsAsFactors=FALSE)
+}
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### fetchSequenceDictionary()
+###
+
+.SEQUENCE_DICTIONARIES <- list(
+    hg38=list(fetch_seq_dict_for_hg38, "GCF_000001405.26")
+    ## more to come...
+)
+
+### Only supports UCSC assemblies. However 'assembly' can be:
+###   (a) a RefSeq Assembly ID (e.g. "GCF_000001405.26");
+###   (b) a GenBank Assembly ID (e.g. "GCA_000001405.15");
+###   (c) an NCBI assembly name (e.g. "GRCh38");
+###   (d) a UCSC assembly name (e.g. "hg38").
+fetchSequenceDictionary <- function(assembly)
+{
+    if (!.isSingleString(assembly))
+        stop("'assembly' must be a single string")
+    idx <- match(assembly, names(.SEQUENCE_DICTIONARIES))
+    if (is.na(idx)) {
+        refseq_assembly_ids <- sapply(.SEQUENCE_DICTIONARIES, `[[`, 2L,
+                                      USE.NAMES=FALSE)
+        refseq_assembly_id <- .lookup_refseq_assembly_id(assembly)
+        if (is.na(refseq_assembly_id) ||
+            is.na(idx <- match(refseq_assembly_id, refseq_assembly_ids)))
+            stop("assembly \"", assembly, "\" is not supported")
+    }
+    FUN <- .SEQUENCE_DICTIONARIES[[idx]][[1L]]
+    FUN()
 }
 
