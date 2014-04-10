@@ -4,67 +4,94 @@
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### .fetch_seq_dict_for_hg38()
+### Some low-level helpers.
 ###
 
-fetch_GenBankAccn2seqlevel_for_GRCh38 <- function()
+### Used in BSgenome!
+fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
 {
-    NCBI_assembly_report <- fetch_assembly_report("GCF_000001405.26")
-    GenBank_accn <- NCBI_assembly_report[[5L]]
-    stopifnot(!any(duplicated(GenBank_accn)))
-    ans <- NCBI_assembly_report[[1L]]
+    assembly_report <- fetch_assembly_report(assembly)
+    if (!is.null(AssemblyUnits)) {
+        stopifnot(all(AssemblyUnits %in% assembly_report$AssemblyUnit))
+        idx <- which(assembly_report$AssemblyUnit %in% AssemblyUnits)
+        assembly_report <- assembly_report[idx, , drop=FALSE]
+    }
+    GenBank_accn <- assembly_report[["GenBankAccn"]]
+    stopifnot(anyDuplicated(GenBank_accn) == 0L)
+    ans <- assembly_report[["SequenceName"]]
     names(ans) <- GenBank_accn
     ans
 }
 
-.fetch_chrominfo_for_hg38 <- function()
+### Use this in GenomicFeatures/R/makeTranscriptDbFromUCSC.R instead of
+### internal utility .downloadChromInfoFromUCSC().
+fetch_ChromInfo_from_UCSC <- function(genome,
+        goldenPath_url="http://hgdownload.cse.ucsc.edu/goldenPath")
 {
-    hg38_chrominfo_url <- paste(
-        "http://hgdownload.soe.ucsc.edu/goldenPath",
-        "hg38/database/chromInfo.txt.gz", sep="/")
+    url <- paste(goldenPath_url, genome, "database/chromInfo.txt.gz", sep="/")
     destfile <- tempfile()
-    download.file(hg38_chrominfo_url, destfile, quiet=TRUE)
+    download.file(url, destfile, quiet=TRUE)
     colnames <- c("chrom", "size", "fileName")
     read.table(destfile, sep="\t", quote="",
                          col.names=colnames, comment.char="",
                          stringsAsFactors=FALSE)
 }
 
-.make_GenBankAccn2seqlevel_for_hg38 <- function(hg38_chrominfo,
-                                                GRCh38_accn2seqlevel)
+### WARNING! Using this for hg18 will assign the *wrong* GenBank accession
+### number to chrM!
+.assign_GenBankAccns_to_UCSCseqlevels <- function(UCSC_seqlevels,
+                                                  NCBI_accn2seqlevel)
 {
     suppressMessages(require(IRanges, quietly=TRUE))  # for elementLengths()
-    hg38_seqlevels <- hg38_chrominfo$chrom
-    tmp <- lapply(names(GRCh38_accn2seqlevel), grep, hg38_seqlevels)
-    idx1 <- which(elementLengths(tmp) == 1L)
-    tmp[idx1] <- as.list(hg38_seqlevels[unlist(tmp[idx1], use.names=FALSE)])
-    NCBI_main_chromosomes <- c(1:22, "X", "Y", "MT")
-    UCSC_main_chromosomes <- paste0("chr", c(1:22, "X", "Y", "M"))
-    idx0 <- which(elementLengths(tmp) == 0L)
-    stopifnot(all(GRCh38_accn2seqlevel[idx0] == NCBI_main_chromosomes))
-    tmp[idx0] <- as.list(UCSC_main_chromosomes)
-    stopifnot(all(elementLengths(tmp) == 1L))
-    ans <- unlist(tmp, use.names=FALSE)
-    names(ans) <- names(GRCh38_accn2seqlevel)
-    ans
-}
+    ans <- rep.int(NA_character_, length(UCSC_seqlevels))
 
-.fetch_seq_dict_for_hg38 <- function()
-{
-    GRCh38_accn2seqlevel <- fetch_GenBankAccn2seqlevel_for_GRCh38()
-    hg38_chrominfo <- .fetch_chrominfo_for_hg38()
-    hg38_accn2seqlevel <- .make_GenBankAccn2seqlevel_for_hg38(
-                              hg38_chrominfo,
-                              GRCh38_accn2seqlevel)
-    GRCh38_seqlevels <- unname(GRCh38_accn2seqlevel)
-    hg38_seqlevels <- unname(hg38_accn2seqlevel)
-    seqlengths <- hg38_chrominfo$size[match(hg38_seqlevels,
-                                            hg38_chrominfo$chrom)]
-    data.frame(accn=names(GRCh38_accn2seqlevel),
-               GRCh38_seqlevels=GRCh38_seqlevels,
-               hg38_seqlevels=hg38_seqlevels,
-               seqlengths=seqlengths,
-               stringsAsFactors=FALSE)
+    ## 1. We assign based on exact matching of the sequence names (after
+    ##    removal of the "chr" prefix).
+    nochr_prefix_seqlevels <- sub("^chr", "", UCSC_seqlevels)
+    m <- match(nochr_prefix_seqlevels, NCBI_accn2seqlevel)
+    ok_idx <- which(!is.na(m))
+    ans[ok_idx] <- names(NCBI_accn2seqlevel)[m[ok_idx]]
+    if (length(ok_idx) == length(ans))
+        return(ans)
+
+    ## 2. We assign based on the number embedded in the UCSC chromosome name.
+    not_ok_idx <- which(is.na(ans))
+    split_seqlevels <- strsplit(UCSC_seqlevels[not_ok_idx], "_")
+    nparts <- elementLengths(split_seqlevels)
+    idx2 <- which(nparts >= 2L)
+    ans[not_ok_idx[idx2]] <- sapply(idx2,
+        function(i2) {
+            part2 <- split_seqlevels[[i2]][2L]
+            part2 <- sub("v", ".", part2, fixed=TRUE)
+            accn <- grep(part2, names(NCBI_accn2seqlevel),
+                         value=TRUE, fixed=TRUE)
+            if (length(accn) >= 2L)
+                stop("cannot assign a GenBank accession number to ",
+                     UCSC_seqlevels[not_ok_idx[i2]])
+            if (length(accn) == 0L)
+                return(NA_character_)
+            accn
+        })
+    not_ok_idx <- which(is.na(ans))
+    if (length(not_ok_idx) == 0L)
+        return(ans)
+
+    ## 3. Handle common sequence renamings.
+    common_renamings <- c(
+        chrM="MT"
+        ## add more common renamings...
+    )
+    m <- match(names(common_renamings), UCSC_seqlevels)
+    ok_idx <- which(!is.na(m))
+    m2 <- match(common_renamings[ok_idx], NCBI_accn2seqlevel)
+    ans[m[ok_idx]] <- names(NCBI_accn2seqlevel)[m2]
+    not_ok_idx <- which(is.na(ans))
+    if (length(not_ok_idx) == 0L)
+        return(ans)
+
+    ## 4. Fail.
+    stop("failed to assign a GenBank accession number to: ",
+         paste(UCSC_seqlevels[not_ok_idx], sep=", "))
 }
 
 
@@ -72,8 +99,57 @@ fetch_GenBankAccn2seqlevel_for_GRCh38 <- function()
 ### fetchSequenceDictionary()
 ###
 
+.fetch_seq_dict_for_hg38 <- function()
+{
+    GRCh38_accn2seqlevel <- fetch_GenBankAccn2seqlevel_from_NCBI(
+                                "GCF_000001405.26")
+    hg38_chrominfo <- fetch_ChromInfo_from_UCSC("hg38")
+    hg38_seqlevels <- hg38_chrominfo$chrom
+    stopifnot(length(hg38_seqlevels) == length(GRCh38_accn2seqlevel))
+    hg38_accns <- .assign_GenBankAccns_to_UCSCseqlevels(
+                                hg38_seqlevels,
+                                GRCh38_accn2seqlevel)
+    stopifnot(anyDuplicated(hg38_accns) == 0L)
+
+    GRCh38_seqlevels <- unname(GRCh38_accn2seqlevel[hg38_accns])
+    seqlengths <- hg38_chrominfo$size[match(hg38_seqlevels,
+                                            hg38_chrominfo$chrom)]
+    data.frame(accn=hg38_accns,
+               GRCh38_seqlevels=GRCh38_seqlevels,
+               hg38_seqlevels=hg38_seqlevels,
+               seqlengths=seqlengths,
+               stringsAsFactors=FALSE)
+}
+
+.fetch_seq_dict_for_mm10 <- function()
+{
+    GRCm38_accn2seqlevel <- fetch_GenBankAccn2seqlevel_from_NCBI(
+                                "GCF_000001635.20",
+                                AssemblyUnits=c("C57BL/6J", "non-nuclear"))
+    mm10_chrominfo <- fetch_ChromInfo_from_UCSC("mm10")
+    mm10_seqlevels <- mm10_chrominfo$chrom
+    stopifnot(length(mm10_seqlevels) == length(GRCm38_accn2seqlevel))
+    mm10_accns <- .assign_GenBankAccns_to_UCSCseqlevels(
+                                mm10_seqlevels,
+                                GRCm38_accn2seqlevel)
+    stopifnot(anyDuplicated(names(mm10_seqlevels)) == 0L)
+
+    GRCm38_seqlevels <- unname(GRCm38_accn2seqlevel[mm10_accns])
+    seqlengths <- mm10_chrominfo$size[match(mm10_seqlevels,
+                                            mm10_chrominfo$chrom)]
+    data.frame(accn=mm10_accns,
+               GRCm38_seqlevels=GRCm38_seqlevels,
+               mm10_seqlevels=mm10_seqlevels,
+               seqlengths=seqlengths,
+               stringsAsFactors=FALSE)
+}
+
 .SEQUENCE_DICTIONARIES <- list(
-    hg38=list(.fetch_seq_dict_for_hg38, "GCF_000001405.26")
+    hg38=list(FUN=.fetch_seq_dict_for_hg38,
+              refseq_assembly_id="GCF_000001405.26"),
+    mm10=list(FUN=.fetch_seq_dict_for_mm10,
+              refseq_assembly_id="GCF_000001635.20",
+              AssemblyUnits=c("C57BL/6J", "non-nuclear"))
     ## more to come...
 )
 
@@ -82,7 +158,8 @@ fetch_GenBankAccn2seqlevel_for_GRCh38 <- function()
     refseq_assembly_id <- lookup_refseq_assembly_id(assembly)
     if (is.na(refseq_assembly_id))
         return(NA_integer_)
-    refseq_assembly_ids <- sapply(.SEQUENCE_DICTIONARIES, `[[`, 2L,
+    refseq_assembly_ids <- sapply(.SEQUENCE_DICTIONARIES,
+                                  `[[`, "refseq_assembly_id",
                                   USE.NAMES=FALSE)
     match(refseq_assembly_id, refseq_assembly_ids)
 }
@@ -102,7 +179,7 @@ fetchSequenceDictionary <- function(assembly)
         if (is.na(idx))
             stop("assembly \"", assembly, "\" is not supported")
     }
-    FUN <- .SEQUENCE_DICTIONARIES[[idx]][[1L]]
+    FUN <- .SEQUENCE_DICTIONARIES[[idx]][["FUN"]]
     FUN()
 }
 
