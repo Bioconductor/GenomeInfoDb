@@ -17,6 +17,7 @@ Description: The Seqnames package contains data and functions that
 License: Artistic-2.0
 biocViews: Genetics, DataRepresentation, Annotation
 Collate: assembly-utils.R
+        fetchSequenceDictionary.R
         seqlevels.R
         seqlevels-helpers.R 
         rankSeqlevels.R   
