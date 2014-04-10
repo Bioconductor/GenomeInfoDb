@@ -1,11 +1,25 @@
 ### =========================================================================
-### fetchSequenceDictionary()
+### fetchExtendedChromInfoFromUCSC()
 ### -------------------------------------------------------------------------
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Some low-level helpers.
 ###
+
+### Use this in GenomicFeatures/R/makeTranscriptDbFromUCSC.R instead of
+### internal utility .downloadChromInfoFromUCSC().
+fetch_ChromInfo_from_UCSC <- function(genome,
+        goldenPath_url="http://hgdownload.cse.ucsc.edu/goldenPath")
+{
+    url <- paste(goldenPath_url, genome, "database/chromInfo.txt.gz", sep="/")
+    destfile <- tempfile()
+    download.file(url, destfile, quiet=TRUE)
+    colnames <- c("chrom", "size", "fileName")
+    read.table(destfile, sep="\t", quote="",
+                         col.names=colnames, comment.char="",
+                         stringsAsFactors=FALSE)
+}
 
 ### Used in BSgenome!
 fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
@@ -21,20 +35,6 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
     ans <- assembly_report[["SequenceName"]]
     names(ans) <- GenBank_accn
     ans
-}
-
-### Use this in GenomicFeatures/R/makeTranscriptDbFromUCSC.R instead of
-### internal utility .downloadChromInfoFromUCSC().
-fetch_ChromInfo_from_UCSC <- function(genome,
-        goldenPath_url="http://hgdownload.cse.ucsc.edu/goldenPath")
-{
-    url <- paste(goldenPath_url, genome, "database/chromInfo.txt.gz", sep="/")
-    destfile <- tempfile()
-    download.file(url, destfile, quiet=TRUE)
-    colnames <- c("chrom", "size", "fileName")
-    read.table(destfile, sep="\t", quote="",
-                         col.names=colnames, comment.char="",
-                         stringsAsFactors=FALSE)
 }
 
 ### WARNING! Using this for hg18 will assign the *wrong* GenBank accession
@@ -91,95 +91,90 @@ fetch_ChromInfo_from_UCSC <- function(genome,
 
     ## 4. Fail.
     stop("failed to assign a GenBank accession number to: ",
-         paste(UCSC_seqlevels[not_ok_idx], sep=", "))
+         paste(UCSC_seqlevels[not_ok_idx], collapse=", "))
 }
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### fetchSequenceDictionary()
+### fetchExtendedChromInfoFromUCSC()
 ###
 
-.fetch_seq_dict_for_hg38 <- function()
+.standard_fetch_extended_ChromInfo_from_UCSC <- function(genome,
+                                                         refseq_assembly_id,
+                                                         AssemblyUnits,
+                                                         goldenPath_url)
 {
-    GRCh38_accn2seqlevel <- fetch_GenBankAccn2seqlevel_from_NCBI(
-                                "GCF_000001405.26")
-    hg38_chrominfo <- fetch_ChromInfo_from_UCSC("hg38")
-    hg38_seqlevels <- hg38_chrominfo$chrom
-    stopifnot(length(hg38_seqlevels) == length(GRCh38_accn2seqlevel))
-    hg38_accns <- .assign_GenBankAccns_to_UCSCseqlevels(
-                                hg38_seqlevels,
-                                GRCh38_accn2seqlevel)
-    stopifnot(anyDuplicated(hg38_accns) == 0L)
-
-    GRCh38_seqlevels <- unname(GRCh38_accn2seqlevel[hg38_accns])
-    seqlengths <- hg38_chrominfo$size[match(hg38_seqlevels,
-                                            hg38_chrominfo$chrom)]
-    data.frame(accn=hg38_accns,
-               GRCh38_seqlevels=GRCh38_seqlevels,
-               hg38_seqlevels=hg38_seqlevels,
-               seqlengths=seqlengths,
+    chrominfo <- fetch_ChromInfo_from_UCSC(genome,
+                                goldenPath_url=goldenPath_url)
+    UCSC_seqlevels <- chrominfo$chrom
+    NCBI_accn2seqlevel <- fetch_GenBankAccn2seqlevel_from_NCBI(
+                                refseq_assembly_id,
+                                AssemblyUnits=AssemblyUnits)
+    stopifnot(length(NCBI_accn2seqlevel) == length(UCSC_seqlevels))
+    UCSC_accns <- .assign_GenBankAccns_to_UCSCseqlevels(
+                                UCSC_seqlevels,
+                                NCBI_accn2seqlevel)
+    stopifnot(anyDuplicated(UCSC_accns) == 0L)
+    NCBI_seqlevels <- unname(NCBI_accn2seqlevel[UCSC_accns])
+    data.frame(UCSC_seqlevels=UCSC_seqlevels,
+               NCBI_seqlevels=NCBI_seqlevels,
+               accn=UCSC_accns,
+               seqlengths=chrominfo$size,
                stringsAsFactors=FALSE)
 }
 
-.fetch_seq_dict_for_mm10 <- function()
-{
-    GRCm38_accn2seqlevel <- fetch_GenBankAccn2seqlevel_from_NCBI(
-                                "GCF_000001635.20",
-                                AssemblyUnits=c("C57BL/6J", "non-nuclear"))
-    mm10_chrominfo <- fetch_ChromInfo_from_UCSC("mm10")
-    mm10_seqlevels <- mm10_chrominfo$chrom
-    stopifnot(length(mm10_seqlevels) == length(GRCm38_accn2seqlevel))
-    mm10_accns <- .assign_GenBankAccns_to_UCSCseqlevels(
-                                mm10_seqlevels,
-                                GRCm38_accn2seqlevel)
-    stopifnot(anyDuplicated(names(mm10_seqlevels)) == 0L)
+.SUPPORTED_GENOMES <- list(
 
-    GRCm38_seqlevels <- unname(GRCm38_accn2seqlevel[mm10_accns])
-    seqlengths <- mm10_chrominfo$size[match(mm10_seqlevels,
-                                            mm10_chrominfo$chrom)]
-    data.frame(accn=mm10_accns,
-               GRCm38_seqlevels=GRCm38_seqlevels,
-               mm10_seqlevels=mm10_seqlevels,
-               seqlengths=seqlengths,
-               stringsAsFactors=FALSE)
-}
-
-.SEQUENCE_DICTIONARIES <- list(
-    hg38=list(FUN=.fetch_seq_dict_for_hg38,
+    hg38=list(FUN=.standard_fetch_extended_ChromInfo_from_UCSC,
               refseq_assembly_id="GCF_000001405.26"),
-    mm10=list(FUN=.fetch_seq_dict_for_mm10,
+
+    mm10=list(FUN=.standard_fetch_extended_ChromInfo_from_UCSC,
               refseq_assembly_id="GCF_000001635.20",
               AssemblyUnits=c("C57BL/6J", "non-nuclear"))
+
+    ## It's impossible to map the sequences in mm9 with the sequences in
+    ## MGSCv37 because the mapping doesn't seem to be one-to-one. For example,
+    ## it seems that the 102 unlocalized sequences on chromosome Y have been
+    ## merged into a single sequence in mm9, the chrY_random sequence.
+    ## So there is no way we can support mm9 :-/
+    #mm9=list(FUN=.standard_fetch_extended_ChromInfo_from_UCSC,
+    #          refseq_assembly_id="GCF_000001635.18",
+    #          AssemblyUnits=c("C57BL/6J", "non-nuclear"))
+
     ## more to come...
 )
 
-.assembly2idx <- function(assembly)
+.genome2idx <- function(genome)
 {
-    refseq_assembly_id <- lookup_refseq_assembly_id(assembly)
+    refseq_assembly_id <- lookup_refseq_assembly_id(genome)
     if (is.na(refseq_assembly_id))
         return(NA_integer_)
-    refseq_assembly_ids <- sapply(.SEQUENCE_DICTIONARIES,
+    refseq_assembly_ids <- sapply(.SUPPORTED_GENOMES,
                                   `[[`, "refseq_assembly_id",
                                   USE.NAMES=FALSE)
     match(refseq_assembly_id, refseq_assembly_ids)
 }
 
-### Only supports UCSC assemblies. However 'assembly' can be:
+### Only supports UCSC genomes. However 'genome' can be:
 ###   (a) a UCSC assembly name (e.g. "hg38");
 ###   (b) a RefSeq Assembly ID (e.g. "GCF_000001405.26");
 ###   (c) a GenBank Assembly ID (e.g. "GCA_000001405.15");
 ###   (d) an NCBI assembly name (e.g. "GRCh38").
-fetchSequenceDictionary <- function(assembly)
+fetchExtendedChromInfoFromUCSC <- function(genome,
+        goldenPath_url="http://hgdownload.cse.ucsc.edu/goldenPath")
 {
-    if (!.isSingleString(assembly))
-        stop("'assembly' must be a single string")
-    idx <- match(assembly, names(.SEQUENCE_DICTIONARIES))
+    if (!.isSingleString(genome))
+        stop("'genome' must be a single string")
+    idx <- match(genome, names(.SUPPORTED_GENOMES))
     if (is.na(idx)) {
-        idx <- .assembly2idx(assembly)
+        idx <- .genome2idx(genome)
         if (is.na(idx))
-            stop("assembly \"", assembly, "\" is not supported")
+            stop("genome \"", genome, "\" is not supported")
     }
-    FUN <- .SEQUENCE_DICTIONARIES[[idx]][["FUN"]]
-    FUN()
+    supported_genome <- .SUPPORTED_GENOMES[[idx]]
+    supported_genome$FUN(names(.SUPPORTED_GENOMES)[idx],
+                         supported_genome$refseq_assembly_id,
+                         supported_genome$AssemblyUnits,
+                         goldenPath_url)
 }
 
