@@ -1,12 +1,13 @@
 Package: GenomeInfoDb
 Type: Package
 Title: Utilities for manipulating chromosome and other 'seqname' identifiers
-Version: 0.99.32
+Version: 0.99.33
 Author:  Sonali Arora, Martin Morgan, Marc Carlson, H. Pages
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 Depends: R (>= 3.1)
-Suggests: BiocGenerics, IRanges,
+Suggests: BiocGenerics, IRanges, BSgenome,
         BSgenome.Scerevisiae.UCSC.sacCer2,
+        BSgenome.Hsapiens.NCBI.GRCh38,
         TxDb.Dmelanogaster.UCSC.dm3.ensGene,
         RUnit, BiocStyle, knitr
 Description: The Seqnames package contains data and functions that
