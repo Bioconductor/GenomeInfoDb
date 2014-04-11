@@ -24,6 +24,7 @@ fetchExtendedChromInfoFromUCSC(genome,
     A single string specifying the URL to the UCSC goldenPath location.
     This URL is used internally to build the full URL to the 'chromInfo'
     MySQL dump containing chromosomes information for \code{genome}.
+    See Details section below.
   }
 }
 
@@ -36,12 +37,12 @@ fetchExtendedChromInfoFromUCSC(genome,
 }
 
   \code{fetchExtendedChromInfoFromUCSC} downloads and imports that table
-  into a data frame and keeps only the \code{UCSC_seqlevels} and
+  into a data frame, and keeps only the \code{UCSC_seqlevels} and
   \code{seqlengths} columns (after renaming them). Then it lookups the
-  assembly report at NCBI for the corresponding NCBI assembly, extracts
-  the seqlevels and GenBank accession numbers from the report, matches
-  them to each UCSC seqlevels (using some heuristic), and adds them to
-  the returned data frame.
+  assembly report at NCBI for the corresponding NCBI assembly (e.g. GRCh38
+  assembly for hg38), extracts the seqlevels and GenBank accession numbers
+  from the report, matches them to each UCSC seqlevels (using some heuristic),
+  and adds them to the returned data frame.
 }
 
 \value{
@@ -52,7 +53,7 @@ fetchExtendedChromInfoFromUCSC(genome,
     \item NCBI_seqlevels: character vector. Can contain NAs (in which case
           \code{fetchExtendedChromInfoFromUCSC} emits a warning).
 
-    \item GenBank_accns: character vector. Can contain NAs.
+    \item GenBank_accns: character vector. Can contain NAs (no warnings).
 
     \item seqlengths: integer vector. No NAs.
   }
