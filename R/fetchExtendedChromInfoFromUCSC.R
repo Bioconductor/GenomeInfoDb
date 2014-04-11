@@ -93,34 +93,41 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
                     return(NA_integer_)
                 m
             })
-        unmapped_idx <- which(is.na(ans))
-        if (length(unmapped_idx) == 0L)
-            return(ans)
     }
-
-    ## 4. Fail.
-    stop("cannot map ", paste(UCSC_seqlevels[unmapped_idx], collapse=", "),
-         " to an NCBI seqlevel")
+    ans
 }
 
 .standard_fetch_extended_ChromInfo_from_UCSC <- function(genome,
                                                          refseq_assembly_id,
                                                          AssemblyUnits,
                                                          special_renamings,
+                                                         unmapped,
                                                          goldenPath_url)
 {
     chrominfo <- fetch_ChromInfo_from_UCSC(genome,
                                 goldenPath_url=goldenPath_url)
-    UCSC_seqlevels <- chrominfo$chrom
     assembly_report <- fetch_assembly_report(refseq_assembly_id,
                                              AssemblyUnits=AssemblyUnits)
-    stopifnot(nrow(assembly_report) == length(UCSC_seqlevels))
+    stopifnot(nrow(chrominfo) == nrow(assembly_report) + length(unmapped))
+    UCSC_seqlevels <- chrominfo$chrom
+    if (!is.null(unmapped)) {
+        unmapped_idx <- match(unmapped, UCSC_seqlevels)
+        stopifnot(!any(is.na(unmapped_idx)))
+        warning(paste(unmapped, collapse=", "),
+                ": not mapped to an NCBI seqlevel")
+    }
     NCBI_GenBankAccns <- assembly_report$GenBankAccn
     NCBI_seqlevels <- assembly_report$SequenceName
     m <- .map_UCSC_seqlevels_to_NCBI_seqlevels(UCSC_seqlevels,
                                 NCBI_seqlevels,
                                 NCBI_GenBankAccns,
                                 special_renamings=special_renamings)
+    unexpectedly_unmapped_idx <-
+        which(is.na(m) & !(UCSC_seqlevels %in% unmapped))
+    if (length(unexpectedly_unmapped_idx) != 0L)
+        stop("cannot map ",
+             paste(UCSC_seqlevels[unexpectedly_unmapped_idx], collapse=", "),
+             " to an NCBI seqlevel")
     NCBI_GenBankAccns[which(NCBI_GenBankAccns == "na")] <- NA_character_
     data.frame(UCSC_seqlevels=UCSC_seqlevels,
                NCBI_seqlevels=NCBI_seqlevels[m],
@@ -139,16 +146,22 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
              refseq_assembly_id="GCF_000001635.20",
              AssemblyUnits=c("C57BL/6J", "non-nuclear"),
              special_renamings=c(chrM="MT")),
+
     ## It's impossible to map the sequences in mm9 with the sequences in
     ## MGSCv37 because the mapping doesn't seem to be one-to-one. For example,
-    ## it seems that the 102 unlocalized sequences on chromosome Y have been
-    ## merged into a single sequence in mm9, the chrY_random sequence.
-    ## So there is no way we can support mm9 :-/
+    ## it seems that UCSC has merged the 102 unlocalized sequences on
+    ## chromosome Y into a single sequence, the chrY_random sequence.
+    ## So we can't support mm9.
     #mm9=
     #    list(FUN=.standard_fetch_extended_ChromInfo_from_UCSC,
     #         refseq_assembly_id="GCF_000001635.18",
     #         AssemblyUnits=c("C57BL/6J", "non-nuclear"),
     #         special_renamings=c(chrM="MT")),
+    dm3=
+        list(FUN=.standard_fetch_extended_ChromInfo_from_UCSC,
+             refseq_assembly_id="GCF_000001215.2",
+             special_renamings=c(chrM="MT", chrU="Un"),
+             unmapped="chrUextra"),
     sacCer3=
         list(FUN=.standard_fetch_extended_ChromInfo_from_UCSC,
              refseq_assembly_id="GCF_000146045.2",
@@ -188,6 +201,7 @@ fetchExtendedChromInfoFromUCSC <- function(genome,
                          supported_genome$refseq_assembly_id,
                          supported_genome$AssemblyUnits,
                          supported_genome$special_renamings,
+                         supported_genome$unmapped,
                          goldenPath_url)
 }
 
