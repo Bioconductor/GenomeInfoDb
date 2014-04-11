@@ -196,12 +196,18 @@ lookup_refseq_assembly_id <- function(assembly)
 ### Note that the 2 URls above both point to the assembly report for GRCh38,
 ### but the report at the 1st URL contains a little bit more information than
 ### the report at the 2nd URL.
-fetch_assembly_report <- function(assembly)
+fetch_assembly_report <- function(assembly, AssemblyUnits=NULL)
 {
     if (!.isSingleString(assembly))
         stop("'assembly' must be a single string")
     if (!grepl("://", assembly))
         assembly <- .make_assembly_report_URL(assembly)
-    .fetch_assembly_report_from_URL(assembly)
+    ans <- .fetch_assembly_report_from_URL(assembly)
+    if (!is.null(AssemblyUnits)) {
+        stopifnot(all(AssemblyUnits %in% ans$AssemblyUnit))
+        idx <- which(ans$AssemblyUnit %in% AssemblyUnits)
+        ans <- ans[idx, , drop=FALSE]
+    }
+    ans
 }
 

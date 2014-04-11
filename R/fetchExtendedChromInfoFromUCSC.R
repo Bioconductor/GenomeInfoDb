@@ -24,74 +24,16 @@ fetch_ChromInfo_from_UCSC <- function(genome,
 ### Used in BSgenome!
 fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
 {
-    assembly_report <- fetch_assembly_report(assembly)
-    if (!is.null(AssemblyUnits)) {
-        stopifnot(all(AssemblyUnits %in% assembly_report$AssemblyUnit))
-        idx <- which(assembly_report$AssemblyUnit %in% AssemblyUnits)
-        assembly_report <- assembly_report[idx, , drop=FALSE]
-    }
+    assembly_report <- fetch_assembly_report(assembly,
+                                             AssemblyUnits=AssemblyUnits)
     GenBank_accn <- assembly_report[["GenBankAccn"]]
+    if ("na" %in% GenBank_accn)
+        stop("GenBankAccn field in assembly report for ",
+             "\"", assembly, "\" contains \"na\"")
     stopifnot(anyDuplicated(GenBank_accn) == 0L)
     ans <- assembly_report[["SequenceName"]]
     names(ans) <- GenBank_accn
     ans
-}
-
-### WARNING! Using this for hg18 will assign the *wrong* GenBank accession
-### number to chrM!
-.assign_GenBankAccns_to_UCSCseqlevels <- function(UCSC_seqlevels,
-                                                  NCBI_accn2seqlevel)
-{
-    suppressMessages(require(IRanges, quietly=TRUE))  # for elementLengths()
-    ans <- rep.int(NA_character_, length(UCSC_seqlevels))
-
-    ## 1. We assign based on exact matching of the sequence names (after
-    ##    removal of the "chr" prefix).
-    nochr_prefix_seqlevels <- sub("^chr", "", UCSC_seqlevels)
-    m <- match(nochr_prefix_seqlevels, NCBI_accn2seqlevel)
-    ok_idx <- which(!is.na(m))
-    ans[ok_idx] <- names(NCBI_accn2seqlevel)[m[ok_idx]]
-    if (length(ok_idx) == length(ans))
-        return(ans)
-
-    ## 2. We assign based on the number embedded in the UCSC chromosome name.
-    not_ok_idx <- which(is.na(ans))
-    split_seqlevels <- strsplit(UCSC_seqlevels[not_ok_idx], "_")
-    nparts <- elementLengths(split_seqlevels)
-    idx2 <- which(nparts >= 2L)
-    ans[not_ok_idx[idx2]] <- sapply(idx2,
-        function(i2) {
-            part2 <- split_seqlevels[[i2]][2L]
-            part2 <- sub("v", ".", part2, fixed=TRUE)
-            accn <- grep(part2, names(NCBI_accn2seqlevel),
-                         value=TRUE, fixed=TRUE)
-            if (length(accn) >= 2L)
-                stop("cannot assign a GenBank accession number to ",
-                     UCSC_seqlevels[not_ok_idx[i2]])
-            if (length(accn) == 0L)
-                return(NA_character_)
-            accn
-        })
-    not_ok_idx <- which(is.na(ans))
-    if (length(not_ok_idx) == 0L)
-        return(ans)
-
-    ## 3. Handle common sequence renamings.
-    common_renamings <- c(
-        chrM="MT"
-        ## add more common renamings...
-    )
-    m <- match(names(common_renamings), UCSC_seqlevels)
-    ok_idx <- which(!is.na(m))
-    m2 <- match(common_renamings[ok_idx], NCBI_accn2seqlevel)
-    ans[m[ok_idx]] <- names(NCBI_accn2seqlevel)[m2]
-    not_ok_idx <- which(is.na(ans))
-    if (length(not_ok_idx) == 0L)
-        return(ans)
-
-    ## 4. Fail.
-    stop("failed to assign a GenBank accession number to: ",
-         paste(UCSC_seqlevels[not_ok_idx], collapse=", "))
 }
 
 
@@ -99,48 +41,118 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
 ### fetchExtendedChromInfoFromUCSC()
 ###
 
+### 'NCBI_seqlevels' and 'NCBI_accns' must be parallel vectors.
+### WARNING! Using this for hg18 will assign the *wrong* GenBank accession
+### number to chrM!
+.map_UCSC_seqlevels_to_NCBI_seqlevels <- function(UCSC_seqlevels,
+                                                  NCBI_seqlevels,
+                                                  NCBI_accns,
+                                                  special_renamings=NULL)
+{
+    suppressMessages(require(IRanges, quietly=TRUE))  # for elementLengths()
+    ans <- rep.int(NA_integer_, length(UCSC_seqlevels))
+
+    ## 1. Handle special renamings.
+    if (!is.null(special_renamings)) {
+        m1 <- match(names(special_renamings), UCSC_seqlevels)
+        if (any(is.na(m1)))
+            stop("'special_renamings' has names not in 'UCSC_seqlevels'")
+        m2 <- match(special_renamings, NCBI_seqlevels)
+        if (any(is.na(m2)))
+            stop("'special_renamings' has values not in 'NCBI_seqlevels'")
+        ans[m1] <- m2
+    }
+    unmapped_idx <- which(is.na(ans))
+    if (length(unmapped_idx) == 0L)
+        return(ans)
+
+    ## 2. We assign based on exact matching of the sequence names (after
+    ##    removal of the "chr" prefix).
+    nochr_prefix_seqlevels <- sub("^chr", "", UCSC_seqlevels[unmapped_idx])
+    m <- match(nochr_prefix_seqlevels, NCBI_seqlevels)
+    ok_idx <- which(!is.na(m))
+    ans[unmapped_idx[ok_idx]] <- m[ok_idx]
+    unmapped_idx <- which(is.na(ans))
+    if (length(unmapped_idx) == 0L)
+        return(ans)
+
+    ## 3. We assign based on the number embedded in the UCSC chromosome name.
+    split_seqlevels <- strsplit(UCSC_seqlevels[unmapped_idx], "_")
+    nparts <- elementLengths(split_seqlevels)
+    idx2 <- which(nparts >= 2L)
+    if (length(idx2) != 0L) {
+        ans[unmapped_idx[idx2]] <- sapply(idx2,
+            function(i2) {
+                part2 <- split_seqlevels[[i2]][2L]
+                part2 <- sub("v", ".", part2, fixed=TRUE)
+                m <- grep(part2, NCBI_accns, fixed=TRUE)
+                if (length(m) >= 2L)
+                    stop("cannot map ", UCSC_seqlevels[unmapped_idx[i2]],
+                         " to a unique NCBI seqlevel")
+                if (length(m) == 0L)
+                    return(NA_integer_)
+                m
+            })
+        unmapped_idx <- which(is.na(ans))
+        if (length(unmapped_idx) == 0L)
+            return(ans)
+    }
+
+    ## 4. Fail.
+    stop("cannot map ", paste(UCSC_seqlevels[unmapped_idx], collapse=", "),
+         " to an NCBI seqlevel")
+}
+
 .standard_fetch_extended_ChromInfo_from_UCSC <- function(genome,
                                                          refseq_assembly_id,
                                                          AssemblyUnits,
+                                                         special_renamings,
                                                          goldenPath_url)
 {
     chrominfo <- fetch_ChromInfo_from_UCSC(genome,
                                 goldenPath_url=goldenPath_url)
     UCSC_seqlevels <- chrominfo$chrom
-    NCBI_accn2seqlevel <- fetch_GenBankAccn2seqlevel_from_NCBI(
-                                refseq_assembly_id,
-                                AssemblyUnits=AssemblyUnits)
-    stopifnot(length(NCBI_accn2seqlevel) == length(UCSC_seqlevels))
-    UCSC_accns <- .assign_GenBankAccns_to_UCSCseqlevels(
-                                UCSC_seqlevels,
-                                NCBI_accn2seqlevel)
-    stopifnot(anyDuplicated(UCSC_accns) == 0L)
-    NCBI_seqlevels <- unname(NCBI_accn2seqlevel[UCSC_accns])
+    assembly_report <- fetch_assembly_report(refseq_assembly_id,
+                                             AssemblyUnits=AssemblyUnits)
+    stopifnot(nrow(assembly_report) == length(UCSC_seqlevels))
+    NCBI_GenBankAccns <- assembly_report$GenBankAccn
+    NCBI_seqlevels <- assembly_report$SequenceName
+    m <- .map_UCSC_seqlevels_to_NCBI_seqlevels(UCSC_seqlevels,
+                                NCBI_seqlevels,
+                                NCBI_GenBankAccns,
+                                special_renamings=special_renamings)
+    NCBI_GenBankAccns[which(NCBI_GenBankAccns == "na")] <- NA_character_
     data.frame(UCSC_seqlevels=UCSC_seqlevels,
-               NCBI_seqlevels=NCBI_seqlevels,
-               accn=UCSC_accns,
+               NCBI_seqlevels=NCBI_seqlevels[m],
+               GenBank_accns=NCBI_GenBankAccns[m],
                seqlengths=chrominfo$size,
                stringsAsFactors=FALSE)
 }
 
 .SUPPORTED_GENOMES <- list(
-
-    hg38=list(FUN=.standard_fetch_extended_ChromInfo_from_UCSC,
-              refseq_assembly_id="GCF_000001405.26"),
-
-    mm10=list(FUN=.standard_fetch_extended_ChromInfo_from_UCSC,
-              refseq_assembly_id="GCF_000001635.20",
-              AssemblyUnits=c("C57BL/6J", "non-nuclear"))
-
+    hg38=
+        list(FUN=.standard_fetch_extended_ChromInfo_from_UCSC,
+             refseq_assembly_id="GCF_000001405.26",
+             special_renamings=c(chrM="MT")),
+    mm10=
+        list(FUN=.standard_fetch_extended_ChromInfo_from_UCSC,
+             refseq_assembly_id="GCF_000001635.20",
+             AssemblyUnits=c("C57BL/6J", "non-nuclear"),
+             special_renamings=c(chrM="MT")),
     ## It's impossible to map the sequences in mm9 with the sequences in
     ## MGSCv37 because the mapping doesn't seem to be one-to-one. For example,
     ## it seems that the 102 unlocalized sequences on chromosome Y have been
     ## merged into a single sequence in mm9, the chrY_random sequence.
     ## So there is no way we can support mm9 :-/
-    #mm9=list(FUN=.standard_fetch_extended_ChromInfo_from_UCSC,
-    #          refseq_assembly_id="GCF_000001635.18",
-    #          AssemblyUnits=c("C57BL/6J", "non-nuclear"))
-
+    #mm9=
+    #    list(FUN=.standard_fetch_extended_ChromInfo_from_UCSC,
+    #         refseq_assembly_id="GCF_000001635.18",
+    #         AssemblyUnits=c("C57BL/6J", "non-nuclear"),
+    #         special_renamings=c(chrM="MT")),
+    sacCer3=
+        list(FUN=.standard_fetch_extended_ChromInfo_from_UCSC,
+             refseq_assembly_id="GCF_000146045.2",
+             special_renamings=c(chrM="MT"))
     ## more to come...
 )
 
@@ -175,6 +187,7 @@ fetchExtendedChromInfoFromUCSC <- function(genome,
     supported_genome$FUN(names(.SUPPORTED_GENOMES)[idx],
                          supported_genome$refseq_assembly_id,
                          supported_genome$AssemblyUnits,
+                         supported_genome$special_renamings,
                          goldenPath_url)
 }
 
