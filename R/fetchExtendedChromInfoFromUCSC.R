@@ -130,9 +130,9 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
              " to an NCBI seqlevel")
     NCBI_GenBankAccns[which(NCBI_GenBankAccns == "na")] <- NA_character_
     data.frame(UCSC_seqlevels=UCSC_seqlevels,
+               UCSC_seqlengths=chrominfo$size,
                NCBI_seqlevels=NCBI_seqlevels[m],
                GenBank_accns=NCBI_GenBankAccns[m],
-               seqlengths=chrominfo$size,
                stringsAsFactors=FALSE)
 }
 

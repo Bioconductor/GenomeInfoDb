@@ -38,24 +38,33 @@ fetchExtendedChromInfoFromUCSC(genome,
 
   \code{fetchExtendedChromInfoFromUCSC} downloads and imports that table
   into a data frame, and keeps only the \code{UCSC_seqlevels} and
-  \code{seqlengths} columns (after renaming them). Then it lookups the
-  assembly report at NCBI for the corresponding NCBI assembly (e.g. GRCh38
+  \code{UCSC_seqlengths} columns (after renaming them). Then it lookups the
+  assembly report at NCBI for that genome corresponding (e.g. GRCh38
   assembly for hg38), extracts the seqlevels and GenBank accession numbers
   from the report, matches them to each UCSC seqlevels (using some heuristic),
   and adds them to the returned data frame.
 }
 
 \value{
-  A data frame with 1 row per seqlevel and with columns:
+  A data frame with one row per seqlevel in the UCSC genome, and with the
+  following columns:
   \itemize{
-    \item UCSC_seqlevels: character vector. No NAs.
+    \item UCSC_seqlevels: Character vector with no NAs. This is the
+          \code{chrom} field of the UCSC 'chromInfo' table for this
+          genome. See Details section above.
 
-    \item NCBI_seqlevels: character vector. Can contain NAs (in which case
+    \item UCSC_seqlengths: Integer vector with no NAs. This is the
+          \code{size} field of the UCSC 'chromInfo' table for this
+          genome. See Details section above.
+
+    \item NCBI_seqlevels: Character vector. Can contain NAs (in which case
           \code{fetchExtendedChromInfoFromUCSC} emits a warning).
+          This information is obtained from the NCBI assembly report for
+          this genome.
 
-    \item GenBank_accns: character vector. Can contain NAs (no warnings).
-
-    \item seqlengths: integer vector. No NAs.
+    \item GenBank_accns: Character vector. Can contain NAs (no warnings).
+          This information is obtained from the NCBI assembly report for
+          this genome.
   }
 
   Note that the rows are not sorted in any particular order.
@@ -91,13 +100,16 @@ chrominfo <- fetchExtendedChromInfoFromUCSC("sacCer3")
 chrominfo
 
 ## ---------------------------------------------------------------------
-## B. USE fetchExtendedChromInfoFromUCSC() TO PUT UCSC SEQLEVELS ON THE
-##    GRCh38 GENOME
+## B. USING fetchExtendedChromInfoFromUCSC() TO PUT UCSC SEQLEVELS ON
+##    THE GRCh38 GENOME
 ## ---------------------------------------------------------------------
 
 ## Load the BSgenome.Hsapiens.NCBI.GRCh38 package:
 library(BSgenome)
-genome <- getBSgenome("GRCh38")
+genome <- getBSgenome("GRCh38")  # this loads the
+                                 # BSgenome.Hsapiens.NCBI.GRCh38 package
+
+## A quick look at the GRCh38 seqlevels:
 length(seqlevels(genome))
 head(seqlevels(genome), n=30)
 
@@ -106,20 +118,25 @@ hg38_chrominfo <- fetchExtendedChromInfoFromUCSC("hg38")
 dim(hg38_chrominfo)
 head(hg38_chrominfo, n=30)
 
-## Extract the hg38 seqlevels and put the GRCh38 seqlevels on it as the
-## names:
+## 2 sanity checks:
+##   1. Check the NCBI seqlevels:
+stopifnot(setequal(hg38_chrominfo$NCBI_seqlevels, seqlevels(genome)))
+##   2. Check that the sequence lengths in 'hg38_chrominfo' (which are
+##      coming from the same 'chromInfo' table as the UCSC seqlevels)
+##      are the same as in 'genome':
+stopifnot(
+  identical(hg38_chrominfo$UCSC_seqlengths,
+            unname(seqlengths(genome)[hg38_chrominfo$NCBI_seqlevels]))
+)
+
+## Extract the hg38 seqlevels and put the GRCh38 seqlevels on it as
+## the names:
 hg38_seqlevels <- setNames(hg38_chrominfo$UCSC_seqlevels,
                            hg38_chrominfo$NCBI_seqlevels)
 
 ## Set the hg38 seqlevels on 'genome':
 seqlevels(genome) <- hg38_seqlevels[seqlevels(genome)]
 head(seqlevels(genome), n=30)
-
-## Sanity check:
-hg38_seqlengths <- setNames(hg38_chrominfo$seqlengths,
-                            hg38_chrominfo$UCSC_seqlevels)
-stopifnot(identical(seqlengths(genome),
-                    hg38_seqlengths[seqlevels(genome)]))
 }
 
 \keyword{manip}
