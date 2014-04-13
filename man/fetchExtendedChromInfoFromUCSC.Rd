@@ -8,7 +8,7 @@
 
 \description{
   Fetch the chromosomes info for some of the UCSC genomes.
-  Only supports hg38, mm10, dm3, and sacCer3 at the moment.
+  Only supports hg38, hg19, mm10, dm3, and sacCer3 at the moment.
 }
 
 \usage{
@@ -50,28 +50,29 @@ fetchExtendedChromInfoFromUCSC(genome,
   following columns:
   \itemize{
     \item UCSC_seqlevels: Character vector with no NAs. This is the
-          \code{chrom} field of the UCSC 'chromInfo' table for this
+          \code{chrom} field of the UCSC 'chromInfo' table for the
           genome. See Details section above.
 
     \item UCSC_seqlengths: Integer vector with no NAs. This is the
-          \code{size} field of the UCSC 'chromInfo' table for this
+          \code{size} field of the UCSC 'chromInfo' table for the
           genome. See Details section above.
 
-    \item NCBI_seqlevels: Character vector. Can contain NAs (in which case
-          \code{fetchExtendedChromInfoFromUCSC} emits a warning).
-          This information is obtained from the NCBI assembly report for
-          this genome.
-
-    \item GenBank_accns: Character vector. Can contain NAs (no warnings).
-          This information is obtained from the NCBI assembly report for
-          this genome.
+    \item NCBI_seqlevels: Character vector. This information is obtained from
+          the NCBI assembly report for the genome. Will contain NAs for UCSC
+          seqlevels with no corresponding NCBI seqlevels (e.g. for chrM in hg18
+          or chrUextra in dm3), in which case
+          \code{fetchExtendedChromInfoFromUCSC} emits a warning.
+          
+    \item GenBank_accns: Character vector. This information is obtained from
+          the NCBI assembly report for the genome. Can contain NAs but no
+          warning is emitted in that case.
   }
 
   Note that the rows are not sorted in any particular order.
 }
 
 \note{
-  Only supports the hg38, mm10, dm3, and sacCer3 genomes at the moment.
+  Only supports the hg38, hg19, mm10, dm3, and sacCer3 genomes at the moment.
   More will come...
 }
 

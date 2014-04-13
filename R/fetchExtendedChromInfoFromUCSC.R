@@ -42,8 +42,6 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
 ###
 
 ### 'NCBI_seqlevels' and 'NCBI_accns' must be parallel vectors.
-### WARNING! Using this for hg18 will assign the *wrong* GenBank accession
-### number to chrM!
 .map_UCSC_seqlevels_to_NCBI_seqlevels <- function(UCSC_seqlevels,
                                                   NCBI_seqlevels,
                                                   NCBI_accns,
@@ -85,7 +83,7 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
             function(i2) {
                 part2 <- split_seqlevels[[i2]][2L]
                 part2 <- sub("v", ".", part2, fixed=TRUE)
-                m <- grep(part2, NCBI_accns, fixed=TRUE)
+                m <- grep(part2, NCBI_accns, ignore.case=TRUE)
                 if (length(m) >= 2L)
                     stop("cannot map ", UCSC_seqlevels[unmapped_idx[i2]],
                          " to a unique NCBI seqlevel")
@@ -141,6 +139,20 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
         list(FUN=.standard_fetch_extended_ChromInfo_from_UCSC,
              refseq_assembly_id="GCF_000001405.26",
              special_renamings=c(chrM="MT")),
+    hg19=
+        list(FUN=.standard_fetch_extended_ChromInfo_from_UCSC,
+             refseq_assembly_id="GCF_000001405.13",
+             ## Special renaming of the 9 alternate scaffolds:
+             special_renamings=c(chr6_apd_hap1="HSCHR6_MHC_APD_CTG1",
+                                 chr6_cox_hap2="HSCHR6_MHC_COX_CTG1",
+                                 chr6_dbb_hap3="HSCHR6_MHC_DBB_CTG1",
+                                 chr6_mann_hap4="HSCHR6_MHC_MANN_CTG1",
+                                 chr6_mcf_hap5="HSCHR6_MHC_MCF_CTG1",
+                                 chr6_qbl_hap6="HSCHR6_MHC_QBL_CTG1",
+                                 chr6_ssto_hap7="HSCHR6_MHC_SSTO_CTG1",
+                                 chr4_ctg9_hap1="HSCHR4_1_CTG9",
+                                 chr17_ctg5_hap1="HSCHR17_1_CTG5"),
+             unmapped="chrM"),
     mm10=
         list(FUN=.standard_fetch_extended_ChromInfo_from_UCSC,
              refseq_assembly_id="GCF_000001635.20",
