@@ -38,7 +38,7 @@ seqlevelsStyle(x) <- value
       a character vector with a single element to specify the style.}
    \item{group}{ 
       Group can be 'auto' for autosomes, 'sex' for
-      sex chromosomes/allosomes, 'linear' for linear chromosomes. The 
+      sex chromosomes/allosomes, 'circular' for circular chromosomes. The 
       default is 'all' which returns all the chromosomes.}
    \item{best.only}{
       if \code{TRUE} (the default), then only the "best"
@@ -103,7 +103,7 @@ seqlevelsStyle(x) <- value
     \code{extractSeqlevelsByGroup}:
     Returns a character vector of the seqnames for a single style and species 
     by group. Group can be 'auto' for autosomes, 'sex' for sex chromosomes/
-    allosomes, 'linear' for linear chromosomes. The default is 'all' which 
+    allosomes, 'circular' for circular chromosomes. The default is 'all' which 
     returns all the chromosomes. 
     
     \code{orderSeqlevels}:
@@ -142,7 +142,7 @@ extractSeqlevels(species="Drosophila_melanogaster" , style="Ensembl")
 
 ## List all sex chromosomes for Homo sapiens using style UCSC
 ## 3 groups are supported: 'auto' for autosomes, 'sex' for allosomes 
-## and 'linear' for linear chromosomes  
+## and 'circular' for circular chromosomes  
 extractSeqlevelsByGroup(species="Homo_sapiens", style="UCSC", group="sex")
 
 ## find whether the seqnames belong to a given group

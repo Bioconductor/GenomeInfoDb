@@ -93,7 +93,7 @@ mapSeqlevels <-
 }
 
 seqlevelsInGroup <- 
-    function(seqnames, group=c("all", "auto", "sex", "linear"),
+    function(seqnames, group=c("all", "auto", "sex", "circular"),
              species, style)
 {
     group <- match.arg(group)

@@ -53,16 +53,16 @@ to be added to \Biocpkg{GenomeInfoDb}
    \file{genus\_{}species.txt}
 \item The columns should be tab-delimited in the following order
 \begin{itemize}
- \item linear 
+ \item circular
  \item auto
  \item sex
  \item 1 column per seqname style and 1 row per chromosome 
     name (not all chromosomes of a given organism necessarily belong to 
     the mapping)
-    where linear denotes all the linear chromosomes, auto denotes all the 
+    where circular denotes all the circular chromosomes, auto denotes all the 
     autosomes and sex denotes all the allosomes or sex chromosomes. 
 \end{itemize}
-\item The entries should be in T/F format for columns linear, auto and sex.
+\item The entries should be in T/F format for columns circular, auto and sex.
 \end{enumerate}
 
 \section{Example File}

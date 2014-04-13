@@ -78,8 +78,9 @@ extractSeqlevels(species="Arabidopsis_thaliana", style="NCBI")
 
 \subsection{extractSeqlevelsByGroup}
 We can also extract the desired seqlevelsStyle from a given organism based on 
-a group ( Group - 'auto' denotes autosomes, 'linear' denotes linear chromosomes
-and 'sex' denotes sex chromosomes; the default is all chromosomes are returned).
+a group ( Group - 'auto' denotes autosomes, 'circular' denotes circular
+chromosomes and 'sex' denotes sex chromosomes; the default is all chromosomes
+are returned).
 <<extractSeqlevelsgroup>>=
 extractSeqlevelsByGroup(species="Arabidopsis_thaliana", style="NCBI",
                          group="auto")
@@ -99,16 +100,16 @@ seqlevelsStyle(c("2L","2R","X","Xhet"))
 We can also subset a given character vector containing seqnames  using the
 \Rfunction{seqlevelsInGroup}.
 We currently support 3 groups: 'auto' for autosomes, 'sex' for allosomes/sex 
-chromosomes and linear for 'linear' chromosomes.
+chromosomes and circular for 'circular' chromosomes.
 The user can also prvoide the style and species they are working with.
-In the following examples, we extract the sex, auto and linear chromosomes 
+In the following examples, we extract the sex, auto and circular chromosomes 
 for Homo sapiens :
 
 <<keepChr-txdb>>=
 newchr <- paste0("chr",c(1:22,"X","Y","M","1_gl000192_random","4_ctg9_hap1"))
 seqlevelsInGroup(newchr, group="sex")
 seqlevelsInGroup(newchr, group="auto")
-seqlevelsInGroup(newchr, group="linear")
+seqlevelsInGroup(newchr, group="circular")
 seqlevelsInGroup(newchr, group="sex","Homo_sapiens","UCSC")
 @
 %%

@@ -8,10 +8,10 @@ test_basic <-
     # check the format of the file
     data<- read.table(filename,header=TRUE,sep="\t")
     checkEquals(c(25,5),dim(data))
-    checkEquals(c('linear','auto','sex','NCBI','UCSC'),names(data))
+    checkEquals(c('circular','auto','sex','NCBI','UCSC'),names(data))
     
     #check if first 3 columns contain only true or false entries
-    checkEquals(c(TRUE,FALSE),unique(data[,1]))
+    checkEquals(c(FALSE,TRUE),unique(data[,1]))
     checkEquals(c(TRUE,FALSE),unique(data[,2]))
     checkEquals(c(FALSE,TRUE),unique(data[,3]))
 }

@@ -42,7 +42,7 @@
 {
     dom <- lapply(.getNamedFiles(), scan, nlines=1, what=character(),
                   quiet=TRUE)
-    lapply(dom, function(x) {x[!(x %in% c("linear","auto","sex"))] })
+    lapply(dom, function(x) {x[!(x %in% c("circular","auto","sex"))] })
 }
 
 
@@ -56,7 +56,7 @@
     possible <- lapply(.getNamedFiles(), scan, nlines=1, what=character(),
                        quiet=TRUE)
     availStyles <- possible[[species]]
-    style %in% availStyles[-which(availStyles %in% c("linear","auto","sex"))]
+    style %in% availStyles[-which(availStyles %in% c("circular","auto","sex"))]
 }
 
 .isSupportedSeqnames <- 
