@@ -10,7 +10,7 @@ Suggests: BiocGenerics, IRanges, BSgenome,
         BSgenome.Hsapiens.NCBI.GRCh38,
         TxDb.Dmelanogaster.UCSC.dm3.ensGene,
         RUnit, BiocStyle, knitr
-Description: The Seqnames package contains data and functions that
+Description: Contains data and functions that
         define and allow translation between different chromosome
         sequence naming conventions (e.g., "chr1" versus "1"),
         including a function that attempts to place sequence names in
