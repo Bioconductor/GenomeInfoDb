@@ -3,8 +3,8 @@ CHANGES IN VERSION 0.99.1
 
 SIGNIFICANT USER-VISIBLE CHANGES
 
-The Seqnames package will have functions which will be moved from 
-AnnotationDbi , GenomicRanges
+    o The Seqnames package will have functions which will be moved from 
+    AnnotationDbi , GenomicRanges
 
    o List of 9 functions moved from AnnotationDbi
      supportedSeqnameMappings, findSequenceRenamingMaps, 
@@ -28,7 +28,9 @@ NEW FEATURES
 
 CHANGES IN VERSION 0.99.6 
 ----------------------------------
+
 NEW FEATURES
+
    o add new functions()
      seqnamesInGroup which will take a character vector of chromosomes and 
      return the chromosomes specified by the group parameter supplied by the 
@@ -45,16 +47,19 @@ SIGNIFICANT USER-VISIBLE CHANGES
      works on a character vector.
          
 DEPRECATED AND DEFUNCT
+
    o deprecate listAllSupportedStylesBySpecies(), 
      listAllSupportedSeqnameStyles(), supportedOrganisms()
      supportedSeqnameMappingsWithGroup()
        
 DEPRECATED AND USED INTERNALLY(NOT EXPORTED)
+
    o deprecate supportedSeqnameMappings(), supportedSeqnameStyles(), 
      isSupportedSeqnamesStyle(),issupportedSeqnames()
 
 CHANGES IN VERSION 0.99.7
 ----------------------------------
+
 SIGNIFICANT USER-VISIBLE CHANGES
 
    o rename:
@@ -65,6 +70,7 @@ SIGNIFICANT USER-VISIBLE CHANGES
 
 CHANGES IN VERSION 0.99.14
 ----------------------------------
+
 SIGNIFICANT USER-VISIBLE CHANGES
 
    o rename:
