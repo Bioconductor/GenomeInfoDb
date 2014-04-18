@@ -106,13 +106,13 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
                                 goldenPath_url=goldenPath_url)
     assembly_report <- fetch_assembly_report(refseq_assembly_id,
                                              AssemblyUnits=AssemblyUnits)
-    stopifnot(nrow(chrominfo) == nrow(assembly_report) + length(unmapped))
+    #stopifnot(nrow(chrominfo) == nrow(assembly_report) + length(unmapped))
     UCSC_seqlevels <- chrominfo$chrom
     if (!is.null(unmapped)) {
         unmapped_idx <- match(unmapped, UCSC_seqlevels)
         stopifnot(!any(is.na(unmapped_idx)))
-        warning(paste(unmapped, collapse=", "),
-                ": not mapped to an NCBI seqlevel")
+        warning("UCSC seqlevel(s) not in the NCBI assembly: ",
+                paste(unmapped, collapse=", "))
     }
     NCBI_GenBankAccns <- assembly_report$GenBankAccn
     NCBI_seqlevels <- assembly_report$SequenceName
@@ -153,22 +153,25 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
                                  chr4_ctg9_hap1="HSCHR4_1_CTG9",
                                  chr17_ctg5_hap1="HSCHR17_1_CTG5"),
              unmapped="chrM"),
+    hg18=
+        list(FUN=.standard_fetch_extended_ChromInfo_from_UCSC,
+             refseq_assembly_id="GCF_000001405.12",
+             AssemblyUnits="Primary Assembly",
+             unmapped=paste0("chr",
+                 c("M", paste0(c((1:22)[-c(12, 14, 20)], "X"), "_random"),
+                   "5_h2_hap1", "6_cox_hap1", "6_qbl_hap2", "22_h2_hap1"))),
     mm10=
         list(FUN=.standard_fetch_extended_ChromInfo_from_UCSC,
              refseq_assembly_id="GCF_000001635.20",
              AssemblyUnits=c("C57BL/6J", "non-nuclear"),
              special_renamings=c(chrM="MT")),
-
-    ## It's impossible to map the sequences in mm9 with the sequences in
-    ## MGSCv37 because the mapping doesn't seem to be one-to-one. For example,
-    ## it seems that UCSC has merged the 102 unlocalized sequences on
-    ## chromosome Y into a single sequence, the chrY_random sequence.
-    ## So we can't support mm9.
-    #mm9=
-    #    list(FUN=.standard_fetch_extended_ChromInfo_from_UCSC,
-    #         refseq_assembly_id="GCF_000001635.18",
-    #         AssemblyUnits=c("C57BL/6J", "non-nuclear"),
-    #         special_renamings=c(chrM="MT")),
+    mm9=
+        list(FUN=.standard_fetch_extended_ChromInfo_from_UCSC,
+             refseq_assembly_id="GCF_000001635.18",
+             AssemblyUnits=c("C57BL/6J", "non-nuclear"),
+             special_renamings=c(chrM="MT"),
+             unmapped=paste0("chr",
+                 paste0(c(1, 3:5, 7:9, 13, 16:17, "X", "Y", "Un"), "_random"))),
     dm3=
         list(FUN=.standard_fetch_extended_ChromInfo_from_UCSC,
              refseq_assembly_id="GCF_000001215.2",
