@@ -42,30 +42,35 @@ fetchExtendedChromInfoFromUCSC(genome,
   assembly report at NCBI for that genome corresponding (e.g. GRCh38
   assembly for hg38), extracts the seqlevels and GenBank accession numbers
   from the report, matches them to each UCSC seqlevels (using some heuristic),
-  and adds them to the returned data frame.
+  and adds them the data frame. Finally the \code{circular} logical field is
+  added and the data frame returned.
 }
 
 \value{
   A data frame with one row per seqlevel in the UCSC genome, and with the
   following columns:
   \itemize{
-    \item UCSC_seqlevels: Character vector with no NAs. This is the
+    \item \code{UCSC_seqlevels}: Character vector with no NAs. This is the
           \code{chrom} field of the UCSC 'chromInfo' table for the
           genome. See Details section above.
 
-    \item UCSC_seqlengths: Integer vector with no NAs. This is the
+    \item \code{UCSC_seqlengths}: Integer vector with no NAs. This is the
           \code{size} field of the UCSC 'chromInfo' table for the
           genome. See Details section above.
 
-    \item NCBI_seqlevels: Character vector. This information is obtained from
-          the NCBI assembly report for the genome. Will contain NAs for UCSC
-          seqlevels with no corresponding NCBI seqlevels (e.g. for chrM in hg18
-          or chrUextra in dm3), in which case
+    \item \code{NCBI_seqlevels}: Character vector. This information is
+          obtained from the NCBI assembly report for the genome. Will contain
+          NAs for UCSC seqlevels with no corresponding NCBI seqlevels (e.g.
+          for chrM in hg18 or chrUextra in dm3), in which case
           \code{fetchExtendedChromInfoFromUCSC} emits a warning.
           
-    \item GenBank_accns: Character vector. This information is obtained from
-          the NCBI assembly report for the genome. Can contain NAs but no
+    \item \code{GenBank_accns}: Character vector. This information is obtained
+          from the NCBI assembly report for the genome. Can contain NAs but no
           warning is emitted in that case.
+
+    \item \code{circular}: Logical vector with no NAs. This knowledge is
+          stored in the \pkg{GenomeInfoDb} package itself for the supported
+          genomes.
   }
 
   Note that the rows are not sorted in any particular order.
