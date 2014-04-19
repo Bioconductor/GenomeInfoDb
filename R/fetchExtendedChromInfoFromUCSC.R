@@ -117,7 +117,7 @@ standard_fetch_extended_ChromInfo_from_UCSC <- function(genome,
     if (!is.null(unmapped)) {
         unmapped_idx <- match(unmapped, UCSC_seqlevels)
         stopifnot(!any(is.na(unmapped_idx)))
-        warning("UCSC seqlevel(s) not in the NCBI assembly: ",
+        warning(genome, " UCSC seqlevel(s) not in the NCBI assembly: ",
                 paste(unmapped, collapse=", "))
     }
     assembly_report <- fetch_assembly_report(refseq_assembly_id,
@@ -132,7 +132,7 @@ standard_fetch_extended_ChromInfo_from_UCSC <- function(genome,
     unexpectedly_unmapped_idx <-
         which(is.na(m) & !(UCSC_seqlevels %in% unmapped))
     if (length(unexpectedly_unmapped_idx) != 0L)
-        stop("cannot map ",
+        stop("cannot map ", genome, " UCSC seqlevel(s) ",
              paste(UCSC_seqlevels[unexpectedly_unmapped_idx], collapse=", "),
              " to an NCBI seqlevel")
     GenBankAccns[which(GenBankAccns == "na")] <- NA_character_
