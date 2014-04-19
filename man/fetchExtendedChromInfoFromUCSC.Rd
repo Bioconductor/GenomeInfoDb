@@ -8,7 +8,8 @@
 
 \description{
   Fetch the chromosomes info for some of the UCSC genomes.
-  Only supports hg38, hg19, hg18, mm10, mm9, dm3, and sacCer3 at the moment.
+  Only supports hg38, hg19, hg18, mm10, mm9, dm3, sacCer3, and sacCer2
+  at the moment.
 }
 
 \usage{
@@ -35,20 +36,21 @@ fetchExtendedChromInfoFromUCSC(genome,
 \preformatted{
   goldenPath_url/<genome>/database/chromInfo.txt.gz
 }
-
   \code{fetchExtendedChromInfoFromUCSC} downloads and imports that table
-  into a data frame, and keeps only the \code{UCSC_seqlevels} and
-  \code{UCSC_seqlengths} columns (after renaming them). Then it lookups the
-  assembly report at NCBI for that genome corresponding (e.g. GRCh38
-  assembly for hg38), extracts the seqlevels and GenBank accession numbers
-  from the report, matches them to each UCSC seqlevels (using some heuristic),
-  and adds them the data frame. Finally the \code{circular} logical field is
-  added and the data frame returned.
+  into a data frame, keeps only the \code{UCSC_seqlevels} and
+  \code{UCSC_seqlengths} columns (after renaming them), and adds the
+  \code{circular} logical column.
+
+  Then, if this UCSC genome is based on an NCBI assembly (e.g. hg38 is based
+  on GRCh38), the NCBI seqlevels and GenBank accession numbers are extracted
+  from the NCBI assembly report and the UCSC seqlevels matched to them (using
+  some guided heuristic). Finally the NCBI seqlevels and GenBank accession
+  numbers are added to the returned data frame.
 }
 
 \value{
-  A data frame with one row per seqlevel in the UCSC genome, and with the
-  following columns:
+  A data frame with 1 row per seqlevel in the UCSC genome, and at least 3
+  columns:
   \itemize{
     \item \code{UCSC_seqlevels}: Character vector with no NAs. This is the
           \code{chrom} field of the UCSC 'chromInfo' table for the
@@ -58,6 +60,14 @@ fetchExtendedChromInfoFromUCSC(genome,
           \code{size} field of the UCSC 'chromInfo' table for the
           genome. See Details section above.
 
+    \item \code{circular}: Logical vector with no NAs. This knowledge is
+          stored in the \pkg{GenomeInfoDb} package itself for the supported
+          genomes.
+  }
+  If the UCSC genome is *not* based on an NCBI assembly (e.g. sacCer2),
+  there are no additional columns and a warning is emitted.
+  Otherwise, 2 more columns are added:
+  \itemize{
     \item \code{NCBI_seqlevels}: Character vector. This information is
           obtained from the NCBI assembly report for the genome. Will contain
           NAs for UCSC seqlevels with no corresponding NCBI seqlevels (e.g.
@@ -67,18 +77,14 @@ fetchExtendedChromInfoFromUCSC(genome,
     \item \code{GenBank_accns}: Character vector. This information is obtained
           from the NCBI assembly report for the genome. Can contain NAs but no
           warning is emitted in that case.
-
-    \item \code{circular}: Logical vector with no NAs. This knowledge is
-          stored in the \pkg{GenomeInfoDb} package itself for the supported
-          genomes.
   }
 
   Note that the rows are not sorted in any particular order.
 }
 
 \note{
-  Only supports the hg38, hg19, hg18, mm10, mm9, dm3, and sacCer3 genomes at the
-  moment. More will come...
+  Only supports the hg38, hg19, hg18, mm10, mm9, dm3, sacCer3, and sacCer2
+  genomes at the moment. More will come...
 }
 
 \author{
@@ -102,8 +108,15 @@ fetchExtendedChromInfoFromUCSC(genome,
 ## ---------------------------------------------------------------------
 ## A. BASIC EXAMPLE
 ## ---------------------------------------------------------------------
-chrominfo <- fetchExtendedChromInfoFromUCSC("sacCer3")
-chrominfo
+
+## The sacCer3 UCSC genome is based on an NCBI assembly (RefSeq Assembly
+## ID is GCF_000146045.2):
+sacCer3_chrominfo <- fetchExtendedChromInfoFromUCSC("sacCer3")
+sacCer3_chrominfo
+
+## But the sacCer2 UCSC genome is not:
+sacCer2_chrominfo <- fetchExtendedChromInfoFromUCSC("sacCer2")
+sacCer2_chrominfo
 
 ## ---------------------------------------------------------------------
 ## B. USING fetchExtendedChromInfoFromUCSC() TO PUT UCSC SEQLEVELS ON
