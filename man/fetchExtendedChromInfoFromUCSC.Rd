@@ -65,8 +65,11 @@ fetchExtendedChromInfoFromUCSC(genome,
           genomes.
   }
   If the UCSC genome is *not* based on an NCBI assembly (e.g. sacCer2),
-  there are no additional columns and a warning is emitted.
-  Otherwise, 2 more columns are added:
+  there are no additional columns and a warning is emitted. Note that, in
+  this case, the rows are not sorted in any particular order.
+
+  If the UCSC genome is based on an NCBI assembly (e.g. sacCer3),
+  the returned data frame has 3 additional columns:
   \itemize{
     \item \code{NCBI_seqlevels}: Character vector. This information is
           obtained from the NCBI assembly report for the genome. Will contain
@@ -74,12 +77,19 @@ fetchExtendedChromInfoFromUCSC(genome,
           for chrM in hg18 or chrUextra in dm3), in which case
           \code{fetchExtendedChromInfoFromUCSC} emits a warning.
           
-    \item \code{GenBank_accns}: Character vector. This information is obtained
+    \item \code{SequenceRole}: Factor with levels \code{assembled-molecule},
+          \code{unlocalized-scaffold}, \code{unplaced-scaffold},
+          \code{alt-scaffold}, and \code{pseudo-scaffold}. This information
+          is obtained from the NCBI assembly report for the genome.
+          Can contain NAs but no warning is emitted in that case.
+
+    \item \code{GenBankAccn}: Character vector. This information is obtained
           from the NCBI assembly report for the genome. Can contain NAs but no
           warning is emitted in that case.
   }
-
-  Note that the rows are not sorted in any particular order.
+  Note that, in this case, the rows are sorted by level in the
+  \code{SequenceRole} column, that is, assembled molecules first,
+  then \code{unlocalized-scaffold}, etc, and NAs last.
 }
 
 \note{

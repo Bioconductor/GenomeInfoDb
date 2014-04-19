@@ -124,11 +124,11 @@ standard_fetch_extended_ChromInfo_from_UCSC <- function(genome,
     assembly_report <- fetch_assembly_report(refseq_assembly_id,
                                              AssemblyUnits=AssemblyUnits)
     #stopifnot(nrow(chrominfo) == nrow(assembly_report) + length(unmapped))
-    GenBankAccns <- assembly_report$GenBankAccn
     NCBI_seqlevels <- assembly_report$SequenceName
+    GenBankAccn <- assembly_report$GenBankAccn
     m <- .map_UCSC_seqlevels_to_NCBI_seqlevels(UCSC_seqlevels,
                                 NCBI_seqlevels,
-                                GenBankAccns,
+                                GenBankAccn,
                                 special_renamings=special_renamings)
     if (!is.null(unmapped))
         stopifnot(all(is.na(m)[unmapped_idx]))
@@ -138,10 +138,20 @@ standard_fetch_extended_ChromInfo_from_UCSC <- function(genome,
         stop("cannot map ", genome, " UCSC seqlevel(s) ",
              paste(UCSC_seqlevels[unexpectedly_unmapped_idx], collapse=", "),
              " to an NCBI seqlevel")
-    GenBankAccns[which(GenBankAccns == "na")] <- NA_character_
-    cbind(ans, NCBI_seqlevels=NCBI_seqlevels[m],
-               GenBank_accns=GenBankAccns[m],
-               stringsAsFactors=FALSE)
+    GenBankAccn[which(GenBankAccn == "na")] <- NA_character_
+    SequenceRole <- factor(assembly_report$SequenceRole,
+                           levels=c("assembled-molecule",
+                                    "unlocalized-scaffold",
+                                    "unplaced-scaffold",
+                                    "alt-scaffold",
+                                    "pseudo-scaffold"))
+    stopifnot(identical(is.na(SequenceRole),
+                        is.na(assembly_report$SequenceRole)))
+    ans <- cbind(ans, NCBI_seqlevels=NCBI_seqlevels[m],
+                      SequenceRole=SequenceRole[m],
+                      GenBankAccn=GenBankAccn[m],
+                      stringsAsFactors=FALSE)
+    ans[order(ans$SequenceRole), , drop=FALSE]
 }
 
 .SUPPORTED_GENOMES <- list(
