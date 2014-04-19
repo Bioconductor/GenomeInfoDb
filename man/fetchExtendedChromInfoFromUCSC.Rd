@@ -31,7 +31,7 @@ fetchExtendedChromInfoFromUCSC(genome,
 
 \details{
   Chromosomes information (e.g. names and lengths) for any UCSC genome
-  is stored in the UCSC database in the 'chromInfo' table and is normally
+  is stored in the UCSC database in the 'chromInfo' table, and is normally
   available as a MySQL dump at:
 \preformatted{
   goldenPath_url/<genome>/database/chromInfo.txt.gz
@@ -88,8 +88,8 @@ fetchExtendedChromInfoFromUCSC(genome,
           warning is emitted in that case.
   }
   Note that, in this case, the rows are sorted by level in the
-  \code{SequenceRole} column, that is, assembled molecules first,
-  then \code{unlocalized-scaffold}, etc, and NAs last.
+  \code{SequenceRole} column, that is, \code{assembled-molecule}s first,
+  then \code{unlocalized-scaffold}s, etc, and NAs last.
 }
 
 \note{
