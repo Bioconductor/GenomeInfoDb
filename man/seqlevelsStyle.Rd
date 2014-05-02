@@ -1,36 +1,48 @@
-\name{GenomeInfoDb-helpers}
+\name{seqlevelsStyle}
 
-\alias{GenomeInfoDb-helpers}
+\alias{seqlevelsStyle}
+\alias{seqlevelsStyle<-}
+\alias{seqlevelsStyle,character-method}
+\alias{seqlevelsStyle,ANY-method}
+\alias{seqlevelsStyle<-,ANY-method}
+
 \alias{genomeStyles}
 \alias{extractSeqlevels}
 \alias{extractSeqlevelsByGroup}
-\alias{orderSeqlevels}
 \alias{mapSeqlevels}
 \alias{seqlevelsInGroup}
-\alias{seqlevelsStyle}
-\alias{seqlevelsStyle,character-method}
-\alias{seqlevelsStyle<-}
-\alias{seqlevelsStyle<-,character-method}
+
+% Old stuff (Deprecated or Defunct):
+\alias{seqnameStyle}
+\alias{seqnameStyle,ANY-method}
+\alias{seqnameStyle<-}
+\alias{seqnameStyle<-,ANY-method}
 
 
 \title{
-List the supported seqname styles for all supported organisms
+  Conveniently rename the seqlevels of an object according to a given style
 }
 \description{
-List the supported seqname styles for all supported organisms
+  The \code{seqlevelsStyle} getter and setter can be used to get the current
+  seqlevels style of an object and to rename its seqlevels according to a given
+  style.
 }
 \usage{
-genomeStyles(species)
-extractSeqlevels(species, style)
-extractSeqlevelsByGroup(species, style, group)
-orderSeqlevels(seqnames, X.is.sexchrom = NA)
-mapSeqlevels(seqnames, style, best.only=TRUE, drop=TRUE)
-seqlevelsInGroup(seqnames, group, species, style)
 seqlevelsStyle(x)
 seqlevelsStyle(x) <- value
 
+## Related low-level utilities:
+genomeStyles(species)
+extractSeqlevels(species, style)
+extractSeqlevelsByGroup(species, style, group)
+mapSeqlevels(seqnames, style, best.only=TRUE, drop=TRUE)
+seqlevelsInGroup(seqnames, group, species, style)
 }
 \arguments{
+   \item{x}{
+      The object from/on which to get/set the seqlevels style.}
+   \item{value}{
+      A single character string that sets the seqnameStyle for \code{x}.}
    \item{species}{
       The genus and species of the organism in question
       separated by a single space. Don't forget to capitalize the genus.}
@@ -51,38 +63,12 @@ seqlevelsStyle(x) <- value
       chromosomes in a given genome for a given style. For example : For
       \emph{Homo sapiens}, NCBI style - they are
       "1","2","3",...,"X","Y","MT"}
-   \item{X.is.sexchrom}{
-      A logical indicating whether X refers to the sexual chromosome or
-      to chromosome with Roman Numeral X. If \code{NA},
-      \code{makeSeqnameIds} does its best to "guess".
-   }
-   \item{x}{
-      The object from/on which to get/set the sequence information.}
-   \item{value}{
-      A single character string that sets the seqnameStyle for \code{x}.}
-}
-\value{
-  For \code{extractSeqlevels} , \code{extractSeqlevelsByGroup} and 
-  \code{seqlevelsInGroup} returns a character vector of seqlevels 
-  for given supported species and group.
-    
-  For \code{mapSeqlevels} returns a matrix with 1 column per supplied sequence 
-  name and 1 row per sequence renaming map compatible with the specified style
-  
-  For \code{seqlevelsStyle} returns a single character string containing the 
-  style of the seqlevels supplied. Note that this information is not stored in 
-  \code{x} but inferred by looking up a seqlevel style database stored inside
-  GenomeInfoDb.
-  
-  For \code{genomeStyle} : If species is specified returns a data.frame 
-  containg the seqlevel style and its mapping for a given organism. If species
-  is not specified, a list is returned with one list per species containing
-  the seqlevel style with the corresponding mappings.
-  
-  For \code{orderSeqlevels} returns an integer vector with indices of seqlevels
-  in their natural order. 
 }
 \details{
+    \code{seqlevelsStyle(x)}, \code{seqlevelsStyle(x) <- value}:
+    Get the current seqlevels style of an object, or rename its seqlevels
+    according to the supplied style.
+
     \code{genomeStyles}:
     Different organizations have different naming conventions for how they
     name the biologically defined sequence elements (usually chromosomes)
@@ -106,10 +92,6 @@ seqlevelsStyle(x) <- value
     allosomes, 'circular' for circular chromosomes. The default is 'all' which 
     returns all the chromosomes. 
     
-    \code{orderSeqlevels}:
-    Returns an integer vector while attempting to provide the \dQuote{natural} 
-    order of seqnames, e.g.,\code{chr1}, \code{chr2}, \code{chr3}, \ldots
-    
     \code{mapSeqlevels}:
     Returns a matrix with 1 column per supplied sequence name and 1 row
     per sequence renaming map compatible with the specified style.
@@ -122,15 +104,53 @@ seqlevelsStyle(x) <- value
     seqnames.
     Returns a character vector of seqnames after subsetting for the group 
     specified by the user. See examples for more details.
+}
+\value{
+  For \code{seqlevelsStyle} returns a single character string containing the 
+  style of the seqlevels supplied. Note that this information is not stored in 
+  \code{x} but inferred by looking up a seqlevels style database stored inside
+  GenomeInfoDb.
+  
+  For \code{extractSeqlevels} , \code{extractSeqlevelsByGroup} and 
+  \code{seqlevelsInGroup} returns a character vector of seqlevels 
+  for given supported species and group.
     
-    \code{seqlevelsStyle(x)}: finds the seqlevelsStyle for a given character 
-    vector.
+  For \code{mapSeqlevels} returns a matrix with 1 column per supplied sequence 
+  name and 1 row per sequence renaming map compatible with the specified style
+  
+  For \code{genomeStyle} : If species is specified returns a data.frame 
+  containg the seqlevels style and its mapping for a given organism. If species
+  is not specified, a list is returned with one list per species containing
+  the seqlevels style with the corresponding mappings.
 }
 \author{
-    Sonali Arora \email{sarora@fhcrc.org}, Martin Morgan , Marc Carlson, 
-    H. Pages
+  Sonali Arora \email{sarora@fhcrc.org}, Martin Morgan , Marc Carlson, 
+  H. Pages
 }
 \examples{
+## ---------------------------------------------------------------------
+## seqlevelsStyle() getter and setter
+## ---------------------------------------------------------------------
+
+## find the seqname Style for a given character vector 
+seqlevelsStyle(paste0("chr", 1:30))
+
+## Rename the seqlevels of a GRanges object with the seqlevelsStyle()
+## setter:
+library(GenomicRanges)
+gr <- GRanges(rep(c("chr2", "chr3", "chrM"), 2), IRanges(1:6, 10))
+
+seqlevelsStyle(gr)
+seqlevelsStyle(gr) <- "NCBI"
+gr
+
+seqlevelsStyle(gr)
+seqlevelsStyle(gr) <- "UCSC"
+gr
+
+## ---------------------------------------------------------------------
+## Related low-level utilities
+## ---------------------------------------------------------------------
 
 names(genomeStyles())
 genomeStyles("Homo_sapiens")
@@ -152,15 +172,9 @@ seqlevelsInGroup(newchr, group="sex")
 newchr <- as.character(c(1:22,"X","Y","MT"))
 seqlevelsInGroup(newchr, group="all","Homo_sapiens","NCBI")
 
-## find the seqname Style for a given character vector 
-seqlevelsStyle(paste0("chr",c(1:30)))
-
-## order a character vector of seqnames
-seqnames <- c("chr1","chr9", "chr2", "chr3", "chr10")
-seqnames[orderSeqlevels(seqnames)]
-
 ## if we have a vector conatining seqnames and we want to verify the
 ## species and style for them , we can use:
+seqnames <- c("chr1","chr9", "chr2", "chr3", "chr10")
 all(seqnames \%in\% extractSeqlevels("Homo_sapiens", "UCSC"))
 
 ## find mapped seqlevelsStyles for exsiting seqnames

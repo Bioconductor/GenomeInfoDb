@@ -269,11 +269,11 @@ rankSeqlevels <- function(seqnames, X.is.sexchrom=NA)
     seqlevel_ids[as.integer(seqnames)]
 }
 
-
 orderSeqlevels <- 
   function(seqnames, X.is.sexchrom=NA)
   {
     if (missing(seqnames))
       seqnames <- character()
     order(rankSeqlevels(seqnames, X.is.sexchrom))
-  }   
+  }
+

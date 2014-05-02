@@ -1,6 +1,8 @@
 \name{rankSeqlevels}
 
 \alias{rankSeqlevels}
+\alias{orderSeqlevels}
+
 
 \title{Assign sequence IDs to sequence names}
 
@@ -8,10 +10,14 @@
   \code{rankSeqlevels} assigns a unique ID to each unique sequence name
   in the input vector. The returned IDs span 1:N where N is the number of
   unique sequence names in the input vector.
+
+  \code{orderSeqlevels} is similar to \code{rankSeqlevels} except that
+  the returned vector contains the order instead of the rank.
 }
 
 \usage{
 rankSeqlevels(seqnames, X.is.sexchrom=NA)
+orderSeqlevels(seqnames, X.is.sexchrom=NA)
 }
 
 \arguments{
@@ -26,19 +32,23 @@ rankSeqlevels(seqnames, X.is.sexchrom=NA)
 }
 
 \value{
-  An integer vector of the same length as \code{seqnames}.
-  The values in the vector span 1:N where N is the number of unique
-  sequence names in the input vector.
+  An integer vector of the same length as \code{seqnames} that tries to
+  reflect the \dQuote{natural} order of seqnames, e.g.,\code{chr1},
+  \code{chr2}, \code{chr3}, \ldots
+
+  The values in the returned vector span 1:N where N is the number
+  of unique sequence names in the input vector.
 }
 
 \author{
-  H. Pages
+  H. Pages for \code{rankSeqlevels}, \code{orderSeqlevels} added by
+  Sonali Arora \email{sarora@fhcrc.org}
 }
 
 \seealso{
   \itemize{
-    \item \code{\link[GenomicRanges]{sortSeqlevels}} for sorting the sequence 
-    levels of an object in "natural" order.
+    \item \code{\link{sortSeqlevels}} for sorting the sequence levels
+          of an object in "natural" order.
   }
 }
 

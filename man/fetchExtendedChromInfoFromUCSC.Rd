@@ -103,8 +103,7 @@ fetchExtendedChromInfoFromUCSC(genome,
 
 \seealso{
   \itemize{
-    \item The \code{\link[GenomicRanges]{seqlevels}} getter and setter
-          in the \pkg{GenomicRanges} package.
+    \item The \code{\link{seqlevels}} getter and setter.
 
     \item The \code{\link{seqlevelsStyle}} getter and setter.
 

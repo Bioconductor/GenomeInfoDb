@@ -47,7 +47,6 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
                                                   NCBI_accns,
                                                   special_renamings=NULL)
 {
-    suppressMessages(require(IRanges, quietly=TRUE))  # for elementLengths()
     ans <- rep.int(NA_integer_, length(UCSC_seqlevels))
 
     ## 1. Handle special renamings.

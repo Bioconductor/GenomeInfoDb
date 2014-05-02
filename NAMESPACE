@@ -1,14 +1,92 @@
+import(methods)
+import(BiocGenerics)
+import(S4Vectors)
+import(IRanges)  # for elementLengths(), runLength(), and runValue()
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Export non-generic functions
+###
+
 export(
+    ## fetchExtendedChromInfoFromUCSC.R:
     fetchExtendedChromInfoFromUCSC,
 
-    genomeStyles,
-    
+    ## rankSeqlevels.R:
     orderSeqlevels,
     rankSeqlevels,
-    
+
+    ## seqlevelsStyle.R:
+    genomeStyles,
     extractSeqlevels,
     extractSeqlevelsByGroup,
     mapSeqlevels,
     seqlevelsInGroup,
-    seqlevelsStyle, "seqlevelsStyle<-"
+
+    ## seqlevels-wrappers.R:
+    keepSeqlevels, dropSeqlevels, renameSeqlevels, restoreSeqlevels,
+    keepStandardChromosomes,
+
+    ## Seqinfo-class.R:
+    Seqinfo
 )
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Export S4 classes
+###
+
+exportClasses(
+    Seqinfo
+)
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Export S4 methods for generics not defined in GenomeInfoDb
+###
+
+exportMethods(
+    length,
+    names, "names<-",
+    "[",
+    as.data.frame,
+    show,
+    merge,
+
+    intersect
+)
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Export S4 generics defined in GenomeInfoDb + export corresponding methods
+###
+
+export(
+    ## seqinfo.R:
+    seqinfo, "seqinfo<-",
+    seqnames, "seqnames<-",
+    seqlevels, "seqlevels<-",
+    sortSeqlevels,
+    seqlevelsInUse,
+    seqlevels0,
+    seqlengths, "seqlengths<-",
+    isCircular, "isCircular<-",
+    genome, "genome<-",
+
+    ## seqlevelsStyle.R:
+    seqlevelsStyle, "seqlevelsStyle<-",
+    seqnameStyle, "seqnameStyle<-"
+)
+
+exportMethods(
+    seqnames, "seqnames<-",
+    seqlevels, "seqlevels<-",
+    sortSeqlevels,
+    seqlevelsInUse,
+    seqlengths, "seqlengths<-",
+    isCircular, "isCircular<-",
+    genome, "genome<-",
+    seqlevelsStyle, "seqlevelsStyle<-",
+    seqnameStyle, "seqnameStyle<-"
+)
+
