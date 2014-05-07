@@ -28,7 +28,10 @@ export(
     keepStandardChromosomes,
 
     ## Seqinfo-class.R:
-    Seqinfo
+    Seqinfo,
+
+    ## GenomeDescription-classR:
+    GenomeDescription
 )
 
 
@@ -37,7 +40,8 @@ export(
 ###
 
 exportClasses(
-    Seqinfo
+    Seqinfo,
+    GenomeDescription
 )
 
 
@@ -75,10 +79,15 @@ export(
 
     ## seqlevelsStyle.R:
     seqlevelsStyle, "seqlevelsStyle<-",
-    seqnameStyle, "seqnameStyle<-"
+    seqnameStyle, "seqnameStyle<-",
+
+    ## GenomeDescription-class.R:
+    organism, species, provider, providerVersion,
+    releaseDate, releaseName, bsgenomeName
 )
 
 exportMethods(
+    seqinfo,
     seqnames, "seqnames<-",
     seqlevels, "seqlevels<-",
     sortSeqlevels,
@@ -87,6 +96,8 @@ exportMethods(
     isCircular, "isCircular<-",
     genome, "genome<-",
     seqlevelsStyle, "seqlevelsStyle<-",
-    seqnameStyle, "seqnameStyle<-"
+    seqnameStyle, "seqnameStyle<-",
+    organism, species, provider, providerVersion,
+    releaseDate, releaseName, bsgenomeName
 )
 
