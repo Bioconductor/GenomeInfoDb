@@ -88,7 +88,7 @@
     ans <- read.table(destfile, header=TRUE, sep="\t", quote="",
                                 comment.char="", stringsAsFactors=FALSE)
     target_colnames <- c("X..assembly_id", "bioproject", "biosample",
-                         "wgs_master", "representative_status", "taxid",
+                         "wgs_master", "refseq_category", "taxid",
                          "species_taxid", "organism_name",
                          "infraspecific_name", "isolate", "version_status",
                          "assembly_level", "release_type", "genome_rep",
