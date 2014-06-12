@@ -129,6 +129,7 @@ order for a given seqnames character vector.
 <<orderSeqlevels>>=
 seqnames <- c("chr1","chr9", "chr2", "chr3", "chr10")
 orderSeqlevels(seqnames)
+seqnames[orderSeqlevels(seqnames)]
 @
 %%
 

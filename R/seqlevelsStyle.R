@@ -96,8 +96,8 @@
 
     if (max(unlistgot2) == 0) {
         txt <- "The style does not have a compatible entry for the
-    species supported by Seqname. Please see
-    genomeStyles() for supported species/style"
+                species supported by Seqname. Please see
+                genomeStyles() for supported species/style"
         stop(paste(strwrap(txt, exdent=2), collapse="\n"))
     }
 
