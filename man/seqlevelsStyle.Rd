@@ -145,6 +145,10 @@ seqlevelsStyle(gr) <- "NCBI"
 gr
 
 seqlevelsStyle(gr)
+seqlevelsStyle(gr) <- "dbSNP"
+gr
+
+seqlevelsStyle(gr)
 seqlevelsStyle(gr) <- "UCSC"
 gr
 

@@ -6,9 +6,10 @@ test_basic <-
     checkTrue(file.exists(filename))
    
     # check the format of the file
-    data<- read.table(filename,header=TRUE,sep="\t")
-    checkEquals(c(25,5),dim(data))
-    checkEquals(c('circular','auto','sex','NCBI','UCSC'),names(data))
+    data <- read.table(filename,header=TRUE,sep="\t")
+    checkIdentical(c(25L, 6L), dim(data))
+    checkIdentical(c('circular', 'auto', 'sex', 'NCBI', 'UCSC', 'dbSNP'),
+                   colnames(data))
     
     #check if first 3 columns contain only true or false entries
     checkEquals(c(FALSE,TRUE),unique(data[,1]))
@@ -19,8 +20,8 @@ test_basic <-
 test_genomeStyles <- 
     function()
 {
-    checkEquals("data.frame", class(genomeStyles("Homo sapiens")))
-    checkEquals(c(25,5), dim(genomeStyles("Homo sapiens")))
+    checkIdentical("data.frame", class(genomeStyles("Homo sapiens")))
+    checkIdentical(c(25L, 6L), dim(genomeStyles("Homo sapiens")))
     checkException(genomeStyles("SAD"))
 }
 
