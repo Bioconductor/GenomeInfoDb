@@ -1,7 +1,7 @@
 import(methods)
 import(BiocGenerics)
 import(S4Vectors)
-import(IRanges)  # for elementLengths(), runLength(), and runValue()
+import(IRanges)  # for elementLengths()
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
