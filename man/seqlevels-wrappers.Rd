@@ -82,7 +82,9 @@ keepStandardChromosomes(x, species=NULL)
   removes masks and any other previous modifications.
   
   \code{keepStandardChromosomes}:Subsetting operation that returns only the 
-  primary Chromosomes and the autosomes. Applicable when \code{x}
+  'standard' Chromosomes. We define 'standard chromosomes' as those chromosomes 
+  which represent sequences in the assembly that are not scaffolds. Also 
+  referred to as 'assembly molecule' on NCBI. Applicable when \code{x}
   has a Seqinfo object.This function automatically detects the species and style
   of the object. Often seqlevels are shared across species and this function 
   then requires the user to specify the species to get the standard Chromsomes. 
