@@ -22,7 +22,7 @@ keepSeqlevels(x, value, ...)
 dropSeqlevels(x, value, ...)
 renameSeqlevels(x, value, ...)
 restoreSeqlevels(x, ...)
-keepStandardChromosomes(x, species, style,...)
+keepStandardChromosomes(x, species=NULL)
 }
 
 \arguments{
@@ -45,10 +45,6 @@ keepStandardChromosomes(x, species, style,...)
   \item{species}{
     The species name of the \link{Seqinfo} class in which the seqlevels will
     be kept, dropped or renamed.
-  }
- \item{style}{
-    The style or provider of the \link{Seqinfo} class in which the seqlevels will
-    be kept, dropped or renamed.eg: UCSC,NCBI and so on.
   }
   \item{...}{
     Arguments passed to other functions.
@@ -86,8 +82,10 @@ keepStandardChromosomes(x, species, style,...)
   removes masks and any other previous modifications.
   
   \code{keepStandardChromosomes}:Subsetting operation that returns only the 
-  primary Chromosomes and the autosomes. Applicable when \code{obj}
-  has a Seqinfo object.
+  primary Chromosomes and the autosomes. Applicable when \code{x}
+  has a Seqinfo object.This function automatically detects the species and style
+  of the object. Often seqlevels are shared across species and this function 
+  then requires the user to specify the species to get the standard Chromsomes. 
 }
 
 \seealso{
@@ -187,22 +185,23 @@ seqlevels(txdb)
 ## keepStandardChromosomes
 ## ---------------------------------------------------------------------
 
- gr <- GRanges(c("chr1","chr2", "chr3", "chr4","chr5","chr6",
-           "chr7","chr8","chr9","chr10", "chr11","chr12","chr13","chr14",
-           "chr15","chr16" ,"chr17" , "chr18", "chr19", "chr20" , "chr21",
-           "chr22" , "chrX", "chrY" , "chrM", "chr1_gl000191_random",
+gr <- GRanges(c(paste0("chr",c(1:22,"X","Y","M")), "chr1_gl000191_random",
            "chr1_gl000192_random" ,"chr4_ctg9_hap1", "chr4_gl000193_random",
            "chr4_gl000194_random" ,"chr6_apd_hap1"), IRanges(1:31, width=3))
 grl <- split(gr,seqnames(gr))
 
 ##GRanges
-keepStandardChromosomes(gr,style="UCSC", species="Homo sapiens")
+keepStandardChromosomes(gr)
 
 ##GRangesList
-keepStandardChromosomes(grl,style="UCSC", species="Homo sapiens")
+keepStandardChromosomes(grl)
 
+## This function automatically detects the species and style of the object. 
+## Often seqlevels are shared across species and this function then requires the 
+## user to specify the species to get the standard Chromsomes.
 
-
+plantgr <- GRanges(c(1:5,"MT","Pltd"), IRanges(1:7,width=5))
+keepStandardChromosomes(plantgr, species="Arabidopsis thaliana")
 }
 
 \author{Valerie Obenchain \email{vobencha@fhcrc.org}, 

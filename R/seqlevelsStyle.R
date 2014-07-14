@@ -35,12 +35,14 @@
 
 }
 
-.isSingleString <- function (x)
+.isSingleString <- 
+    function (x)
 {
     is.character(x) && length(x) == 1L && !is.na(x)
 }
 
-.isTRUEorFALSE <- function (x)
+.isTRUEorFALSE <- 
+    function (x)
 {
     is.logical(x) && length(x) == 1L && !is.na(x)
 }

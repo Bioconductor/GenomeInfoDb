@@ -59,24 +59,36 @@ restoreSeqlevels <- function(x, ...)
     x
 }
 
-.checkStyleSpecies <- function(species, style, xlevels)
+keepStandardChromosomes <- function(x, species=NULL)
 {
-   #extract the standard chromsomes using species and style
-   seqvec <- extractSeqlevels(species, style)
-   seqvec[na.omit(match(xlevels, seqvec))]
-}
-
-keepStandardChromosomes <- function(x, species=species, style=style, ...)
-{
-    #check if user has entered same style as the given object
-    originalstyle <- seqlevelsStyle(x)
+    style <- seqlevelsStyle(x)
     
-    if(identical(originalstyle,style)){
-        seq_vec <- .checkStyleSpecies(species=species,style=style,seqlevels(x))
-        x <- keepSeqlevels(x,seq_vec)
-        return(x)
-    }else{
-        stop("please check the seqlevelsStyle entered for object x.")
-    }
+    ori_seqlevels <- seqlevels(x)
+    
+    if(missing(species))
+    {
+        ## try to guess species here
+        ## 1- get names of all species supported by GenomeInfodb
+        ## 2- extract seqlevels for all species for current style
+        ## 3- intersect, find how many species have some seqlevels as original?
+        ## 4- if max(length(intersect)) is found once - then predict species
+        allspecies <- names(genomeStyles())
+    
+        allseqlevels <- lapply(allspecies, function(x) 
+            tryCatch(extractSeqlevels(x, style), error=function(e) NULL))
+                
+        mres <- sapply(allseqlevels, function(x) 
+            length(intersect(x, ori_seqlevels)))
+        
+        if(length(which(mres == max(mres))) > 1)
+            stop("Cannot determine standard chromosomes, Specify species arg")
+        
+        species <- allspecies[which(mres==max(mres))]
+    } 
+    
+    standard_chromosomes <- extractSeqlevels(species, style)
+    x <- keepSeqlevels(x,standard_chromosomes)
+    return(x)
+    
 }
 

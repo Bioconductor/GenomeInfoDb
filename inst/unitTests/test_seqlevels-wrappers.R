@@ -61,24 +61,22 @@ test_renameSeqlevels <- function()
 }
 
 test_keepStandardChromosomes <- function()
-{         
-    gr <- GRanges(c("chr1","chr2", "chr3", "chr4","chr5","chr6",
-           "chr7","chr8","chr9","chr10", "chr11","chr12","chr13","chr14",
-           "chr15","chr16" ,"chr17" , "chr18", "chr19", "chr20" , "chr21",
-           "chr22" , "chrX", "chrY" , "chrM", "chr1_gl000191_random",
+{      
+    gr <- GRanges(c(paste0("chr",1:22), "chrX", "chrY" , "chrM", 
+                    "chr1_gl000191_random",
            "chr1_gl000192_random" ,"chr4_ctg9_hap1", "chr4_gl000193_random",
            "chr4_gl000194_random" ,"chr6_apd_hap1"), IRanges(1:31, width=3)) 
-       
-    gr <- keepStandardChromosomes(gr,style="UCSC", species="Homo sapiens")
-    got <- length(seqlevels(gr))
-    checkEquals(25,got)
-    checkEquals(27,end(gr[25]))
-     
-    checkException(keepStandardChromosomes(gr,"UCSC","Homo sapiens"), 
-            silent =TRUE)
-
+    gr2 <- gr
     
-    checkException(keepStandardChromosomes(gr,"Hm sapiens","UCSC"),silent=TRUE)
-
+    gr <- keepStandardChromosomes(gr)
+    checkEquals(25,length(seqlevels(gr)))
+           
+    gr2 <- keepStandardChromosomes(gr2, species="Homo sapiens")
+    checkEquals(25,length(seqlevels(gr2)))
+    checkEquals(27,end(gr2[25]))
+    
+    ## seqlevels common across multiple species. 
+    plantgr <- GRanges(c(1:5,"MT","Pltd"), IRanges(1:7,width=5))
+    checkException(keepStandardChromosomes(plantgr),silent =TRUE)
 }    
 
