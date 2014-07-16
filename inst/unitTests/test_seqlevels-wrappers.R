@@ -77,6 +77,19 @@ test_keepStandardChromosomes <- function()
     
     ## seqlevels common across multiple species. 
     plantgr <- GRanges(c(1:5,"MT","Pltd"), IRanges(1:7,width=5))
-    checkException(keepStandardChromosomes(plantgr),silent =TRUE)
+    checkEquals(c(1:5,"MT","Pltd"), seqlevels(plantgr))
+    
+    ## smaller example:
+    gr <- GRanges(c("chr1", "chr1", "chr2", "chr3"), IRanges(1:4, width=3))
+    gr <- keepStandardChromosomes(gr)
+    checkEquals(3, length(seqlevels(gr)))
+    checkEquals(c("chr1","chr2","chr3"), seqlevels(gr))
+    
+    gr <- GRanges(c("chr1", "chr1_gl000192_random", "chrM", "chr1"), 
+                  IRanges(1:4, width=3))
+    gr <- keepStandardChromosomes(gr) 
+    checkEquals(c("chrM","chr1"), seqlevels(gr))
+    checkEquals(2, length(seqlevels(gr)))
+    
 }    
 

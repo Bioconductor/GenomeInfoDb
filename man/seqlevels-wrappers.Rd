@@ -85,9 +85,9 @@ keepStandardChromosomes(x, species=NULL)
   'standard' Chromosomes. We define 'standard chromosomes' as those chromosomes 
   which represent sequences in the assembly that are not scaffolds. Also 
   referred to as 'assembly molecule' on NCBI. Applicable when \code{x}
-  has a Seqinfo object.This function automatically detects the species and style
-  of the object. Often seqlevels are shared across species and this function 
-  then requires the user to specify the species to get the standard Chromsomes. 
+  has a Seqinfo object.This function determines which seqlevels need to be kept 
+  using the organism's supported by GenomeInfoDb. The user can also specify the 
+  species to get the standard Chromsomes in \code{x}. 
 }
 
 \seealso{
@@ -197,10 +197,6 @@ keepStandardChromosomes(gr)
 
 ##GRangesList
 keepStandardChromosomes(grl)
-
-## This function automatically detects the species and style of the object. 
-## Often seqlevels are shared across species and this function then requires the 
-## user to specify the species to get the standard Chromsomes.
 
 plantgr <- GRanges(c(1:5,"MT","Pltd"), IRanges(1:7,width=5))
 keepStandardChromosomes(plantgr, species="Arabidopsis thaliana")
