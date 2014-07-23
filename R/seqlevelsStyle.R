@@ -126,6 +126,9 @@ setMethod("seqlevelsStyle", "character",
     function(x) 
 {
     ## implement seqlevelsStyle,character-method
+    if(length(x)==0)
+        stop("No seqlevels present in this object.")
+    
     seqnames <- unique(x)      
     ans <- .guessSpeciesStyle(seqnames)
     ans[2]

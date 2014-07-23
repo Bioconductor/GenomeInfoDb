@@ -69,15 +69,18 @@ keepStandardChromosomes <- function(x, species=NULL)
     
     if(missing(species))
     {
-        ## 1- get names of all species supported by GenomeInfodb
-        ## 2- extract seqlevels for all species for current style
+        ## 1- find compatible species based on style of Seqinfo object
+        ## 2- extract seqlevels for all compatible species. 
         ## 3- intersect, find how many species have some seqlevels as original?
         allspecies <- names(genomeStyles())
-    
-        allseqlevels <- lapply(allspecies, function(x) 
-            tryCatch(extractSeqlevels(x, style), error=function(e) NULL))
+        
+        compatibility_idx <- sapply(genomeStyles(),
+                                    function(y) style %in% colnames(y))
+        compatible_species <- names(compatibility_idx)[compatibility_idx]
+        allseqlevels <- lapply(compatible_species,
+                               function(y) extractSeqlevels(y, style)) 
                 
-        mres <- sapply(allseqlevels, function(x) intersect(x, ori_seqlevels))
+        mres <- sapply(allseqlevels, function(y) intersect(y, ori_seqlevels))
         
         standard_chromosomes <- unique(unlist(mres))
         
@@ -88,7 +91,8 @@ keepStandardChromosomes <- function(x, species=NULL)
         standard_chromosomes <- extractSeqlevels(species, style)
     }
     
-    x <- keepSeqlevels(x,standard_chromosomes)
+    #x <- keepSeqlevels(x,standard_chromosomes)
+    seqlevels(x,force=TRUE) <- standard_chromosomes 
     return(x)
     
 }

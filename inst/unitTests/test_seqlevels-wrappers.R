@@ -91,5 +91,7 @@ test_keepStandardChromosomes <- function()
     checkEquals(c("chrM","chr1"), seqlevels(gr))
     checkEquals(2, length(seqlevels(gr)))
     
+    checkException(keepStandardChromosomes(GRanges()))
+    
 }    
 
