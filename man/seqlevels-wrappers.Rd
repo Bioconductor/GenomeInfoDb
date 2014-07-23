@@ -187,8 +187,9 @@ seqlevels(txdb)
 ## keepStandardChromosomes
 ## ---------------------------------------------------------------------
 
-gr <- GRanges(c(paste0("chr",c(1:22,"X","Y","M")), "chr1_gl000191_random",
-           "chr1_gl000192_random"), IRanges(1:27, width=3))
+gr <- GRanges(c(paste0("chr",c(1:3)), "chr1_gl000191_random",
+           "chr1_gl000192_random"), IRanges(1:5, width=3))
+gr
 grl <- split(gr,seqnames(gr))
 
 ##GRanges
@@ -197,7 +198,7 @@ keepStandardChromosomes(gr)
 ##GRangesList
 keepStandardChromosomes(grl)
 
-plantgr <- GRanges(c(1:2,"Pltd","wrong"), IRanges(1:4,width=5))
+plantgr <- GRanges(c(1:5,"MT","Pltd","wrong"), IRanges(1:8,width=5))
 keepStandardChromosomes(plantgr, species="Arabidopsis thaliana")
 }
 

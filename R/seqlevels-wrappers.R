@@ -61,10 +61,13 @@ restoreSeqlevels <- function(x, ...)
 
 keepStandardChromosomes <- function(x, species=NULL)
 {
-    style <- seqlevelsStyle(x)
-    
     ori_seqlevels <- seqlevels(x)
     
+    if(length(ori_seqlevels)==0)
+        return(x)
+    
+    style <- seqlevelsStyle(x)
+        
     standard_chromosomes <- character(0)
     
     if(missing(species))
