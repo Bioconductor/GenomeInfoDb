@@ -75,21 +75,48 @@ test_keepStandardChromosomes <- function()
     checkEquals(25,length(seqlevels(gr2)))
     checkEquals(27,end(gr2[25]))
     
-    ## seqlevels common across multiple species. 
-    plantgr <- GRanges(c(1:5,"MT","Pltd"), IRanges(1:7,width=5))
-    checkEquals(c(1:5,"MT","Pltd"), seqlevels(plantgr))
-    
-    ## smaller example:
-    gr <- GRanges(c("chr1", "chr1", "chr2", "chr3"), IRanges(1:4, width=3))
-    gr <- keepStandardChromosomes(gr)
-    checkEquals(3, length(seqlevels(gr)))
-    checkEquals(c("chr1","chr2","chr3"), seqlevels(gr))
-    
+   
+    ## drop scaffolds - eg1. 
     gr <- GRanges(c("chr1", "chr1_gl000192_random", "chrM", "chr1"), 
                   IRanges(1:4, width=3))
     gr <- keepStandardChromosomes(gr) 
     checkEquals(c("chrM","chr1"), seqlevels(gr))
     checkEquals(2, length(seqlevels(gr)))
     
+    ## seqlevels not supported by GenomeInfodb.  
+    gr <- GRanges("chr4_ctg9_hap1", IRanges(1, 5))
+    checkEquals(length(seqlevels(keepStandardChromosomes(gr))),0)
+    checkException(seqlevelsStyle(gr))
+    
+    ## drop seqlevels not supported by GenomeInfoDb
+    plantgr <- GRanges(c(31:35,"MT","Pltd"), IRanges(1:7,width=5))
+    plantgr <- keepStandardChromosomes(plantgr)
+    checkEquals(c("MT","Pltd"), seqlevels(plantgr))
+    
+    ## no seqlevels in object
+    checkEquals(0,length(seqlevels(keepStandardChromosomes(GRanges()))))
+    
 }    
 
+test_seqlevelsStyle <- function()
+{
+    #1. correctseqnames
+    got <- seqlevelsStyle(c(paste0('chr',1:20)))
+    checkEquals(got,"UCSC")
+    
+    #2. mix seqnames from 2 styles for same organism
+    got2 <- seqlevelsStyle(c('1','MT','Pltd','chr1'))
+    checkEquals(got2,"NCBI")
+    
+    #3. mix seqnames from 2 different organisms
+    got2 <- seqlevelsStyle(c('1','chr2RHet','chr3LHet'))
+    checkEquals(got2,"UCSC")
+    
+    #4. incorrect seqnames
+    checkException(seqlevelsStyle(c('234','567','acv')))
+        
+    #5. empty Seqinfo obj - with no seqnames
+    checkException(seqlevelsStyle(c('')))
+    checkException(seqlevelsStyle(GRanges()))
+    
+}

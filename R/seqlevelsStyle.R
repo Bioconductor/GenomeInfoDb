@@ -97,17 +97,17 @@
     unlistgot2 <- unlist(got2, recursive=TRUE,use.names=TRUE)
 
     if (max(unlistgot2) == 0) {
-        txt <- "The style does not have a compatible entry for the
-                species supported by Seqname. Please see
-                genomeStyles() for supported species/style"
-        stop(paste(strwrap(txt, exdent=2), collapse="\n"))
+       ans <- NA
+    }else{
+        ##vec is in format "Homo_sapiens.UCSC"
+        vec <- names(which.max(unlistgot2))
+        species <- sub("_", " ",unlist(strsplit(vec,"[.]")),fixed=TRUE)[[1]]
+        style <- unlist(strsplit(vec,"[.]"))[[2]]
+        ans <- c(species, style) 
     }
-
-    ##vec is in format "Homo_sapiens.UCSC"
-    vec <- names(which.max(unlistgot2))
-    species <- sub("_", " ",unlist(strsplit(vec,"[.]")),fixed=TRUE)[[1]]
-    style <- unlist(strsplit(vec,"[.]"))[[2]]
-    c(species,style)
+    
+    ans
+    
 }
 
 
@@ -130,8 +130,15 @@ setMethod("seqlevelsStyle", "character",
         stop("No seqlevels present in this object.")
     
     seqnames <- unique(x)      
-    ans <- .guessSpeciesStyle(seqnames)
-    ans[2]
+    ans <- .guessSpeciesStyle(seqnames)[2]
+    if(is.na(ans)){
+        txt <- "The style does not have a compatible entry for the
+            species supported by Seqname. Please see
+            genomeStyles() for supported species/style"
+        stop(paste(strwrap(txt, exdent=2), collapse="\n"))
+        
+    }
+    ans
 })
 
 ### The default methods work on any object 'x' with working "seqlevels"

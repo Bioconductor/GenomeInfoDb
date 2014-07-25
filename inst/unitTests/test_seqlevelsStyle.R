@@ -70,9 +70,3 @@ test_seqlevelsInGroup <-
     checkEquals(25,length(got2))
 }  
 
-test_seqlevelsStyle <-
-    function()
-{
-       checkEquals("NCBI",seqlevelsStyle(c("2L","2R","X","Xhet")))
-       checkEquals("UCSC",seqlevelsStyle(paste0("chr",c(1:30))))
-}
