@@ -98,6 +98,7 @@ keepStandardChromosomes <- function(x, species=NULL)
         
     }else{
         standard_chromosomes <- extractSeqlevels(species, style)
+        standard_chromosomes <- intersect(ori_seqlevels,standard_chromosomes)
     }
     
     #x <- keepSeqlevels(x,standard_chromosomes)

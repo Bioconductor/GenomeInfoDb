@@ -75,6 +75,10 @@ test_keepStandardChromosomes <- function()
     checkEquals(25,length(seqlevels(gr2)))
     checkEquals(27,end(gr2[25]))
     
+    gr <- GRanges(c("chr1", "chr2", "chr3L", "3L"), 
+                  IRanges(1:4, width=3))
+    gr <- keepStandardChromosomes(gr, species="Homo sapiens") 
+    checkEquals(2, length(seqlevels(gr)))
    
     ## drop scaffolds - eg1. 
     gr <- GRanges(c("chr1", "chr1_gl000192_random", "chrM", "chr1"), 

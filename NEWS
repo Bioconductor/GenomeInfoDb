@@ -87,3 +87,11 @@ SIGNIFICANT USER-VISIBLE CHANGES
      seqnamesInGroup --> seqlevelsInGroup
      seqnamesStyle --> seqlevelsStyle
      "seqnameStyle<-" --> "seqlevelsStyle<-" 
+
+CHANGES IN VERSION 0.99.17
+----------------------------------
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+   o keepStandardChromosomes: Make 'species' argument optional and remove 
+     'style' argument.
