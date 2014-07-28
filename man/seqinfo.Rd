@@ -136,7 +136,7 @@ genome(x) <- value
         \link[GenomicAlignments]{GAlignmentPairs},
         and \link[GenomicAlignments]{GAlignmentsList} classes in the
         \pkg{GenomicAlignments} package;
-        the \link[GenomicFeatures]{TranscriptDb} class in the
+        the \link[GenomicFeatures]{TxDb} class in the
         \pkg{GenomicFeatures} package;
         the \link[BSgenome]{BSgenome} class in the
         \pkg{BSgenome} package; etc...
@@ -182,7 +182,7 @@ genome(x) <- value
           and \link[GenomicAlignments]{GAlignmentsList} objects in the
           \pkg{GenomicAlignments} package.
 
-    \item \link[GenomicFeatures]{TranscriptDb} objects in the
+    \item \link[GenomicFeatures]{TxDb} objects in the
           \pkg{GenomicFeatures} package.
 
     \item \link[BSgenome]{BSgenome} objects in the \pkg{BSgenome} package.
@@ -221,7 +221,7 @@ if (interactive()) {
 ## Overlap and matching operations between objects require matching
 ## seqlevels. Often the seqlevels in one must be modified to match 
 ## the other. The seqlevels() function can rename, drop, add and reorder 
-## seqlevels of an object. Examples below are shown on TranscriptDb 
+## seqlevels of an object. Examples below are shown on TxDb 
 ## and GRanges but the approach is the same for all objects that have
 ## a 'Seqinfo' class.
 
@@ -300,7 +300,7 @@ seqlevels(tx)
 ## Restore original seqlevels. 
 ## ---------------------------------------------------------------------
 
-## Applicable to TranscriptDb objects only.
+## Applicable to TxDb objects only.
 \dontrun{
 seqlevels0(txdb)
 seqlevels(txdb)

@@ -52,7 +52,7 @@ renameSeqlevels <- function(x, value, ...)
     x 
 }
 
-## Currently applies to TranscriptDb only.
+## Currently applies to TxDb only.
 restoreSeqlevels <- function(x, ...)
 {
     seqlevels0(x) 

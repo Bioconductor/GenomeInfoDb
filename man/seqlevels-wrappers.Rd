@@ -77,8 +77,8 @@ keepStandardChromosomes(x, species=NULL)
   original \code{seqlevels(x)}.
 
   \code{restoreSeqlevels}: Restore the seqlevels in \code{x} back to the
-  original values. Applicable only when \code{x} is a TranscriptDb. The 
-  function re-initializes the TranscriptDb which resets the seqlevels, 
+  original values. Applicable only when \code{x} is a TxDb. The 
+  function re-initializes the TxDb which resets the seqlevels, 
   removes masks and any other previous modifications.
   
   \code{keepStandardChromosomes}:Subsetting operation that returns only the 
@@ -129,9 +129,9 @@ dropSeqlevels(grl, c("chr1", "chr2"))
 galist <- split(gal, as.character(seqnames(gal)))
 keepSeqlevels(galist, "seq2")
 
-## TranscriptDb:
+## TxDb:
 
-## A TranscriptDb cannot be directly subset with 'keepSeqlevels' 
+## A TxDb cannot be directly subset with 'keepSeqlevels' 
 ## and 'dropSeqlevels'.
 library(TxDb.Dmelanogaster.UCSC.dm3.ensGene)
 txdb <- TxDb.Dmelanogaster.UCSC.dm3.ensGene
@@ -140,7 +140,7 @@ seqlevels(txdb)
 keepSeqlevels(txdb, "chr2L") ## fails
 }
 
-## GRanges or GRangesLists extracted from the TranscriptDb can be subset.
+## GRanges or GRangesLists extracted from the TxDb can be subset.
 txbygene <- transcriptsBy(txdb, "gene")
 seqlevels(txbygene)
 chr2L <- keepSeqlevels(txbygene, "chr2L")
@@ -161,10 +161,10 @@ gal2b <- renameSeqlevels(gal, c("seq1", "chr2"))
 gal3 <- renameSeqlevels(gal, c(foo="chr2"))
 identical(seqlevels(gal), seqlevels(gal3))
 
-## TranscriptDb:
+## TxDb:
 
 seqlevels(txdb)
-## When the seqlevels of a TranscriptDb are renamed, all future 
+## When the seqlevels of a TxDb are renamed, all future 
 ## extractions reflect the modified seqlevels.
 renameSeqlevels(txdb, sub("chr", "CH", seqlevels(txdb)))
 renameSeqlevels(txdb, c(CHM="M"))
@@ -177,7 +177,7 @@ identical(seqlevels(txdb), seqlevels(transcripts))
 ## restoreSeqlevels 
 ## ---------------------------------------------------------------------
 
-## Restore seqlevels in a TranscriptDb to original values.
+## Restore seqlevels in a TxDb to original values.
 \dontrun{
 restoreSeqlevels(txdb)
 seqlevels(txdb)
