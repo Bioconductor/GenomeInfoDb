@@ -142,15 +142,15 @@ genome(x) <- value
         \pkg{BSgenome} package; etc...
       }
 
-      The GenomicRanges package defines \code{seqinfo} and
-      \code{seqinfo<-} methods for these low-level IRanges data
-      structures: \code{List}, \code{RangesList} and
-      \code{RangedData}. Those objects do not have the means to formally
-      store sequence information. Thus, the wrappers simply store the
-      \code{Seqinfo} object within \code{metadata(x)}. Initially, the
-      metadata is empty, so there is some effort to generate a
-      reasonable default \code{Seqinfo}. The names of any \code{List}
-      are taken as the \code{seqnames}, and the \code{universe} of
+      The \pkg{GenomicRanges} package defines \code{seqinfo} and
+      \code{seqinfo<-} methods for these low-level data types:
+      \code{List}, \code{RangesList} and \code{RangedData}. Those
+      objects do not have the means to formally store sequence
+      information. Thus, the wrappers simply store the \code{Seqinfo}
+      object within \code{metadata(x)}. Initially, the metadata
+      is empty, so there is some effort to generate a reasonable
+      default \code{Seqinfo}. The names of any \code{List} are
+      taken as the \code{seqnames}, and the \code{universe} of
       \code{RangesList} or \code{RangedData} is taken as the
       \code{genome}.
 }

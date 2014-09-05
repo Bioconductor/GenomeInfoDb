@@ -1,7 +1,7 @@
 import(methods)
 import(BiocGenerics)
 import(S4Vectors)
-import(IRanges)  # for elementLengths()
+import(IRanges)  # for CompressedList
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
