@@ -361,8 +361,45 @@ setMethod("as.data.frame", "Seqinfo",
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### "show" method.
+### Displaying.
 ###
+
+### S3/S4 combo for summary.Seqinfo
+summary.Seqinfo <- function(object, ...)
+{
+    ## nb of sequences
+    object_len <- length(object)
+    if (object_len == 0L)
+        return("no sequences")
+    ans <- c(object_len, " sequence")
+    if (object_len > 1L)
+        ans <- c(ans, "s")
+    ## circularity
+    circ_count <- sum(isCircular(object), na.rm=TRUE)
+    if (circ_count != 0L)
+        ans <- c(ans, " (", circ_count, " circular)")
+    ## genomes
+    ugenomes <- unique(genome(object))
+    genome_count <- length(ugenomes)
+    if (genome_count == 1L) {
+        if (is.na(ugenomes))
+            ans <- c(ans, " from an unspecified genome")
+        else
+            ans <- c(ans, " from ", ugenomes, " genome")
+    } else {
+        if (genome_count > 3L)
+            ugenomes <- c(ugenomes[1:2], "...")
+        genomes_in1string <- paste0(ugenomes, collapse=", ")
+        ans <- c(ans, " from ", genome_count, " genomes ",
+                      "(", genomes_in1string, ")")
+    }
+    ## seqlengths
+    seqlengths <- seqlengths(object)
+    if (all(is.na(seqlengths)))
+        ans <- c(ans, "; no seqlengths")
+    paste0(ans, collapse="")
+}
+setMethod("summary", "Seqinfo", summary.Seqinfo)
 
 ### cat(.showOutputAsCharacter(x), sep="\n") is equivalent to show(x).
 .showOutputAsCharacter <- function(x)
@@ -411,11 +448,11 @@ showCompactDataFrame <- function(x, rownames.label="", left.margin="")
 setMethod("show", "Seqinfo",
     function(object)
     {
-        lo <- length(object)
-        cat(class(object), " of length ", lo, "\n", sep="")
-        if (lo == 0L)
+        cat(class(object), " object with ", summary(object), ":\n", sep="")
+        if (length(object) == 0L)
             return(NULL)
-        showCompactDataFrame(as.data.frame(object), "seqnames")
+        showCompactDataFrame(as.data.frame(object),
+                             rownames.label="seqnames", left.margin="  ")
     }
 )
 

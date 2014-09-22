@@ -25,6 +25,8 @@
 \alias{genome<-,Seqinfo-method}
 \alias{[,Seqinfo-method}
 \alias{as.data.frame,Seqinfo-method}
+\alias{summary.Seqinfo}
+\alias{summary,Seqinfo-method}
 \alias{show,Seqinfo-method}
 \alias{merge,Seqinfo,missing-method}
 \alias{merge,missing,Seqinfo-method}
@@ -202,6 +204,10 @@
 }
 
 \examples{
+## ---------------------------------------------------------------------
+## A. BASIC MANIPULATION OF A Seqinfo OBJECT
+## ---------------------------------------------------------------------
+
 ## Note that all the arguments (except 'genome') must have the
 ## same length. 'genome' can be of length 1, whatever the lengths
 ## of the other arguments are.
@@ -209,6 +215,9 @@ x <- Seqinfo(seqnames=c("chr1", "chr2", "chr3", "chrM"),
              seqlengths=c(100, 200, NA, 15),
              isCircular=c(NA, FALSE, FALSE, TRUE),
              genome="toy")
+x
+
+## Accessors:
 length(x)
 seqnames(x)
 names(x)
@@ -217,7 +226,11 @@ seqlengths(x)
 isCircular(x)
 genome(x)
 
-x[c("chrY", "chr3", "chr1")]  # subset by names
+## Get a compact summary:
+summary(x)
+
+## Subset by names:
+x[c("chrY", "chr3", "chr1")]
 
 ## Rename, drop, add and/or reorder the sequence levels:
 xx <- x
@@ -229,6 +242,10 @@ seqlevels(xx) <- c("ch1", "ch2", "chY")  # drop/add/reorder
 xx
 seqlevels(xx) <- c(chY="Y", ch1="1", "22")  # rename/reorder/drop/add
 xx
+
+## ---------------------------------------------------------------------
+## B. MERGING 2 Seqinfo OBJECTS
+## ---------------------------------------------------------------------
 
 y <- Seqinfo(seqnames=c("chr3", "chr4", "chrM"),
              seqlengths=c(300, NA, 15))
@@ -249,6 +266,11 @@ y
 if (interactive()) {
   merge(x, y)  # raises an error
 }
+
+## Sanity checks:
+stopifnot(identical(x, merge(x, Seqinfo())))
+stopifnot(identical(x, merge(Seqinfo(), x)))
+stopifnot(identical(x, merge(x, x)))
 }
 
 \keyword{methods}
