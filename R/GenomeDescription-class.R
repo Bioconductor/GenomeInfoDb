@@ -128,6 +128,30 @@ GenomeDescription <- function(organism, species,
 ### The 'show' method
 ###
 
+### Kind of very low-level. Could go into S4Vectors if someone else needed
+### this...
+.compactPrintNamedAtomicVector <- function(x, margin="")
+{
+    x_len <- length(x)
+    halfWidth <- (getOption("width") - nchar(margin)) %/% 2L
+    first <- max(1L, halfWidth)
+    showMatrix <-
+      rbind(as.character(head(names(x), first)),
+            as.character(head(x, first)))
+    if (x_len > first) {
+        last <- min(x_len - first, halfWidth)
+        showMatrix <-
+          cbind(showMatrix,
+                rbind(as.character(tail(names(x), last)),
+                      as.character(tail(x, last))))
+    }
+    showMatrix <- format(showMatrix, justify="right")
+    cat(BiocGenerics:::labeledLine(margin, showMatrix[1L, ], count=FALSE,
+                                           labelSep=""), sep="")
+    cat(BiocGenerics:::labeledLine(margin, showMatrix[2L, ], count=FALSE,
+                                           labelSep=""), sep="")
+}
+
 ### NOT exported (but used in the BSgenome package).
 showGenomeDescription <- function(x, margin="", print.seqlengths=FALSE)
 {
@@ -138,7 +162,8 @@ showGenomeDescription <- function(x, margin="", print.seqlengths=FALSE)
     cat(margin, "release name: ", releaseName(x), "\n", sep="")
     if (print.seqlengths) {
         cat(margin, "---\n", sep="")
-        GenomicRanges:::showSeqlengths(x, margin=margin)
+        cat(margin, "seqlengths:\n", sep="")
+        .compactPrintNamedAtomicVector(seqlengths(x), margin=margin)
     }
 }
 
