@@ -20,6 +20,7 @@ export(
 
     ## seqlevelsStyle.R:
     genomeStyles,
+    genomeAssemblies,
     extractSeqlevels,
     extractSeqlevelsByGroup,
     mapSeqlevels,
