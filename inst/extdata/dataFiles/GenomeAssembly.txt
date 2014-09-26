@@ -1,4 +1,4 @@
-Common_Name	Scientific_Name	UCSC_ID	Taxon_ID
+Common_Name	Scientific_Name	UCSC_assembly_ID	Taxon_ID
 Panda	Ailuropoda melanoleuca	ailMel1	9646
 American alligator	Alligator mississippiensis	allMis1	8496
 Anopheles gambiae	Anopheles gambiae	anoGam1	7165

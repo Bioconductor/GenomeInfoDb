@@ -192,7 +192,7 @@ genomeAssemblies <-
 {
     fileName <- system.file("extdata","dataFiles","GenomeAssembly.txt",
                             package="GenomeInfoDb")
-    read.table(fileName, sep="\t", header=TRUE)    
+    read.table(fileName, sep="\t", header=TRUE, stringsAsFactors=FALSE)    
 }
 
 
