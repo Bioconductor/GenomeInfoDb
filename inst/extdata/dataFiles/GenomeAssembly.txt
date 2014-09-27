@@ -20,16 +20,16 @@ Lancelet 	Branchiostoma floridae	braFlo2	7739
 Worm	Caenorhabditis angaria	caeAng1	860376
 Nematode	Caenorhabditis japonica	caeJap1	281687
 Camellia japonica	Camellia japonica	caeJap4	4443
-Caenorhabditis brenneri 	Caenorhabditis brenneri	caePb1	135651
-Caenorhabditis brenneri 	Caenorhabditis brenneri	caePb2	135651
-Caenorhabditis brenneri 	Caenorhabditis brenneri	caePb3	135651
+Caenorhabditis brenneri	Caenorhabditis brenneri	caePb1	135651
+Caenorhabditis brenneri	Caenorhabditis brenneri	caePb2	135651
+Caenorhabditis brenneri	Caenorhabditis brenneri	caePb3	135651
 Nematode	Caenorhabditis remanei	caeRem2	31234
 Nematode	Caenorhabditis remanei	caeRem3	31234
 Nematode	Caenorhabditis remanei	caeRem4	31234
 Caenorhabditis sp. 111	Caenorhabditis sp.	caeSp111	56638
 Caenorhabditis sp. 71	Caenorhabditis sp.	caeSp71	56638
 Caenorhabditis sp. 91	Caenorhabditis sp.	caeSp91	56638
-Marmoset 	Callithrix jacchus	calJac1	9483
+Marmoset	Callithrix jacchus	calJac1	9483
 Marmoset 	Callithrix jacchus	calJac3	9483
 Elephant Shark	Callorhinchus milii	calMil1	7868
 Dog	Canis familiaris	canFam1	9615
@@ -105,7 +105,7 @@ Stickleback	Gasterosteus aculeatus	gasAcu1	69293
 Medium ground finch	Geospiza fortis	geoFor1	48883
 Gorilla	Gorilla gorilla gorilla	gorGor1	9595
 Gorilla	Gorilla gorilla gorilla	gorGor3	9595
-Naked mole-rat	Heterocephalus glaber	hetGla1	10181
+Naked mole rat	Heterocephalus glaber	hetGla1	10181
 Naked mole rat	Heterocephalus glaber	hetGla2	10181
 Human	Homo sapiens	hg15	9606
 Human	Homo sapiens	hg16	9606
@@ -135,8 +135,8 @@ Ferret	Mustela putorius furo	musFur1	9669
 Microbat	Myotis lucifugus	myoLuc1	59463
 Microbat	Myotis lucifugus	myoLuc2	59463
 Gibbon	Nomascus leucogenys	nomLeu1	61853
- Gibbon	Nomascus leucogenys	nomLeu2	61853
- Gibbon	Nomascus leucogenys	nomLeu3	61853
+Gibbon	Nomascus leucogenys	nomLeu2	61853
+Gibbon	Nomascus leucogenys	nomLeu3	61853
 Pika	Ochotona princeps	ochPri2	9978
 Pika	Ochotona princeps	ochPri3	9978
 Nile tilapia	Oreochromis niloticus	oreNil1	8128
@@ -144,7 +144,7 @@ Nile tilapia	Oreochromis niloticus	oreNil2	8128
 Platypus 	Ornithorhynchus anatinus	ornAna1	9258
 Rabbit	Oryctolagus cuniculus	oryCun1	9986
 Rabbit	Oryctolagus cuniculus	oryCun2	9986
-Medaka 	Oryzias latipes	oryLat2	8090
+Medaka	Oryzias latipes	oryLat2	8090
 Bushbaby	Otolemur garnettii	otoGar1	30611
 Bushbaby	Otolemur garnettii	otoGar3	30611
 Sheep	Ovis aries	oviAri1	9940
@@ -157,7 +157,7 @@ Baboon	Papio anubis	papAnu2	9555
 Baboon	Papio hamadryas	papHam1	9557
 Lamprey	Petromyzon marinus	petMar1	7757
 Lamprey	Petromyzon marinus	petMar2	7757
-Orangutan 	Pongo abelii	ponAbe2	9601
+Orangutan	Pongo abelii	ponAbe2	9601
 Roundworm	Pristionchus pacificus	priPac1	54126
 Rock hyrax	Procavia capensis	proCap1	9813
 Megabat	Pteropus vampyrus	pteVam1	132908
@@ -191,8 +191,8 @@ Manatee	Trichechus manatus latirostris	triMan1	127582
 Tree shrew	Tupaia belangeri	tupBel1	37347
 Dolphin	Tursiops truncatus	turTru1	9739
 Dolphin	Tursiops truncatus	turTru2	9739
- Alpaca	Vicugna pacos	vicPac1	30538
- Alpaca	Vicugna pacos	vicPac2	30538
+Alpaca	Vicugna pacos	vicPac1	30538
+Alpaca	Vicugna pacos	vicPac2	30538
 Western clawed frog	Xenopus (Silurana) tropicalis	xenTro1	8364
 Western clawed frog	Xenopus (Silurana) tropicalis	xenTro2	8364
 Western clawed frog	Xenopus (Silurana) tropicalis	xenTro3	8364

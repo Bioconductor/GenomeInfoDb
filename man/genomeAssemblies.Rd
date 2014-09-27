@@ -12,8 +12,7 @@ genomeAssemblies()
 }
 \value{
 A data.frame is returned which contains four columns -"Common_Name", 
-"Scientific_ID", "UCSC_assembly_ID" and "Taxon_ID". Each row of the data.frame
-contains a unique "UCSC_assembly_ID"
+"Scientific_ID", "UCSC_assembly_ID" and "Taxon_ID".
 }
 \author{
 Sonali Arora
