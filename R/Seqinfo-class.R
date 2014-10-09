@@ -474,25 +474,39 @@ setMethod("show", "Seqinfo",
 
 .Seqinfo.mergexy <- function(x, y)
 {
-    x_propernames <- setdiff(seqnames(x), seqnames(y))
-    y_propernames <- setdiff(seqnames(y), seqnames(x))
-    if (length(x_propernames) != 0L && length(y_propernames) != 0L) {
-        msg <- c("Each of the 2 combined objects has sequence levels not in ",
-                 "the other:\n  - in 'x': ",
-                 paste(x_propernames, collapse=", "), "\n  - in 'y': ",
-                 paste(y_propernames, collapse=", "), "\n",
-                 "  Make sure to always combine/compare objects based on the ",
-                 "same reference\n  genome (use suppressWarnings() to ",
-                 "suppress this warning).")
-        warning(msg)
-    }
-    ans_seqnames <- union(seqnames(x), seqnames(y))
-    ans_seqlengths <- mergeNamedAtomicVectors(seqlengths(x), seqlengths(y),
-                        what=c("sequence", "seqlengths"))
+    ans_seqnames    <- union(seqnames(x), seqnames(y))
+    ans_genome      <- mergeNamedAtomicVectors(genome(x), genome(y),
+                           what=c("sequence", "genomes"))
+    ans_seqlengths  <- mergeNamedAtomicVectors(seqlengths(x), seqlengths(y),
+                           what=c("sequence", "seqlengths"))
     ans_is_circular <- mergeNamedAtomicVectors(isCircular(x), isCircular(y),
-                        what=c("sequence", "circularity flags"))
-    ans_genome <- mergeNamedAtomicVectors(genome(x), genome(y),
-                        what=c("sequence", "genomes"))
+                           what=c("sequence", "circularity flags"))
+
+    common_seqnames <- intersect(seqnames(x), seqnames(y))
+    if (length(common_seqnames) == 0L) {
+        msg <- c("The 2 combined objects have no sequence levels in common. ",
+                 "(Use\n  suppressWarnings() to suppress this warning.)")
+        warning(msg)
+    } else {
+        x_proper_seqnames <- setdiff(seqnames(x), common_seqnames)
+        y_proper_seqnames <- setdiff(seqnames(y), common_seqnames)
+        if (length(x_proper_seqnames) != 0L
+         && length(y_proper_seqnames) != 0L
+         && (any(is.na(genome(x)[common_seqnames])) ||
+             any(is.na(genome(y)[common_seqnames]))))
+        {
+            msg <- c("Each of the 2 combined objects has sequence levels ",
+                     "not in the other:\n",
+                     "  - in 'x': ",
+                     paste(x_proper_seqnames, collapse=", "), "\n",
+                     "  - in 'y': ",
+                     paste(y_proper_seqnames, collapse=", "), "\n",
+                     "  Make sure to always combine/compare objects based on ",
+                     "the same reference\n  genome (use suppressWarnings() ",
+                     "to suppress this warning).")
+            warning(msg)
+        }
+    }
     Seqinfo(seqnames=ans_seqnames, seqlengths=ans_seqlengths,
             isCircular=ans_is_circular, genome=ans_genome)
 }

@@ -250,15 +250,22 @@ xx
 y <- Seqinfo(seqnames=c("chr3", "chr4", "chrM"),
              seqlengths=c(300, NA, 15))
 y
+
+## This issues a warning:
 merge(x, y)  # rows for chr3 and chrM are merged
+
+## To get rid of the above warning, either use suppressWarnings() or
+## set the genome on 'y':
 suppressWarnings(merge(x, y))
+genome(y) <- genome(x)[[1]]
+merge(x, y)
 
 ## Note that, strictly speaking, merging 2 Seqinfo objects is not
 ## a commutative operation, i.e., in general 'z1 <- merge(x, y)'
 ## is not identical to 'z2 <- merge(y, x)'. However 'z1' and 'z2'
 ## are guaranteed to contain the same information (i.e. the same
 ## rows, but typically not in the same order):
-suppressWarnings(merge(y, x))
+merge(y, x)
 
 ## This contradicts what 'x' says about circularity of chr3 and chrM:
 isCircular(y)[c("chr3", "chrM")] <- c(TRUE, FALSE)
@@ -268,8 +275,8 @@ if (interactive()) {
 }
 
 ## Sanity checks:
-stopifnot(identical(x, merge(x, Seqinfo())))
-stopifnot(identical(x, merge(Seqinfo(), x)))
+stopifnot(identical(x, suppressWarnings(merge(x, Seqinfo()))))
+stopifnot(identical(x, suppressWarnings(merge(Seqinfo(), x))))
 stopifnot(identical(x, merge(x, x)))
 }
 
