@@ -483,18 +483,16 @@ setMethod("show", "Seqinfo",
                            what=c("sequence", "circularity flags"))
 
     common_seqnames <- intersect(seqnames(x), seqnames(y))
-    if (length(common_seqnames) == 0L) {
-        msg <- c("The 2 combined objects have no sequence levels in common. ",
-                 "(Use\n  suppressWarnings() to suppress this warning.)")
-        warning(msg)
-    } else {
-        x_proper_seqnames <- setdiff(seqnames(x), common_seqnames)
-        y_proper_seqnames <- setdiff(seqnames(y), common_seqnames)
-        if (length(x_proper_seqnames) != 0L
-         && length(y_proper_seqnames) != 0L
-         && (any(is.na(genome(x)[common_seqnames])) ||
-             any(is.na(genome(y)[common_seqnames]))))
-        {
+    x_proper_seqnames <- setdiff(seqnames(x), common_seqnames)
+    y_proper_seqnames <- setdiff(seqnames(y), common_seqnames)
+    if (length(x_proper_seqnames) != 0L && length(y_proper_seqnames) != 0L) {
+        if (length(common_seqnames) == 0L) {
+            msg <- c("The 2 combined objects have no sequence levels in ",
+                     "common. (Use\n  suppressWarnings() to suppress this ",
+                     "warning.)")
+            warning(msg)
+        } else if (any(is.na(genome(x)[common_seqnames]))
+                || any(is.na(genome(y)[common_seqnames]))) {
             msg <- c("Each of the 2 combined objects has sequence levels ",
                      "not in the other:\n",
                      "  - in 'x': ",

@@ -275,8 +275,8 @@ if (interactive()) {
 }
 
 ## Sanity checks:
-stopifnot(identical(x, suppressWarnings(merge(x, Seqinfo()))))
-stopifnot(identical(x, suppressWarnings(merge(Seqinfo(), x))))
+stopifnot(identical(x, merge(x, Seqinfo())))
+stopifnot(identical(x, merge(Seqinfo(), x)))
 stopifnot(identical(x, merge(x, x)))
 }
 
