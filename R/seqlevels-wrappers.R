@@ -92,6 +92,8 @@ keepStandardChromosomes <- function(x, species=NULL)
         mres <- sapply(allseqlevels, function(y) intersect(y, ori_seqlevels))
         
         standard_chromosomes <- unique(unlist(mres))
+        standard_chromosomes <- 
+            ori_seqlevels[which(ori_seqlevels %in% standard_chromosomes)]
         
         if(length(standard_chromosomes) == 0 )
             stop("Cannot determine standard chromosomes, Specify species arg")
