@@ -96,7 +96,7 @@ test_keepStandardChromosomes <- function()
     checkException(seqlevelsStyle(gr))
     
     ## drop seqlevels not supported by GenomeInfoDb
-    plantgr <- GRanges(c(31:35,"MT","Pltd"), IRanges(1:7,width=5))
+    plantgr <- GRanges(c(41:45,"MT","Pltd"), IRanges(1:7,width=5))
     plantgr <- keepStandardChromosomes(plantgr)
     checkEquals(c("MT","Pltd"), seqlevels(plantgr))
     

@@ -69,4 +69,12 @@ to be added to \Biocpkg{GenomeInfoDb}
 One can look at existing organism files under GenomeInfoDb/extdata/dataFiles
 in their R/library to get a further idea about the format of files. 
 
+\section{Contacting us with your new file}
+
+Once your file is ready, Please send your file  to:
+
+<<email>>=
+packageDescription("GenomeInfoDb")$Maintainer
+@
+
 \end{document}
