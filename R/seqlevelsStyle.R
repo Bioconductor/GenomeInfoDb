@@ -100,10 +100,20 @@
        ans <- NA
     }else{
         ##vec is in format "Homo_sapiens.UCSC"
-        vec <- names(which.max(unlistgot2))
-        species <- sub("_", " ",unlist(strsplit(vec,"[.]")),fixed=TRUE)[[1]]
-        style <- unlist(strsplit(vec,"[.]"))[[2]]
-        ans <- c(species, style) 
+        vec <- names(which(unlistgot2==max(unlistgot2)))
+        
+        if(length(vec)!=1)
+        {
+            species  <- sapply(vec, function(x) sub("_", " ", 
+                unlist(strsplit(x,"[.]")),fixed=TRUE)[[1]], USE.NAMES=FALSE)
+            style <- sapply(vec, function(x) 
+                unlist(strsplit(x,"[.]"))[[2]], USE.NAMES=FALSE)
+        } else {
+            species <- sub("_", " ",unlist(strsplit(vec,"[.]")),fixed=TRUE)[[1]]
+            style <- unlist(strsplit(vec,"[.]"))[[2]]
+        }
+        
+        ans <- list(species=species, style=style) 
     }
     
     ans
@@ -130,15 +140,30 @@ setMethod("seqlevelsStyle", "character",
         stop("No seqlevels present in this object.")
     
     seqnames <- unique(x)      
-    ans <- .guessSpeciesStyle(seqnames)[2]
-    if(is.na(ans)){
-        txt <- "The style does not have a compatible entry for the
+    ans <- .guessSpeciesStyle(seqnames)
+    
+    ## 3 cases -
+    ## 1. if no style found - ans is na - stop with message 
+    ## 2. if multiple styles returned then print message saying that it could be 
+    ## any of these styles
+    ## 3. if one style returned - hurray!
+    
+    if(length(ans)==1){
+        if(is.na(ans)){
+            txt <- "The style does not have a compatible entry for the
             species supported by Seqname. Please see
             genomeStyles() for supported species/style"
-        stop(paste(strwrap(txt, exdent=2), collapse="\n"))
-        
+            stop(paste(strwrap(txt, exdent=2), collapse="\n"))
+        }
     }
-    ans
+    
+    
+    style <- unique(ans$style)
+    
+    if(length(style)>1)
+        message("warning! Multiple seqnameStyles found.")
+      
+    style
 })
 
 ### The default methods work on any object 'x' with working "seqlevels"

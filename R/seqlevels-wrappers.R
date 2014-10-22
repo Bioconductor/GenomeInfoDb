@@ -66,14 +66,17 @@ keepStandardChromosomes <- function(x, species=NULL)
     if(length(ori_seqlevels)==0)
         return(x)
     
-    style <- .guessSpeciesStyle(ori_seqlevels)[2]
+    ans <- .guessSpeciesStyle(ori_seqlevels)
     
-    if(is.na(style)){
-        ## Interanally the seqlevels did not match any organism's style - so
-        ## drop all levels and return an empty object
-        return(dropSeqlevels(x, seqlevels(x), force=TRUE))
+    if(length(ans)==1){
+        if(is.na(ans)){
+            ## Interanally the seqlevels did not match any organism's style - so
+            ## drop all levels and return an empty object
+            return(dropSeqlevels(x, seqlevels(x), force=TRUE))
+        }
     }
-        
+    
+    style <- unique(ans$style)
     standard_chromosomes <- character(0)
     
     if(missing(species))
