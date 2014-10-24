@@ -101,23 +101,11 @@
     }else{
         ##vec is in format "Homo_sapiens.UCSC"
         vec <- names(which(unlistgot2==max(unlistgot2)))
-        
-        if(length(vec)!=1)
-        {
-            species  <- sapply(vec, function(x) sub("_", " ", 
-                unlist(strsplit(x,"[.]")),fixed=TRUE)[[1]], USE.NAMES=FALSE)
-            style <- sapply(vec, function(x) 
-                unlist(strsplit(x,"[.]"))[[2]], USE.NAMES=FALSE)
-        } else {
-            species <- sub("_", " ",unlist(strsplit(vec,"[.]")),fixed=TRUE)[[1]]
-            style <- unlist(strsplit(vec,"[.]"))[[2]]
-        }
-        
+        species <- sub("_"," ",sub("(.*?)[.].*", "\\1", vec))
+        style <- gsub("^[^.]+.","", vec)
         ans <- list(species=species, style=style) 
     }
-    
     ans
-    
 }
 
 

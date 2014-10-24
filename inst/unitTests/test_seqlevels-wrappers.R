@@ -134,3 +134,28 @@ test_seqlevelsStyle <- function()
     checkException(seqlevelsStyle(GRanges()))
     
 }
+
+test_guessSpeciesStyle <- function()
+{
+    got  <- GenomeInfoDb:::.guessSpeciesStyle(c(paste0("chr",1:10)))
+    checkEquals(unique(got$style), "UCSC")
+    
+    got <- GenomeInfoDb:::.guessSpeciesStyle(c(paste0("chr",1:22)))
+    checkEquals(unique(got$style), "UCSC")
+    
+    got <- GenomeInfoDb:::.guessSpeciesStyle("chr2")
+    checkEquals(unique(got$style), "UCSC")
+    
+    got <- GenomeInfoDb:::.guessSpeciesStyle("2")
+    checkEquals(unique(got$style), c("NCBI","TAIR10","MSU6","JGI2.F","AGPvF"))
+    
+    got <- GenomeInfoDb:::.guessSpeciesStyle('T')
+    checkEquals(unique(got$style), "JGI2.F")
+    
+    got <- GenomeInfoDb:::.guessSpeciesStyle(c("chr1","chr2","chr3",
+        "chr1_gl000191_random", "chr1_gl000192_random"))
+    checkEquals(unique(got$style), "UCSC")
+    
+    got <-  GenomeInfoDb:::.guessSpeciesStyle("h")
+    checkEquals(got, NA)    
+}
