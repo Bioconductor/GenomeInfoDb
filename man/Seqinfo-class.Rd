@@ -257,7 +257,7 @@ merge(x, y)  # rows for chr3 and chrM are merged
 ## To get rid of the above warning, either use suppressWarnings() or
 ## set the genome on 'y':
 suppressWarnings(merge(x, y))
-genome(y) <- genome(x)[[1]]
+genome(y) <- genome(x)
 merge(x, y)
 
 ## Note that, strictly speaking, merging 2 Seqinfo objects is not

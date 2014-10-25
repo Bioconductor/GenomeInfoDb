@@ -194,39 +194,40 @@ setValidity2("Seqinfo", .valid.Seqinfo)
     unname(isCircular)
 }
 
-### Make sure this always returns an *unnamed* character vector.
+### Make sure this always returns an *unnamed* character vector parallel to
+### 'seqnames'.
 .normargGenome <- function(genome, seqnames)
 {
-    if (identical(genome, NA))
-        return(rep.int(NA_character_, length(seqnames)))
-    if (is.factor(genome))
-        genome <- as.character(genome)
-    else if (!is.vector(genome))
-        stop("supplied 'genome' must be a vector")
-    if (length(genome) != length(seqnames)) {
-        if (length(genome) != 1L)
-            stop("when length of supplied 'genome' vector is not 1, ",
-                 "then it must equal the number of sequences")
-        if (!is.null(names(genome)))
-            stop("when length of supplied 'genome' vector is 1 ",
-                 "and number of sequences is != 1, ",
-                 "then 'genome' cannot be named")
-        if (length(seqnames) == 0L)
-            warning("supplied 'genome' vector has length 1 ",
-                    "but number of sequences is 0")
-        genome <- rep.int(genome, length(seqnames))
-    } else if (!is.null(names(genome))
-            && !identical(names(genome), seqnames))
-        stop("when the supplied 'genome' vector is named, ",
-             "the names must match the seqnames")
-    if (is.logical(genome)) {
-        if (all(is.na(genome)))
-            return(as.character(genome))
-        stop("bad supplied 'genome' vector")
-    }
+    if (!(is.vector(genome) || is.factor(genome)))
+        stop(wmsg("supplied 'genome' must be a vector or factor"))
     if (!is.character(genome))
-        stop("bad supplied 'genome' vector")
-    unname(genome)
+        genome <- as.character(genome)
+
+    if (length(genome) == 0L) {
+        if (length(seqnames) == 0L)
+            return(unname(genome))
+        stop(wmsg("supplied 'genome' vector is empty"))
+    }
+
+    ## The most common situation is that the supplied 'genome' vector contains
+    ## a single (possibly NA) unique value. Note that, in that case, the names
+    ## on 'genome' are ignored.
+    ugenome <- unique(genome)
+    if (length(ugenome) == 1L)
+        return(rep.int(ugenome, length(seqnames)))
+
+    if (!is.null(names(genome))) {
+        if (identical(names(genome), seqnames))
+            return(unname(genome))
+        stop(wmsg("when 'genome' vector is named and contains more than ",
+                  "one distinct value, it cannot have duplicated names"))
+    }
+    if (length(genome) == length(seqnames))
+        return(genome)
+    if (length(genome) != 1L)
+        stop(wmsg("when length of supplied 'genome' vector is not 1, ",
+                  "then it must equal the number of sequences"))
+    rep.int(genome, length(seqnames))
 }
 
 Seqinfo <- function(seqnames=NULL, seqlengths=NA, isCircular=NA, genome=NA)
