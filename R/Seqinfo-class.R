@@ -24,7 +24,7 @@ setClass("Seqinfo",
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Getters.
+### Getters
 ###
 
 setMethod("seqnames", "Seqinfo", function(x) x@seqnames)
@@ -64,7 +64,7 @@ setMethod("genome", "Seqinfo",
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Validity.
+### Validity
 ###
 
 .valid.Seqinfo.seqnames <- function(x_seqnames, what="'seqnames(x)'")
@@ -130,7 +130,7 @@ setValidity2("Seqinfo", .valid.Seqinfo)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Constructor.
+### Constructor
 ###
 ### The .normarg*() helper functions below do only partial checking of the
 ### arguments. The full validation is performed by new() thru the validity
@@ -244,7 +244,26 @@ Seqinfo <- function(seqnames=NULL, seqlengths=NA, isCircular=NA, genome=NA)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Subsetting.
+### Updating old Seqinfo objects
+###
+
+setMethod("updateObject", "Seqinfo",
+    function(object, ..., verbose=FALSE)
+    {
+        if (verbose)
+            message("updateObject(object = 'Seqinfo')")
+        if (!is(try(object@genome, silent=TRUE), "try-error"))
+            return(genome)
+        as(Seqinfo(seqnames=object@seqnames,
+                   seqlengths=object@seqlengths,
+                   isCircular=object@is_circular),
+           class(object))
+    }
+)
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Subsetting
 ###
 
 ### Support subsetting only by name.
@@ -273,7 +292,7 @@ setMethod("[", "Seqinfo",
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Setters.
+### Setters
 ###
 
 setReplaceMethod("seqnames", "Seqinfo",
@@ -339,7 +358,7 @@ setReplaceMethod("genome", "Seqinfo",
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Coercion.
+### Coercion
 ###
 
 setMethod("as.data.frame", "Seqinfo",
@@ -362,7 +381,7 @@ setMethod("as.data.frame", "Seqinfo",
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Displaying.
+### Displaying
 ###
 
 ### S3/S4 combo for summary.Seqinfo
@@ -459,7 +478,7 @@ setMethod("show", "Seqinfo",
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Combining.
+### Combining
 ###
 ### Why no "c" or "rbind" method for Seqinfo objects?
 ### 'c(x, y)' would be expected to just append the rows in 'y' to the rows in
