@@ -208,8 +208,9 @@
 ## A. MAKING A Seqinfo OBJECT FOR A SUPPORTED GENOME
 ## ---------------------------------------------------------------------
 
-## Only the following genomes are supported at the moment (more will
-## come):
+## This queries the UCSC Genome Browser and thus requires internet
+## access. Only the following genomes are supported at the moment (more
+## will come):
 Seqinfo(genome="hg38")
 Seqinfo(genome="hg19")
 Seqinfo(genome="hg18")
