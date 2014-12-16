@@ -153,7 +153,7 @@ standard_fetch_extended_ChromInfo_from_UCSC <- function(genome,
     ans[order(ans$SequenceRole), , drop=FALSE]
 }
 
-.SUPPORTED_GENOMES <- list(
+SUPPORTED_UCSC_GENOMES <- list(
     hg38=
         list(FUN="standard_fetch_extended_ChromInfo_from_UCSC",
              circular="chrM",
@@ -196,6 +196,11 @@ standard_fetch_extended_ChromInfo_from_UCSC <- function(genome,
              special_renamings=c(chrM="MT"),
              unmapped=paste0("chr",
                  paste0(c(1, 3:5, 7:9, 13, 16:17, "X", "Y", "Un"), "_random"))),
+    dm6=
+        list(FUN="standard_fetch_extended_ChromInfo_from_UCSC",
+             circular="chrM",
+             refseq_assembly_id="GCF_000001215.4",
+             special_renamings=c(chrM="MT")),
     dm3=
         list(FUN="standard_fetch_extended_ChromInfo_from_UCSC",
              circular="chrM",
@@ -218,7 +223,7 @@ standard_fetch_extended_ChromInfo_from_UCSC <- function(genome,
     refseq_assembly_id <- lookup_refseq_assembly_id(genome)
     if (is.na(refseq_assembly_id))
         return(NA_integer_)
-    refseq_assembly_ids <- sapply(.SUPPORTED_GENOMES,
+    refseq_assembly_ids <- sapply(SUPPORTED_UCSC_GENOMES,
                                   `[[`, "refseq_assembly_id",
                                   USE.NAMES=FALSE)
     match(refseq_assembly_id, refseq_assembly_ids)
@@ -232,17 +237,17 @@ standard_fetch_extended_ChromInfo_from_UCSC <- function(genome,
 fetchExtendedChromInfoFromUCSC <- function(genome,
         goldenPath_url="http://hgdownload.cse.ucsc.edu/goldenPath")
 {
-    if (!.isSingleString(genome))
+    if (!isSingleString(genome))
         stop("'genome' must be a single string")
-    idx <- match(genome, names(.SUPPORTED_GENOMES))
+    idx <- match(genome, names(SUPPORTED_UCSC_GENOMES))
     if (is.na(idx)) {
         idx <- .genome2idx(genome)
         if (is.na(idx))
             stop("genome \"", genome, "\" is not supported")
     }
-    supported_genome <- .SUPPORTED_GENOMES[[idx]]
+    supported_genome <- SUPPORTED_UCSC_GENOMES[[idx]]
     FUN <- get(supported_genome$FUN)
-    FUN(genome=names(.SUPPORTED_GENOMES)[idx],
+    FUN(genome=names(SUPPORTED_UCSC_GENOMES)[idx],
         circular=supported_genome$circular,
         refseq_assembly_id=supported_genome$refseq_assembly_id,
         AssemblyUnits=supported_genome$AssemblyUnits,

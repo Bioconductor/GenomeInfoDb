@@ -205,7 +205,23 @@
 
 \examples{
 ## ---------------------------------------------------------------------
-## A. BASIC MANIPULATION OF A Seqinfo OBJECT
+## A. MAKING A Seqinfo OBJECT FOR A SUPPORTED GENOME
+## ---------------------------------------------------------------------
+
+## Only the following genomes are supported at the moment (more will
+## come):
+Seqinfo(genome="hg38")
+Seqinfo(genome="hg19")
+Seqinfo(genome="hg18")
+Seqinfo(genome="mm10")
+Seqinfo(genome="mm9")
+Seqinfo(genome="dm6")
+Seqinfo(genome="dm3")
+Seqinfo(genome="sacCer3")
+Seqinfo(genome="sacCer2")
+
+## ---------------------------------------------------------------------
+## B. BASIC MANIPULATION OF A Seqinfo OBJECT
 ## ---------------------------------------------------------------------
 
 ## Note that all the arguments (except 'genome') must have the
@@ -244,7 +260,7 @@ seqlevels(xx) <- c(chY="Y", ch1="1", "22")  # rename/reorder/drop/add
 xx
 
 ## ---------------------------------------------------------------------
-## B. MERGING 2 Seqinfo OBJECTS
+## C. MERGING 2 Seqinfo OBJECTS
 ## ---------------------------------------------------------------------
 
 y <- Seqinfo(seqnames=c("chr3", "chr4", "chrM"),

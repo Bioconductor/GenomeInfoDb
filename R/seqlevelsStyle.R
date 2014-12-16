@@ -35,12 +35,6 @@
 
 }
 
-.isSingleString <- 
-    function (x)
-{
-    is.character(x) && length(x) == 1L && !is.na(x)
-}
-
 .isTRUEorFALSE <- 
     function (x)
 {
@@ -247,7 +241,7 @@ mapSeqlevels <-
 {
     if (!is.character(seqnames))
         stop("'seqnames' must be a character vector")
-    if (!.isSingleString(style))
+    if (!isSingleString(style))
         stop("the supplied seqname style must be a single string")
     if (!.isTRUEorFALSE(best.only))
         stop("'best.only' must be TRUE or FALSE")

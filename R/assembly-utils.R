@@ -12,11 +12,6 @@
 .GENBANK_GENOMES_URL <-
     "ftp://ftp.ncbi.nlm.nih.gov/genbank/genomes/"
 
-.isSingleString <- function(x)
-{
-    is.character(x) && length(x) == 1L && !is.na(x)
-}
-
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### fetch_assembly_report()
@@ -109,7 +104,7 @@
 ###   (c) an NCBI assembly name (e.g. "GRCh38").
 lookup_refseq_assembly_id <- function(assembly)
 {
-    if (!.isSingleString(assembly))
+    if (!isSingleString(assembly))
         stop("'assembly' must be a single string")
     if (.is_refseq_assembly_id(assembly))
         return(assembly)
@@ -198,7 +193,7 @@ lookup_refseq_assembly_id <- function(assembly)
 ### the report at the 2nd URL.
 fetch_assembly_report <- function(assembly, AssemblyUnits=NULL)
 {
-    if (!.isSingleString(assembly))
+    if (!isSingleString(assembly))
         stop("'assembly' must be a single string")
     if (!grepl("://", assembly))
         assembly <- .make_assembly_report_URL(assembly)

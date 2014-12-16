@@ -232,6 +232,11 @@ setValidity2("Seqinfo", .valid.Seqinfo)
 
 Seqinfo <- function(seqnames=NULL, seqlengths=NA, isCircular=NA, genome=NA)
 {
+    if (is.null(seqnames)
+     && identical(seqlengths, NA)
+     && identical(isCircular, NA)
+     && isSingleString(genome))
+        return(genomeToSeqinfo(genome))
     seqnames <- .normargSeqlevels(seqnames)
     seqlengths <- .normargSeqlengths(seqlengths, seqnames)
     is_circular <- .normargIsCircular(isCircular, seqnames)
