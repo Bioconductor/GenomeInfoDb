@@ -25,6 +25,8 @@
 \alias{genome<-,Seqinfo-method}
 \alias{[,Seqinfo-method}
 \alias{as.data.frame,Seqinfo-method}
+\alias{coerce,data.frame,Seqinfo-method}
+\alias{coerce,DataFrame,Seqinfo-method}
 \alias{summary.Seqinfo}
 \alias{summary,Seqinfo-method}
 \alias{show,Seqinfo-method}

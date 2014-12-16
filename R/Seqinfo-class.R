@@ -235,8 +235,9 @@ Seqinfo <- function(seqnames=NULL, seqlengths=NA, isCircular=NA, genome=NA)
     if (is.null(seqnames)
      && identical(seqlengths, NA)
      && identical(isCircular, NA)
-     && isSingleString(genome))
-        return(genomeToSeqinfo(genome))
+     && isSingleString(genome)) {
+        return(as(fetchSequenceInfo(genome), "Seqinfo"))
+    }
     seqnames <- .normargSeqlevels(seqnames)
     seqlengths <- .normargSeqlengths(seqlengths, seqnames)
     is_circular <- .normargIsCircular(isCircular, seqnames)
@@ -245,6 +246,60 @@ Seqinfo <- function(seqnames=NULL, seqlengths=NA, isCircular=NA, genome=NA)
                    seqlengths=seqlengths,
                    is_circular=is_circular,
                    genome=genome)
+}
+
+.makeSeqinfoFromDataFrame <- function(df)
+{
+    if (!is.data.frame(df) && !is(df, "DataFrame")) 
+        stop("'df' must be a data.frame or DataFrame object")
+    df_colnames <- colnames(df)
+
+    ## Extract seqnames.
+    if ("seqnames" %in% df_colnames) {
+        ans_seqnames <- df[ , "seqnames"]
+    } else if ("seqlevels" %in% df_colnames) {
+        ans_seqnames <- df[ , "seqlevels"]
+    } else {
+        ans_seqnames <- rownames(df)
+        seqnames_as_ints <- suppressWarnings(as.integer(ans_seqnames))
+        if (!any(is.na(seqnames_as_ints))
+          && all(seqnames_as_ints == ans_seqnames))
+            stop("no sequence names found in input")
+    }
+    if (!is.character(ans_seqnames))
+        ans_seqnames <- as.character(ans_seqnames)
+
+    ## Extract seqlengths.
+    if ("seqlengths" %in% df_colnames) {
+        ans_seqlengths <- df[ , "seqlengths"]
+    } else {
+        ans_seqlengths <- rep.int(NA_integer_, nrow(df))
+    }
+    if (!is.integer(ans_seqlengths))
+        ans_seqlengths <-  as.integer(ans_seqlengths)
+
+    ## Extract isCircular.
+    if ("isCircular" %in% df_colnames) {
+        ans_isCircular <- df[ , "isCircular"]
+    } else if ("is_circular" %in% df_colnames) {
+        ans_isCircular <- df[ , "is_circular"]
+    } else {
+        ans_isCircular <- rep.int(NA, nrow(df))
+    }
+    if (!is.logical(ans_isCircular))
+        ans_isCircular <-  as.logical(ans_isCircular)
+
+    ## Extract genome.
+    if ("genome" %in% df_colnames) {
+        ans_genome <- df[ , "genome"]
+    } else {
+        ans_genome <- rep.int(NA_character_, nrow(df))
+    }
+    if (!is.character(ans_genome))
+        ans_genome <-  as.character(ans_genome)
+
+    Seqinfo(seqnames=ans_seqnames, seqlengths=ans_seqlengths,
+            isCircular=ans_isCircular, genome=ans_genome)
 }
 
 
@@ -383,6 +438,9 @@ setMethod("as.data.frame", "Seqinfo",
                    stringsAsFactors=FALSE)
     }
 )
+
+setAs("data.frame", "Seqinfo", function(from) .makeSeqinfoFromDataFrame(from))
+setAs("DataFrame", "Seqinfo", function(from) .makeSeqinfoFromDataFrame(from))
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

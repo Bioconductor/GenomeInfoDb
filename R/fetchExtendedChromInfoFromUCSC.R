@@ -7,8 +7,6 @@
 ### Some low-level helpers.
 ###
 
-### Use this in GenomicFeatures/R/makeTranscriptDbFromUCSC.R instead of
-### internal utility .downloadChromInfoFromUCSC().
 fetch_ChromInfo_from_UCSC <- function(genome,
         goldenPath_url="http://hgdownload.cse.ucsc.edu/goldenPath")
 {
