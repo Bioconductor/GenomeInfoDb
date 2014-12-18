@@ -194,6 +194,11 @@ SUPPORTED_UCSC_GENOMES <- list(
              special_renamings=c(chrM="MT"),
              unmapped=paste0("chr",
                  paste0(c(1, 3:5, 7:9, 13, 16:17, "X", "Y", "Un"), "_random"))),
+    rn6=
+        list(FUN="standard_fetch_extended_ChromInfo_from_UCSC",
+             circular="chrM",
+             refseq_assembly_id="GCA_000001895.4",
+             special_renamings=c(chrM="MT")),
     dm6=
         list(FUN="standard_fetch_extended_ChromInfo_from_UCSC",
              circular="chrM",

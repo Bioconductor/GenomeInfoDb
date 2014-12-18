@@ -8,8 +8,8 @@
 
 \description{
   Fetch the chromosomes info for some of the UCSC genomes.
-  Only supports hg38, hg19, hg18, mm10, mm9, dm6, dm3, sacCer3, and sacCer2
-  at the moment.
+  Only supports hg38, hg19, hg18, mm10, mm9, rn6, dm6, dm3, sacCer3, and
+  sacCer2 at the moment.
 }
 
 \usage{
@@ -93,7 +93,7 @@ fetchExtendedChromInfoFromUCSC(genome,
 }
 
 \note{
-  Only supports the hg38, hg19, hg18, mm10, mm9, dm6, dm3, sacCer3, and
+  Only supports the hg38, hg19, hg18, mm10, mm9, rn6, dm6, dm3, sacCer3, and
   sacCer2 genomes at the moment. More will come...
 }
 
