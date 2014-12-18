@@ -11,12 +11,12 @@ import(IRanges)  # for CompressedList
 ###
 
 export(
-    ## fetchExtendedChromInfoFromUCSC.R:
-    fetchExtendedChromInfoFromUCSC,
-
     ## rankSeqlevels.R:
     orderSeqlevels,
     rankSeqlevels,
+
+    ## fetchExtendedChromInfoFromUCSC.R:
+    fetchExtendedChromInfoFromUCSC,
 
     ## seqlevelsStyle.R:
     genomeStyles,

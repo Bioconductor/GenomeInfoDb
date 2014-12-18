@@ -21,9 +21,9 @@ Suggests: GenomicRanges, Rsamtools, GenomicAlignments, BSgenome,
 	RUnit, BiocStyle, knitr
 License: Artistic-2.0
 Collate: utils.R
+	rankSeqlevels.R
 	assembly-utils.R
 	fetchExtendedChromInfoFromUCSC.R
-	rankSeqlevels.R
 	fetchSequenceInfo.R
 	seqinfo.R
 	seqlevelsStyle.R

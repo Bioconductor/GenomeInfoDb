@@ -78,9 +78,9 @@ fetchExtendedChromInfoFromUCSC(genome,
           \code{fetchExtendedChromInfoFromUCSC} emits a warning.
           
     \item \code{SequenceRole}: Factor with levels \code{assembled-molecule},
-          \code{unlocalized-scaffold}, \code{unplaced-scaffold},
-          \code{alt-scaffold}, and \code{pseudo-scaffold}. This information
-          is obtained from the NCBI assembly report for the genome.
+          \code{alt-scaffold}, \code{unlocalized-scaffold},
+          \code{unplaced-scaffold}, and \code{pseudo-scaffold}. This
+          information is obtained from the NCBI assembly report for the genome.
           Can contain NAs but no warning is emitted in that case.
 
     \item \code{GenBankAccn}: Character vector. This information is obtained

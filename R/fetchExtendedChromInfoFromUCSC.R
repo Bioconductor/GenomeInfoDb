@@ -61,7 +61,15 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
     if (length(unmapped_idx) == 0L)
         return(ans)
 
-    ## 2. We assign based on exact matching of the sequence names (after
+    ## 2. We assign based on exact matching of the seqlevels.
+    m <- match(UCSC_seqlevels[unmapped_idx], NCBI_seqlevels)
+    ok_idx <- which(!is.na(m))
+    ans[unmapped_idx[ok_idx]] <- m[ok_idx]
+    unmapped_idx <- which(is.na(ans))
+    if (length(unmapped_idx) == 0L)
+        return(ans)
+
+    ## 3. We assign based on exact matching of the seqlevels (after
     ##    removal of the "chr" prefix).
     nochr_prefix_seqlevels <- sub("^chr", "", UCSC_seqlevels[unmapped_idx])
     m <- match(nochr_prefix_seqlevels, NCBI_seqlevels)
@@ -71,7 +79,7 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
     if (length(unmapped_idx) == 0L)
         return(ans)
 
-    ## 3. We assign based on the number embedded in the UCSC chromosome name.
+    ## 4. We assign based on the number embedded in the UCSC chromosome name.
     split_seqlevels <- strsplit(UCSC_seqlevels[unmapped_idx], "_")
     nparts <- elementLengths(split_seqlevels)
     idx2 <- which(nparts >= 2L)
@@ -138,9 +146,9 @@ standard_fetch_extended_ChromInfo_from_UCSC <- function(genome,
     GenBankAccn[which(GenBankAccn == "na")] <- NA_character_
     SequenceRole <- factor(assembly_report$SequenceRole,
                            levels=c("assembled-molecule",
+                                    "alt-scaffold",
                                     "unlocalized-scaffold",
                                     "unplaced-scaffold",
-                                    "alt-scaffold",
                                     "pseudo-scaffold"))
     stopifnot(identical(is.na(SequenceRole),
                         is.na(assembly_report$SequenceRole)))
@@ -148,7 +156,11 @@ standard_fetch_extended_ChromInfo_from_UCSC <- function(genome,
                       SequenceRole=SequenceRole[m],
                       GenBankAccn=GenBankAccn[m],
                       stringsAsFactors=FALSE)
-    ans[order(ans$SequenceRole), , drop=FALSE]
+    oo <- order(as.integer(ans[ , "SequenceRole"]),
+                rankSeqlevels(ans[ , "UCSC_seqlevels"]))
+    ans <- ans[oo, , drop=FALSE]
+    rownames(ans) <- NULL
+    ans
 }
 
 SUPPORTED_UCSC_GENOMES <- list(
@@ -197,7 +209,7 @@ SUPPORTED_UCSC_GENOMES <- list(
     rn6=
         list(FUN="standard_fetch_extended_ChromInfo_from_UCSC",
              circular="chrM",
-             refseq_assembly_id="GCA_000001895.4",
+             refseq_assembly_id="GCF_000001895.5",
              special_renamings=c(chrM="MT")),
     dm6=
         list(FUN="standard_fetch_extended_ChromInfo_from_UCSC",
