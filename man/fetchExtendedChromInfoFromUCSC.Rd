@@ -89,7 +89,9 @@ fetchExtendedChromInfoFromUCSC(genome,
   }
   Note that, in this case, the rows are sorted by level in the
   \code{SequenceRole} column, that is, \code{assembled-molecule}s first,
-  then \code{unlocalized-scaffold}s, etc, and NAs last.
+  then \code{alt-scaffold}s, etc, and NAs last. Then within each group they
+  are sorted by UCSC seqlevel rank as determined by
+  \code{\link{rankSeqlevels}()}.
 }
 
 \note{
@@ -104,6 +106,8 @@ fetchExtendedChromInfoFromUCSC(genome,
 \seealso{
   \itemize{
     \item The \code{\link{seqlevels}} getter and setter.
+
+    \item The \code{\link{rankSeqlevels}} function for ranking sequence names.
 
     \item The \code{\link{seqlevelsStyle}} getter and setter.
 
