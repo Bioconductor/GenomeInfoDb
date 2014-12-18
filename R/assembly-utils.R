@@ -102,7 +102,7 @@
 ###       returned as is;
 ###   (b) a GenBank Assembly ID (e.g. "GCA_000001405.15");
 ###   (c) an NCBI assembly name (e.g. "GRCh38").
-lookup_refseq_assembly_accession <- function(assembly)
+.lookup_refseq_assembly_accession <- function(assembly)
 {
     if (!isSingleString(assembly))
         stop("'assembly' must be a single string")
@@ -114,7 +114,7 @@ lookup_refseq_assembly_accession <- function(assembly)
 
     .get_answers <- function(idx1, idx2) {
         ans2 <- assembly_summary_refseq$assembly_accession[idx2]
-        if (is.na(idx1))
+        if (all(is.na(idx1)))
             return(ans2)
         ans1 <- assembly_summary_genbank$gbrs_paired_asm[idx1]
         ans1 <- setdiff(ans1, "na")
@@ -136,7 +136,7 @@ lookup_refseq_assembly_accession <- function(assembly)
     }
 
     ## If 'assembly' is not a RefSeq Assembly ID or a GenBank Assembly ID,
-    ## then we assume it's an assembly name (e.g. "GRCh38" or
+    ## then we assume it's an assembly name (e.g. "GRCh38", or "hg16", or
     ## "Pan_troglodytes-2.1.4").
 
     ## Exact match.
@@ -166,10 +166,11 @@ lookup_refseq_assembly_accession <- function(assembly)
     NA_character_
 }
 
-### See lookup_refseq_assembly_accession() for how 'assembly' can be specified.
+### See .lookup_refseq_assembly_accession() for how 'assembly' can be
+### specified.
 .make_assembly_report_URL <- function(assembly)
 {
-    assembly_accession <- lookup_refseq_assembly_accession(assembly)
+    assembly_accession <- .lookup_refseq_assembly_accession(assembly)
     if (is.na(assembly_accession))
         stop("cannot find a RefSeq assembly accession for \"", assembly, "\"")
     assembly_report_filename <- paste0(assembly_accession, ".assembly.txt")
@@ -187,7 +188,8 @@ lookup_refseq_assembly_accession <- function(assembly)
     read.table(url, sep="\t", col.names=colnames, stringsAsFactors=FALSE)
 }
 
-### See lookup_refseq_assembly_accession() for how 'assembly' can be specified.
+### See .lookup_refseq_assembly_accession() for how 'assembly' can be
+### specified.
 ### In addition, here 'assembly' can be the URL to an assembly report (a.k.a.
 ### full sequence report). Examples of such URLs:
 ###   ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000001405.26.assembly.txt

@@ -7,7 +7,7 @@
     goldenPath_url="http://hgdownload.cse.ucsc.edu/goldenPath")
 {
     ext_chrominfo <- fetchExtendedChromInfoFromUCSC(genome,
-                         goldenPath_url=goldenPath_url)
+                         goldenPath_url=goldenPath_url, quiet=TRUE)
     data.frame(seqnames=ext_chrominfo[ , "UCSC_seqlevels"],
                seqlengths=ext_chrominfo[ , "UCSC_seqlengths"],
                is_circular=ext_chrominfo[ , "circular"],

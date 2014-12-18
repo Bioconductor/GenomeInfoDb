@@ -14,7 +14,8 @@
 
 \usage{
 fetchExtendedChromInfoFromUCSC(genome,
-        goldenPath_url="http://hgdownload.cse.ucsc.edu/goldenPath")
+        goldenPath_url="http://hgdownload.cse.ucsc.edu/goldenPath",
+        quiet=FALSE)
 }
 
 \arguments{
@@ -26,6 +27,10 @@ fetchExtendedChromInfoFromUCSC(genome,
     This URL is used internally to build the full URL to the 'chromInfo'
     MySQL dump containing chromosomes information for \code{genome}.
     See Details section below.
+  }
+  \item{quiet}{
+    \code{TRUE} or \code{FALSE} (the default). If \code{TRUE} then some
+    warnings are suppressed. See below for the details.
   }
 }
 
@@ -65,8 +70,9 @@ fetchExtendedChromInfoFromUCSC(genome,
           genomes.
   }
   If the UCSC genome is *not* based on an NCBI assembly (e.g. sacCer2),
-  there are no additional columns and a warning is emitted. Note that, in
-  this case, the rows are not sorted in any particular order.
+  there are no additional columns and a warning is emitted (unless
+  \code{quiet} is set to \code{TRUE}). In this case, the rows are sorted
+  by UCSC seqlevel rank as determined by \code{\link{rankSeqlevels}()}.
 
   If the UCSC genome is based on an NCBI assembly (e.g. sacCer3),
   the returned data frame has 3 additional columns:
@@ -75,7 +81,8 @@ fetchExtendedChromInfoFromUCSC(genome,
           obtained from the NCBI assembly report for the genome. Will contain
           NAs for UCSC seqlevels with no corresponding NCBI seqlevels (e.g.
           for chrM in hg18 or chrUextra in dm3), in which case
-          \code{fetchExtendedChromInfoFromUCSC} emits a warning.
+          \code{fetchExtendedChromInfoFromUCSC} emits a warning (unless
+          \code{quiet} is set to \code{TRUE}).
           
     \item \code{SequenceRole}: Factor with levels \code{assembled-molecule},
           \code{alt-scaffold}, \code{unlocalized-scaffold},
@@ -87,11 +94,10 @@ fetchExtendedChromInfoFromUCSC(genome,
           from the NCBI assembly report for the genome. Can contain NAs but no
           warning is emitted in that case.
   }
-  Note that, in this case, the rows are sorted by level in the
-  \code{SequenceRole} column, that is, \code{assembled-molecule}s first,
-  then \code{alt-scaffold}s, etc, and NAs last. Then within each group they
-  are sorted by UCSC seqlevel rank as determined by
-  \code{\link{rankSeqlevels}()}.
+  In this case, the rows are sorted first by level in the \code{SequenceRole}
+  column, that is, \code{assembled-molecule}s first, then \code{alt-scaffold}s,
+  etc, and NAs last. Then within each group they are sorted by UCSC seqlevel
+  rank as determined by \code{\link{rankSeqlevels}()}.
 }
 
 \note{

@@ -106,31 +106,37 @@ standard_fetch_extended_ChromInfo_from_UCSC <- function(genome,
                                                         AssemblyUnits,
                                                         special_renamings,
                                                         unmapped,
-                                                        goldenPath_url)
+                                                        goldenPath_url,
+                                                        quiet)
 {
     chrominfo <- fetch_ChromInfo_from_UCSC(genome,
                                 goldenPath_url=goldenPath_url)
-    UCSC_seqlevels <- chrominfo$chrom
+    UCSC_seqlevels <- chrominfo[ , "chrom"]
     ans <- data.frame(UCSC_seqlevels=UCSC_seqlevels,
-                      UCSC_seqlengths=chrominfo$size,
+                      UCSC_seqlengths=chrominfo[ , "size"],
                       circular=UCSC_seqlevels %in% circular,
                       stringsAsFactors=FALSE)
     if (is.null(refseq_assembly_id)) {
-        warning(genome, " UCSC genome is not based on an NCBI assembly")
+        if (!quiet)
+            warning(genome, " UCSC genome is not based on an NCBI assembly")
+        oo <- order(rankSeqlevels(ans[ , "UCSC_seqlevels"]))
+        ans <- ans[oo, , drop=FALSE]
+        rownames(ans) <- NULL
         return(ans)
     }
     if (!is.null(unmapped)) {
         unmapped_idx <- match(unmapped, UCSC_seqlevels)
         stopifnot(!any(is.na(unmapped_idx)))
-        warning("NCBI seqlevel was set to NA for ", genome,
-                " UCSC seqlevel(s) not in the NCBI assembly: ",
-                paste(unmapped, collapse=", "))
+        if (!quiet)
+            warning("NCBI seqlevel was set to NA for ", genome,
+                    " UCSC seqlevel(s) not in the NCBI assembly: ",
+                    paste(unmapped, collapse=", "))
     }
     assembly_report <- fetch_assembly_report(refseq_assembly_id,
                                              AssemblyUnits=AssemblyUnits)
     #stopifnot(nrow(chrominfo) == nrow(assembly_report) + length(unmapped))
-    NCBI_seqlevels <- assembly_report$SequenceName
-    GenBankAccn <- assembly_report$GenBankAccn
+    NCBI_seqlevels <- assembly_report[ , "SequenceName"]
+    GenBankAccn <- assembly_report[ , "GenBankAccn"]
     m <- .map_UCSC_seqlevels_to_NCBI_seqlevels(UCSC_seqlevels,
                                 NCBI_seqlevels,
                                 GenBankAccn,
@@ -144,14 +150,14 @@ standard_fetch_extended_ChromInfo_from_UCSC <- function(genome,
              paste(UCSC_seqlevels[unexpectedly_unmapped_idx], collapse=", "),
              " to an NCBI seqlevel")
     GenBankAccn[which(GenBankAccn == "na")] <- NA_character_
-    SequenceRole <- factor(assembly_report$SequenceRole,
+    SequenceRole <- factor(assembly_report[ , "SequenceRole"],
                            levels=c("assembled-molecule",
                                     "alt-scaffold",
                                     "unlocalized-scaffold",
                                     "unplaced-scaffold",
                                     "pseudo-scaffold"))
     stopifnot(identical(is.na(SequenceRole),
-                        is.na(assembly_report$SequenceRole)))
+                        is.na(assembly_report[ , "SequenceRole"])))
     ans <- cbind(ans, NCBI_seqlevels=NCBI_seqlevels[m],
                       SequenceRole=SequenceRole[m],
                       GenBankAccn=GenBankAccn[m],
@@ -233,33 +239,17 @@ SUPPORTED_UCSC_GENOMES <- list(
     ## more to come...
 )
 
-.genome2idx <- function(genome)
-{
-    refseq_assembly_id <- lookup_refseq_assembly_accession(genome)
-    if (is.na(refseq_assembly_id))
-        return(NA_integer_)
-    refseq_assembly_ids <- sapply(SUPPORTED_UCSC_GENOMES,
-                                  `[[`, "refseq_assembly_id",
-                                  USE.NAMES=FALSE)
-    match(refseq_assembly_id, refseq_assembly_ids)
-}
-
-### Only supports UCSC genomes. However 'genome' can be:
-###   (a) a UCSC assembly name (e.g. "hg38");
-###   (b) a RefSeq Assembly ID (e.g. "GCF_000001405.26");
-###   (c) a GenBank Assembly ID (e.g. "GCA_000001405.15");
-###   (d) an NCBI assembly name (e.g. "GRCh38").
 fetchExtendedChromInfoFromUCSC <- function(genome,
-        goldenPath_url="http://hgdownload.cse.ucsc.edu/goldenPath")
+        goldenPath_url="http://hgdownload.cse.ucsc.edu/goldenPath",
+        quiet=FALSE)
 {
     if (!isSingleString(genome))
         stop("'genome' must be a single string")
+    if (!isTRUEorFALSE(quiet))
+        stop("'quiet' must be TRUE or FALSE")
     idx <- match(genome, names(SUPPORTED_UCSC_GENOMES))
-    if (is.na(idx)) {
-        idx <- .genome2idx(genome)
-        if (is.na(idx))
-            stop("genome \"", genome, "\" is not supported")
-    }
+    if (is.na(idx))
+        stop("genome \"", genome, "\" is not supported")
     supported_genome <- SUPPORTED_UCSC_GENOMES[[idx]]
     FUN <- get(supported_genome$FUN)
     FUN(genome=names(SUPPORTED_UCSC_GENOMES)[idx],
@@ -268,6 +258,7 @@ fetchExtendedChromInfoFromUCSC <- function(genome,
         AssemblyUnits=supported_genome$AssemblyUnits,
         special_renamings=supported_genome$special_renamings,
         unmapped=supported_genome$unmapped,
-        goldenPath_url=goldenPath_url)
+        goldenPath_url=goldenPath_url,
+        quiet=quiet)
 }
 
