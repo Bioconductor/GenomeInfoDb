@@ -17,14 +17,14 @@
 ### fetch_assembly_report()
 ###
 
-.is_genbank_assembly_id <- function(x)
+.is_genbank_assembly_accession <- function(x)
 {
     ## We use %in% instead of == to be NA-proof.
     substr(x, 1L, nchar(.GENBANK_ASSEMBLY_ID_PREFIX)) %in%
         .GENBANK_ASSEMBLY_ID_PREFIX
 }
 
-.is_refseq_assembly_id <- function(x)
+.is_refseq_assembly_accession <- function(x)
 {
     ## We use %in% instead of == to be NA-proof.
     substr(x, 1L, nchar(.REFSEQ_ASSEMBLY_ID_PREFIX)) %in%
@@ -34,16 +34,16 @@
 ### Performs some quick sanity checks on the assembly summary.
 .check_assembly_summary <- function(assembly_summary, genbank_or_refseq)
 {
-    ## Check "assembly_id" prefixes.
+    ## Check "assembly_accession" prefixes.
     if (genbank_or_refseq == "genbank") {
-        is_valid_id <- .is_genbank_assembly_id
+        is_valid_accession <- .is_genbank_assembly_accession
     } else {
-        is_valid_id <- .is_refseq_assembly_id
+        is_valid_accession <- .is_refseq_assembly_accession
     }
-    stopifnot(all(is_valid_id(assembly_summary$assembly_id)))
+    stopifnot(all(is_valid_accession(assembly_summary$assembly_accession)))
 
-    ## Check "assembly_id" uniqueness.
-    stopifnot(anyDuplicated(assembly_summary$assembly_id) == 0L)
+    ## Check "assembly_accession" uniqueness.
+    stopifnot(anyDuplicated(assembly_summary$assembly_accession) == 0L)
 
     ## Check "paired_asm_comp" levels.
     paired_asm_comp_levels <- c("identical", "different", "na")
@@ -60,11 +60,11 @@
 
     ## Check "gbrs_paired_asm" prefixes.
     if (genbank_or_refseq == "genbank") {
-        is_valid_id <- .is_refseq_assembly_id
+        is_valid_accession <- .is_refseq_assembly_accession
     } else {
-        is_valid_id <- .is_genbank_assembly_id
+        is_valid_accession <- .is_genbank_assembly_accession
     }
-    stopifnot(all(is_valid_id(gbrs_paired_asm)))
+    stopifnot(all(is_valid_accession(gbrs_paired_asm)))
 }
 
 .assembly_summary_cache <- new.env(parent=emptyenv())
@@ -91,7 +91,7 @@
                          "gbrs_paired_asm", "paired_asm_comp")
     if (!identical(target_colnames, colnames(ans)))
         stop(url, " does not contain the expected fields")
-    colnames(ans)[1L] <- "assembly_id"
+    colnames(ans)[1L] <- "assembly_accession"
     .check_assembly_summary(ans, genbank_or_refseq)
     assign(objname, ans, envir=.assembly_summary_cache)
     ans
@@ -102,31 +102,33 @@
 ###       returned as is;
 ###   (b) a GenBank Assembly ID (e.g. "GCA_000001405.15");
 ###   (c) an NCBI assembly name (e.g. "GRCh38").
-lookup_refseq_assembly_id <- function(assembly)
+lookup_refseq_assembly_accession <- function(assembly)
 {
     if (!isSingleString(assembly))
         stop("'assembly' must be a single string")
-    if (.is_refseq_assembly_id(assembly))
+    if (.is_refseq_assembly_accession(assembly))
         return(assembly)
 
     assembly_summary_genbank <- .fetch_assembly_summary("genbank")
     assembly_summary_refseq <- .fetch_assembly_summary("refseq")
 
     .get_answers <- function(idx1, idx2) {
+        ans2 <- assembly_summary_refseq$assembly_accession[idx2]
+        if (is.na(idx1))
+            return(ans2)
         ans1 <- assembly_summary_genbank$gbrs_paired_asm[idx1]
         ans1 <- setdiff(ans1, "na")
-        ans2 <- assembly_summary_refseq$assembly_id[idx2]
         union(ans1, ans2)
     }
 
-    if (.is_genbank_assembly_id(assembly)) {
-        idx1 <- match(assembly, assembly_summary_genbank$assembly_id)
+    if (.is_genbank_assembly_accession(assembly)) {
+        idx1 <- match(assembly, assembly_summary_genbank$assembly_accession)
         idx2 <- which(assembly_summary_refseq$gbrs_paired_asm == assembly)
         ans <- .get_answers(idx1, idx2)
         if (length(ans) == 1L)
             return(ans)
         if (length(ans) >= 2L) {
-            warning("more than one RefSeq assembly id found for ",
+            warning("more than one RefSeq assembly accession found for ",
                     "\"", assembly, "\",\n  returning the 1st one")
             return(ans[1L])
         }
@@ -144,11 +146,11 @@ lookup_refseq_assembly_id <- function(assembly)
     if (length(ans) == 1L)
         return(ans)
     if (length(ans) >= 2L)
-        stop("more than one RefSeq assembly id found for ",
+        stop("more than one RefSeq assembly accession found for ",
              "\"", assembly, "\"")
 
     ## Fuzzy match.
-    warning("No RefSeq assembly id found for ",
+    warning("No RefSeq assembly accession found for ",
             "\"", assembly, "\".\n",
             "  Searching again using ",
             "\"", assembly, "\" as a regular expression.")
@@ -158,17 +160,19 @@ lookup_refseq_assembly_id <- function(assembly)
     if (length(ans) == 1L)
         return(ans)
     if (length(ans) >= 2L) 
-        stop("more than one RefSeq assembly id found for regular ",
+        stop("more than one RefSeq assembly accession found for regular ",
              "expression \"", assembly, "\"")
 
     NA_character_
 }
 
-### See lookup_refseq_assembly_id() for how 'assembly' can be specified.
+### See lookup_refseq_assembly_accession() for how 'assembly' can be specified.
 .make_assembly_report_URL <- function(assembly)
 {
-    assembly_id <- lookup_refseq_assembly_id(assembly)
-    assembly_report_filename <- paste0(assembly_id, ".assembly.txt")
+    assembly_accession <- lookup_refseq_assembly_accession(assembly)
+    if (is.na(assembly_accession))
+        stop("cannot find a RefSeq assembly accession for \"", assembly, "\"")
+    assembly_report_filename <- paste0(assembly_accession, ".assembly.txt")
     paste0(.NCBI_ASSEMBLY_REPORTS_URL, "All/", assembly_report_filename)
 }
 
@@ -183,7 +187,7 @@ lookup_refseq_assembly_id <- function(assembly)
     read.table(url, sep="\t", col.names=colnames, stringsAsFactors=FALSE)
 }
 
-### See lookup_refseq_assembly_id() for how 'assembly' can be specified.
+### See lookup_refseq_assembly_accession() for how 'assembly' can be specified.
 ### In addition, here 'assembly' can be the URL to an assembly report (a.k.a.
 ### full sequence report). Examples of such URLs:
 ###   ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000001405.26.assembly.txt
