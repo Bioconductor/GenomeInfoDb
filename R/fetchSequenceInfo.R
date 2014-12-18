@@ -3,26 +3,16 @@
 ### -------------------------------------------------------------------------
 
 
-.fetch_sequence_info_for_UCSC_genome <- function(genome, circ_seqs,
+.fetch_sequence_info_for_UCSC_genome <- function(genome,
     goldenPath_url="http://hgdownload.cse.ucsc.edu/goldenPath")
 {
-    chromInfo_table <- fetch_ChromInfo_from_UCSC(genome, goldenPath_url)
-    ans_seqnames <- as.character(chromInfo_table[ , "chrom"])
-    ans_seqlengths <- as.integer(chromInfo_table[ , "size"])
-    ans_is_circular <- logical(nrow(chromInfo_table))
-    if (!is.null(circ_seqs)) {
-        circ_idx <- match(circ_seqs, ans_seqnames)
-        if (any(is.na(circ_idx)))
-            stop("'circ_seqs' contains sequence names not in ",
-                 "\"", genome, "\" genome")
-        ans_is_circular[circ_idx] <- TRUE
-    }
-    sequence_info <- data.frame(seqnames=ans_seqnames,
-                                seqlengths=ans_seqlengths,
-                                is_circular=ans_is_circular,
-                                genome=genome,
-                                stringsAsFactors=FALSE)
-    sequence_info[order(rankSeqlevels(ans_seqnames)), , drop=FALSE]
+    ext_chrominfo <- fetchExtendedChromInfoFromUCSC(genome,
+                         goldenPath_url=goldenPath_url)
+    data.frame(seqnames=ext_chrominfo[ , "UCSC_seqlevels"],
+               seqlengths=ext_chrominfo[ , "UCSC_seqlengths"],
+               is_circular=ext_chrominfo[ , "circular"],
+               genome=genome,
+               stringsAsFactors=FALSE)
 }
 
 #.fetch_sequence_info_for_NCBI_genome <- function(refseq_assembly_id,
@@ -49,11 +39,8 @@ fetchSequenceInfo <- function(genome)
     if (!isSingleString(genome) || genome == "")
         stop("'genome' must be a single non-empty string")
     idx <- match(genome, names(SUPPORTED_UCSC_GENOMES))
-    if (!is.na(idx)) {
-        supported_genome <- SUPPORTED_UCSC_GENOMES[[idx]]
-        circ_seqs <- supported_genome$circular
-        return(.fetch_sequence_info_for_UCSC_genome(genome, circ_seqs))
-    }
+    if (!is.na(idx))
+        return(.fetch_sequence_info_for_UCSC_genome(genome))
     #idx <- match(genome, names(SUPPORTED_NCBI_GENOMES))
     #if (!is.na(idx)) {
     #    supported_genome <- SUPPORTED_NCBI_GENOMES[[idx]]
