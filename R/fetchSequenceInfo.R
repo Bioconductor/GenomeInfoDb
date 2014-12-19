@@ -8,8 +8,8 @@
 {
     ext_chrominfo <- fetchExtendedChromInfoFromUCSC(genome,
                          goldenPath_url=goldenPath_url, quiet=TRUE)
-    data.frame(seqnames=ext_chrominfo[ , "UCSC_seqlevels"],
-               seqlengths=ext_chrominfo[ , "UCSC_seqlengths"],
+    data.frame(seqnames=ext_chrominfo[ , "UCSC_seqlevel"],
+               seqlengths=ext_chrominfo[ , "UCSC_seqlength"],
                is_circular=ext_chrominfo[ , "circular"],
                genome=genome,
                stringsAsFactors=FALSE)
