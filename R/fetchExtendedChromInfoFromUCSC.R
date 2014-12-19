@@ -284,6 +284,17 @@ SUPPORTED_UCSC_GENOMES <- list(
                 c(1, 3:5, 7:9, 13, 16:17, "X", "Y", "Un"), "_random"))
     ),
 
+    mm8=list(
+        FUN="standard_fetch_extended_ChromInfo_from_UCSC",
+        circ_seqs="chrM",
+        refseq_assembly_accession="GCF_000001635.15",
+        AssemblyUnits="C57BL/6J",
+        unmapped_seqs=list(
+            `assembled-molecule`="chrM",
+            `pseudo-scaffold`=paste0("chr",
+                c(1, 5, 7:10, 13, 15, 17, "X", "Y", "Un"), "_random"))
+    ),
+
 ### Rat
     rn6=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",

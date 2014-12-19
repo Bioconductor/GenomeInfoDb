@@ -7,10 +7,10 @@
 }
 
 \description{
-  Fetch the chromosomes info for some of the UCSC genomes.
+  Fetch the chromosomes info for some UCSC genomes.
   Only supports hg38, hg19, hg18, bosTau8, bosTau7, bosTau6, canFam3, canFam2,
-  canFam1, mm10, mm9, rn6, dm6, dm3, ce10, ce6, ce4, ce2, sacCer3, and sacCer2
-  at the moment.
+  canFam1, mm10, mm9, mm8, rn6, dm6, dm3, ce10, ce6, ce4, ce2, sacCer3, and
+  sacCer2 at the moment.
 }
 
 \usage{
@@ -108,8 +108,8 @@ fetchExtendedChromInfoFromUCSC(genome,
   well as the FTP site at NCBI and thus requires internet access.
 
   Only supports the hg38, hg19, hg18, bosTau8, bosTau7, bosTau6, canFam3,
-  canFam2, canFam1, mm10, mm9, rn6, dm6, dm3, ce10, ce6, ce4, ce2, sacCer3,
-  and sacCer2 genomes at the moment. More will come...
+  canFam2, canFam1, mm10, mm9, mm8, rn6, dm6, dm3, ce10, ce6, ce4, ce2,
+  sacCer3, and sacCer2 genomes at the moment. More will come...
 }
 
 \author{
