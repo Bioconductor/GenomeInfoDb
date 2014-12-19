@@ -39,10 +39,45 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
 ### fetchExtendedChromInfoFromUCSC()
 ###
 
-### 'NCBI_seqlevel' and 'NCBI_accns' must be parallel vectors.
+.match_seqlevel_part2_to_NCBI_accn <- function(seqlevel, NCBI_accn)
+{
+    ans <- rep.int(NA_integer_, length(seqlevel))
+    seqlevel_parts <- strsplit(seqlevel, "_")
+    nparts <- elementLengths(seqlevel_parts)
+    idx2 <- which(nparts >= 2L)
+    if (length(idx2) == 0L)
+        return(ans)
+    offsets <- c(0L, cumsum(nparts[idx2[-length(idx2)]]))
+    part2 <- unlist(seqlevel_parts[idx2], use.names=FALSE)[offsets + 2L]
+    part2 <- sub("v", ".", part2, fixed=TRUE)
+    unversioned_idx <- grep(".", part2, fixed=TRUE, invert=TRUE)
+    if (length(unversioned_idx) != 0L)
+        part2[unversioned_idx] <- paste0(part2[unversioned_idx], ".1")
+    hits <- findMatches(part2, NCBI_accn)
+    q_hits <- queryHits(hits)
+    s_hits <- subjectHits(hits)
+    ambig_q_idx <- which(duplicated(q_hits))
+    if (length(ambig_q_idx) != 0L) {
+        ambig_idx <- idx2[unique(q_hits[ambig_q_idx])]
+        in1string <- paste0(seqlevel[ambig_idx], collapse=", ")
+        stop("more than one accession number matches each ",
+             "of the following UCSC seqlevel: ", in1string)
+    }
+    ambig_s_idx <- which(duplicated(s_hits))
+    if (length(ambig_s_idx) != 0L) {
+        ambig_idx <- idx2[unique(s_hits[ambig_s_idx])]
+        in1string <- paste0(NCBI_accn[ambig_idx], collapse=", ")
+        stop("more than one UCSC seqlevel matches each ",
+             "of the following accession number: ", in1string)
+    }
+    ans[idx2[q_hits]] <- s_hits
+    ans
+}
+
+### 'NCBI_seqlevel' and 'NCBI_accn' must be parallel vectors.
 .map_UCSC_seqlevel_to_NCBI_seqlevel <- function(UCSC_seqlevel,
                                                 NCBI_seqlevel,
-                                                NCBI_accns,
+                                                NCBI_accn,
                                                 special_mappings=NULL)
 {
     ans <- rep.int(NA_integer_, length(UCSC_seqlevel))
@@ -61,22 +96,22 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
     if (length(unmapped_idx) == 0L)
         return(ans)
 
-    ## From now on, matching is case insensitive.
-    UCSC_seqlevel <- tolower(UCSC_seqlevel)
-    NCBI_seqlevel <- tolower(NCBI_seqlevel)
-
-    ## 2. We assign based on exact matching of the seqlevels.
-    m <- match(UCSC_seqlevel[unmapped_idx], NCBI_seqlevel)
+    ## 2. We assign based on exact matching (case insensitive) of the
+    ##    seqlevels.
+    ucsc_seqlevel <- tolower(UCSC_seqlevel)
+    ncbi_seqlevel <- tolower(NCBI_seqlevel)
+    m <- match(ucsc_seqlevel[unmapped_idx], ncbi_seqlevel)
     ok_idx <- which(!is.na(m))
     ans[unmapped_idx[ok_idx]] <- m[ok_idx]
     unmapped_idx <- which(is.na(ans))
     if (length(unmapped_idx) == 0L)
         return(ans)
 
-    ## 3. We assign based on exact matching of the seqlevels (after
-    ##    removal of the "chr" prefix).
-    nochr_prefix_seqlevels <- sub("^chr", "", UCSC_seqlevel[unmapped_idx])
-    m <- match(nochr_prefix_seqlevels, NCBI_seqlevel)
+    ## 3. We assign based on exact matching (case insensitive) of the
+    ##    seqlevels after removal of the "chr" prefix.
+    nochr_ucsc_seqlevel <- sub("^chr", "", ucsc_seqlevel[unmapped_idx])
+    nochr_ncbi_seqlevel <- sub("^chr", "", ncbi_seqlevel)
+    m <- match(nochr_ucsc_seqlevel, nochr_ncbi_seqlevel)
     ok_idx <- which(!is.na(m))
     ans[unmapped_idx[ok_idx]] <- m[ok_idx]
     unmapped_idx <- which(is.na(ans))
@@ -84,35 +119,20 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
         return(ans)
 
     ## 4. We assign based on the number embedded in the UCSC chromosome name.
-    split_seqlevels <- strsplit(UCSC_seqlevel[unmapped_idx], "_")
-    nparts <- elementLengths(split_seqlevels)
-    idx2 <- which(nparts >= 2L)
-    if (length(idx2) != 0L) {
-        ans[unmapped_idx[idx2]] <- sapply(idx2,
-            function(i2) {
-                part2 <- split_seqlevels[[i2]][2L]
-                part2 <- sub("v", ".", part2, fixed=TRUE)
-                m <- grep(part2, NCBI_accns, ignore.case=TRUE)
-                if (length(m) >= 2L)
-                    stop("cannot map ", UCSC_seqlevel[unmapped_idx[i2]],
-                         " to a unique NCBI seqlevel")
-                if (length(m) == 0L)
-                    return(NA_integer_)
-                m
-            })
-    }
+    ans[unmapped_idx] <- .match_seqlevel_part2_to_NCBI_accn(
+                                    UCSC_seqlevel[unmapped_idx], NCBI_accn)
     ans
 }
 
 standard_fetch_extended_ChromInfo_from_UCSC <- function(
-                        genome,
-                        circ_seqs,
-                        refseq_assembly_accession,
-                        AssemblyUnits,
-                        special_mappings,
-                        unmapped_seqs,
-                        goldenPath_url,
-                        quiet)
+                                  genome,
+                                  circ_seqs,
+                                  assembly_accession,
+                                  AssemblyUnits,
+                                  special_mappings,
+                                  unmapped_seqs,
+                                  goldenPath_url,
+                                  quiet)
 {
     chrominfo <- fetch_ChromInfo_from_UCSC(genome,
                                 goldenPath_url=goldenPath_url)
@@ -121,7 +141,7 @@ standard_fetch_extended_ChromInfo_from_UCSC <- function(
                       UCSC_seqlength=chrominfo[ , "size"],
                       circular=UCSC_seqlevel %in% circ_seqs,
                       stringsAsFactors=FALSE)
-    if (is.null(refseq_assembly_accession)) {
+    if (is.null(assembly_accession)) {
         if (!quiet)
             warning(genome, " UCSC genome is not based on an NCBI assembly")
         oo <- order(rankSeqlevels(ans[ , "UCSC_seqlevel"]))
@@ -140,7 +160,7 @@ standard_fetch_extended_ChromInfo_from_UCSC <- function(
                     " UCSC seqlevel(s) not in the NCBI assembly: ",
                     paste(unmapped_seqs, collapse=", "))
     }
-    assembly_report <- fetch_assembly_report(refseq_assembly_accession,
+    assembly_report <- fetch_assembly_report(assembly_accession,
                                              AssemblyUnits=AssemblyUnits)
     #stopifnot(nrow(chrominfo) == nrow(assembly_report) + length(unmapped_seqs))
     NCBI_seqlevel <- assembly_report[ , "SequenceName"]
@@ -154,9 +174,8 @@ standard_fetch_extended_ChromInfo_from_UCSC <- function(
     unexpectedly_unmapped_idx <-
         which(is.na(m) & !(UCSC_seqlevel %in% unmapped_seqs))
     if (length(unexpectedly_unmapped_idx) != 0L)
-        stop("cannot map ", genome, " UCSC seqlevel(s) ",
-             paste(UCSC_seqlevel[unexpectedly_unmapped_idx], collapse=", "),
-             " to an NCBI seqlevel")
+        stop("cannot map the following UCSC seqlevel(s) to an NCBI seqlevel: ",
+             paste(UCSC_seqlevel[unexpectedly_unmapped_idx], collapse=", "))
     GenBankAccn[which(GenBankAccn == "na")] <- NA_character_
     SequenceRole <- factor(assembly_report[ , "SequenceRole"],
                            levels=c("assembled-molecule",
@@ -187,14 +206,14 @@ SUPPORTED_UCSC_GENOMES <- list(
     hg38=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         circ_seqs="chrM",
-        refseq_assembly_accession="GCF_000001405.26",
+        assembly_accession="GCF_000001405.26",
         special_mappings=c(chrM="MT")
     ),
 
     hg19=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         circ_seqs="chrM",
-        refseq_assembly_accession="GCF_000001405.13",
+        assembly_accession="GCF_000001405.13",
         ## Special renaming of the 9 alternate scaffolds:
         special_mappings=c(chr4_ctg9_hap1="HSCHR4_1_CTG9",
                            chr6_apd_hap1="HSCHR6_MHC_APD_CTG1",
@@ -211,7 +230,7 @@ SUPPORTED_UCSC_GENOMES <- list(
     hg18=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         circ_seqs="chrM",
-        refseq_assembly_accession="GCF_000001405.12",
+        assembly_accession="GCF_000001405.12",
         special_mappings=c(chr6_cox_hap1="Hs6_111610_36",
                            chr22_h2_hap1="Hs22_111678_36"),
         unmapped_seqs=list(
@@ -221,25 +240,52 @@ SUPPORTED_UCSC_GENOMES <- list(
                   paste0(c((1:22)[-c(12, 14, 20)], "X"), "_random"))))
         ),
 
+### Chimp
+
+    panTro4=list(
+        FUN="standard_fetch_extended_ChromInfo_from_UCSC",
+        circ_seqs="chrM",
+        assembly_accession="GCF_000001515.5",
+        special_mappings=c(chrM="MT")
+    ),
+
+    panTro3=list(
+        FUN="standard_fetch_extended_ChromInfo_from_UCSC",
+        circ_seqs="chrM",
+        assembly_accession="GCA_000001515.3",
+        unmapped_seqs=list(`assembled-molecule`="chrM")
+    ),
+
+    panTro2=list(
+        FUN="standard_fetch_extended_ChromInfo_from_UCSC",
+        circ_seqs="chrM",
+        assembly_accession="GCF_000001515.3",
+        special_mappings=c(chrM="MT"),
+        unmapped_seqs=list(
+            `pseudo-scaffold`=c("chr6_hla_hap1", paste0("chr",
+                c(1, "2a", "2b", 3:20, 22, "X", "Y"), "_random"),
+                "chrUn"))
+    ),
+
 ### Cow
     bosTau8=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         circ_seqs="chrM",
-        refseq_assembly_accession="GCF_000003055.5",
+        assembly_accession="GCF_000003055.5",
         special_mappings=c(chrM="MT")
     ),
 
     bosTau7=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         circ_seqs="chrM",
-        refseq_assembly_accession="GCF_000003205.5",
+        assembly_accession="GCF_000003205.5",
         unmapped_seqs=list(`assembled-molecule`="chrM")
     ),
 
     bosTau6=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         circ_seqs="chrM",
-        refseq_assembly_accession="GCF_000003055.4",
+        assembly_accession="GCF_000003055.4",
         special_mappings=c(chrM="MT")
     ),
 
@@ -247,7 +293,7 @@ SUPPORTED_UCSC_GENOMES <- list(
     canFam3=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         circ_seqs="chrM",
-        refseq_assembly_accession="GCF_000002285.3",
+        assembly_accession="GCF_000002285.3",
         special_mappings=c(chr1="chr01", chr2="chr02", chr3="chr03",
                            chr4="chr04", chr5="chr05", chr6="chr06",
                            chr7="chr07", chr8="chr08", chr9="chr09",
@@ -268,7 +314,7 @@ SUPPORTED_UCSC_GENOMES <- list(
     mm10=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         circ_seqs="chrM",
-        refseq_assembly_accession="GCF_000001635.20",
+        assembly_accession="GCF_000001635.20",
         AssemblyUnits=c("C57BL/6J", "non-nuclear"),
         special_mappings=c(chrM="MT")
     ),
@@ -276,7 +322,7 @@ SUPPORTED_UCSC_GENOMES <- list(
     mm9=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         circ_seqs="chrM",
-        refseq_assembly_accession="GCF_000001635.18",
+        assembly_accession="GCF_000001635.18",
         AssemblyUnits=c("C57BL/6J", "non-nuclear"),
         special_mappings=c(chrM="MT"),
         unmapped_seqs=list(
@@ -287,7 +333,7 @@ SUPPORTED_UCSC_GENOMES <- list(
     mm8=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         circ_seqs="chrM",
-        refseq_assembly_accession="GCF_000001635.15",
+        assembly_accession="GCF_000001635.15",
         AssemblyUnits="C57BL/6J",
         unmapped_seqs=list(
             `assembled-molecule`="chrM",
@@ -299,7 +345,7 @@ SUPPORTED_UCSC_GENOMES <- list(
     rn6=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         circ_seqs="chrM",
-        refseq_assembly_accession="GCF_000001895.5",
+        assembly_accession="GCF_000001895.5",
         special_mappings=c(chrM="MT")
     ),
 
@@ -307,14 +353,14 @@ SUPPORTED_UCSC_GENOMES <- list(
     dm6=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         circ_seqs="chrM",
-        refseq_assembly_accession="GCF_000001215.4",
+        assembly_accession="GCF_000001215.4",
         special_mappings=c(chrM="MT")
     ),
 
     dm3=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         circ_seqs="chrM",
-        refseq_assembly_accession="GCF_000001215.2",
+        assembly_accession="GCF_000001215.2",
         special_mappings=c(chrM="MT", chrU="Un"),
         unmapped_seqs=list(`pseudo-scaffold`="chrUextra")
     ),
@@ -328,7 +374,7 @@ SUPPORTED_UCSC_GENOMES <- list(
     ce6=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         circ_seqs="chrM",
-        refseq_assembly_accession="GCF_000002985.1",
+        assembly_accession="GCF_000002985.1",
         special_mappings=c(chrM="MT")
     ),
 
@@ -346,7 +392,7 @@ SUPPORTED_UCSC_GENOMES <- list(
     sacCer3=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         circ_seqs="chrM",
-        refseq_assembly_accession="GCF_000146045.2",
+        assembly_accession="GCF_000146045.2",
         special_mappings=c(chrM="MT")
     ),
 
@@ -372,7 +418,7 @@ fetchExtendedChromInfoFromUCSC <- function(genome,
     FUN <- get(supported_genome$FUN)
     FUN(genome=names(SUPPORTED_UCSC_GENOMES)[idx],
         circ_seqs=supported_genome$circ_seqs,
-        refseq_assembly_accession=supported_genome$refseq_assembly_accession,
+        assembly_accession=supported_genome$assembly_accession,
         AssemblyUnits=supported_genome$AssemblyUnits,
         special_mappings=supported_genome$special_mappings,
         unmapped_seqs=supported_genome$unmapped_seqs,

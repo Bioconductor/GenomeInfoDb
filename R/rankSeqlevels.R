@@ -24,13 +24,13 @@
 ###      super group has been dropped (nothing is dropped for super group (E)),
 ###      every name should fall into exactly 1 of the 14 following groups:
 ###        (a) roman number
-###        (b) arabic number (possibly followed by L or R)
+###        (b) arabic number (possibly followed by A, a, B, b, L, or R)
 ###        (c) X
 ###        (d) Y
 ###        (e) U
 ###        (f) M
 ###        (g) MT
-###        (h) arabic number "followed by something" (not L or R)
+###        (h) arabic number "followed by something" (not A, a, B, b, L, or R)
 ###        (i) X "followed by something"
 ###        (j) Y "followed by something"
 ###        (k) U "followed by something"
@@ -39,8 +39,8 @@
 ###        (n) anything else
 ###      Names in early groups are ranked before names in late groups.
 ###
-###   3. A name in group (b) that ends with L or R is ranked right after the
-###      name obtained by dropping the L or R.
+###   3. A name in group (b) that ends with A, a, B, b, L, or R, is ranked
+###      right after the name obtained by dropping the A, a, B, b, L, or R.
 ###
 ###   4. In groups (h) to (n), ties are broken by looking at the "followed
 ###      by something" part (or at the entire name for group (n)): collation
@@ -131,16 +131,21 @@ rankSeqlevels <- function(seqnames, X.is.sexchrom=NA)
         sgsuffix <- seqlevels[sgidx]
         sgsuffix <- dropPrefix(sgsuffix, nchar(prefix))
         is_nb <- isNb(sgsuffix)
+        is_nbA <- isNb(sgsuffix, abc="A")
+        is_nba <- isNb(sgsuffix, abc="a")
+        is_nbB <- isNb(sgsuffix, abc="B")
+        is_nbb <- isNb(sgsuffix, abc="b")
         is_nbL <- isNb(sgsuffix, abc="L")
         is_nbR <- isNb(sgsuffix, abc="R")
-        is_nb_or_nbL_or_nbR <- is_nb | is_nbL | is_nbR
-        is_nbxxx <- isNb(sgsuffix, abc=".*") & !is_nb_or_nbL_or_nbR
+        is_nb_with_suffix <- is_nb | is_nbA | is_nba | is_nbB | is_nbb |
+                                                       is_nbL | is_nbR
+        is_nbxxx <- isNb(sgsuffix, abc=".*") & !is_nb_with_suffix
         is_X <- sgsuffix == "X"
         is_Y <- sgsuffix == "Y"
         if (is.na(X.is.sexchrom)) {
             if (any(is_X)) {
                 X_is_seXual <- any(is_Y) ||
-                    any(is_nb_or_nbL_or_nbR) ||
+                    any(is_nb_with_suffix) ||
                     any(is_nbxxx)
             } else {
                 X_is_seXual <- TRUE  # or FALSE, won't make any difference
@@ -161,7 +166,7 @@ rankSeqlevels <- function(seqnames, X.is.sexchrom=NA)
             !is_MT & !is_MTxxx & !is_roman
         ## The groups below must define a partitioning of the current super
         ## group i.e. any element in 'sgsuffix' must fall in exactly 1 group.
-        is_xxx <- !is_roman & !is_nb_or_nbL_or_nbR &
+        is_xxx <- !is_roman & !is_nb_with_suffix &
             !is_seXual & !is_Y & !is_U & !is_M & !is_MT &
             !is_nbxxx &
             !is_Xxxx & !is_Yxxx & !is_Uxxx & !is_Mxxx & !is_MTxxx
@@ -172,12 +177,32 @@ rankSeqlevels <- function(seqnames, X.is.sexchrom=NA)
             makeAndAssignProvIds(sgidx[is_roman], ints=ints)
         }
         ## Group (b).
-        if (any(is_nb_or_nbL_or_nbR)) {
-            gsuffix <- sgsuffix[is_nb_or_nbL_or_nbR]
-            isnb_idx <- which(is_nb[is_nb_or_nbL_or_nbR])
-            isnbL_idx <- which(is_nbL[is_nb_or_nbL_or_nbR])
-            isnbR_idx <- which(is_nbR[is_nb_or_nbL_or_nbR])
+        if (any(is_nb_with_suffix)) {
+            gsuffix <- sgsuffix[is_nb_with_suffix]
+            isnb_idx <- which(is_nb[is_nb_with_suffix])
+            isnbA_idx <- which(is_nbA[is_nb_with_suffix])
+            isnba_idx <- which(is_nba[is_nb_with_suffix])
+            isnbB_idx <- which(is_nbB[is_nb_with_suffix])
+            isnbb_idx <- which(is_nbb[is_nb_with_suffix])
+            isnbL_idx <- which(is_nbL[is_nb_with_suffix])
+            isnbR_idx <- which(is_nbR[is_nb_with_suffix])
             nb_ints <- as.integer(gsuffix[isnb_idx])
+            gsuffixA <- gsuffix[isnbA_idx]
+            nbA_ints <- as.integer(substr(gsuffixA,
+                                          start=1L,
+                                          stop=nchar(gsuffixA)-1L))
+            gsuffixa <- gsuffix[isnba_idx]
+            nba_ints <- as.integer(substr(gsuffixa,
+                                          start=1L,
+                                          stop=nchar(gsuffixa)-1L))
+            gsuffixB <- gsuffix[isnbB_idx]
+            nbB_ints <- as.integer(substr(gsuffixB,
+                                          start=1L,
+                                          stop=nchar(gsuffixB)-1L))
+            gsuffixb <- gsuffix[isnbb_idx]
+            nbb_ints <- as.integer(substr(gsuffixb,
+                                          start=1L,
+                                          stop=nchar(gsuffixb)-1L))
             gsuffixL <- gsuffix[isnbL_idx]
             nbL_ints <- as.integer(substr(gsuffixL,
                                           start=1L,
@@ -187,10 +212,14 @@ rankSeqlevels <- function(seqnames, X.is.sexchrom=NA)
                                           start=1L,
                                           stop=nchar(gsuffixR)-1L))
             ints <- integer(length(gsuffix))
-            ints[isnb_idx] <- 3L * nb_ints
-            ints[isnbL_idx] <- 3L * nbL_ints + 1L
-            ints[isnbR_idx] <- 3L * nbR_ints + 2L
-            makeAndAssignProvIds(sgidx[is_nb_or_nbL_or_nbR], ints=ints)
+            ints[isnb_idx] <- 7L * nb_ints
+            ints[isnbA_idx] <- 7L * nbA_ints + 1L
+            ints[isnba_idx] <- 7L * nba_ints + 2L
+            ints[isnbB_idx] <- 7L * nbB_ints + 3L
+            ints[isnbb_idx] <- 7L * nbb_ints + 4L
+            ints[isnbL_idx] <- 7L * nbL_ints + 5L
+            ints[isnbR_idx] <- 7L * nbR_ints + 6L
+            makeAndAssignProvIds(sgidx[is_nb_with_suffix], ints=ints)
         }
         ## Group (c).
         if (any(is_seXual))

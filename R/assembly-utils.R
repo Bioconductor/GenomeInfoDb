@@ -97,18 +97,11 @@
     ans
 }
 
-### 'assembly' can be:
-###   (a) a RefSeq assembly accession (e.g. "GCF_000001405.26"), in which case
-###       it's returned as is;
-###   (b) a GenBank assembly accession (e.g. "GCA_000001405.15");
-###   (c) an NCBI assembly name (e.g. "GRCh38").
-.lookup_refseq_assembly_accession <- function(assembly)
+### 'assembly_accession' can be:
+###   (a) a GenBank assembly accession (e.g. "GCA_000001405.15");
+###   (b) an NCBI assembly name (e.g. "GRCh38").
+.lookup_refseq_assembly_accession <- function(assembly_accession)
 {
-    if (!isSingleString(assembly))
-        stop("'assembly' must be a single string")
-    if (.is_refseq_assembly_accession(assembly))
-        return(assembly)
-
     assembly_summary_genbank <- .fetch_assembly_summary("genbank")
     assembly_summary_refseq <- .fetch_assembly_summary("refseq")
 
@@ -121,58 +114,75 @@
         union(ans1, ans2)
     }
 
-    if (.is_genbank_assembly_accession(assembly)) {
-        idx1 <- match(assembly, assembly_summary_genbank$assembly_accession)
-        idx2 <- which(assembly_summary_refseq$gbrs_paired_asm == assembly)
+    if (.is_genbank_assembly_accession(assembly_accession)) {
+        idx1 <- match(assembly_accession,
+                      assembly_summary_genbank$assembly_accession)
+        idx2 <- which(assembly_summary_refseq$gbrs_paired_asm ==
+                      assembly_accession)
         ans <- .get_answers(idx1, idx2)
         if (length(ans) == 1L)
             return(ans)
         if (length(ans) >= 2L) {
             warning("more than one RefSeq assembly accession found for ",
-                    "\"", assembly, "\",\n  returning the 1st one")
+                    "\"", assembly_accession, "\",\n  returning the 1st one")
             return(ans[1L])
         }
         return(NA_character_)
     }
 
-    ## If 'assembly' is not a RefSeq or GenBank assembly accession, then we
-    ## assume it's an assembly name (e.g. "GRCh38", or "hg16", or
+    ## If 'assembly_accession' is not a RefSeq or GenBank assembly accession,
+    ## then we assume it's an assembly name (e.g. "GRCh38", or "hg16", or
     ## "Pan_troglodytes-2.1.4").
 
     ## Exact match.
-    idx1 <- which(assembly_summary_genbank$asm_name == assembly)
-    idx2 <- which(assembly_summary_refseq$asm_name == assembly)
+    idx1 <- which(assembly_summary_genbank$asm_name == assembly_accession)
+    idx2 <- which(assembly_summary_refseq$asm_name == assembly_accession)
     ans <- .get_answers(idx1, idx2)
     if (length(ans) == 1L)
         return(ans)
     if (length(ans) >= 2L)
         stop("more than one RefSeq assembly accession found for ",
-             "\"", assembly, "\"")
+             "\"", assembly_accession, "\"")
 
     ## Fuzzy match.
     warning("No RefSeq assembly accession found for ",
-            "\"", assembly, "\".\n",
+            "\"", assembly_accession, "\".\n",
             "  Searching again using ",
-            "\"", assembly, "\" as a regular expression.")
-    idx1 <- grep(assembly, assembly_summary_genbank$asm_name, ignore.case=TRUE)
-    idx2 <- grep(assembly, assembly_summary_refseq$asm_name, ignore.case=TRUE)
+            "\"", assembly_accession, "\" as a regular expression.")
+    idx1 <- grep(assembly_accession, assembly_summary_genbank$asm_name,
+                 ignore.case=TRUE)
+    idx2 <- grep(assembly_accession, assembly_summary_refseq$asm_name,
+                 ignore.case=TRUE)
     ans <- .get_answers(idx1, idx2)
     if (length(ans) == 1L)
         return(ans)
     if (length(ans) >= 2L) 
         stop("more than one RefSeq assembly accession found for regular ",
-             "expression \"", assembly, "\"")
+             "expression \"", assembly_accession, "\"")
 
     NA_character_
 }
 
-### See .lookup_refseq_assembly_accession() for how 'assembly' can be
-### specified.
-.make_assembly_report_URL <- function(assembly)
+### 'assembly_accession' can be:
+###   (a) a GenBank assembly accession (e.g. "GCA_000001405.15");
+###   (b) a RefSeq assembly accession (e.g. "GCF_000001405.26");
+###   (c) an NCBI assembly name (e.g. "GRCh38").
+.normarg_assembly_accession <- function(assembly_accession)
 {
-    assembly_accession <- .lookup_refseq_assembly_accession(assembly)
+    if (.is_genbank_assembly_accession(assembly_accession) ||
+        .is_refseq_assembly_accession(assembly_accession))
+        return(assembly_accession)
+    accession0 <- assembly_accession
+    assembly_accession <- .lookup_refseq_assembly_accession(accession0)
     if (is.na(assembly_accession))
-        stop("cannot find a RefSeq assembly accession for \"", assembly, "\"")
+        stop("cannot find a RefSeq assembly accession for \"",
+             accession0, "\"")
+    assembly_accession
+}
+
+.make_assembly_report_URL <- function(assembly_accession)
+{
+    assembly_accession <- .normarg_assembly_accession(assembly_accession)
     assembly_report_filename <- paste0(assembly_accession, ".assembly.txt")
     paste0(.NCBI_ASSEMBLY_REPORTS_URL, "All/", assembly_report_filename)
 }
@@ -188,22 +198,24 @@
     read.table(url, sep="\t", col.names=colnames, stringsAsFactors=FALSE)
 }
 
-### See .lookup_refseq_assembly_accession() for how 'assembly' can be
-### specified.
-### In addition, here 'assembly' can be the URL to an assembly report (a.k.a.
-### full sequence report). Examples of such URLs:
+### See .normarg_assembly_accession() for how 'assembly_accession' can be
+### specified. In addition, here 'assembly_accession' can be the URL to an
+### assembly report (a.k.a. full sequence report). Examples of such URLs:
 ###   ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000001405.26.assembly.txt
 ###   ftp://ftp.ncbi.nlm.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh38/GCA_000001405.15_GRCh38_assembly_report.txt
 ### Note that the 2 URls above both point to the assembly report for GRCh38,
 ### but the report at the 1st URL contains a little bit more information than
 ### the report at the 2nd URL.
-fetch_assembly_report <- function(assembly, AssemblyUnits=NULL)
+fetch_assembly_report <- function(assembly_accession, AssemblyUnits=NULL)
 {
-    if (!isSingleString(assembly))
-        stop("'assembly' must be a single string")
-    if (!grepl("://", assembly))
-        assembly <- .make_assembly_report_URL(assembly)
-    ans <- .fetch_assembly_report_from_URL(assembly)
+    if (!isSingleString(assembly_accession))
+        stop("'assembly_accession' must be a single string")
+    if (grepl("://", assembly_accession, fixed=TRUE)) {
+        report_url <- assembly_accession
+    } else {
+        report_url <- .make_assembly_report_URL(assembly_accession)
+    }
+    ans <- .fetch_assembly_report_from_URL(report_url)
     if (!is.null(AssemblyUnits)) {
         stopifnot(all(AssemblyUnits %in% ans$AssemblyUnit))
         idx <- which(ans$AssemblyUnit %in% AssemblyUnits)
