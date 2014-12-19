@@ -26,8 +26,8 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
                                              AssemblyUnits=AssemblyUnits)
     GenBank_accn <- assembly_report[["GenBankAccn"]]
     if ("na" %in% GenBank_accn)
-        stop("GenBankAccn field in assembly report for ",
-             "\"", assembly, "\" contains \"na\"")
+        stop(wmsg("GenBankAccn field in assembly report for ",
+                  "\"", assembly, "\" contains \"na\""))
     stopifnot(anyDuplicated(GenBank_accn) == 0L)
     ans <- assembly_report[["SequenceName"]]
     names(ans) <- GenBank_accn
@@ -39,10 +39,10 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
 ### fetchExtendedChromInfoFromUCSC()
 ###
 
-.match_seqlevel_part2_to_NCBI_accn <- function(seqlevel, NCBI_accn)
+.match_UCSC_seqlevel_part2_to_NCBI_accn <- function(UCSC_seqlevel, NCBI_accn)
 {
-    ans <- rep.int(NA_integer_, length(seqlevel))
-    seqlevel_parts <- strsplit(seqlevel, "_")
+    ans <- rep.int(NA_integer_, length(UCSC_seqlevel))
+    seqlevel_parts <- strsplit(UCSC_seqlevel, "_")
     nparts <- elementLengths(seqlevel_parts)
     idx2 <- which(nparts >= 2L)
     if (length(idx2) == 0L)
@@ -53,22 +53,22 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
     unversioned_idx <- grep(".", part2, fixed=TRUE, invert=TRUE)
     if (length(unversioned_idx) != 0L)
         part2[unversioned_idx] <- paste0(part2[unversioned_idx], ".1")
-    hits <- findMatches(part2, NCBI_accn)
+    hits <- findMatches(toupper(part2), NCBI_accn)
     q_hits <- queryHits(hits)
     s_hits <- subjectHits(hits)
     ambig_q_idx <- which(duplicated(q_hits))
     if (length(ambig_q_idx) != 0L) {
         ambig_idx <- idx2[unique(q_hits[ambig_q_idx])]
-        in1string <- paste0(seqlevel[ambig_idx], collapse=", ")
-        stop("more than one accession number matches each ",
-             "of the following UCSC seqlevel: ", in1string)
+        in1string <- paste0(UCSC_seqlevel[ambig_idx], collapse=", ")
+        stop(wmsg("more than one accession number matches each ",
+                  "of the following UCSC seqlevel: ", in1string))
     }
     ambig_s_idx <- which(duplicated(s_hits))
     if (length(ambig_s_idx) != 0L) {
         ambig_idx <- idx2[unique(s_hits[ambig_s_idx])]
         in1string <- paste0(NCBI_accn[ambig_idx], collapse=", ")
-        stop("more than one UCSC seqlevel matches each ",
-             "of the following accession number: ", in1string)
+        stop(wmsg("more than one UCSC seqlevel matches each ",
+                  "of the following accession number: ", in1string))
     }
     ans[idx2[q_hits]] <- s_hits
     ans
@@ -86,10 +86,10 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
     if (!is.null(special_mappings)) {
         m1 <- match(names(special_mappings), UCSC_seqlevel)
         if (any(is.na(m1)))
-            stop("'special_mappings' has names not in 'UCSC_seqlevel'")
+            stop(wmsg("'special_mappings' has names not in 'UCSC_seqlevel'"))
         m2 <- match(special_mappings, NCBI_seqlevel)
         if (any(is.na(m2)))
-            stop("'special_mappings' has values not in 'NCBI_seqlevel'")
+            stop(wmsg("'special_mappings' has values not in 'NCBI_seqlevel'"))
         ans[m1] <- m2
     }
     unmapped_idx <- which(is.na(ans))
@@ -119,7 +119,7 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
         return(ans)
 
     ## 4. We assign based on the number embedded in the UCSC chromosome name.
-    ans[unmapped_idx] <- .match_seqlevel_part2_to_NCBI_accn(
+    ans[unmapped_idx] <- .match_UCSC_seqlevel_part2_to_NCBI_accn(
                                     UCSC_seqlevel[unmapped_idx], NCBI_accn)
     ans
 }
@@ -143,7 +143,8 @@ standard_fetch_extended_ChromInfo_from_UCSC <- function(
                       stringsAsFactors=FALSE)
     if (is.null(assembly_accession)) {
         if (!quiet)
-            warning(genome, " UCSC genome is not based on an NCBI assembly")
+            warning(wmsg(genome, " UCSC genome is not based on ",
+                         "an NCBI assembly"))
         oo <- order(rankSeqlevels(ans[ , "UCSC_seqlevel"]))
         ans <- ans[oo, , drop=FALSE]
         rownames(ans) <- NULL
@@ -156,9 +157,9 @@ standard_fetch_extended_ChromInfo_from_UCSC <- function(
         unmapped_idx <- match(unmapped_seqs, UCSC_seqlevel)
         stopifnot(!any(is.na(unmapped_idx)))
         if (!quiet)
-            warning("NCBI seqlevel was set to NA for ", genome,
-                    " UCSC seqlevel(s) not in the NCBI assembly: ",
-                    paste(unmapped_seqs, collapse=", "))
+            warning(wmsg("NCBI seqlevel was set to NA for ", genome,
+                         " UCSC seqlevel(s) not in the NCBI assembly: ",
+                         paste0(unmapped_seqs, collapse=", ")))
     }
     assembly_report <- fetch_assembly_report(assembly_accession,
                                              AssemblyUnits=AssemblyUnits)
@@ -173,9 +174,12 @@ standard_fetch_extended_ChromInfo_from_UCSC <- function(
         stopifnot(all(is.na(m)[unmapped_idx]))
     unexpectedly_unmapped_idx <-
         which(is.na(m) & !(UCSC_seqlevel %in% unmapped_seqs))
-    if (length(unexpectedly_unmapped_idx) != 0L)
-        stop("cannot map the following UCSC seqlevel(s) to an NCBI seqlevel: ",
-             paste(UCSC_seqlevel[unexpectedly_unmapped_idx], collapse=", "))
+    if (length(unexpectedly_unmapped_idx) != 0L) {
+        in1string <- paste0(UCSC_seqlevel[unexpectedly_unmapped_idx],
+                            collapse=", ")
+        stop(wmsg("cannot map the following UCSC seqlevel(s) to an ",
+                  "NCBI seqlevel: ", in1string))
+    }
     GenBankAccn[which(GenBankAccn == "na")] <- NA_character_
     SequenceRole <- factor(assembly_report[ , "SequenceRole"],
                            levels=c("assembled-molecule",
