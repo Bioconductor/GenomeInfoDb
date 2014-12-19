@@ -61,6 +61,10 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
     if (length(unmapped_idx) == 0L)
         return(ans)
 
+    ## From now on, matching is case insensitive.
+    UCSC_seqlevel <- tolower(UCSC_seqlevel)
+    NCBI_seqlevel <- tolower(NCBI_seqlevel)
+
     ## 2. We assign based on exact matching of the seqlevels.
     m <- match(UCSC_seqlevel[unmapped_idx], NCBI_seqlevel)
     ok_idx <- which(!is.na(m))
@@ -176,6 +180,7 @@ standard_fetch_extended_ChromInfo_from_UCSC <- function(genome,
 
 SUPPORTED_UCSC_GENOMES <- list(
 
+### Human
     hg38=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         circ_seqs="chrM",
@@ -213,6 +218,29 @@ SUPPORTED_UCSC_GENOMES <- list(
                   paste0(c((1:22)[-c(12, 14, 20)], "X"), "_random"))))
         ),
 
+### Cow
+    bosTau8=list(
+        FUN="standard_fetch_extended_ChromInfo_from_UCSC",
+        circ_seqs="chrM",
+        refseq_assembly_id="GCF_000003055.5",
+        special_mappings=c(chrM="MT")
+    ),
+
+    bosTau7=list(
+        FUN="standard_fetch_extended_ChromInfo_from_UCSC",
+        circ_seqs="chrM",
+        refseq_assembly_id="GCF_000003205.5",
+        unmapped_seqs=list(`assembled-molecule`="chrM")
+    ),
+
+    bosTau6=list(
+        FUN="standard_fetch_extended_ChromInfo_from_UCSC",
+        circ_seqs="chrM",
+        refseq_assembly_id="GCF_000003055.4",
+        special_mappings=c(chrM="MT")
+    ),
+
+### Mouse
     mm10=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         circ_seqs="chrM",
@@ -232,6 +260,7 @@ SUPPORTED_UCSC_GENOMES <- list(
                 c(1, 3:5, 7:9, 13, 16:17, "X", "Y", "Un"), "_random"))
     ),
 
+### Rat
     rn6=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         circ_seqs="chrM",
@@ -239,6 +268,7 @@ SUPPORTED_UCSC_GENOMES <- list(
         special_mappings=c(chrM="MT")
     ),
 
+### D. melanogaster
     dm6=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         circ_seqs="chrM",
@@ -254,6 +284,7 @@ SUPPORTED_UCSC_GENOMES <- list(
         unmapped_seqs=list(`pseudo-scaffold`="chrUextra")
     ),
 
+### Yeast
     sacCer3=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         circ_seqs="chrM",

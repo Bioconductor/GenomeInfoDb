@@ -210,19 +210,24 @@
 ## A. MAKING A Seqinfo OBJECT FOR A SUPPORTED GENOME
 ## ---------------------------------------------------------------------
 
-## This queries the UCSC Genome Browser and thus requires internet
-## access. Only the following genomes are supported at the moment (more
-## will come):
-Seqinfo(genome="hg38")
-Seqinfo(genome="hg19")
-Seqinfo(genome="hg18")
-Seqinfo(genome="mm10")
-Seqinfo(genome="mm9")
-Seqinfo(genome="rn6")
-Seqinfo(genome="dm6")
-Seqinfo(genome="dm3")
-Seqinfo(genome="sacCer3")
-Seqinfo(genome="sacCer2")
+if (interactive()) {
+  ## This queries the UCSC Genome Browser and thus requires internet
+  ## access. Only the following genomes are supported at the moment (more
+  ## will come):
+  Seqinfo(genome="hg38")
+  Seqinfo(genome="hg19")
+  Seqinfo(genome="hg18")
+  Seqinfo(genome="bosTau8")
+  Seqinfo(genome="bosTau7")
+  Seqinfo(genome="bosTau6")
+  Seqinfo(genome="mm10")
+  Seqinfo(genome="mm9")
+  Seqinfo(genome="rn6")
+  Seqinfo(genome="dm6")
+  Seqinfo(genome="dm3")
+  Seqinfo(genome="sacCer3")
+  Seqinfo(genome="sacCer2")
+}
 
 ## ---------------------------------------------------------------------
 ## B. BASIC MANIPULATION OF A Seqinfo OBJECT
