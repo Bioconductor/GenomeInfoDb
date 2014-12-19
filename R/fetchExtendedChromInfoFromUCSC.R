@@ -284,6 +284,29 @@ SUPPORTED_UCSC_GENOMES <- list(
         unmapped_seqs=list(`pseudo-scaffold`="chrUextra")
     ),
 
+### C. elegans
+    ce10=list(
+        FUN="standard_fetch_extended_ChromInfo_from_UCSC",
+        circ_seqs="chrM"
+    ),
+
+    ce6=list(
+        FUN="standard_fetch_extended_ChromInfo_from_UCSC",
+        circ_seqs="chrM",
+        refseq_assembly_id="GCF_000002985.1",
+        special_mappings=c(chrM="MT")
+    ),
+
+    ce4=list(
+        FUN="standard_fetch_extended_ChromInfo_from_UCSC",
+        circ_seqs="chrM"
+    ),
+
+    ce2=list(
+        FUN="standard_fetch_extended_ChromInfo_from_UCSC",
+        circ_seqs="chrM"
+    ),
+
 ### Yeast
     sacCer3=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",

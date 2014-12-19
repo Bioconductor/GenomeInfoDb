@@ -202,7 +202,13 @@
 \author{H. Pages}
 
 \seealso{
-  \code{\link{seqinfo}}
+  \itemize{
+    \item \code{\link{seqinfo}}
+
+    \item The \code{\link{fetchExtendedChromInfoFromUCSC}} utility
+          function that is used behind the scene to make a Seqinfo
+          object for a supported genome (see examples below).
+  }
 }
 
 \examples{
@@ -211,22 +217,15 @@
 ## ---------------------------------------------------------------------
 
 if (interactive()) {
-  ## This queries the UCSC Genome Browser and thus requires internet
-  ## access. Only the following genomes are supported at the moment (more
-  ## will come):
+  ## This uses fetchExtendedChromInfoFromUCSC() behind the scene and
+  ## thus requires internet access. See ?fetchExtendedChromInfoFromUCSC
+  ## for the list of UCSC genomes that are currently supported.
   Seqinfo(genome="hg38")
-  Seqinfo(genome="hg19")
-  Seqinfo(genome="hg18")
   Seqinfo(genome="bosTau8")
-  Seqinfo(genome="bosTau7")
-  Seqinfo(genome="bosTau6")
   Seqinfo(genome="mm10")
-  Seqinfo(genome="mm9")
   Seqinfo(genome="rn6")
   Seqinfo(genome="dm6")
-  Seqinfo(genome="dm3")
   Seqinfo(genome="sacCer3")
-  Seqinfo(genome="sacCer2")
 }
 
 ## ---------------------------------------------------------------------
