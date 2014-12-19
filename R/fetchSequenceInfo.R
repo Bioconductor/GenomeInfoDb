@@ -15,11 +15,11 @@
                stringsAsFactors=FALSE)
 }
 
-#.fetch_sequence_info_for_NCBI_genome <- function(refseq_assembly_id,
+#.fetch_sequence_info_for_NCBI_genome <- function(refseq_assembly_accession,
 #                                                 AssemblyUnits,
 #                                                 circ_seqs)
 #{
-#    assembly_report <- fetch_assembly_report(refseq_assembly_id,
+#    assembly_report <- fetch_assembly_report(refseq_assembly_accession,
 #                                             AssemblyUnits=AssemblyUnits)
 #    ans_seqnames <- as.character(assembly_report[ , "SequenceName"])
 #
@@ -27,7 +27,7 @@
 #
 #SUPPORTED_NCBI_GENOMES <- list(
 #    GRCh38=
-#        list(refseq_assembly_id="GCF_000001405.26", circular="MT")
+#        list(refseq_assembly_accession="GCF_000001405.26", circular="MT")
 #)
 
 ### Returns a data frame.
@@ -44,10 +44,10 @@ fetchSequenceInfo <- function(genome)
     #idx <- match(genome, names(SUPPORTED_NCBI_GENOMES))
     #if (!is.na(idx)) {
     #    supported_genome <- SUPPORTED_NCBI_GENOMES[[idx]]
-    #    refseq_assembly_id <- supported_genome$refseq_assembly_id
+    #    refseq_assembly_accession <- supported_genome$refseq_assembly_accession
     #    AssemblyUnits <- supported_genome$AssemblyUnits
     #    circ_seqs <- supported_genome$circular
-    #    return(.fetch_sequence_info_for_NCBI_genome(refseq_assembly_id,
+    #    return(.fetch_sequence_info_for_NCBI_genome(refseq_assembly_accession,
     #                                                AssemblyUnits,
     #                                                circ_seqs))
     #}

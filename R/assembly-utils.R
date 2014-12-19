@@ -3,8 +3,8 @@
 ### -------------------------------------------------------------------------
 
 
-.GENBANK_ASSEMBLY_ID_PREFIX <- "GCA_"
-.REFSEQ_ASSEMBLY_ID_PREFIX <- "GCF_"
+.GENBANK_ASSEMBLY_ACCESSION_PREFIX <- "GCA_"
+.REFSEQ_ASSEMBLY_ACCESSION_PREFIX <- "GCF_"
 
 .NCBI_ASSEMBLY_REPORTS_URL <-
     "ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/"
@@ -20,15 +20,15 @@
 .is_genbank_assembly_accession <- function(x)
 {
     ## We use %in% instead of == to be NA-proof.
-    substr(x, 1L, nchar(.GENBANK_ASSEMBLY_ID_PREFIX)) %in%
-        .GENBANK_ASSEMBLY_ID_PREFIX
+    substr(x, 1L, nchar(.GENBANK_ASSEMBLY_ACCESSION_PREFIX)) %in%
+        .GENBANK_ASSEMBLY_ACCESSION_PREFIX
 }
 
 .is_refseq_assembly_accession <- function(x)
 {
     ## We use %in% instead of == to be NA-proof.
-    substr(x, 1L, nchar(.REFSEQ_ASSEMBLY_ID_PREFIX)) %in%
-        .REFSEQ_ASSEMBLY_ID_PREFIX
+    substr(x, 1L, nchar(.REFSEQ_ASSEMBLY_ACCESSION_PREFIX)) %in%
+        .REFSEQ_ASSEMBLY_ACCESSION_PREFIX
 }
 
 ### Performs some quick sanity checks on the assembly summary.
@@ -98,9 +98,9 @@
 }
 
 ### 'assembly' can be:
-###   (a) a RefSeq Assembly ID (e.g. "GCF_000001405.26"), in which case it's
-###       returned as is;
-###   (b) a GenBank Assembly ID (e.g. "GCA_000001405.15");
+###   (a) a RefSeq assembly accession (e.g. "GCF_000001405.26"), in which case
+###       it's returned as is;
+###   (b) a GenBank assembly accession (e.g. "GCA_000001405.15");
 ###   (c) an NCBI assembly name (e.g. "GRCh38").
 .lookup_refseq_assembly_accession <- function(assembly)
 {
@@ -135,8 +135,8 @@
         return(NA_character_)
     }
 
-    ## If 'assembly' is not a RefSeq Assembly ID or a GenBank Assembly ID,
-    ## then we assume it's an assembly name (e.g. "GRCh38", or "hg16", or
+    ## If 'assembly' is not a RefSeq or GenBank assembly accession, then we
+    ## assume it's an assembly name (e.g. "GRCh38", or "hg16", or
     ## "Pan_troglodytes-2.1.4").
 
     ## Exact match.
