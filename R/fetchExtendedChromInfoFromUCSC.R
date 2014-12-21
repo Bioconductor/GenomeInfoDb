@@ -370,6 +370,14 @@ SUPPORTED_UCSC_GENOMES <- list(
         special_mappings=c(chrM="MT")
     ),
 
+### Rhesus
+    rheMac3=list(
+        FUN="standard_fetch_extended_ChromInfo_from_UCSC",
+        circ_seqs="chrM",
+        assembly_accession="GCA_000230795.1",
+        unmapped_seqs=list(`assembled-molecule`="chrM")
+    ),
+
 ### Chicken
     galGal4=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
