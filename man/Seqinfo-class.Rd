@@ -225,6 +225,7 @@ if (interactive()) {
   Seqinfo(genome="canFam3")
   Seqinfo(genome="mm10")
   Seqinfo(genome="rn6")
+  Seqinfo(genome="galGal4")
   Seqinfo(genome="dm6")
   Seqinfo(genome="sacCer3")
 }

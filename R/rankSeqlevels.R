@@ -25,18 +25,20 @@
 ###      every name should fall into exactly 1 of the 14 following groups:
 ###        (a) roman number
 ###        (b) arabic number (possibly followed by A, a, B, b, L, or R)
-###        (c) X
-###        (d) Y
-###        (e) U
-###        (f) M
-###        (g) MT
-###        (h) arabic number "followed by something" (not A, a, B, b, L, or R)
-###        (i) X "followed by something"
-###        (j) Y "followed by something"
-###        (k) U "followed by something"
-###        (l) M "followed by something"
-###        (m) MT "followed by something"
-###        (n) anything else
+###        (c) W
+###        (d) Z
+###        (e) X
+###        (f) Y
+###        (g) U
+###        (h) M
+###        (i) MT
+###        (j) arabic number "followed by something" (not A, a, B, b, L, or R)
+###        (k) X "followed by something"
+###        (l) Y "followed by something"
+###        (m) U "followed by something"
+###        (n) M "followed by something"
+###        (o) MT "followed by something"
+###        (p) anything else
 ###      Names in early groups are ranked before names in late groups.
 ###
 ###   3. A name in group (b) that ends with A, a, B, b, L, or R, is ranked
@@ -140,6 +142,8 @@ rankSeqlevels <- function(seqnames, X.is.sexchrom=NA)
         is_nb_with_suffix <- is_nb | is_nbA | is_nba | is_nbB | is_nbb |
                                                        is_nbL | is_nbR
         is_nbxxx <- isNb(sgsuffix, abc=".*") & !is_nb_with_suffix
+        is_W <- sgsuffix == "W"
+        is_Z <- sgsuffix == "Z"
         is_X <- sgsuffix == "X"
         is_Y <- sgsuffix == "Y"
         if (is.na(X.is.sexchrom)) {
@@ -167,7 +171,7 @@ rankSeqlevels <- function(seqnames, X.is.sexchrom=NA)
         ## The groups below must define a partitioning of the current super
         ## group i.e. any element in 'sgsuffix' must fall in exactly 1 group.
         is_xxx <- !is_roman & !is_nb_with_suffix &
-            !is_seXual & !is_Y & !is_U & !is_M & !is_MT &
+            !is_W & !is_Z & !is_seXual & !is_Y & !is_U & !is_M & !is_MT &
             !is_nbxxx &
             !is_Xxxx & !is_Yxxx & !is_Uxxx & !is_Mxxx & !is_MTxxx
         ## Group (a).
@@ -222,21 +226,27 @@ rankSeqlevels <- function(seqnames, X.is.sexchrom=NA)
             makeAndAssignProvIds(sgidx[is_nb_with_suffix], ints=ints)
         }
         ## Group (c).
+        if (any(is_W))
+            makeAndAssignProvIds(sgidx[is_W])
+        ## Group (d).
+        if (any(is_Z))
+            makeAndAssignProvIds(sgidx[is_Z])
+        ## Group (e).
         if (any(is_seXual))
             makeAndAssignProvIds(sgidx[is_seXual])
-        ## Group (d).
+        ## Group (f).
         if (any(is_Y))
             makeAndAssignProvIds(sgidx[is_Y])
-        ## Group (e).
+        ## Group (g).
         if (any(is_U))
             makeAndAssignProvIds(sgidx[is_U])
-        ## Group (f).
+        ## Group (h).
         if (any(is_M))
             makeAndAssignProvIds(sgidx[is_M])
-        ## Group (g).
+        ## Group (i).
         if (any(is_MT))
             makeAndAssignProvIds(sgidx[is_MT])
-        ## Group (h).
+        ## Group (j).
         if (any(is_nbxxx)) {
             gsuffix <- sgsuffix[is_nbxxx]
             ints1 <- as.integer(getIntPrefix(gsuffix))
@@ -244,37 +254,37 @@ rankSeqlevels <- function(seqnames, X.is.sexchrom=NA)
             ints <- (max(ints2) + 1L) * ints1 + ints2
             makeAndAssignProvIds(sgidx[is_nbxxx], ints=ints)
         }
-        ## Group (i).
+        ## Group (k).
         if (any(is_Xxxx)) {
             gsuffix <- sgsuffix[is_Xxxx]
             ints <- as.integer(factor(dropPrefix(gsuffix, 1L)))
             makeAndAssignProvIds(sgidx[is_Xxxx], ints=ints)
         }
-        ## Group (j).
+        ## Group (l).
         if (any(is_Yxxx)) {
             gsuffix <- sgsuffix[is_Yxxx]
             ints <- as.integer(factor(dropPrefix(gsuffix, 1L)))
             makeAndAssignProvIds(sgidx[is_Yxxx], ints=ints)
         }
-        ## Group (k).
+        ## Group (m).
         if (any(is_Uxxx)) {
             gsuffix <- sgsuffix[is_Uxxx]
             ints <- as.integer(factor(dropPrefix(gsuffix, 1L)))
             makeAndAssignProvIds(sgidx[is_Uxxx], ints=ints)
         }
-        ## Group (l).
+        ## Group (n).
         if (any(is_Mxxx)) {
             gsuffix <- sgsuffix[is_Mxxx]
             ints <- as.integer(factor(dropPrefix(gsuffix, 1L)))
             makeAndAssignProvIds(sgidx[is_Mxxx], ints=ints)
         }
-        ## Group (m).
+        ## Group (o).
         if (any(is_MTxxx)) {
             gsuffix <- sgsuffix[is_MTxxx]
             ints <- as.integer(factor(dropPrefix(gsuffix, 2L)))
             makeAndAssignProvIds(sgidx[is_MTxxx], ints=ints)
         }
-        ## Group (n).
+        ## Group (p).
         if (any(is_xxx)) {
             gsuffix <- sgsuffix[is_xxx]
             ints <- as.integer(factor(gsuffix))

@@ -39,7 +39,8 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
 ### fetchExtendedChromInfoFromUCSC()
 ###
 
-.match_UCSC_seqlevel_part2_to_NCBI_accn <- function(UCSC_seqlevel, NCBI_accn)
+.match_UCSC_seqlevel_part2_to_NCBI_accn <- function(UCSC_seqlevel, NCBI_accn,
+                                                    accn_prefix="")
 {
     ans <- rep.int(NA_integer_, length(UCSC_seqlevel))
     seqlevel_parts <- strsplit(UCSC_seqlevel, "_")
@@ -53,6 +54,7 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
     unversioned_idx <- grep(".", part2, fixed=TRUE, invert=TRUE)
     if (length(unversioned_idx) != 0L)
         part2[unversioned_idx] <- paste0(part2[unversioned_idx], ".1")
+    part2 <- paste0(accn_prefix, part2)
     hits <- findMatches(toupper(part2), NCBI_accn)
     q_hits <- queryHits(hits)
     s_hits <- subjectHits(hits)
@@ -119,8 +121,18 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
         return(ans)
 
     ## 4. We assign based on the number embedded in the UCSC chromosome name.
+    m <- .match_UCSC_seqlevel_part2_to_NCBI_accn(UCSC_seqlevel[unmapped_idx],
+                                                 NCBI_accn)
+    ok_idx <- which(!is.na(m))
+    ans[unmapped_idx[ok_idx]] <- m[ok_idx]
+    unmapped_idx <- which(is.na(ans))
+    if (length(unmapped_idx) == 0L)
+        return(ans)
+
+    ## 5. We assign based on the number embedded in the UCSC chromosome name.
     ans[unmapped_idx] <- .match_UCSC_seqlevel_part2_to_NCBI_accn(
-                                    UCSC_seqlevel[unmapped_idx], NCBI_accn)
+                                    UCSC_seqlevel[unmapped_idx], NCBI_accn,
+                                    accn_prefix="AAD")
     ans
 }
 
@@ -351,6 +363,16 @@ SUPPORTED_UCSC_GENOMES <- list(
         circ_seqs="chrM",
         assembly_accession="GCF_000001895.5",
         special_mappings=c(chrM="MT")
+    ),
+
+### Chicken
+    galGal4=list(
+        FUN="standard_fetch_extended_ChromInfo_from_UCSC",
+        circ_seqs="chrM",
+        assembly_accession="GCF_000002315.3",
+        special_mappings=c(chrLGE22C19W28_E50C23="ChrE22C19W28_E50C23",
+                           chrLGE64="ChrE64",
+                           chrM="MT")
     ),
 
 ### D. melanogaster
