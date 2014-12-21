@@ -33,12 +33,14 @@
 ###        (h) M
 ###        (i) MT
 ###        (j) arabic number "followed by something" (not A, a, B, b, L, or R)
-###        (k) X "followed by something"
-###        (l) Y "followed by something"
-###        (m) U "followed by something"
-###        (n) M "followed by something"
-###        (o) MT "followed by something"
-###        (p) anything else
+###        (k) W "followed by something"
+###        (l) Z "followed by something"
+###        (m) X "followed by something"
+###        (n) Y "followed by something"
+###        (o) U "followed by something"
+###        (p) M "followed by something"
+###        (q) MT "followed by something"
+###        (r) anything else
 ###      Names in early groups are ranked before names in late groups.
 ###
 ###   3. A name in group (b) that ends with A, a, B, b, L, or R, is ranked
@@ -162,6 +164,8 @@ rankSeqlevels <- function(seqnames, X.is.sexchrom=NA)
         is_U <- sgsuffix == "U"
         is_MT <- sgsuffix == "MT"
         is_M <- sgsuffix == "M"
+        is_Wxxx <- hasPrefix(sgsuffix, "W") & !is_W & !is_roman
+        is_Zxxx <- hasPrefix(sgsuffix, "Z") & !is_Z & !is_roman
         is_Xxxx <- hasPrefix(sgsuffix, "X") & !is_X & !is_roman
         is_Yxxx <- hasPrefix(sgsuffix, "Y") & !is_Y & !is_roman
         is_Uxxx <- hasPrefix(sgsuffix, "U") & !is_U & !is_roman
@@ -173,7 +177,8 @@ rankSeqlevels <- function(seqnames, X.is.sexchrom=NA)
         is_xxx <- !is_roman & !is_nb_with_suffix &
             !is_W & !is_Z & !is_seXual & !is_Y & !is_U & !is_M & !is_MT &
             !is_nbxxx &
-            !is_Xxxx & !is_Yxxx & !is_Uxxx & !is_Mxxx & !is_MTxxx
+            !is_Wxxx & !is_Zxxx  & !is_Xxxx & !is_Yxxx &
+                                   !is_Uxxx & !is_Mxxx & !is_MTxxx
         ## Group (a).
         if (any(is_roman)) {
             gsuffix <- sgsuffix[is_roman]
@@ -255,36 +260,48 @@ rankSeqlevels <- function(seqnames, X.is.sexchrom=NA)
             makeAndAssignProvIds(sgidx[is_nbxxx], ints=ints)
         }
         ## Group (k).
+        if (any(is_Wxxx)) {
+            gsuffix <- sgsuffix[is_Wxxx]
+            ints <- as.integer(factor(dropPrefix(gsuffix, 1L)))
+            makeAndAssignProvIds(sgidx[is_Wxxx], ints=ints)
+        }
+        ## Group (l).
+        if (any(is_Zxxx)) {
+            gsuffix <- sgsuffix[is_Zxxx]
+            ints <- as.integer(factor(dropPrefix(gsuffix, 1L)))
+            makeAndAssignProvIds(sgidx[is_Zxxx], ints=ints)
+        }
+        ## Group (m).
         if (any(is_Xxxx)) {
             gsuffix <- sgsuffix[is_Xxxx]
             ints <- as.integer(factor(dropPrefix(gsuffix, 1L)))
             makeAndAssignProvIds(sgidx[is_Xxxx], ints=ints)
         }
-        ## Group (l).
+        ## Group (n).
         if (any(is_Yxxx)) {
             gsuffix <- sgsuffix[is_Yxxx]
             ints <- as.integer(factor(dropPrefix(gsuffix, 1L)))
             makeAndAssignProvIds(sgidx[is_Yxxx], ints=ints)
         }
-        ## Group (m).
+        ## Group (o).
         if (any(is_Uxxx)) {
             gsuffix <- sgsuffix[is_Uxxx]
             ints <- as.integer(factor(dropPrefix(gsuffix, 1L)))
             makeAndAssignProvIds(sgidx[is_Uxxx], ints=ints)
         }
-        ## Group (n).
+        ## Group (p).
         if (any(is_Mxxx)) {
             gsuffix <- sgsuffix[is_Mxxx]
             ints <- as.integer(factor(dropPrefix(gsuffix, 1L)))
             makeAndAssignProvIds(sgidx[is_Mxxx], ints=ints)
         }
-        ## Group (o).
+        ## Group (q).
         if (any(is_MTxxx)) {
             gsuffix <- sgsuffix[is_MTxxx]
             ints <- as.integer(factor(dropPrefix(gsuffix, 2L)))
             makeAndAssignProvIds(sgidx[is_MTxxx], ints=ints)
         }
-        ## Group (p).
+        ## Group (r).
         if (any(is_xxx)) {
             gsuffix <- sgsuffix[is_xxx]
             ints <- as.integer(factor(gsuffix))

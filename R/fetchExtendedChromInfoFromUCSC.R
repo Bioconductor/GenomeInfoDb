@@ -210,6 +210,11 @@ standard_fetch_extended_ChromInfo_from_UCSC <- function(
     oo <- order(as.integer(ans[ , "SequenceRole"]),
                 rankSeqlevels(ans[ , "UCSC_seqlevel"]))
     ans <- ans[oo, , drop=FALSE]
+    if (length(unmapped_seqs) != 0L) {
+        ## The order hardcoded in 'unmapped_seqs' is authority.
+        unmapped_idx <- match(unmapped_seqs, ans[ , "UCSC_seqlevel"])
+        ans[sort(unmapped_idx), ] <- ans[unmapped_idx, , drop=FALSE]
+    }
     rownames(ans) <- NULL
     ans
 }
@@ -373,6 +378,19 @@ SUPPORTED_UCSC_GENOMES <- list(
         special_mappings=c(chrLGE22C19W28_E50C23="ChrE22C19W28_E50C23",
                            chrLGE64="ChrE64",
                            chrM="MT")
+    ),
+
+    galGal3=list(
+        FUN="standard_fetch_extended_ChromInfo_from_UCSC",
+        circ_seqs="chrM",
+        assembly_accession="GCF_000002315.2",
+        special_mappings=c(chrE22C19W28_E50C23="LGE22C19W28_E50C23",
+                           chrE64="LGE64",
+                           chrM="MT"),
+        unmapped_seqs=list(
+            `pseudo-scaffold`=paste0("chr",
+                c(1:2, 4:8, 10:13, 16:18, 20, 22, 25, 28, "W", "Z",
+                  "E22C19W28_E50C23", "E64", "Un"), "_random"))
     ),
 
 ### D. melanogaster
