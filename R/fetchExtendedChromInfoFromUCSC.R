@@ -39,6 +39,37 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
 ### fetchExtendedChromInfoFromUCSC()
 ###
 
+.safe_match <- function(query, NCBI_accn)
+{
+    hits <- findMatches(query, NCBI_accn)
+    q_hits <- queryHits(hits)
+    s_hits <- subjectHits(hits)
+    ambig_q_idx <- which(duplicated(q_hits))
+    if (length(ambig_q_idx) != 0L) {
+        ambig_idx <- unique(q_hits[ambig_q_idx])
+        in1string <- paste0(names(query)[ambig_idx], collapse=", ")
+        stop(wmsg("UCSC seqlevel(s) matching more than one accession number: ",
+                  in1string))
+    }
+    ambig_s_idx <- which(duplicated(s_hits))
+    if (length(ambig_s_idx) != 0L) {
+        ambig_idx <- unique(s_hits[ambig_s_idx])
+        in1string <- paste0(NCBI_accn[ambig_idx], collapse=", ")
+        stop(wmsg("accession number(s) with more than one UCSC seqlevel ",
+                  "match: ", in1string))
+    }
+    ans <- rep.int(NA_integer_, length(query))
+    ans[q_hits] <- s_hits
+    ans
+}
+
+.match_UCSC_seqlevel_to_NCBI_accn <- function(UCSC_seqlevel, NCBI_accn)
+{
+    query <- sub("-", ".", UCSC_seqlevel, fixed=TRUE)
+    names(query) <- UCSC_seqlevel
+    .safe_match(query, NCBI_accn)
+}
+
 .match_UCSC_seqlevel_part2_to_NCBI_accn <- function(UCSC_seqlevel, NCBI_accn,
                                                     accn_prefix="")
 {
@@ -49,30 +80,14 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
     if (length(idx2) == 0L)
         return(ans)
     offsets <- c(0L, cumsum(nparts[idx2[-length(idx2)]]))
-    part2 <- unlist(seqlevel_parts[idx2], use.names=FALSE)[offsets + 2L]
-    part2 <- sub("v", ".", part2, fixed=TRUE)
-    unversioned_idx <- grep(".", part2, fixed=TRUE, invert=TRUE)
+    query <- unlist(seqlevel_parts[idx2], use.names=FALSE)[offsets + 2L]
+    query <- sub("v", ".", query, fixed=TRUE)
+    unversioned_idx <- grep(".", query, fixed=TRUE, invert=TRUE)
     if (length(unversioned_idx) != 0L)
-        part2[unversioned_idx] <- paste0(part2[unversioned_idx], ".1")
-    part2 <- paste0(accn_prefix, part2)
-    hits <- findMatches(toupper(part2), NCBI_accn)
-    q_hits <- queryHits(hits)
-    s_hits <- subjectHits(hits)
-    ambig_q_idx <- which(duplicated(q_hits))
-    if (length(ambig_q_idx) != 0L) {
-        ambig_idx <- idx2[unique(q_hits[ambig_q_idx])]
-        in1string <- paste0(UCSC_seqlevel[ambig_idx], collapse=", ")
-        stop(wmsg("more than one accession number matches each ",
-                  "of the following UCSC seqlevel: ", in1string))
-    }
-    ambig_s_idx <- which(duplicated(s_hits))
-    if (length(ambig_s_idx) != 0L) {
-        ambig_idx <- idx2[unique(s_hits[ambig_s_idx])]
-        in1string <- paste0(NCBI_accn[ambig_idx], collapse=", ")
-        stop(wmsg("more than one UCSC seqlevel matches each ",
-                  "of the following accession number: ", in1string))
-    }
-    ans[idx2[q_hits]] <- s_hits
+        query[unversioned_idx] <- paste0(query[unversioned_idx], ".1")
+    query <- paste0(accn_prefix, query)
+    names(query) <- UCSC_seqlevel[idx2]
+    ans[idx2] <- .safe_match(query, NCBI_accn)
     ans
 }
 
@@ -121,7 +136,16 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
     if (length(unmapped_idx) == 0L)
         return(ans)
 
-    ## 4. We assign based on the number embedded in the UCSC chromosome name.
+    ## 4. We assign based on accession number found in UCSC seqlevel.
+    m <- .match_UCSC_seqlevel_to_NCBI_accn(UCSC_seqlevel[unmapped_idx],
+                                           NCBI_accn)
+    ok_idx <- which(!is.na(m))
+    ans[unmapped_idx[ok_idx]] <- m[ok_idx]
+    unmapped_idx <- which(is.na(ans))
+    if (length(unmapped_idx) == 0L)
+        return(ans)
+
+    ## 5. We assign based on accession number found in part 2 of UCSC seqlevel.
     m <- .match_UCSC_seqlevel_part2_to_NCBI_accn(UCSC_seqlevel[unmapped_idx],
                                                  NCBI_accn)
     ok_idx <- which(!is.na(m))
@@ -130,7 +154,8 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
     if (length(unmapped_idx) == 0L)
         return(ans)
 
-    ## 5. We assign based on the number embedded in the UCSC chromosome name.
+    ## 6. We assign based on accession number found in part 2 of UCSC seqlevel
+    ##    after adding AAD prefix to it.
     ans[unmapped_idx] <- .match_UCSC_seqlevel_part2_to_NCBI_accn(
                                     UCSC_seqlevel[unmapped_idx], NCBI_accn,
                                     accn_prefix="AAD")
@@ -367,6 +392,14 @@ SUPPORTED_UCSC_GENOMES <- list(
             `assembled-molecule`="chrM",
             `pseudo-scaffold`=paste0("chr",
                 c(1, 5, 7:10, 13, 15, 17, "X", "Y", "Un"), "_random"))
+    ),
+
+### Pig
+    susScr3=list(
+        FUN="standard_fetch_extended_ChromInfo_from_UCSC",
+        circ_seqs="chrM",
+        assembly_accession="GCF_000003025.5",
+        special_mappings=c(chrM="MT")
     ),
 
 ### Rat
