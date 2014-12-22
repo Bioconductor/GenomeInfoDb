@@ -402,6 +402,13 @@ SUPPORTED_UCSC_GENOMES <- list(
         special_mappings=c(chrM="MT")
     ),
 
+    susScr2=list(
+        FUN="standard_fetch_extended_ChromInfo_from_UCSC",
+        circ_seqs="chrM",
+        assembly_accession="GCF_000003025.3",
+        unmapped_seqs=list(`assembled-molecule`="chrM")
+    ),
+
 ### Rat
     rn6=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
