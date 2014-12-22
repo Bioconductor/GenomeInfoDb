@@ -88,7 +88,8 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
     if (!is.null(special_mappings)) {
         m1 <- match(names(special_mappings), UCSC_seqlevel)
         if (any(is.na(m1)))
-            stop(wmsg("'special_mappings' has names not in 'UCSC_seqlevel'"))
+            stop(wmsg("'special_mappings' contains sequence names ",
+                      "not in 'UCSC_seqlevel'"))
         m2 <- match(special_mappings, NCBI_seqlevel)
         if (any(is.na(m2)))
             stop(wmsg("'special_mappings' has values not in 'NCBI_seqlevel'"))
@@ -149,9 +150,15 @@ standard_fetch_extended_ChromInfo_from_UCSC <- function(
     chrominfo <- fetch_ChromInfo_from_UCSC(genome,
                                 goldenPath_url=goldenPath_url)
     UCSC_seqlevel <- chrominfo[ , "chrom"]
+    circular_idx <- match(circ_seqs, UCSC_seqlevel)
+    if (any(is.na(circular_idx)))
+        stop(wmsg("'circ_seqs' contains sequence names not in ",
+                  genome, " genome"))
+    circular <- logical(length(UCSC_seqlevel))
+    circular[circular_idx] <- TRUE
     ans <- data.frame(UCSC_seqlevel=UCSC_seqlevel,
                       UCSC_seqlength=chrominfo[ , "size"],
-                      circular=UCSC_seqlevel %in% circ_seqs,
+                      circular=circular,
                       stringsAsFactors=FALSE)
     if (is.null(assembly_accession)) {
         if (!quiet)
@@ -376,6 +383,12 @@ SUPPORTED_UCSC_GENOMES <- list(
         circ_seqs="chrM",
         assembly_accession="GCA_000230795.1",
         unmapped_seqs=list(`assembled-molecule`="chrM")
+    ),
+
+    rheMac2=list(
+        FUN="standard_fetch_extended_ChromInfo_from_UCSC",
+        assembly_accession="GCF_000002255.3",
+        unmapped_seqs=list(`pseudo-scaffold`="chrUr")
     ),
 
 ### Chicken
