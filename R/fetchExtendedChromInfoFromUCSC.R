@@ -294,7 +294,6 @@ SUPPORTED_UCSC_GENOMES <- list(
         ),
 
 ### Chimp
-
     panTro4=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         circ_seqs="chrM",
@@ -452,6 +451,14 @@ SUPPORTED_UCSC_GENOMES <- list(
             `pseudo-scaffold`=paste0("chr",
                 c(1:2, 4:8, 10:13, 16:18, 20, 22, 25, 28, "W", "Z",
                   "E22C19W28_E50C23", "E64", "Un"), "_random"))
+    ),
+
+### Zebrafish
+    danRer7=list(
+        FUN="standard_fetch_extended_ChromInfo_from_UCSC",
+        circ_seqs="chrM",
+        assembly_accession="GCF_000002035.4",
+        special_mappings=c(chrM="MT")
     ),
 
 ### D. melanogaster
