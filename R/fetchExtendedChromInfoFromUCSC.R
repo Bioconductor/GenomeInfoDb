@@ -453,6 +453,13 @@ SUPPORTED_UCSC_GENOMES <- list(
                   "E22C19W28_E50C23", "E64", "Un"), "_random"))
     ),
 
+### Stickleback
+    gasAcu1=list(
+        FUN="standard_fetch_extended_ChromInfo_from_UCSC",
+        circ_seqs="chrM"
+        #assembly_accession="GCA_000180675.1"
+    ),
+
 ### Zebrafish
     danRer7=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
