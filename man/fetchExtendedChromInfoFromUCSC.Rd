@@ -10,8 +10,8 @@
   Fetch the chromosomes info for some UCSC genomes.
   Only supports hg38, hg19, hg18, panTro4, panTro3, panTro2, bosTau8, bosTau7,
   bosTau6, canFam3, canFam2, canFam1, mm10, mm9, mm8, susScr3, susScr2, rn6,
-  rheMac3, rheMac2, galGal4, galGal3, danRer7, dm6, dm3, ce10, ce6, ce4, ce2,
-  sacCer3, and sacCer2 at the moment.
+  rheMac3, rheMac2, galGal4, galGal3, danRer7, apiMel2, dm6, dm3, ce10, ce6,
+  ce4, ce2, sacCer3, and sacCer2 at the moment.
 }
 
 \usage{
@@ -110,8 +110,9 @@ fetchExtendedChromInfoFromUCSC(genome,
 
   Only supports the hg38, hg19, hg18, panTro4, panTro3, panTro2, bosTau8,
   bosTau7, bosTau6, canFam3, canFam2, canFam1, mm10, mm9, mm8, susScr3,
-  susScr2, rn6, rheMac3, rheMac2, galGal4, galGal3, danRer7, dm6, dm3, ce10,
-  ce6, ce4, ce2, sacCer3, and sacCer2 genomes at the moment. More will come...
+  susScr2, rn6, rheMac3, rheMac2, galGal4, galGal3, danRer7, apiMel2, dm6, dm3,
+  ce10, ce6, ce4, ce2, sacCer3, and sacCer2 genomes at the moment. More will
+  come...
 }
 
 \author{

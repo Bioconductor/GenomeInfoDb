@@ -461,6 +461,22 @@ SUPPORTED_UCSC_GENOMES <- list(
         special_mappings=c(chrM="MT")
     ),
 
+    #Too messy!
+    #danRer6=list(
+    #    FUN="standard_fetch_extended_ChromInfo_from_UCSC",
+    #    circ_seqs="chrM",
+    #    assembly_accession="GCF_000002035.3",
+    #    special_mappings=c(chrM="MT")
+    #),
+
+### A. mellifera
+    apiMel2=list(
+        FUN="standard_fetch_extended_ChromInfo_from_UCSC",
+        assembly_accession="GCF_000002195.1",
+        special_mappings=setNames(paste0("LG", 1:16), paste0("Group", 1:16)),
+        unmapped_seqs=list(`pseudo-scaffold`="GroupUn")
+    ),
+
 ### D. melanogaster
     dm6=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
