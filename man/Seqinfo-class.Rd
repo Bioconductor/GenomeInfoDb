@@ -223,6 +223,7 @@ if (interactive()) {
   Seqinfo(genome="hg38")
   Seqinfo(genome="bosTau8")
   Seqinfo(genome="canFam3")
+  Seqinfo(genome="musFur1")
   Seqinfo(genome="mm10")
   Seqinfo(genome="rn6")
   Seqinfo(genome="galGal4")

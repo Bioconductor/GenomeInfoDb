@@ -63,9 +63,11 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
     ans
 }
 
-.match_UCSC_seqlevel_to_NCBI_accn <- function(UCSC_seqlevel, NCBI_accn)
+.match_UCSC_seqlevel_to_NCBI_accn <- function(UCSC_seqlevel, NCBI_accn,
+                                              accn_suffix="")
 {
     query <- sub("-", ".", UCSC_seqlevel, fixed=TRUE)
+    query <- paste0(query, accn_suffix)
     names(query) <- UCSC_seqlevel
     .safe_match(query, NCBI_accn)
 }
@@ -145,7 +147,17 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
     if (length(unmapped_idx) == 0L)
         return(ans)
 
-    ## 5. We assign based on accession number found in part 2 of UCSC seqlevel.
+    ## 5. We assign based on accession number found in UCSC seqlevel after
+    ##    adding .1 suffix to it.
+    m <- .match_UCSC_seqlevel_to_NCBI_accn(UCSC_seqlevel[unmapped_idx],
+                                           NCBI_accn, accn_suffix=".1")
+    ok_idx <- which(!is.na(m))
+    ans[unmapped_idx[ok_idx]] <- m[ok_idx]
+    unmapped_idx <- which(is.na(ans))
+    if (length(unmapped_idx) == 0L)
+        return(ans)
+
+    ## 6. We assign based on accession number found in part 2 of UCSC seqlevel.
     m <- .match_UCSC_seqlevel_part2_to_NCBI_accn(UCSC_seqlevel[unmapped_idx],
                                                  NCBI_accn)
     ok_idx <- which(!is.na(m))
@@ -154,7 +166,7 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
     if (length(unmapped_idx) == 0L)
         return(ans)
 
-    ## 6. We assign based on accession number found in part 2 of UCSC seqlevel
+    ## 7. We assign based on accession number found in part 2 of UCSC seqlevel
     ##    after adding AAD prefix to it.
     ans[unmapped_idx] <- .match_UCSC_seqlevel_part2_to_NCBI_accn(
                                     UCSC_seqlevel[unmapped_idx], NCBI_accn,
@@ -360,6 +372,12 @@ SUPPORTED_UCSC_GENOMES <- list(
     canFam1=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         circ_seqs="chrM"
+    ),
+
+### Ferret
+    musFur1=list(
+        FUN="standard_fetch_extended_ChromInfo_from_UCSC",
+        assembly_accession="GCF_000215625.1"
     ),
 
 ### Mouse
