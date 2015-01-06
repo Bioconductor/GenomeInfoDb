@@ -55,13 +55,13 @@
 ###
 ### One of the ugliest functions I ever wrote, sorry...
 ###
-### NOTE: makeSeqnameIds() was successfully tested on the BSgenome data
+### NOTE: rankSeqlevels() was successfully tested on the BSgenome data
 ### packages for hg19, mm10, ce2, dm3, sacCer1, sacCer2, sacCer3 and rheMac2
 ### i.e. the IDs returned on the seqnames defined in those packages match the
 ### ranks of the seqnames.
-### For example, for hg19, 'makeSeqnameIds(seqlevels(Hsapiens))' is identical
+### For example, for hg19, 'rankSeqlevels(seqlevels(Hsapiens))' is identical
 ### to 'seq_along(seqlevels(Hsapiens)))'.
-### TODO: Add unit test for makeSeqnameIds().
+### TODO: Add unit test for rankSeqlevels().
 
 rankSeqlevels <- function(seqnames, X.is.sexchrom=NA)
 {
