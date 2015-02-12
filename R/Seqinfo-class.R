@@ -170,9 +170,14 @@ setValidity2("Seqinfo", .valid.Seqinfo)
     }
     if (!is.numeric(seqlengths))
         stop("bad supplied 'seqlengths' vector")
-    if (!is.integer(seqlengths))
-        return(as.integer(seqlengths))
-    unname(seqlengths)
+    if (is.integer(seqlengths)) {
+        seqlengths <- unname(seqlengths)
+    } else {
+        seqlengths <- as.integer(seqlengths)
+    }
+    if (any(seqlengths < 0L, na.rm=TRUE))
+        stop("supplied 'seqlengths' contains negative values")
+    seqlengths
 }
 
 ### Make sure this always returns an *unnamed* logical vector.
