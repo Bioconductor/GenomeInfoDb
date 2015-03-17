@@ -77,7 +77,7 @@ exportMethods(
     summary,
 
     ## Generics defined in the BiocGenerics package:
-    intersect
+    intersect, organism, species
 )
 
 
@@ -102,7 +102,7 @@ export(
     seqnameStyle, "seqnameStyle<-",
 
     ## GenomeDescription-class.R:
-    organism, species, provider, providerVersion,
+    provider, providerVersion,
     releaseDate, releaseName, bsgenomeName
 )
 
@@ -117,7 +117,7 @@ exportMethods(
     genome, "genome<-",
     seqlevelsStyle, "seqlevelsStyle<-",
     seqnameStyle, "seqnameStyle<-",
-    organism, species, provider, providerVersion,
+    provider, providerVersion,
     releaseDate, releaseName, bsgenomeName
 )
 
