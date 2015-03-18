@@ -33,9 +33,9 @@ setClass("GenomeDescription",
 ### Accessor methods.
 ###
 
-setMethod("organism", "GenomeDescription", function(x) x@organism)
+setMethod("organism", "GenomeDescription", function(object) object@organism)
 
-setMethod("species", "GenomeDescription", function(x) x@species)
+setMethod("species", "GenomeDescription", function(object) object@species)
 
 setGeneric("provider", function(x) standardGeneric("provider"))
 setMethod("provider", "GenomeDescription", function(x) x@provider)

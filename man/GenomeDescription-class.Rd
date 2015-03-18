@@ -47,17 +47,17 @@
 }
 
 \section{Accessor methods}{
-  In the code snippets below,
-  \code{x} is a GenomeDescription object.
+  In the code snippets below, \code{object} or \code{x} is a
+  GenomeDescription object.
 
   \describe{
     \item{}{
-      \code{organism(x)}:
+      \code{organism(object)}:
       Return the target organism for this genome e.g. \code{"Homo sapiens"},
       \code{"Mus musculus"}, \code{"Caenorhabditis elegans"}, etc...
     }
     \item{}{
-      \code{species(x)}:
+      \code{species(object)}:
       Return the target species for this genome e.g. \code{"Human"},
       \code{"Mouse"}, \code{"Worm"}, etc...
     }
