@@ -43,10 +43,8 @@ setMethod("commonName", "GenomeDescription",
 setMethod("species", "GenomeDescription",
     function(object)
     {
-         msg <- wmsg("The \"species\" method for GenomeDescription objects ",
-                     "is deprecated and should not be used anymore. ",
-                     "Please use commonName() instead of species() on ",
-                     "GenomeDescription objects.")
+         msg <- c("  Calling species() on a ", class(object), " object ",
+                  "is *deprecated*.\n  Please use commonName() instead.")
         .Deprecated(msg=msg)
         commonName(object)
     }
