@@ -9,6 +9,8 @@
 % Accessor methods:
 \alias{organism}
 \alias{organism,GenomeDescription-method}
+\alias{commonName}
+\alias{commonName,GenomeDescription-method}
 \alias{species}
 \alias{species,GenomeDescription-method}
 \alias{provider}
@@ -53,13 +55,14 @@
   \describe{
     \item{}{
       \code{organism(object)}:
-      Return the target organism for this genome e.g. \code{"Homo sapiens"},
-      \code{"Mus musculus"}, \code{"Caenorhabditis elegans"}, etc...
+      Return the scientific name of the organism of the genome e.g.
+      \code{"Homo sapiens"}, \code{"Mus musculus"},
+      \code{"Caenorhabditis elegans"}, etc...
     }
     \item{}{
-      \code{species(object)}:
-      Return the target species for this genome e.g. \code{"Human"},
-      \code{"Mouse"}, \code{"Worm"}, etc...
+      \code{commonName(object)}:
+      Return the common name of the organism of the genome e.g.
+      \code{"Human"}, \code{"Mouse"}, \code{"Worm"}, etc...
     }
     \item{}{
       \code{provider(x)}:

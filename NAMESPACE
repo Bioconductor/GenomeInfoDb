@@ -102,7 +102,7 @@ export(
     seqnameStyle, "seqnameStyle<-",
 
     ## GenomeDescription-class.R:
-    provider, providerVersion,
+    commonName, provider, providerVersion,
     releaseDate, releaseName, bsgenomeName
 )
 
@@ -117,7 +117,7 @@ exportMethods(
     genome, "genome<-",
     seqlevelsStyle, "seqlevelsStyle<-",
     seqnameStyle, "seqnameStyle<-",
-    provider, providerVersion,
+    commonName, provider, providerVersion,
     releaseDate, releaseName, bsgenomeName
 )
 

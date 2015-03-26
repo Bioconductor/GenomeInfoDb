@@ -7,8 +7,8 @@ setClass("GenomeDescription",
         ## organism: "Homo sapiens", "Mus musculus", etc...
         organism="character",
 
-        ## species: "Human", "Mouse", etc...
-        species="character",
+        ## common_name: "Human", "Mouse", etc...
+        common_name="character",
 
         ## provider: "UCSC", "BDGP", etc...
         provider="character",
@@ -35,7 +35,22 @@ setClass("GenomeDescription",
 
 setMethod("organism", "GenomeDescription", function(object) object@organism)
 
-setMethod("species", "GenomeDescription", function(object) object@species)
+setGeneric("commonName", function(object) standardGeneric("commonName"))
+setMethod("commonName", "GenomeDescription",
+    function(object) object@common_name
+)
+
+setMethod("species", "GenomeDescription",
+    function(object)
+    {
+         msg <- wmsg("The \"species\" method for GenomeDescription objects ",
+                     "is deprecated and should not be used anymore. ",
+                     "Please use commonName() instead of species() on ",
+                     "GenomeDescription objects.")
+        .Deprecated(msg=msg)
+        commonName(object)
+    }
+)
 
 setGeneric("provider", function(x) standardGeneric("provider"))
 setMethod("provider", "GenomeDescription", function(x) x@provider)
@@ -102,18 +117,25 @@ setValidity("GenomeDescription",
 ### Constructor-like functions
 ###
 
-GenomeDescription <- function(organism, species,
+### NOTE: In BioC 3.1, the 'species' argument was replaced with the
+### 'common_name' argument but the former was kept for backward compatibility
+### (essentially with existing SNPlocs and XtraSNPlocs packages).
+### TODO: At some point the 'species' needs to be deprecated.
+GenomeDescription <- function(organism, common_name,
                               provider, provider_version,
                               release_date, release_name,
-                              seqinfo)
+                              seqinfo,
+                              species=NA_character_)
 {
     if (identical(organism, "NA")) organism <- NA_character_
-    if (identical(species, "NA")) species <- NA_character_
+    if (missing(common_name))
+        common_name <- species
+    if (identical(common_name, "NA")) common_name <- NA_character_
     if (identical(release_date, "NA")) release_date <- NA_character_
     if (identical(release_name, "NA")) release_name <- NA_character_
     new("GenomeDescription",
         organism=organism,
-        species=species,
+        common_name=common_name,
         provider=provider,
         provider_version=provider_version,
         release_date=release_date,
@@ -153,7 +175,7 @@ GenomeDescription <- function(organism, species,
 ### NOT exported (but used in the BSgenome package).
 showGenomeDescription <- function(x, margin="", print.seqlengths=FALSE)
 {
-    cat(margin, "organism: ", organism(x), " (",  species(x), ")\n", sep="")
+    cat(margin, "organism: ", organism(x), " (",  commonName(x), ")\n", sep="")
     cat(margin, "provider: ", provider(x), "\n", sep="")
     cat(margin, "provider version: ", providerVersion(x), "\n", sep="")
     cat(margin, "release date: ", releaseDate(x), "\n", sep="")
