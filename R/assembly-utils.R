@@ -194,7 +194,8 @@
     ## by NCBI in the assembly report.
     colnames <- c("SequenceName", "SequenceRole", "AssignedMolecule",
                   "AssignedMoleculeLocationOrType", "GenBankAccn",
-                  "Relationship", "RefSeqAccn", "AssemblyUnit")
+                  "Relationship", "RefSeqAccn", "AssemblyUnit" , 
+                  "SequenceLength", "UCSCStyleName")
     read.table(url, sep="\t", col.names=colnames, stringsAsFactors=FALSE)
 }
 
