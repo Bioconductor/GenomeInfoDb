@@ -146,9 +146,10 @@ GenomeDescription <- function(organism, common_name,
 ### The 'show' method
 ###
 
+### NOT exported but used in BSgenome package.
 ### Kind of very low-level. Could go into S4Vectors if someone else needed
 ### this...
-.compactPrintNamedAtomicVector <- function(x, margin="")
+compactPrintNamedAtomicVector <- function(x, margin="")
 {
     x_len <- length(x)
     halfWidth <- (getOption("width") - nchar(margin)) %/% 2L
@@ -181,7 +182,7 @@ showGenomeDescription <- function(x, margin="", print.seqlengths=FALSE)
     if (print.seqlengths) {
         cat(margin, "---\n", sep="")
         cat(margin, "seqlengths:\n", sep="")
-        .compactPrintNamedAtomicVector(seqlengths(x), margin=margin)
+        compactPrintNamedAtomicVector(seqlengths(x), margin=margin)
     }
 }
 
