@@ -22,9 +22,10 @@
 ###
 ###   2. Within each super group, and after the prefix corresponding to the
 ###      super group has been dropped (nothing is dropped for super group (E)),
-###      every name should fall into exactly 1 of the 14 following groups:
+###      every name should fall into exactly 1 of the 18 following groups:
 ###        (a) roman number
-###        (b) arabic number (possibly followed by A, a, B, b, L, or R)
+###        (b) "short" arabic integer number (i.e. 6 digits or less) possibly
+###            with A, a, B, b, L, or R suffix
 ###        (c) W
 ###        (d) Z
 ###        (e) X
@@ -32,7 +33,8 @@
 ###        (g) U
 ###        (h) M
 ###        (i) MT
-###        (j) arabic number "followed by something" (not A, a, B, b, L, or R)
+###        (j) "short" arabic integer number (i.e. 6 digits or less) "followed
+###            by something" (not A, a, B, b, L, or R)
 ###        (k) W "followed by something"
 ###        (l) Z "followed by something"
 ###        (m) X "followed by something"
@@ -43,17 +45,17 @@
 ###        (r) anything else
 ###      Names in early groups are ranked before names in late groups.
 ###
-###   3. A name in group (b) that ends with A, a, B, b, L, or R, is ranked
-###      right after the name obtained by dropping the A, a, B, b, L, or R.
+###   3. A name in group (b) with A, a, B, b, L, or R suffix, is ranked
+###      right after the name obtained by dropping the suffix.
 ###
-###   4. In groups (h) to (n), ties are broken by looking at the "followed
-###      by something" part (or at the entire name for group (n)): collation
+###   4. In groups (k-r), ties are broken by looking at the "followed by
+###      something" part (or at the entire name for group (r)): collation
 ###      defined by LC_COLLATE set to C applies.
 ###
 ### 'X.is.sexchrom' lets the user control whether X refers to the sexual
 ### chromosome or to chromosome with roman number X.
 ###
-### One of the ugliest functions I ever wrote, sorry...
+### Yes, an ugly and messy function, sorry...
 ###
 ### NOTE: rankSeqlevels() was successfully tested on the BSgenome data
 ### packages for hg19, mm10, ce2, dm3, sacCer1, sacCer2, sacCer3 and rheMac2
@@ -62,6 +64,46 @@
 ### For example, for hg19, 'rankSeqlevels(seqlevels(Hsapiens))' is identical
 ### to 'seq_along(seqlevels(Hsapiens)))'.
 ### TODO: Add unit test for rankSeqlevels().
+
+
+### Some simple helpers for low-level string manipulation.
+
+.hasPrefix <- function(x, prefix)
+    substr(x, start=1L, stop=nchar(prefix)) == prefix
+
+.dropPrefix <- function(x, nchar)
+    substr(x, start=nchar+1L, stop=nchar(x))
+
+isRoman <- function(x)
+{
+    suppressWarnings(roman <- utils:::.roman2numeric(x))
+    ans <- logical(length(x))
+    ans[!is.na(roman) & toupper(x) == x] <- TRUE
+    ans
+}
+    
+.REGEXP0 <- "[1-9][0-9]*"
+.REGEXP1 <- "[0-9]*"
+
+.isShortNb <- function(x, abc="")
+{
+    pattern <- paste0("^", .REGEXP0, abc, "$")
+    grepl(pattern, x) & nchar(x) <= 6L
+}
+
+.getIntPrefix <- function(x)
+{
+    pattern <- paste0("^(", .REGEXP1, ")(.*)$")
+    sub(pattern, "\\1", x)
+}
+
+.getIntPrefixTail <- function(x)
+{
+    pattern <- paste0("^(", .REGEXP1, ")(.*)$")
+    sub(pattern, "\\2", x)
+}
+
+### rankSeqlevels()
 
 rankSeqlevels <- function(seqnames, X.is.sexchrom=NA)
 {
@@ -97,53 +139,23 @@ rankSeqlevels <- function(seqnames, X.is.sexchrom=NA)
         assign("last_prov_id", last_prov_id2, inherits=TRUE)
     }
     
-    ## Some simple helpers for low-level string manipulation.
-    hasPrefix <- function(seqnames, prefix)
-        substr(seqnames, start=1L, stop=nchar(prefix)) == prefix
-    dropPrefix <- function(seqnames, nchar)
-        substr(seqnames, start=nchar+1L, stop=nchar(seqnames))
-    isRoman <- function(seqnames)
-    {
-        suppressWarnings(roman <- utils:::.roman2numeric(seqnames))
-        ans <- logical(length(seqnames))
-        ans[!is.na(roman) & toupper(seqnames) == seqnames] <- TRUE
-        ans
-    }
-    REGEXP0 <- "[1-9][0-9]*"
-    REGEXP1 <- "[0-9]*"
-    isNb <- function(seqnames, abc="")
-    {
-        regexp <- paste0("^", REGEXP0, abc, "$")
-        grepl(regexp, seqnames)
-    }
-    getIntPrefix <- function(seqnames)
-    {
-        regexp <- paste0("^(", REGEXP1, ")(.*)$")
-        sub(regexp, "\\1", seqnames)
-    }
-    getIntPrefixTail <- function(seqnames)
-    {
-        regexp <- paste0("^(", REGEXP1, ")(.*)$")
-        sub(regexp, "\\2", seqnames)
-    }
-    
     assignProvIdsForSuperGroup <- function(seqlevels, prefix)
     {
-        sgidx <- which(is.na(prov_ids) & hasPrefix(seqlevels, prefix))
+        sgidx <- which(is.na(prov_ids) & .hasPrefix(seqlevels, prefix))
         if (length(sgidx) == 0L)
             return()
         sgsuffix <- seqlevels[sgidx]
-        sgsuffix <- dropPrefix(sgsuffix, nchar(prefix))
-        is_nb <- isNb(sgsuffix)
-        is_nbA <- isNb(sgsuffix, abc="A")
-        is_nba <- isNb(sgsuffix, abc="a")
-        is_nbB <- isNb(sgsuffix, abc="B")
-        is_nbb <- isNb(sgsuffix, abc="b")
-        is_nbL <- isNb(sgsuffix, abc="L")
-        is_nbR <- isNb(sgsuffix, abc="R")
+        sgsuffix <- .dropPrefix(sgsuffix, nchar(prefix))
+        is_nb <- .isShortNb(sgsuffix)
+        is_nbA <- .isShortNb(sgsuffix, abc="A")
+        is_nba <- .isShortNb(sgsuffix, abc="a")
+        is_nbB <- .isShortNb(sgsuffix, abc="B")
+        is_nbb <- .isShortNb(sgsuffix, abc="b")
+        is_nbL <- .isShortNb(sgsuffix, abc="L")
+        is_nbR <- .isShortNb(sgsuffix, abc="R")
         is_nb_with_suffix <- is_nb | is_nbA | is_nba | is_nbB | is_nbb |
                                                        is_nbL | is_nbR
-        is_nbxxx <- isNb(sgsuffix, abc=".*") & !is_nb_with_suffix
+        is_nbxxx <- .isShortNb(sgsuffix, abc=".*") & !is_nb_with_suffix
         is_W <- sgsuffix == "W"
         is_Z <- sgsuffix == "Z"
         is_X <- sgsuffix == "X"
@@ -164,13 +176,13 @@ rankSeqlevels <- function(seqnames, X.is.sexchrom=NA)
         is_U <- sgsuffix == "U"
         is_MT <- sgsuffix == "MT"
         is_M <- sgsuffix == "M"
-        is_Wxxx <- hasPrefix(sgsuffix, "W") & !is_W & !is_roman
-        is_Zxxx <- hasPrefix(sgsuffix, "Z") & !is_Z & !is_roman
-        is_Xxxx <- hasPrefix(sgsuffix, "X") & !is_X & !is_roman
-        is_Yxxx <- hasPrefix(sgsuffix, "Y") & !is_Y & !is_roman
-        is_Uxxx <- hasPrefix(sgsuffix, "U") & !is_U & !is_roman
-        is_MTxxx <- hasPrefix(sgsuffix, "MT") & !is_MT & !is_roman
-        is_Mxxx <- hasPrefix(sgsuffix, "M") & !is_M &
+        is_Wxxx <- .hasPrefix(sgsuffix, "W") & !is_W & !is_roman
+        is_Zxxx <- .hasPrefix(sgsuffix, "Z") & !is_Z & !is_roman
+        is_Xxxx <- .hasPrefix(sgsuffix, "X") & !is_X & !is_roman
+        is_Yxxx <- .hasPrefix(sgsuffix, "Y") & !is_Y & !is_roman
+        is_Uxxx <- .hasPrefix(sgsuffix, "U") & !is_U & !is_roman
+        is_MTxxx <- .hasPrefix(sgsuffix, "MT") & !is_MT & !is_roman
+        is_Mxxx <- .hasPrefix(sgsuffix, "M") & !is_M &
             !is_MT & !is_MTxxx & !is_roman
         ## The groups below must define a partitioning of the current super
         ## group i.e. any element in 'sgsuffix' must fall in exactly 1 group.
@@ -254,51 +266,51 @@ rankSeqlevels <- function(seqnames, X.is.sexchrom=NA)
         ## Group (j).
         if (any(is_nbxxx)) {
             gsuffix <- sgsuffix[is_nbxxx]
-            ints1 <- as.integer(getIntPrefix(gsuffix))
-            ints2 <- as.integer(factor(getIntPrefixTail(gsuffix)))
+            ints1 <- as.integer(.getIntPrefix(gsuffix))
+            ints2 <- as.integer(factor(.getIntPrefixTail(gsuffix)))
             ints <- (max(ints2) + 1L) * ints1 + ints2
             makeAndAssignProvIds(sgidx[is_nbxxx], ints=ints)
         }
         ## Group (k).
         if (any(is_Wxxx)) {
             gsuffix <- sgsuffix[is_Wxxx]
-            ints <- as.integer(factor(dropPrefix(gsuffix, 1L)))
+            ints <- as.integer(factor(.dropPrefix(gsuffix, 1L)))
             makeAndAssignProvIds(sgidx[is_Wxxx], ints=ints)
         }
         ## Group (l).
         if (any(is_Zxxx)) {
             gsuffix <- sgsuffix[is_Zxxx]
-            ints <- as.integer(factor(dropPrefix(gsuffix, 1L)))
+            ints <- as.integer(factor(.dropPrefix(gsuffix, 1L)))
             makeAndAssignProvIds(sgidx[is_Zxxx], ints=ints)
         }
         ## Group (m).
         if (any(is_Xxxx)) {
             gsuffix <- sgsuffix[is_Xxxx]
-            ints <- as.integer(factor(dropPrefix(gsuffix, 1L)))
+            ints <- as.integer(factor(.dropPrefix(gsuffix, 1L)))
             makeAndAssignProvIds(sgidx[is_Xxxx], ints=ints)
         }
         ## Group (n).
         if (any(is_Yxxx)) {
             gsuffix <- sgsuffix[is_Yxxx]
-            ints <- as.integer(factor(dropPrefix(gsuffix, 1L)))
+            ints <- as.integer(factor(.dropPrefix(gsuffix, 1L)))
             makeAndAssignProvIds(sgidx[is_Yxxx], ints=ints)
         }
         ## Group (o).
         if (any(is_Uxxx)) {
             gsuffix <- sgsuffix[is_Uxxx]
-            ints <- as.integer(factor(dropPrefix(gsuffix, 1L)))
+            ints <- as.integer(factor(.dropPrefix(gsuffix, 1L)))
             makeAndAssignProvIds(sgidx[is_Uxxx], ints=ints)
         }
         ## Group (p).
         if (any(is_Mxxx)) {
             gsuffix <- sgsuffix[is_Mxxx]
-            ints <- as.integer(factor(dropPrefix(gsuffix, 1L)))
+            ints <- as.integer(factor(.dropPrefix(gsuffix, 1L)))
             makeAndAssignProvIds(sgidx[is_Mxxx], ints=ints)
         }
         ## Group (q).
         if (any(is_MTxxx)) {
             gsuffix <- sgsuffix[is_MTxxx]
-            ints <- as.integer(factor(dropPrefix(gsuffix, 2L)))
+            ints <- as.integer(factor(.dropPrefix(gsuffix, 2L)))
             makeAndAssignProvIds(sgidx[is_MTxxx], ints=ints)
         }
         ## Group (r).
