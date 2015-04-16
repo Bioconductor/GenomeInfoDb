@@ -85,22 +85,24 @@ isRoman <- function(x)
 .REGEXP0 <- "[1-9][0-9]*"
 .REGEXP1 <- "[0-9]*"
 
-.isShortNb <- function(x, abc="")
-{
-    pattern <- paste0("^", .REGEXP0, abc, "$")
-    grepl(pattern, x) & nchar(x) <= 6L
-}
-
-.getIntPrefix <- function(x)
+.getNbPart <- function(x)
 {
     pattern <- paste0("^(", .REGEXP1, ")(.*)$")
     sub(pattern, "\\1", x)
 }
 
-.getIntPrefixTail <- function(x)
+.getPostNbPart <- function(x)
 {
     pattern <- paste0("^(", .REGEXP1, ")(.*)$")
     sub(pattern, "\\2", x)
+}
+
+.isShortNb <- function(x, abc="")
+{
+    pattern <- paste0("^", .REGEXP0, abc, "$")
+    is_nb <- grepl(pattern, x)
+    prefix <- .getNbPart(x)
+    is_nb & nchar(prefix) <= 6L
 }
 
 ### rankSeqlevels()
@@ -266,8 +268,8 @@ rankSeqlevels <- function(seqnames, X.is.sexchrom=NA)
         ## Group (j).
         if (any(is_nbxxx)) {
             gsuffix <- sgsuffix[is_nbxxx]
-            ints1 <- as.integer(.getIntPrefix(gsuffix))
-            ints2 <- as.integer(factor(.getIntPrefixTail(gsuffix)))
+            ints1 <- as.integer(.getNbPart(gsuffix))
+            ints2 <- as.integer(factor(.getPostNbPart(gsuffix)))
             ints <- (max(ints2) + 1L) * ints1 + ints2
             makeAndAssignProvIds(sgidx[is_nbxxx], ints=ints)
         }
