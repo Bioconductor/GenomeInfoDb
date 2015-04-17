@@ -99,7 +99,6 @@ export(
 
     ## seqlevelsStyle.R:
     seqlevelsStyle, "seqlevelsStyle<-",
-    seqnameStyle, "seqnameStyle<-",
 
     ## GenomeDescription-class.R:
     commonName, provider, providerVersion,
@@ -116,7 +115,6 @@ exportMethods(
     isCircular, "isCircular<-",
     genome, "genome<-",
     seqlevelsStyle, "seqlevelsStyle<-",
-    seqnameStyle, "seqnameStyle<-",
     commonName, provider, providerVersion,
     releaseDate, releaseName, bsgenomeName
 )

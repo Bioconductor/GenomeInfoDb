@@ -12,12 +12,6 @@
 \alias{mapSeqlevels}
 \alias{seqlevelsInGroup}
 
-% Old stuff (Deprecated or Defunct):
-\alias{seqnameStyle}
-\alias{seqnameStyle,ANY-method}
-\alias{seqnameStyle<-}
-\alias{seqnameStyle<-,ANY-method}
-
 
 \title{
   Conveniently rename the seqlevels of an object according to a given style
@@ -42,7 +36,7 @@ seqlevelsInGroup(seqnames, group, species, style)
    \item{x}{
       The object from/on which to get/set the seqlevels style.}
    \item{value}{
-      A single character string that sets the seqnameStyle for \code{x}.}
+      A single character string that sets the seqlevels style for \code{x}.}
    \item{species}{
       The genus and species of the organism in question
       separated by a single space. Don't forget to capitalize the genus.}

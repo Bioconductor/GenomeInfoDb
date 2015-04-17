@@ -42,7 +42,7 @@
 }
 
 
-.supportedSeqnameStyles <-
+.supportedSeqlevelsStyles <-
     function()
 {
     dom <- lapply(.getNamedFiles(), scan, nlines=1, what=character(),
@@ -143,7 +143,7 @@ setMethod("seqlevelsStyle", "character",
     style <- unique(ans$style)
     
     if(length(style)>1)
-        message("warning! Multiple seqnameStyles found.")
+        message("warning! Multiple seqlevels styles found.")
       
     style
 })
@@ -247,7 +247,7 @@ mapSeqlevels <-
         stop("'best.only' must be TRUE or FALSE")
     if (!.isTRUEorFALSE(drop))
         stop("'drop' must be TRUE or FALSE")
-    supported_styles <- .supportedSeqnameStyles()
+    supported_styles <- .supportedSeqlevelsStyles()
     tmp <- unlist(supported_styles, use.names = FALSE)
     compatible_species <- rep.int(names(supported_styles),
                                   sapply(supported_styles,NROW))

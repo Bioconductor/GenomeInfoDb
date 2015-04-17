@@ -319,30 +319,3 @@ setReplaceMethod("genome", "ANY",
     }
 )
 
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Old stuff (deprecated & defunct)
-###
-
-setGeneric("seqnameStyle", function(x) standardGeneric("seqnameStyle"))
-
-setMethod("seqnameStyle", "ANY",
-    function(x)
-    {
-        .Defunct("seqlevelsStyle")
-        seqlevelsStyle(x)
-    }
-)
-
-setGeneric("seqnameStyle<-", signature="x",
-    function(x, value) standardGeneric("seqnameStyle<-")
-)
-
-setReplaceMethod("seqnameStyle", "ANY",
-    function(x, value)
-    {
-        .Defunct("seqlevelsStyle")
-        `seqlevelsStyle<-`(x, value)
-    }
-)
-
