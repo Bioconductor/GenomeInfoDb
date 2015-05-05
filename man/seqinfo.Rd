@@ -97,7 +97,10 @@ genome(x) <- value
     \code{x} where at least one of the sequence levels to drop is used is
     \emph{fully} dropped. In other words, the \code{seqlevels} setter always
     keeps or drops \emph{full list elements} and never tries to change their
-    content. See below for an example.
+    content. This guarantees that the geometry of the list elements is
+    preserved, which is a desirable property when they represent compound
+    features (e.g. exons grouped by transcript or paired-end reads).
+    See below for an example.
   }
   \item{value}{
     Typically a \link{Seqinfo} object for the \code{seqinfo} setter.
