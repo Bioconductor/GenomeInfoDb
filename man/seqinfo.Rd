@@ -89,6 +89,15 @@ genome(x) <- value
     Force dropping sequence levels currently in use. This is achieved by
     dropping the elements in \code{x} where those levels are used (hence
     typically reducing the length of \code{x}).
+
+    Note that if \code{x} is a list-like object (e.g.
+    \link[GenomicRanges]{GRangesList},
+    \link[GenomicAlignments]{GAlignmentPairs}, or
+    \link[GenomicAlignments]{GAlignmentsList}), then any list element in
+    \code{x} where at least one of the sequence levels to drop is used is
+    \emph{fully} dropped. In other words, the \code{seqlevels} setter always
+    keeps or drops \emph{full list elements} and never tries to change their
+    content. See below for an example.
   }
   \item{value}{
     Typically a \link{Seqinfo} object for the \code{seqinfo} setter.
@@ -197,27 +206,8 @@ genome(x) <- value
 
 \examples{
 ## ---------------------------------------------------------------------
-## Finding methods.
+## A. MODIFY THE SEQLEVELS OF AN OBJECT
 ## ---------------------------------------------------------------------
-
-showMethods("seqinfo")
-showMethods("seqinfo<-")
-
-showMethods("seqnames")
-showMethods("seqnames<-")
-
-showMethods("seqlevels")
-showMethods("seqlevels<-")
-
-if (interactive()) {
-  library(GenomicRanges)
-  ?`GRanges-class`
-}
-
-## ---------------------------------------------------------------------
-## Modify seqlevels of an object.
-## ---------------------------------------------------------------------
-
 ## Overlap and matching operations between objects require matching
 ## seqlevels. Often the seqlevels in one must be modified to match 
 ## the other. The seqlevels() function can rename, drop, add and reorder 
@@ -262,7 +252,33 @@ seqlevels(gr) <- c("chr1", chr2="chr2", chrM="Mitochondrion")
 seqlevels(gr)
 
 ## ---------------------------------------------------------------------
-## Sort seqlevels in "natural" order
+## B. DROP SEQLEVELS OF A LIST-LIKE OBJECT
+## ---------------------------------------------------------------------
+
+grl0 <- GRangesList(GRanges("chr2", IRanges(3:2, 5)),
+                    GRanges("chr5", IRanges(11, 18)),
+                    GRanges(c("chr4", "chr2"), IRanges(7:6, 15)))
+grl0
+
+grl1 <- grl0
+seqlevels(grl1, force=TRUE) <- c("chr2", "chr5")
+grl1  # grl0[[3]] was fully dropped!
+
+## If what is desired is to drop the first range in grl0[[3]] only, or,
+## more generally speaking, to drop the ranges within each list element
+## that are located on one of the seqlevels to drop, then do:
+grl2 <- grl0[seqnames(grl0) \%in\% c("chr2", "chr5")]
+grl2
+
+## Note that the above subsetting doesn't drop any seqlevel:
+seqlevels(grl2)
+
+## To drop them (no need to use 'force=TRUE' anymore):
+seqlevels(grl2) <- c("chr2", "chr5")
+seqlevels(grl2)
+
+## ---------------------------------------------------------------------
+## C. SORT SEQLEVELS IN "NATURAL" ORDER
 ## ---------------------------------------------------------------------
 
 sortSeqlevels(c("11", "Y", "1", "10", "9", "M", "2"))
@@ -282,7 +298,7 @@ seqlevels(gr) <- seqlevels
 sortSeqlevels(gr)
 
 ## ---------------------------------------------------------------------
-## Subset objects by seqlevels. 
+## D. SUBSET OBJECTS BY SEQLEVELS
 ## ---------------------------------------------------------------------
 
 tx <- transcripts(txdb)
@@ -297,13 +313,31 @@ seqlevels(tx, force=TRUE) <- c("ch3L", "ch3R")
 seqlevels(tx)
 
 ## ---------------------------------------------------------------------
-## Restore original seqlevels. 
+## E. RESTORE ORIGINAL SEQLEVELS OF A TxDb OBJECT
 ## ---------------------------------------------------------------------
 
 ## Applicable to TxDb objects only.
 \dontrun{
 seqlevels0(txdb)
 seqlevels(txdb)
+}
+
+## ---------------------------------------------------------------------
+## F. FINDING METHODS
+## ---------------------------------------------------------------------
+
+showMethods("seqinfo")
+showMethods("seqinfo<-")
+
+showMethods("seqnames")
+showMethods("seqnames<-")
+
+showMethods("seqlevels")
+showMethods("seqlevels<-")
+
+if (interactive()) {
+  library(GenomicRanges)
+  ?`GRanges-class`
 }
 }
 
