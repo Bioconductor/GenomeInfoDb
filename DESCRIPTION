@@ -23,6 +23,7 @@ License: Artistic-2.0
 Collate: utils.R
 	rankSeqlevels.R
 	assembly-utils.R
+	taxIDSpeciesLookup.R
 	fetchExtendedChromInfoFromUCSC.R
 	fetchSequenceInfo.R
 	seqinfo.R
