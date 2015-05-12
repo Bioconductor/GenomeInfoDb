@@ -54,6 +54,7 @@ globalVariables(c("speciesMap"))
 .taxonomyId <-
     function(species)
 {
+    if(is.na(species)){return(NA)}
     if (!exists("speciesMap"))
         data(speciesMap, package="GenomeInfoDb")
     species <- gsub(" {2,}", " ", species)
