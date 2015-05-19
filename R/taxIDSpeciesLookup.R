@@ -48,13 +48,16 @@ globalVariables(c("speciesMap"))
 ## for.
 
 
-
+## helper function to list possible species.
+available.species <- function(){
+    if (!exists("speciesMap"))
+        data(speciesMap, package="GenomeInfoDb")
+    speciesMap
+}
 
 ## Gets a taxonomyId For a species name...
-.taxonomyId <-
-    function(species)
-{
-    if(is.na(species)){return(NA)}
+.taxonomyId <- function(species){
+    if (is.na(species)){return(NA)}    
     if (!exists("speciesMap"))
         data(speciesMap, package="GenomeInfoDb")
     species <- gsub(" {2,}", " ", species)
@@ -62,8 +65,10 @@ globalVariables(c("speciesMap"))
     idx <- match(species, speciesMap$species)
     if (any(is.na(idx)))
         stop(sum(is.na(idx)), " unknown species: ",
-             paste(sQuote(head(species[is.na(idx)])), collapse=" "))
-    as.character(speciesMap$taxon[idx])
+             paste(sQuote(head(species[is.na(idx)])),
+   "Please use 'available.species' to see viable species names or tax Ids",
+                   collapse=" "))
+    as.integer(speciesMap$taxon[idx])
 }
 
 ## usage:

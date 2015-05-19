@@ -102,7 +102,8 @@ export(
 
     ## GenomeDescription-class.R:
     commonName, provider, providerVersion,
-    releaseDate, releaseName, bsgenomeName
+    releaseDate, releaseName, bsgenomeName,
+    available.species
 )
 
 exportMethods(
