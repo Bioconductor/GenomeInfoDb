@@ -140,4 +140,28 @@ if(!(taxId %in% validTaxIds)){
 ## .processTaxNamesFile()
 
 
+##
+.processSpeciesMapData <- function(){
+    species <- readLines(file('names.dmp','r'))
+
+    
+    ## for testing just test on 1st 10
+ ##   species <- species[1:1000]
+    ## split on tabs and pipes
+    splt <- strsplit(species, split='\\t\\|\\t')
+
+    ## Throw away elements where column 4 is not 'scientific name' or 'synonym'
+    idx1 <- unlist(lapply(splt, function(x){grepl('scientific name', x[4])}))
+    idx2 <- unlist(lapply(splt, function(x){grepl('synonym', x[4])}))
+    idx <- idx1 | idx2
+    splt <- splt[idx]
+    ## keep only 1st two elements
+    ##splt <- lapply(splt, function(x){x[1:2]})
+    taxon <-  unlist(lapply(splt, function(x){x[1]}))
+    species <- unlist(lapply(splt, function(x){x[2]}))
+    speciesMap <- data.frame(taxon, species)
+    
+    save(speciesMap, file='speciesMap.rda')
+}
+
 
