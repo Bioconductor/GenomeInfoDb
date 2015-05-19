@@ -85,7 +85,7 @@ validTaxIds <- c(validTaxIds, NA_integer_)
 if(!(taxId %in% validTaxIds)){
       stop(wmsg(paste0("The taxonomy Id you have provided (",taxId,")",
                        " is not in our list of valid Tax Ids.",
-                       ". Please check to make sure that your tax ID",
+                       " Please check to make sure that your tax ID",
                        " is really legitimate and if so, then please tell",
                        " us about it so that we can update our list."))) 
   }
