@@ -73,7 +73,7 @@ keepStandardChromosomes(x, species=NULL)
   \code{renameSeqlevels}: Rename the seqlevels in \code{x} to those in 
   \code{value}. If \code{value} is a named character vector, the names are used
   to map the new seqlevels to the old. When \code{value} is unnamed, the
-  replacment vector must be the same length and in the same order as the
+  replacement vector must be the same length and in the same order as the
   original \code{seqlevels(x)}.
 
   \code{restoreSeqlevels}: Restore the seqlevels in \code{x} back to the
@@ -153,8 +153,10 @@ seqlevels(chr2L)
 ## GAlignments:
 
 seqlevels(gal)
-## Rename 'seq2' to 'chr2' with a named or unnamed vector.
+## Rename 'seq2' to 'chr2' with a named vector.
 gal2a <- renameSeqlevels(gal, c(seq2="chr2"))
+## Rename 'seq2' to 'chr2' with an unnamed vector that includes all 
+## seqlevels as they appear in the object.
 gal2b <- renameSeqlevels(gal, c("seq1", "chr2"))
 ## Names that do not match existing seqlevels are ignored.
 ## This attempt at renaming does nothing.

@@ -43,12 +43,12 @@ renameSeqlevels <- function(x, value, ...)
                     paste(sQuote(nms[nomatch]), collapse=", "), " ignored")
         if (length(value) != length(seqlevels(x))) {
             level <- seqlevels(x)
-            idx <- match(nms, level)
-            idx <- idx[complete.cases(idx)]
-            value <- replace(level, idx, value[seq_along(idx)])
+            idx <- match(level, nms)
+            level[!is.na(idx)] <- value[na.omit(idx)]
+            value <- level
         } 
     } 
-    seqlevels(x) <- value  
+    seqlevels(x) <- value 
     x 
 }
 
