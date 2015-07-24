@@ -110,10 +110,14 @@ if(!(taxId %in% validTaxIds)){
 ## ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz
 ## And grab out the names.dmp file
 ## and then do this to it to preprocess it:
-.processTaxNamesFile <- function(){
-    species <- read.delim('names.dmp',header = FALSE,sep = "|")
+.processTaxNamesFile <- function(filesDir=getwd()){
+##    species <- read.delim('names.dmp',header = FALSE,sep = "|")
+    dest  <- file.path(filesDir, "names.dmp")
+    data <-  read.delim(dest, header=FALSE, sep="\t", quote="",
+                        stringsAsFactors=FALSE)
+    species <- data[,seq(1, dim(data)[2], by=2)] ## Throw away 'pipe columns'
     colnames(species) <- c('tax_id','name_txt','unique_name','name_class')
-    ## keep only 1st two cols
+    ## keep only some cols
     species <- species[,c(1:2,4)]
     ## throw away tabs from second col
     species[[2]] <- gsub('\t','',species[[2]])
