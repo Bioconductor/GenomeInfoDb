@@ -5,12 +5,12 @@ Description: Contains data and functions that
 	sequence naming conventions (e.g., "chr1" versus "1"),
 	including a function that attempts to place sequence names in
 	their natural, rather than lexicographic, order.
-Version: 1.5.9
+Version: 1.5.10
 Author: Sonali Arora, Martin Morgan, Marc Carlson, H. Pages
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 biocViews: Genetics, DataRepresentation, Annotation, GenomeAnnotation
 Depends: R (>= 3.1), methods, stats4, BiocGenerics (>= 0.13.8),
-	S4Vectors (>= 0.2.0), IRanges (>= 1.99.26)
+	S4Vectors (>= 0.7.11), IRanges (>= 1.99.26)
 Imports: methods, BiocGenerics, S4Vectors
 Suggests: GenomicRanges, Rsamtools, GenomicAlignments, BSgenome,
 	GenomicFeatures,

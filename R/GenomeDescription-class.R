@@ -165,10 +165,10 @@ compactPrintNamedAtomicVector <- function(x, margin="")
                       as.character(tail(x, last))))
     }
     showMatrix <- format(showMatrix, justify="right")
-    cat(BiocGenerics:::labeledLine(margin, showMatrix[1L, ], count=FALSE,
-                                           labelSep=""), sep="")
-    cat(BiocGenerics:::labeledLine(margin, showMatrix[2L, ], count=FALSE,
-                                           labelSep=""), sep="")
+    cat(S4Vectors:::labeledLine(margin, showMatrix[1L, ], count=FALSE,
+                                        labelSep=""), sep="")
+    cat(S4Vectors:::labeledLine(margin, showMatrix[2L, ], count=FALSE,
+                                        labelSep=""), sep="")
 }
 
 ### NOT exported (but used in the BSgenome package).
