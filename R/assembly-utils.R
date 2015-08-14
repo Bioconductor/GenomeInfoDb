@@ -7,10 +7,10 @@
 .REFSEQ_ASSEMBLY_ACCESSION_PREFIX <- "GCF_"
 
 .NCBI_ASSEMBLY_REPORTS_URL <-
-    "ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/"
+    "http://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/"
 
 .GENBANK_GENOMES_URL <-
-    "ftp://ftp.ncbi.nlm.nih.gov/genbank/genomes/"
+    "http://ftp.ncbi.nlm.nih.gov/genbank/genomes/"
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
