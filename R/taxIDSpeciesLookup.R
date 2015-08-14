@@ -56,7 +56,7 @@ available.species <- function(){
 }
 
 ## Gets a taxonomyId For a species name...
-.taxonomyId <- function(species){
+.getTaxonomyId <- function(species){
     if (is.na(species)){return(NA)}    
     if (!exists("speciesMap"))
         data(speciesMap, package="GenomeInfoDb")
@@ -70,6 +70,11 @@ available.species <- function(){
                    collapse=" "))
     as.integer(speciesMap$taxon[idx])
 }
+
+.taxonomyId <- function(species){
+    unlist(lapply(species, .getTaxonomyId))
+}
+
 
 ## usage:
 ## .taxonomyId("Homo sapiens")
