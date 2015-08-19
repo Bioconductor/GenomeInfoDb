@@ -118,8 +118,7 @@ seqlevelsInGroup(seqnames, group, species, style)
   the seqlevels style with the corresponding mappings.
 }
 \author{
-  Sonali Arora \email{sarora@fhcrc.org}, Martin Morgan , Marc Carlson, 
-  H. Pages
+  Sonali Arora, Martin Morgan , Marc Carlson, H. Pages
 }
 \examples{
 ## ---------------------------------------------------------------------

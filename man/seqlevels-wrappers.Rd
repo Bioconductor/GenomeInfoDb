@@ -204,8 +204,7 @@ plantgr <- GRanges(c(1:5,"MT","Pltd","wrong"), IRanges(1:8,width=5))
 keepStandardChromosomes(plantgr, species="Arabidopsis thaliana")
 }
 
-\author{Valerie Obenchain \email{vobencha@fhcrc.org}, 
-        Sonali Arora \email{sarora@fhcrc.org}}
+\author{Valerie Obenchain \email{vobencha@fhcrc.org}, Sonali Arora}
 
 \keyword{methods}
 \keyword{utilities}
