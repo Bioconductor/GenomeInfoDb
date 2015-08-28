@@ -18,10 +18,10 @@
 }
 
 \usage{
-keepSeqlevels(x, value, ...)
-dropSeqlevels(x, value, ...)
-renameSeqlevels(x, value, ...)
-restoreSeqlevels(x, ...)
+keepSeqlevels(x, value)
+dropSeqlevels(x, value)
+renameSeqlevels(x, value)
+restoreSeqlevels(x)
 keepStandardChromosomes(x, species=NULL)
 }
 
@@ -46,9 +46,6 @@ keepStandardChromosomes(x, species=NULL)
     The species name of the \link{Seqinfo} class in which the seqlevels will
     be kept, dropped or renamed.
   }
-  \item{...}{
-    Arguments passed to other functions.
-  }
 }
 
 \value{
@@ -62,7 +59,7 @@ keepStandardChromosomes(x, species=NULL)
   seqlevels match before a comparison can be made (e.g., \code{findOverlaps}).
   \code{keepSeqlevels}, \code{dropSeqlevels} and \code{renameSeqlevels} are 
   high-level convenience functions that wrap the low-level \code{seqlevels}
-  function.
+  setter.
 
   \code{keepSeqlevels}, \code{dropSeqlevels}: Subsetting operations 
   that modify the size of \code{x}. \code{keepSeqlevels} keeps only the
@@ -76,10 +73,9 @@ keepStandardChromosomes(x, species=NULL)
   replacement vector must be the same length and in the same order as the
   original \code{seqlevels(x)}.
 
-  \code{restoreSeqlevels}: Restore the seqlevels in \code{x} back to the
-  original values. Applicable only when \code{x} is a TxDb. The 
-  function re-initializes the TxDb which resets the seqlevels, 
-  removes masks and any other previous modifications.
+  \code{restoreSeqlevels}: Perform \code{seqlevels(txdb) <- seqlevels0(txdb)},
+  that is, restore the seqlevels in \code{x} back to the original values.
+  Applicable only when \code{x} is a TxDb object.
   
   \code{keepStandardChromosomes}:Subsetting operation that returns only the 
   'standard' Chromosomes. We define 'standard chromosomes' as those chromosomes 
@@ -181,7 +177,7 @@ identical(seqlevels(txdb), seqlevels(transcripts))
 
 ## Restore seqlevels in a TxDb to original values.
 \dontrun{
-restoreSeqlevels(txdb)
+txdb <- restoreSeqlevels(txdb)
 seqlevels(txdb)
 }
 

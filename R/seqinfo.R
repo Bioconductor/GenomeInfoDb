@@ -240,8 +240,9 @@ setMethod("seqlevelsInUse", "CompressedList",
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### seqlevels0() getter
 ###
+### Currently applicable to TxDb objects only.
+###
 
-### Currently applicable to TxDb only.
 setGeneric("seqlevels0", function(x) standardGeneric("seqlevels0"))
 
 

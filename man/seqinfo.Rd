@@ -321,7 +321,7 @@ seqlevels(tx)
 
 ## Applicable to TxDb objects only.
 \dontrun{
-seqlevels0(txdb)
+seqlevels(txdb) <- seqlevels0(txdb)
 seqlevels(txdb)
 }
 

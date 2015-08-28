@@ -2,7 +2,7 @@
 ### Convenience wrappers to the seqlevels() getter and setter
 ### -------------------------------------------------------------------------
 
-keepSeqlevels <- function(x, value, ...)
+keepSeqlevels <- function(x, value)
 {
     value <- unname(value)
     if (any(nomatch <- !value %in% seqlevels(x)))
@@ -15,7 +15,7 @@ keepSeqlevels <- function(x, value, ...)
     x
 }
 
-dropSeqlevels <- function(x, value, ...)
+dropSeqlevels <- function(x, value)
 {
     value <- unname(value)
     if (any(nomatch <- !value %in% seqlevels(x)))
@@ -28,7 +28,7 @@ dropSeqlevels <- function(x, value, ...)
     x
 }
 
-renameSeqlevels <- function(x, value, ...)
+renameSeqlevels <- function(x, value)
 {
     nms <- names(value)
     ## unnamed
@@ -53,9 +53,9 @@ renameSeqlevels <- function(x, value, ...)
 }
 
 ## Currently applies to TxDb only.
-restoreSeqlevels <- function(x, ...)
+restoreSeqlevels <- function(x)
 {
-    seqlevels0(x) 
+    seqlevels(x) <- seqlevels0(x) 
     x
 }
 
