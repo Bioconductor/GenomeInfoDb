@@ -72,7 +72,7 @@ keepStandardChromosomes <- function(x, species=NULL)
         if(is.na(ans)){
             ## Interanally the seqlevels did not match any organism's style - so
             ## drop all levels and return an empty object
-            return(dropSeqlevels(x, seqlevels(x), force=TRUE))
+            return(dropSeqlevels(x, seqlevels(x)))
         }
     }
     
