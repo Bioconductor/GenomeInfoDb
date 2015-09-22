@@ -382,16 +382,19 @@ setReplaceMethod("seqlevels", "Seqinfo",
         if (!identical(force, FALSE))
             warning("'force' is ignored in \"seqlevels<-\" method ",
                     "for Seqinfo objects")
-        mode <- getSeqlevelsReplacementMode(value, seqlevels(x))
-        if (identical(mode, -2L))
-            return(x[value])
-        if (identical(mode, -1L)) {
+        new2old <- getSeqlevelsReplacementMode(value, seqlevels(x))
+        if (identical(new2old, -3L)) {
+            ## "renaming" mode
             seqnames(x) <- value
             return(x)
         }
-        new_seqlengths <- unname(seqlengths(x))[mode]
-        new_isCircular <- unname(isCircular(x))[mode]
-        new_genome <- unname(genome(x))[mode]
+        if (identical(new2old, -2L) || identical(new2old, -1L)) {
+            ## "subsetting" mode
+            return(x[value])
+        }
+        new_seqlengths <- unname(seqlengths(x))[new2old]
+        new_isCircular <- unname(isCircular(x))[new2old]
+        new_genome <- unname(genome(x))[new2old]
         Seqinfo(seqnames=value, seqlengths=new_seqlengths,
                 isCircular=new_isCircular, genome=new_genome)
     }

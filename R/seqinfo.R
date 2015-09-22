@@ -76,32 +76,37 @@ makeNewSeqnames <- function(x, new2old=NULL, new_seqlevels)
     return(x_seqnames)
 }
 
-### Returns -2 for "subsetting" mode, -1 for "renaming" mode, or an integer
-### vector containing the mapping from the new to the old levels for "general"
-### mode (i.e. a combination of renaming and/or subsetting). Note that this
-### integer vector is guaranteed to contain no negative values.
+### Return -3L for "renaming" mode, -2L for "strict subsetting" mode (no new
+### seqlevels added), -1L for "extended subsetting" mode (new seqlevels added),
+### or an integer vector containing the mapping from the new to the old
+### seqlevels for "general" mode (i.e. a combination of renaming and/or
+### subsetting). Note that the vector describing the "general" mode is
+### guaranteed to contain no negative values.
 getSeqlevelsReplacementMode <- function(new_seqlevels, old_seqlevels)
 {
-    ## Only check for NAs. Duplicated or zero-length values will be rejected
-    ## later by the Seqinfo() constructor.
-    if (!is.character(new_seqlevels) || any(is.na(new_seqlevels)))
-        stop("the supplied 'seqlevels' must be a character vector with no NAs")
+    if (!is.character(new_seqlevels)
+     || anyNA(new_seqlevels)
+     || anyDuplicated(new_seqlevels))
+        stop(wmsg("the supplied 'seqlevels' must be a character vector ",
+                  "with no NAs and no duplicates"))
     nsl_names <- names(new_seqlevels)
     if (!is.null(nsl_names)) {
         nonempty_names <- nsl_names[!(nsl_names %in% c(NA, ""))]
         if (any(duplicated(nonempty_names)) ||
             length(setdiff(nonempty_names, old_seqlevels)) != 0L)
-            stop("the names of the supplied 'seqlevels' contain duplicates ",
-                 "or invalid sequence levels")
+            stop(wmsg("the names of the supplied 'seqlevels' contain ",
+                      "duplicates or invalid sequence levels"))
         return(match(nsl_names, old_seqlevels))
     }
-    if (length(new_seqlevels) != length(old_seqlevels))
+    if (all(new_seqlevels %in% old_seqlevels))
         return(-2L)
+    if (length(new_seqlevels) != length(old_seqlevels))
+        return(-1L)
     is_renamed <- new_seqlevels != old_seqlevels
     tmp <- intersect(new_seqlevels[is_renamed], old_seqlevels[is_renamed])
     if (length(tmp) != 0L)
-        return(-2L)
-    return(-1L)
+        return(-1L)
+    return(-3L)
 }
 
 ### Returns a logical vector of the same length as 'new_seqinfo' indicating
@@ -178,10 +183,12 @@ setReplaceMethod("seqlevels", "ANY",
         seqlevels(x_seqinfo) <- value
         ## Map the new sequence levels to the old ones.
         new2old <- getSeqlevelsReplacementMode(value, seqlevels(x))
-        if (identical(new2old, -2L)) {
+        if (identical(new2old, -3L)) {
+            ## "renaming" mode
+            new2old <- seq_along(value)
+        } else if (identical(new2old, -2L) || identical(new2old, -1L)) {
+            ## "subsetting" mode
             new2old <- match(value, seqlevels(x))
-        } else if (identical(new2old, -1L)) {
-            new2old <- seq_len(length(value))
         }
         ## Do the replacement.
         seqinfo(x, new2old=new2old, force=force) <- x_seqinfo
