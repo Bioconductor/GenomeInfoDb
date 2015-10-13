@@ -5,4 +5,4 @@ F	T	F	3	Chr3	3
 F	T	F	4	Chr4	4
 F	T	F	5	Chr5	5
 T	F	F	MT	ChrM	Mt
-F	F	T	Pltd	ChrC	Pt
+T	F	T	Pltd	ChrC	Pt

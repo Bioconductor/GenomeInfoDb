@@ -10,4 +10,4 @@ F	T	F	8	8
 F	T	F	9	9
 F	T	F	10	10
 T	F	F	MT	mitochondrion
-F	F	T	Pltd	chloroplast
+T	F	T	Pltd	chloroplast

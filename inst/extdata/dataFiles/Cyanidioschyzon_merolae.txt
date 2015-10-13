@@ -20,4 +20,4 @@ F	T	F	18	Chr18
 F	T	F	19	Chr19
 F	T	F	20	Chr20
 T	F	F	MT	Mito
-F	F	T	Pltd	Chloro
+T	F	T	Pltd	Chloro

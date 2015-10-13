@@ -12,6 +12,6 @@ F	T	F	10	10
 F	T	F	11	11
 F	T	F	12	12
 T	F	F	MT	Mt
-F	F	T	Pltd	Pt
+T	F	T	Pltd	Pt
 F	F	F	NA	Sy
 F	F	F	NA	Un
