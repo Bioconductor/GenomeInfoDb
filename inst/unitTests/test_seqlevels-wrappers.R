@@ -147,7 +147,7 @@ test_guessSpeciesStyle <- function()
     checkEquals(unique(got$style), "UCSC")
     
     got <- GenomeInfoDb:::.guessSpeciesStyle("2")
-    checkEquals(unique(got$style), c("NCBI","TAIR10","MSU6","JGI2.F","AGPvF"))
+    checkEquals(unique(got$style), c("NCBI","Ensembl","MSU6","JGI2.F","AGPvF"))
     
     got <- GenomeInfoDb:::.guessSpeciesStyle('T')
     checkEquals(unique(got$style), "JGI2.F")
@@ -159,3 +159,4 @@ test_guessSpeciesStyle <- function()
     got <-  GenomeInfoDb:::.guessSpeciesStyle("h")
     checkEquals(got, NA)    
 }
+
