@@ -153,10 +153,10 @@ setMethod("seqlevelsStyle", "character",
 
 setMethod("seqlevelsStyle", "ANY", function(x) seqlevelsStyle(seqlevels(x)))
 
-setReplaceMethod("seqlevelsStyle", "ANY",
-    function(x, value)
+setReplaceMethod("seqlevelsStyle", "character",
+    function (x, value)
     {
-        x_seqlevels <- seqlevels(x)
+        x_seqlevels <- unique(x)
         renaming_maps <- mapSeqlevels(x_seqlevels, value, drop=FALSE)
         if (nrow(renaming_maps) == 0L) {
             msg <- c("found no sequence renaming map compatible ",
@@ -174,11 +174,17 @@ setReplaceMethod("seqlevelsStyle", "ANY",
         new_seqlevels <- as.vector(renaming_maps)
         na_idx <- which(is.na(new_seqlevels))
         new_seqlevels[na_idx] <- x_seqlevels[na_idx]
-        seqlevels(x) <- new_seqlevels
-        x
-    }
+        new_seqlevels[match(x, x_seqlevels)]
+     }
 )
 
+setReplaceMethod("seqlevelsStyle", "ANY",
+     function (x, value)
+     {
+         seqlevelsStyle(seqlevels(x)) <- value 
+         x
+     }
+)
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Related low-level utilities
