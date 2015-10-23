@@ -44,7 +44,7 @@ setMethod("species", "GenomeDescription",
     function(object)
     {
          msg <- c("  Calling species() on a ", class(object), " object ",
-                  "is *deprecated*.\n  Please use commonName() instead.")
+                  "is *defunct*.\n  Please use commonName() instead.")
         .Defunct(msg=msg)
     }
 )
