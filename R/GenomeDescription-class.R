@@ -117,7 +117,7 @@ setValidity("GenomeDescription",
 ### NOTE: In BioC 3.1, the 'species' argument was replaced with the
 ### 'common_name' argument but the former was kept for backward compatibility
 ### (essentially with existing SNPlocs and XtraSNPlocs packages).
-### TODO: At some point the 'species' needs to be deprecated.
+### TODO: At some point the 'species' argument needs to be deprecated.
 GenomeDescription <- function(organism, common_name,
                               provider, provider_version,
                               release_date, release_name,
