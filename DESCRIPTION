@@ -5,7 +5,7 @@ Description: Contains data and functions that
 	sequence naming conventions (e.g., "chr1" versus "1"),
 	including a function that attempts to place sequence names in
 	their natural, rather than lexicographic, order.
-Version: 1.7.2
+Version: 1.7.3
 Author: Sonali Arora, Martin Morgan, Marc Carlson, H. Pages
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 biocViews: Genetics, DataRepresentation, Annotation, GenomeAnnotation

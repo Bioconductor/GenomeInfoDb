@@ -21,16 +21,25 @@
     setNames(files, sub(".txt$", "", basename(files)))
 }
 
-.getDataInFile <-
-    function(name)
+.normalize_organism <- function(organism)
 {
-    ##name will always be informat Homo sapiens
-    ## files are in format of : Homo_sapiens.txt
-    filename <- paste0(.getDatadir(),"/",sub(" ", "_", name),".txt")
+    parts <- CharacterList(strsplit(organism, "_| "))
+    parts_eltlens <- elementLengths(parts)
+    ## If 3 parts or more (e.g. "Canis_lupus_familiaris") then remove part 2.
+    idx3 <- which(parts_eltlens >= 3L)
+    if (length(idx3) != 0L)
+        parts[idx3] <- parts[idx3][rep.int(list(-2L), length(idx3))]
+    unstrsplit(parts, sep="_")
+}
+
+.getDataInFile <- function(organism)
+{
+    organism2 <- .normalize_organism(organism)
+    filename <- paste0(.getDatadir(), "/", organism2, ".txt")
     if (file.exists(filename)) {
         read.table(filename, header=TRUE, sep="\t", stringsAsFactors=FALSE)
     } else {
-        stop("The species, " ,name, " is not supported by GenomeInfoDb")
+        stop("Organism ", organism, " is not supported by GenomeInfoDb")
     }
 
 }
@@ -52,26 +61,13 @@
 
 
 .isSupportedSeqnamesStyle <-
-    function(species, style)
+    function(organism, style)
 {
-    if (missing(species) || missing(style))
-        stop("'species' or 'style' missing")
-
-    species <- sub(" ", "_", species)
+    organism <- .normalize_organism(organism)
     possible <- lapply(.getNamedFiles(), scan, nlines=1, what=character(),
                        quiet=TRUE)
-    availStyles <- possible[[species]]
+    availStyles <- possible[[organism]]
     style %in% availStyles[-which(availStyles %in% c("circular","auto","sex"))]
-}
-
-.isSupportedSeqnames <-
-    function(species, style, seqnames)
-{
-    if (missing(species) || missing(style) || missing(seqnames))
-        stop("'species', 'style' or 'seqnames' missing")
-
-    trueSeq <- extractSeqlevels(species=species,style=style)
-    all(trueSeq %in% seqnames)
 }
 
 .supportedSeqnameMappings <-
@@ -95,9 +91,9 @@
     }else{
         ##vec is in format "Homo_sapiens.UCSC"
         vec <- names(which(unlistgot2==max(unlistgot2)))
-        species <- sub("_"," ",sub("(.*?)[.].*", "\\1", vec))
+        organism <- .normalize_organism(sub("(.*?)[.].*", "\\1", vec))
         style <- gsub("^[^.]+.","", vec)
-        ans <- list(species=species, style=style) 
+        ans <- list(species=organism, style=style) 
     }
     ans
 }
