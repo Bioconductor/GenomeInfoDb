@@ -1,26 +1,26 @@
-circular	auto	sex	NCBI	UCSC	dbSNP
-F	T	F	1	chr1	ch1
-F	T	F	2	chr2	ch2
-F	T	F	3	chr3	ch3
-F	T	F	4	chr4	ch4
-F	T	F	5	chr5	ch5
-F	T	F	6	chr6	ch6
-F	T	F	7	chr7	ch7
-F	T	F	8	chr8	ch8
-F	T	F	9	chr9	ch9
-F	T	F	10	chr10	ch10
-F	T	F	11	chr11	ch11
-F	T	F	12	chr12	ch12
-F	T	F	13	chr13	ch13
-F	T	F	14	chr14	ch14
-F	T	F	15	chr15	ch15
-F	T	F	16	chr16	ch16
-F	T	F	17	chr17	ch17
-F	T	F	18	chr18	ch18
-F	T	F	19	chr19	ch19
-F	T	F	20	chr20	ch20
-F	T	F	21	chr21	ch21
-F	T	F	22	chr22	ch22
-F	F	T	X	chrX	chX
-F	F	T	Y	chrY	chY
-T	F	F	MT	chrM	chMT
+circular	auto	sex	NCBI	UCSC	dbSNP	Ensembl
+F	T	F	1	chr1	ch1	1
+F	T	F	2	chr2	ch2	2
+F	T	F	3	chr3	ch3	3
+F	T	F	4	chr4	ch4	4
+F	T	F	5	chr5	ch5	5
+F	T	F	6	chr6	ch6	6
+F	T	F	7	chr7	ch7	7
+F	T	F	8	chr8	ch8	8
+F	T	F	9	chr9	ch9	9
+F	T	F	10	chr10	ch10	10
+F	T	F	11	chr11	ch11	11
+F	T	F	12	chr12	ch12	12
+F	T	F	13	chr13	ch13	13
+F	T	F	14	chr14	ch14	14
+F	T	F	15	chr15	ch15	15
+F	T	F	16	chr16	ch16	16
+F	T	F	17	chr17	ch17	17
+F	T	F	18	chr18	ch18	18
+F	T	F	19	chr19	ch19	19
+F	T	F	20	chr20	ch20	20
+F	T	F	21	chr21	ch21	21
+F	T	F	22	chr22	ch22	22
+F	F	T	X	chrX	chX	X
+F	F	T	Y	chrY	chY	Y
+T	F	F	MT	chrM	chMT	MT

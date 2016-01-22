@@ -1,23 +1,23 @@
-circular	auto	sex	NCBI	UCSC
-F	T	F	1	chr1
-F	T	F	2	chr2
-F	T	F	3	chr3
-F	T	F	4	chr4
-F	T	F	5	chr5
-F	T	F	6	chr6
-F	T	F	7	chr7
-F	T	F	8	chr8
-F	T	F	9	chr9
-F	T	F	10	chr10
-F	T	F	11	chr11
-F	T	F	12	chr12
-F	T	F	13	chr13
-F	T	F	14	chr14
-F	T	F	15	chr15
-F	T	F	16	chr16
-F	T	F	17	chr17
-F	T	F	18	chr18
-F	T	F	19	chr19
-F	F	T	X	chrX
-F	F	T	Y	chrY
-T	F	F	MT	chrM
+circular	auto	sex	NCBI	UCSC	Ensembl
+F	T	F	1	chr1	1
+F	T	F	2	chr2	2
+F	T	F	3	chr3	3
+F	T	F	4	chr4	4
+F	T	F	5	chr5	5
+F	T	F	6	chr6	6
+F	T	F	7	chr7	7
+F	T	F	8	chr8	8
+F	T	F	9	chr9	9
+F	T	F	10	chr10	10
+F	T	F	11	chr11	11
+F	T	F	12	chr12	12
+F	T	F	13	chr13	13
+F	T	F	14	chr14	14
+F	T	F	15	chr15	15
+F	T	F	16	chr16	16
+F	T	F	17	chr17	17
+F	T	F	18	chr18	18
+F	T	F	19	chr19	19
+F	F	T	X	chrX	X
+F	F	T	Y	chrY	Y
+T	F	F	MT	chrM	MT

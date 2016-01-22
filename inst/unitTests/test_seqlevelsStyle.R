@@ -7,8 +7,9 @@ test_basic <-
    
     # check the format of the file
     data <- read.table(filename,header=TRUE,sep="\t")
-    checkIdentical(c(25L, 6L), dim(data))
-    checkIdentical(c('circular', 'auto', 'sex', 'NCBI', 'UCSC', 'dbSNP'),
+    checkIdentical(c(25L, 7L), dim(data))
+    checkIdentical(c('circular', 'auto', 'sex',
+                     'NCBI', 'UCSC', 'dbSNP', 'Ensembl'),
                    colnames(data))
     
     #check if first 3 columns contain only true or false entries
@@ -21,7 +22,7 @@ test_genomeStyles <-
     function()
 {
     checkIdentical("data.frame", class(genomeStyles("Homo sapiens")))
-    checkIdentical(c(25L, 6L), dim(genomeStyles("Homo sapiens")))
+    checkIdentical(c(25L, 7L), dim(genomeStyles("Homo sapiens")))
     checkException(genomeStyles("SAD"))
 }
 
