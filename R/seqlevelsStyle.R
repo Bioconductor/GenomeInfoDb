@@ -119,13 +119,13 @@ setMethod("seqlevelsStyle", "character",
     
     seqnames <- unique(x)      
     ans <- .guessSpeciesStyle(seqnames)
-    
+
     ## 3 cases -
     ## 1. if no style found - ans is na - stop with message 
     ## 2. if multiple styles returned then print message saying that it could be 
     ## any of these styles
     ## 3. if one style returned - hurray!
-    
+
     if(length(ans)==1){
         if(is.na(ans)){
             txt <- "The style does not have a compatible entry for the
@@ -134,14 +134,7 @@ setMethod("seqlevelsStyle", "character",
             stop(paste(strwrap(txt, exdent=2), collapse="\n"))
         }
     }
-    
-    
-    style <- unique(ans$style)
-    
-    if(length(style)>1)
-        message("warning! Multiple seqlevels styles found.")
-      
-    style
+    unique(ans$style)
 })
 
 ### The default methods work on any object 'x' with working "seqlevels"
@@ -149,27 +142,40 @@ setMethod("seqlevelsStyle", "character",
 
 setMethod("seqlevelsStyle", "ANY", function(x) seqlevelsStyle(seqlevels(x)))
 
+.replace_seqlevels_style <- function(x_seqlevels, value)
+{
+    renaming_maps <- mapSeqlevels(x_seqlevels, value, drop=FALSE)
+    if (nrow(renaming_maps) == 0L) {
+        msg <- c("found no sequence renaming map compatible ",
+                 "with seqname style \"", value, "\" for this object")
+        stop(msg)
+    }
+    ## Use 1st best renaming map.
+    if (nrow(renaming_maps) != 1L) {
+        msg <- c("found more than one best sequence renaming map ",
+                 "compatible with seqname style \"", value, "\" for ",
+                 "this object, using the first one")
+        warning(msg)
+        renaming_maps <- renaming_maps[1L, , drop=FALSE]
+    }
+    new_seqlevels <- as.vector(renaming_maps)
+    na_idx <- which(is.na(new_seqlevels))
+    new_seqlevels[na_idx] <- x_seqlevels[na_idx]
+    new_seqlevels
+}
+
 setReplaceMethod("seqlevelsStyle", "character",
     function (x, value)
     {
         x_seqlevels <- unique(x)
-        renaming_maps <- mapSeqlevels(x_seqlevels, value, drop=FALSE)
-        if (nrow(renaming_maps) == 0L) {
-            msg <- c("found no sequence renaming map compatible ",
-                     "with seqname style \"", value, "\" for this object")
-            stop(msg)
+        if (!(is.character(value) && length(value) >= 1L))
+            stop("the supplied seqlevels style must be a single string")
+        if (length(value) > 1L) {
+            warning(wmsg("more than one seqlevels style supplied, ",
+                         "using the 1st one only"))
+            value <- value[[1L]]
         }
-        ## Use 1st best renaming map.
-        if (nrow(renaming_maps) != 1L) {
-            msg <- c("found more than one best sequence renaming map ",
-                     "compatible with seqname style \"", value, "\" for ",
-                     "this object, using the first one")
-            warning(msg)
-            renaming_maps <- renaming_maps[1L, , drop=FALSE]
-        }
-        new_seqlevels <- as.vector(renaming_maps)
-        na_idx <- which(is.na(new_seqlevels))
-        new_seqlevels[na_idx] <- x_seqlevels[na_idx]
+        new_seqlevels <- .replace_seqlevels_style(x_seqlevels, value)
         new_seqlevels[match(x, x_seqlevels)]
      }
 )
@@ -244,7 +250,7 @@ mapSeqlevels <-
     if (!is.character(seqnames))
         stop("'seqnames' must be a character vector")
     if (!isSingleString(style))
-        stop("the supplied seqname style must be a single string")
+        stop("the supplied seqlevels style must be a single string")
     if (!.isTRUEorFALSE(best.only))
         stop("'best.only' must be TRUE or FALSE")
     if (!.isTRUEorFALSE(drop))

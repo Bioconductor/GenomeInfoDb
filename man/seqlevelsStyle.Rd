@@ -115,26 +115,28 @@ seqlevelsInGroup(seqnames, group, species, style)
 }
 
 \value{
-  For \code{seqlevelsStyle} returns a single character string containing the 
-  style of the seqlevels supplied. Note that this information is not stored in 
-  \code{x} but inferred by looking up a seqlevels style database stored inside
-  GenomeInfoDb.
+  For \code{seqlevelsStyle}: A single string containing the style of the
+  seqlevels in \code{x}, or a character vector containing the styles of the
+  seqlevels in \code{x} if the current style cannot be determined
+  unambiguously. Note that this information is not stored in \code{x} but
+  inferred by looking up a seqlevels style database stored inside the
+  \pkg{GenomeInfoDb} package.
  
   For \code{extractSeqlevels} , \code{extractSeqlevelsByGroup} and 
-  \code{seqlevelsInGroup} returns a character vector of seqlevels 
+  \code{seqlevelsInGroup}: A character vector of seqlevels 
   for given supported species and group.
  
-  For \code{mapSeqlevels} returns a matrix with 1 column per supplied sequence 
-  name and 1 row per sequence renaming map compatible with the specified style
+  For \code{mapSeqlevels}: A matrix with 1 column per supplied sequence 
+  name and 1 row per sequence renaming map compatible with the specified style.
 
-  For \code{genomeStyle} : If species is specified returns a data.frame 
+  For \code{genomeStyle}: If species is specified returns a data.frame 
   containg the seqlevels style and its mapping for a given organism. If species
   is not specified, a list is returned with one list per species containing
   the seqlevels style with the corresponding mappings.
 }
 
 \author{
-  Sonali Arora, Martin Morgan , Marc Carlson, H. Pages
+  Sonali Arora, Martin Morgan, Marc Carlson, H. Pages
 }
 
 \examples{
