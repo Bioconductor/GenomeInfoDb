@@ -77,7 +77,7 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
 {
     ans <- rep.int(NA_integer_, length(UCSC_seqlevel))
     seqlevel_parts <- strsplit(UCSC_seqlevel, "_")
-    nparts <- elementLengths(seqlevel_parts)
+    nparts <- elementNROWS(seqlevel_parts)
     idx2 <- which(nparts >= 2L)
     if (length(idx2) == 0L)
         return(ans)
@@ -208,7 +208,7 @@ standard_fetch_extended_ChromInfo_from_UCSC <- function(
     }
     if (length(unmapped_seqs) != 0L) {
         unmapped_seqs_role <- rep.int(names(unmapped_seqs),
-                                      elementLengths(unmapped_seqs))
+                                      elementNROWS(unmapped_seqs))
         unmapped_seqs <- unlist(unmapped_seqs, use.names=FALSE)
         unmapped_idx <- match(unmapped_seqs, UCSC_seqlevel)
         stopifnot(!any(is.na(unmapped_idx)))
