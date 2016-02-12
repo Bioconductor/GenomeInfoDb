@@ -31,6 +31,6 @@ Collate: utils.R
 	seqlevels-wrappers.R
 	Seqinfo-class.R
 	GenomeDescription-class.R
-	test_GenomeInfoDb_package.R
+	zzz.R
 VignetteBuilder: knitr
 Video: http://youtu.be/wdEjCYSXa7w
