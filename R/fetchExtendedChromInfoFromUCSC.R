@@ -479,17 +479,19 @@ SUPPORTED_UCSC_GENOMES <- list(
     ),
 
 ### Zebra finch
-    taeGut2=list(
-        FUN="standard_fetch_extended_ChromInfo_from_UCSC",
-        circ_seqs="chrM",
-        assembly_accession="GCF_000151805.1",
-        special_mappings=c(chrM="MT")
-    ),
-
-    taeGut1=list(
-        FUN="standard_fetch_extended_ChromInfo_from_UCSC",
-        circ_seqs="chrM"
-    ),
+# Check/test this before commenting out. Once everything is ok, update man
+# page and commit.
+#    taeGut2=list(
+#        FUN="standard_fetch_extended_ChromInfo_from_UCSC",
+#        circ_seqs="chrM",
+#        assembly_accession="GCF_000151805.1",
+#        special_mappings=c(chrM="MT")
+#    ),
+#
+#    taeGut1=list(
+#        FUN="standard_fetch_extended_ChromInfo_from_UCSC",
+#        circ_seqs="chrM"
+#    ),
 
 ### Zebrafish
     danRer7=list(
