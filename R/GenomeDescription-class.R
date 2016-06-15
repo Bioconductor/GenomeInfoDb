@@ -40,15 +40,6 @@ setMethod("commonName", "GenomeDescription",
     function(object) object@common_name
 )
 
-setMethod("species", "GenomeDescription",
-    function(object)
-    {
-         msg <- c("  Calling species() on a ", class(object), " object ",
-                  "is *defunct*.\n  Please use commonName() instead.")
-        .Defunct(msg=msg)
-    }
-)
-
 setGeneric("provider", function(x) standardGeneric("provider"))
 setMethod("provider", "GenomeDescription", function(x) x@provider)
 

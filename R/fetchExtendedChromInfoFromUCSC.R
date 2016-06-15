@@ -478,6 +478,19 @@ SUPPORTED_UCSC_GENOMES <- list(
         #assembly_accession="GCA_000180675.1"
     ),
 
+### Zebra finch
+    taeGut2=list(
+        FUN="standard_fetch_extended_ChromInfo_from_UCSC",
+        circ_seqs="chrM",
+        assembly_accession="GCF_000151805.1",
+        special_mappings=c(chrM="MT")
+    ),
+
+    taeGut1=list(
+        FUN="standard_fetch_extended_ChromInfo_from_UCSC",
+        circ_seqs="chrM"
+    ),
+
 ### Zebrafish
     danRer7=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
