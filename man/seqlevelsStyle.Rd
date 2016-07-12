@@ -136,7 +136,7 @@ seqlevelsInGroup(seqnames, group, species, style)
 }
 
 \author{
-  Sonali Arora, Martin Morgan, Marc Carlson, H. Pages
+  Sonali Arora, Martin Morgan, Marc Carlson, H. Pagès
 }
 
 \examples{

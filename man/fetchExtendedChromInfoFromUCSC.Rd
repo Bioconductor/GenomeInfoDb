@@ -116,7 +116,7 @@ fetchExtendedChromInfoFromUCSC(genome,
 }
 
 \author{
-  H. Pages
+  H. Pagès
 }
 
 \seealso{

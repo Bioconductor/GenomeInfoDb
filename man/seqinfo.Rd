@@ -177,7 +177,7 @@ genome(x) <- value
   that are currently attached.
 }
 
-\author{H. Pages}
+\author{H. Pagès}
 
 \seealso{
   \itemize{

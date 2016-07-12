@@ -41,7 +41,7 @@ orderSeqlevels(seqnames, X.is.sexchrom=NA)
 }
 
 \author{
-  H. Pages for \code{rankSeqlevels}, \code{orderSeqlevels} added by
+  H. Pagès for \code{rankSeqlevels}, \code{orderSeqlevels} added by
   Sonali Arora 
 }
 

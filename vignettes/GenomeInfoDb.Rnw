@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{GenomeInfoDb :Introduction to GenomeInfoDb}
+%\VignetteIndexEntry{GenomeInfoDb: Introduction to GenomeInfoDb}
 %\VignetteDepends{}
 %\VignetteKeywords{organism, GenomeInfoDb}
 %\VignettePackage{GenomeInfoDb}
@@ -10,7 +10,7 @@ BiocStyle::latex()
 @
 
 \title{An Introduction to \Biocpkg{GenomeInfoDb}}
-\author{Martin Morgan, Herve Pages, Marc Carlson, Sonali Arora}
+\author{Martin Morgan, Herv\'e Pag\`es, Marc Carlson, Sonali Arora}
 \date{Modified: 17 January, 2014. Compiled: \today}
 
 \begin{document}
@@ -319,7 +319,7 @@ x <- keepSeqlevels(x,auto)
 \section{Session Information}
 Here is the output of \Rfunction{sessionInfo} on the system on which
 this document was compiled:
-<<sessionInfo, results='asis', print=TRUE, eval=TRUE>>=
+<<sessionInfo, results='asis', eval=TRUE>>=
 toLatex(sessionInfo())
 @
 
