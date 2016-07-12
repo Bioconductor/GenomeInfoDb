@@ -141,9 +141,10 @@ genome(x) <- value
         also work out-of-the-box.
 
         Examples of containers that have a \code{seqinfo} getter and setter:
-        the \link[GenomicRanges]{GRanges}, \link[GenomicRanges]{GRangesList},
-        and \link[GenomicRanges]{SummarizedExperiment} classes in the
-        \pkg{GenomicRanges} package;
+        the \link[GenomicRanges]{GRanges} and \link[GenomicRanges]{GRangesList}
+        classes in the \pkg{GenomicRanges} package;
+        the \link[SummarizedExperiment]{SummarizedExperiment} class in the
+        \pkg{SummarizedExperiment} package;
         the \link[GenomicAlignments]{GAlignments},
         \link[GenomicAlignments]{GAlignmentPairs},
         and \link[GenomicAlignments]{GAlignmentsList} classes in the
@@ -185,9 +186,11 @@ genome(x) <- value
 
     \item \link{Seqinfo} objects.
 
-    \item \link[GenomicRanges]{GRanges}, \link[GenomicRanges]{GRangesList},
-          and \link[GenomicRanges]{SummarizedExperiment} objects in the
-          \pkg{GenomicRanges} package.
+    \item \link[GenomicRanges]{GRanges} and \link[GenomicRanges]{GRangesList}
+          objects in the \pkg{GenomicRanges} package.
+
+    \item \link[SummarizedExperiment]{SummarizedExperiment} objects in the
+          \pkg{SummarizedExperiment} package.
 
     \item \link[GenomicAlignments]{GAlignments},
           \link[GenomicAlignments]{GAlignmentPairs},

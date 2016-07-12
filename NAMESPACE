@@ -1,4 +1,6 @@
 import(methods)
+importFrom(utils, data, download.file, read.delim, read.table)
+importFrom(stats, setNames)
 importFrom(stats4, summary)
 
 import(BiocGenerics)
