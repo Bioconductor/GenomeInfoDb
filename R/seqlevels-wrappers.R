@@ -62,12 +62,12 @@ restoreSeqlevels <- function(x)
 keepStandardChromosomes <- function(x, species=NULL)
 {
     ori_seqlevels <- seqlevels(x)
-    
+ 
     if(length(ori_seqlevels)==0)
         return(x)
-    
+ 
     ans <- .guessSpeciesStyle(ori_seqlevels)
-    
+ 
     if(length(ans)==1){
         if(is.na(ans)){
             ## Interanally the seqlevels did not match any organism's style - so
@@ -75,40 +75,39 @@ keepStandardChromosomes <- function(x, species=NULL)
             return(dropSeqlevels(x, seqlevels(x)))
         }
     }
-    
+ 
     style <- unique(ans$style)
-    standard_chromosomes <- character(0)
-    
+    if (length(style) > 1L) {
+        message(paste0("using the first of multiple styles matched: ",
+                       paste(style, collapse=", ")))
+        style <- style[1]
+    }
+    standard <- character(0)
+ 
     if(missing(species))
     {
-        ## 1- find compatible species based on style of Seqinfo object
-        ## 2- extract seqlevels for all compatible species. 
-        ## 3- intersect, find how many species have some seqlevels as original?
-        allspecies <- names(genomeStyles())
-        
-        compatibility_idx <- sapply(genomeStyles(),
-                                    function(y) style %in% colnames(y))
-        compatible_species <- names(compatibility_idx)[compatibility_idx]
-        allseqlevels <- lapply(compatible_species,
-                               function(y) extractSeqlevels(y, style)) 
-                
-        mres <- sapply(allseqlevels, function(y) intersect(y, ori_seqlevels))
-        
-        standard_chromosomes <- unique(unlist(mres))
-        standard_chromosomes <- 
-            ori_seqlevels[which(ori_seqlevels %in% standard_chromosomes)]
-        
-        if(length(standard_chromosomes) == 0 )
-            stop("Cannot determine standard chromosomes, Specify species arg")
-        
+        ## compatible species
+        possible <- genomeStyles()
+        idx <- sapply(possible, function(y) style %in% colnames(y))
+        compatible <- names(possible)[idx]
+        ## intersect seqlevels for compatible species with original
+        mres <- sapply(compatible, function(y) {
+            levels <- extractSeqlevels(y, style)
+            intersect(levels, ori_seqlevels)
+        }) 
+ 
+        standard <- unique(unlist(mres))
+        standard <- ori_seqlevels[which(ori_seqlevels %in% standard)]
+        if(length(standard) == 0 )
+            stop(paste0("cannot determine standard chromosomes;",
+                 " try specifying 'species' arg"))
+ 
     }else{
-        standard_chromosomes <- extractSeqlevels(species, style)
-        standard_chromosomes <- intersect(ori_seqlevels,standard_chromosomes)
+        standard <- extractSeqlevels(species, style)
+        standard <- intersect(ori_seqlevels,standard)
     }
-    
-    #x <- keepSeqlevels(x,standard_chromosomes)
-    seqlevels(x,force=TRUE) <- standard_chromosomes 
-    return(x)
-    
+
+    seqlevels(x, force=TRUE) <- standard 
+    x 
 }
 

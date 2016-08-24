@@ -268,12 +268,11 @@ mapSeqlevels <-
         mapping <- seqname_mappings[[species]]
         names(mapping) <- tolower(names(mapping))
         to_seqnames <- as.character(mapping[[tolower(style)]])
-        lapply(mapping, function(from_seqnames) to_seqnames[match(seqnames,
-                                                  from_seqnames)])
+        lapply(mapping, function(from_seqnames) 
+            to_seqnames[match(seqnames, from_seqnames)])
     })
     ans_ncol <- length(seqnames)
-    ans <- matrix(unlist(ans, use.names = FALSE), ncol = ans_ncol,
-                  byrow = TRUE)
+    ans <- matrix(unlist(ans, use.names = FALSE), ncol = ans_ncol, byrow = TRUE)
     colnames(ans) <- seqnames
     score <- rowSums(!is.na(ans))
     idx <- score != 0L

@@ -43,8 +43,8 @@ keepStandardChromosomes(x, species=NULL)
     and in the same order as the original \code{seqlevels(x)}.
   }
   \item{species}{
-    The species name of the \link{Seqinfo} class in which the seqlevels will
-    be kept, dropped or renamed.
+     The genus and species of the organism. Supported species can be seen with 
+     \code{names(genomeStyles())}.
   }
 }
 
@@ -77,11 +77,11 @@ keepStandardChromosomes(x, species=NULL)
   that is, restore the seqlevels in \code{x} back to the original values.
   Applicable only when \code{x} is a TxDb object.
   
-  \code{keepStandardChromosomes}:Subsetting operation that returns only the 
+  \code{keepStandardChromosomes}: Subsetting operation that returns only the 
   'standard' Chromosomes. We define 'standard chromosomes' as those chromosomes 
   which represent sequences in the assembly that are not scaffolds. Also 
   referred to as 'assembly molecule' on NCBI. Applicable when \code{x}
-  has a Seqinfo object.This function determines which seqlevels need to be kept 
+  has a Seqinfo object. Seqlevels need to be kept 
   using the organism's supported by GenomeInfoDb. The user can also specify the 
   species to get the standard Chromsomes in \code{x}. 
 }
@@ -92,6 +92,8 @@ keepStandardChromosomes(x, species=NULL)
     \item \link{Seqinfo} ## The Seqinfo class
   }
 }
+
+\author{Valerie Obenchain, Sonali Arora}
 
 \examples{
 
@@ -186,21 +188,28 @@ seqlevels(txdb)
 ## ---------------------------------------------------------------------
 
 gr <- GRanges(c(paste0("chr",c(1:3)), "chr1_gl000191_random",
-           "chr1_gl000192_random"), IRanges(1:5, width=3))
+              "chr1_gl000192_random"), IRanges(1:5, width=3))
 gr
-grl <- split(gr,seqnames(gr))
 
-##GRanges
+## GRanges
 keepStandardChromosomes(gr)
 
-##GRangesList
+## GRangesList
+grl <- split(gr,seqnames(gr))
 keepStandardChromosomes(grl)
 
-plantgr <- GRanges(c(1:5,"MT","Pltd","wrong"), IRanges(1:8,width=5))
-keepStandardChromosomes(plantgr, species="Arabidopsis thaliana")
-}
+## NCBI
+worm <- GRanges(c("I", "II", "wrong", "X", "MT"), IRanges(1:5, width=5))
+keepStandardChromosomes(worm)
 
-\author{Valerie Obenchain \email{vobencha@fhcrc.org}, Sonali Arora}
+## UCSC
+seqlevelsStyle(worm) <- "UCSC"
+keepStandardChromosomes(worm)
+
+## Ensembl
+seqlevelsStyle(worm) <- "Ensembl"
+keepStandardChromosomes(worm)
+}
 
 \keyword{methods}
 \keyword{utilities}
