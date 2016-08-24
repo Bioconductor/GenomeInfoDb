@@ -78,7 +78,7 @@ keepStandardChromosomes <- function(x, species=NULL)
  
     style <- unique(ans$style)
     if (length(style) > 1L) {
-        message(paste0("using the first of multiple styles matched: ",
+        warning(paste0("using the first of multiple styles matched: ",
                        paste(style, collapse=", ")))
         style <- style[1]
     }
