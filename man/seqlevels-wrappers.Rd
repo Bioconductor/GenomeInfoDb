@@ -76,14 +76,16 @@ keepStandardChromosomes(x, species=NULL)
   \code{restoreSeqlevels}: Perform \code{seqlevels(txdb) <- seqlevels0(txdb)},
   that is, restore the seqlevels in \code{x} back to the original values.
   Applicable only when \code{x} is a TxDb object.
-  
+ 
   \code{keepStandardChromosomes}: Subsetting operation that returns only the 
-  'standard' Chromosomes. We define 'standard chromosomes' as those chromosomes 
+  'standard' Chromosomes. We define 'standard chromosomes' as those 
   which represent sequences in the assembly that are not scaffolds. Also 
   referred to as 'assembly molecule' on NCBI. Applicable when \code{x}
-  has a Seqinfo object. Seqlevels need to be kept 
-  using the organism's supported by GenomeInfoDb. The user can also specify the 
-  species to get the standard Chromsomes in \code{x}. 
+  has a Seqinfo object. 
+ 
+  \code{species} can be specified as a character string; supported species are
+  listed with \code{names(genomeStyles())}.  When more than one seqlevel
+  'style' is matched, e.g., 'UCSC' and 'Ensembl', the first is chosen.
 }
 
 \seealso{
