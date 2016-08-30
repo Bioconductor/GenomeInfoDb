@@ -93,7 +93,7 @@ test_keepStandardChromosomes <- function()
     ## seqlevels not supported by GenomeInfodb.  
     gr <- GRanges("chr4_ctg9_hap1", IRanges(1, 5))
     checkEquals(length(seqlevels(keepStandardChromosomes(gr))),0)
-    checkException(seqlevelsStyle(gr))
+    checkException(seqlevelsStyle(gr), silent=TRUE)
     
     ## drop seqlevels not supported by GenomeInfoDb
     plantgr <- GRanges(c(41:45,"MT","Pltd"), IRanges(1:7,width=5))
@@ -103,13 +103,29 @@ test_keepStandardChromosomes <- function()
     ## no seqlevels in object
     checkEquals(0,length(seqlevels(keepStandardChromosomes(GRanges()))))
     
-    ## want to test if sorted seqlevels are being returned.
-    gr <- GRanges(c("chr10", "chr2", "chr3L", "3L"), 
-                  IRanges(1:4, width=3))
-    checkEquals(seqlevels(keepStandardChromosomes(gr)), 
-                c("chr10", "chr2", "chr3L"))
-    gr <- GRanges(c("chr3", "blabla", "chr1"), IRanges(1:3, 10)) 
-    checkEquals(seqlevels(keepStandardChromosomes(gr)), c("chr3", "chr1"))
+    ## seqlevels retain order
+    gr <- GRanges(c("chr8", "chr2", "foo", "chr3L"), IRanges(1:4, width=3))
+    ans <- keepStandardChromosomes(gr)
+    checkEquals(seqlevels(ans), c("chr8", "chr2"))
+    ans <- keepStandardChromosomes(gr, "Homo sapiens")
+    checkEquals(seqlevels(ans), c("chr8", "chr2"))
+    fly <- "Drosophila melanogaster"
+    checkException(keepStandardChromosomes(gr, fly), silent=TRUE)
+
+    ## tie in seqlevels from different species
+    gr <- GRanges(c("chr8", "chr2", "chr3R", "chr3L"), IRanges(1:4, width=3))
+    checkException(keepStandardChromosomes(gr), silent=TRUE)
+    ans <- keepStandardChromosomes(gr, fly)
+    checkEquals(seqlevels(ans), c("chr3R", "chr3L"))
+    ans <- keepStandardChromosomes(gr, "Homo sapiens")
+    checkEquals(seqlevels(ans), c("chr8", "chr2"))
+
+    # match multiple styles
+    gr <- GRanges( c("1","1","X","FOO"), IRanges(start=1:4,width=2))
+    ans <- keepStandardChromosomes(gr)
+    checkEquals(seqlevels(ans), c("1", "X"))
+    ans <- keepStandardChromosomes(gr, species="Homo sapiens")
+    checkEquals(seqlevels(ans), c("1", "X"))
 }    
 
 test_seqlevelsStyle <- function()

@@ -70,38 +70,38 @@ keepStandardChromosomes <- function(x, species=NULL)
  
     if(length(ans)==1){
         if(is.na(ans)){
-            ## Interanally the seqlevels did not match any organism's style - so
+            ## seqlevels did not match any organism's style - so
             ## drop all levels and return an empty object
             return(dropSeqlevels(x, seqlevels(x)))
         }
     }
  
-    style <- unique(ans$style)
-    if (length(style) > 1L) {
-        style <- style[1]
-    }
     standard <- character(0)
- 
     if(missing(species))
     {
-        ## compatible species
-        possible <- genomeStyles()
-        idx <- sapply(possible, function(y) style %in% colnames(y))
-        compatible <- names(possible)[idx]
-        ## intersect seqlevels for compatible species with original
-        mres <- sapply(compatible, function(y) {
-            levels <- extractSeqlevels(y, style)
-            intersect(levels, ori_seqlevels)
-        }) 
- 
+        ## compatible species:
+        mres <- Map(function(y, style) {
+                    levels <- extractSeqlevels(y, style)
+                    intersect(ori_seqlevels, levels)
+                }, y = ans$species, style = ans$style) 
+
+        ## seqlevels must be the same for all possible species, else fail
         standard <- unique(unlist(mres))
-        standard <- ori_seqlevels[which(ori_seqlevels %in% standard)]
-        if(length(standard) == 0 )
+        if (length(unique(lengths(mres))) != 1L | 
+            length(standard) != lengths(mres[1]) | 
+            length(standard) == 0L)
             stop(paste0("cannot determine standard chromosomes;",
                  " try specifying 'species' arg"))
- 
-    }else{
-        standard <- extractSeqlevels(species, style)
+    } else {
+        ## exact species:
+        ## .guessSpeciesStyle() returned 'possible' species using weights
+        idx <- which(ans$species == .normalize_organism(species))
+        if (length(idx) == 0L)
+            stop(paste0("'species' not found or not compatible with given ",
+                 "seqlevels; see names(genomeStyles()) for valid species"))
+        if (length(idx) > 1L)
+            idx <- idx[1]
+        standard <- extractSeqlevels(ans$species[idx], ans$style[idx])
         standard <- intersect(ori_seqlevels,standard)
     }
 
