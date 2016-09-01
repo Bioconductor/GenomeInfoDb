@@ -62,46 +62,35 @@ restoreSeqlevels <- function(x)
 keepStandardChromosomes <- function(x, species=NULL)
 {
     ori_seqlevels <- seqlevels(x)
- 
-    if(length(ori_seqlevels)==0)
+    if(!length(ori_seqlevels))
         return(x)
- 
-    ans <- .guessSpeciesStyle(ori_seqlevels)
- 
-    if(length(ans)==1){
-        if(is.na(ans)){
-            ## seqlevels did not match any organism's style - so
-            ## drop all levels and return an empty object
-            return(dropSeqlevels(x, seqlevels(x)))
-        }
-    }
- 
-    standard <- character(0)
-    if(missing(species))
-    {
-        ## compatible species:
-        mres <- Map(function(y, style) {
-                    levels <- extractSeqlevels(y, style)
-                    intersect(ori_seqlevels, levels)
-                }, y = ans$species, style = ans$style) 
 
-        ## seqlevels must be the same for all possible species, else fail
-        standard <- unique(unlist(mres))
-        if (length(unique(lengths(mres))) != 1L | 
-            length(standard) != lengths(mres[1]) | 
-            length(standard) == 0L)
-            stop(paste0("cannot determine standard chromosomes;",
-                 " try specifying 'species' arg"))
+    ## guess at style
+    guess <- .guessSpeciesStyle(ori_seqlevels)
+    if (!is.na(guess))
+        style <- unique(guess$style)
+    else
+        return(dropSeqlevels(x, seqlevels(x)))
+    if (length(style) > 1)
+        style <- style[1]
+
+    standard <- character(0)
+    if(missing(species)) {
+        possible <- genomeStyles()
+        ## extractSeqlevels will fail if no style-species match; 
+        ## must check style match first
+        standard <- unique(unlist(
+            Map(function(name, data) {
+                if (style %in% colnames(data))
+                    intersect(ori_seqlevels, extractSeqlevels(name, style))
+            }, name=names(possible), data=possible)))
+        ## preserve order
+        standard <- ori_seqlevels[ori_seqlevels %in% standard]
+        if (!length(standard))
+            stop(paste0("cannot determine standard chromosomes; ",
+                        "try specifying 'species' argument"))
     } else {
-        ## exact species:
-        ## .guessSpeciesStyle() returned 'possible' species using weights
-        idx <- which(ans$species == .normalize_organism(species))
-        if (length(idx) == 0L)
-            stop(paste0("'species' not found or not compatible with given ",
-                 "seqlevels; see names(genomeStyles()) for valid species"))
-        if (length(idx) > 1L)
-            idx <- idx[1]
-        standard <- extractSeqlevels(ans$species[idx], ans$style[idx])
+        standard <- extractSeqlevels(species, style)
         standard <- intersect(ori_seqlevels,standard)
     }
 

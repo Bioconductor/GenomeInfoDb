@@ -103,22 +103,20 @@ test_keepStandardChromosomes <- function()
     ## no seqlevels in object
     checkEquals(0,length(seqlevels(keepStandardChromosomes(GRanges()))))
     
-    ## seqlevels retain order
+    ## mixed seqlevels; no species
     gr <- GRanges(c("chr8", "chr2", "foo", "chr3L"), IRanges(1:4, width=3))
     ans <- keepStandardChromosomes(gr)
-    checkEquals(seqlevels(ans), c("chr8", "chr2"))
+    checkEquals(seqlevels(ans), c("chr8", "chr2", "chr3L"))
+    gr <- GRanges(c("chr8", "chr2", "chr3R", "chr3L"), IRanges(1:4, width=3))
+    ans <- keepStandardChromosomes(gr)
+    checkEquals(seqlevels(ans), c("chr8", "chr2", "chr3R", "chr3L"))
+    ## mixed seqlevels; species
+    gr <- GRanges(c("chr8", "chr2", "foo", "chr3L"), IRanges(1:4, width=3))
     ans <- keepStandardChromosomes(gr, "Homo sapiens")
     checkEquals(seqlevels(ans), c("chr8", "chr2"))
     fly <- "Drosophila melanogaster"
-    checkException(keepStandardChromosomes(gr, fly), silent=TRUE)
-
-    ## tie in seqlevels from different species
-    gr <- GRanges(c("chr8", "chr2", "chr3R", "chr3L"), IRanges(1:4, width=3))
-    checkException(keepStandardChromosomes(gr), silent=TRUE)
     ans <- keepStandardChromosomes(gr, fly)
-    checkEquals(seqlevels(ans), c("chr3R", "chr3L"))
-    ans <- keepStandardChromosomes(gr, "Homo sapiens")
-    checkEquals(seqlevels(ans), c("chr8", "chr2"))
+    checkEquals(seqlevels(ans), "chr3L")
 
     # match multiple styles
     gr <- GRanges( c("1","1","X","FOO"), IRanges(start=1:4,width=2))
