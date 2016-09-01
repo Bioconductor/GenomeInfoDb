@@ -61,31 +61,42 @@ keepStandardChromosomes(x, species=NULL)
   high-level convenience functions that wrap the low-level \code{seqlevels}
   setter.
 
-  \code{keepSeqlevels}, \code{dropSeqlevels}: Subsetting operations 
-  that modify the size of \code{x}. \code{keepSeqlevels} keeps only the
-  seqlevels in \code{value} and removes all others. \code{dropSeqlevels}
-  drops the levels in \code{value} and retains all others. If \code{value} 
-  does not match any seqlevels in \code{x} an empty object is returned.
+  \itemize{
+    \item  \code{keepSeqlevels}, \code{dropSeqlevels}: Subsetting operations 
+           that modify the size of \code{x}. \code{keepSeqlevels} keeps only
+           the seqlevels in \code{value} and removes all others.
+           \code{dropSeqlevels} drops the levels in \code{value} and retains
+           all others. If \code{value} does not match any seqlevels in \code{x}
+           an empty object is returned.
 
-  \code{renameSeqlevels}: Rename the seqlevels in \code{x} to those in 
-  \code{value}. If \code{value} is a named character vector, the names are used
-  to map the new seqlevels to the old. When \code{value} is unnamed, the
-  replacement vector must be the same length and in the same order as the
-  original \code{seqlevels(x)}.
+    \item  \code{renameSeqlevels}: Rename the seqlevels in \code{x} to those in 
+           \code{value}. If \code{value} is a named character vector, the names
+           are used to map the new seqlevels to the old. When \code{value} is
+           unnamed, the replacement vector must be the same length and in the
+           same order as the original \code{seqlevels(x)}.
 
-  \code{restoreSeqlevels}: Perform \code{seqlevels(txdb) <- seqlevels0(txdb)},
-  that is, restore the seqlevels in \code{x} back to the original values.
-  Applicable only when \code{x} is a TxDb object.
+    \item  \code{restoreSeqlevels}: Perform 
+           \code{seqlevels(txdb) <- seqlevels0(txdb)}, that is, restore the
+           seqlevels in \code{x} back to the original values.
+           Applicable only when \code{x} is a TxDb object.
  
-  \code{keepStandardChromosomes}: Subsetting operation that returns only the 
-  'standard' Chromosomes. We define 'standard chromosomes' as those 
-  which represent sequences in the assembly that are not scaffolds. Also 
-  referred to as 'assembly molecule' on NCBI. Applicable when \code{x}
-  has a Seqinfo object. 
+    \item  \code{keepStandardChromosomes}: Subsetting operation that returns 
+           only the 'standard' Chromosomes. We define 'standard chromosomes' as
+           those which represent sequences in the assembly that are not
+           scaffolds. Also referred to as 'assembly molecule' on NCBI.  The
+           function attempts to detect the seqlevel style and if more than one
+           style is matched, e.g., 'UCSC' and 'Ensembl', the first is chosen.
  
-  \code{species} can be specified as a character string; supported species are
-  listed with \code{names(genomeStyles())}.  When more than one seqlevel
-  'style' is matched, e.g., 'UCSC' and 'Ensembl', the first is chosen.
+           \code{x} must have a Seqinfo object.  \code{species} can be
+           specified as a character string; supported species are listed with
+           \code{names(genomeStyles())}.
+
+           When \code{x} contains seqlevels from multiple organisms all
+           those considered standard will be kept. For example, if 
+           seqlevels are "chr1" and "chr3R" from human and fly both will be
+           kept. If \code{species="Homo sapiens"} is specified then only 
+           "chr1" is kept.
+    }
 }
 
 \seealso{
