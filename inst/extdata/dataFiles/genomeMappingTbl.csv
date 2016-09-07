@@ -1,0 +1,171 @@
+speciesShort,speciesLong,ensemblID,origEnsemblVersion,origEnsemblDate,ensemblVersion,ensemblDate,ucscID,ucscDate,releaseName
+Alpaca,Vicugna pacos,vicPac1,54,May.2009,54,May.2009,vicPac1,Jul.2008,Broad Institute VicPac1.0
+Alpaca,Vicugna pacos,vicPac1,54,May.2009,71,Apr.2013,vicPac2,Mar.2013,Broad Institute Vicugna_pacos-2.0.1
+Amazon molly,Poecilia formosa,Poecilia_formosa-5.1.2,76,Aug.2014,76,Aug.2014,poeFor1,NA,NA
+Anole lizard,Anolis carolinensis,AnoCar1.0,54,May.2009,54,May.2009,anoCar1,Feb.2007,Broad Institute AnoCar1
+Anole lizard,Anolis carolinensis,AnoCar1.0,54,May.2009,58,May.2010,anoCar2,May.2010,Broad Institute AnoCar2
+Anole lizard,Anolis carolinensis,AnoCar2.0,61,Feb.2011,61,Feb.2011,anoCar2,May.2010,Broad Institute AnoCar2
+Armadillo,Dasypus novemcinctus,ARMA,54,May.2009,54,May.2009,NA,NA,NA
+Armadillo,Dasypus novemcinctus,ARMA,54,May.2009,65,Dec.2011,dasNov3,Dec.2011,Broad institute DasNov3
+Armadillo,Dasypus novemcinctus,dasNov2,58,May.2012,58,May.2012,dasNov3,Dec.2011,Broad institute DasNov3
+Armadillo,Dasypus novemcinctus,Dasnov3.0,74,Dec.2013,74,Dec.2013,dasNov3,Dec.2011,Broad institute DasNov3
+Armadillo,Dasypus novemcinctus,NA,85,Jul.2016,85,Jul.2016,dasNov3,Dec.2011,Broad institute DasNov3
+Bushbaby,Otolemur garnettii,otoGar1,54,May.2009,54,May.2009,NA,NA,NA
+Bushbaby,Otolemur garnettii,otoGar1,54,May.2009,62,Apr.2011,otoGar3,Mar.2011,Broad Institute OtoGar3
+Bushbaby,Otolemur garnettii,OtoGar3,65,Dec.2011,65,Dec.2011,otoGar3,Mar.2011,Broad Institute OtoGar3
+Bushbaby,Otolemur garnettii,OtoGar3,65,Dec.2011,67,May.2012,papAnu2,Mar.2012,Baylor College of Medicine Panu_2.0
+Caenorhabditis elegans,Caenorhabditis elegans,WS190,54,May.2009,54,May.2009,ce6,May.2008,WormBase v. WS190
+Caenorhabditis elegans,Caenorhabditis elegans,WS200,58,May.2010,58,May.2010,ce6,May.2008,WormBase v. WS190
+Caenorhabditis elegans,Caenorhabditis elegans,WS210,59,Aug.2010,59,Aug.2010,ce6,May.2008,WormBase v. WS190
+Caenorhabditis elegans,Caenorhabditis elegans,WS210,59,Aug.2010,60,Nov.2010,ce10,Oct.2010,WormBase v. WS220
+Caenorhabditis elegans,Caenorhabditis elegans,WS220,61,Feb.2011,61,Feb.2011,ce10,Oct.2010,WormBase v. WS220
+Caenorhabditis elegans,Caenorhabditis elegans,WBcel215,67,May.2012,67,May.2012,ce10,Oct.2010,WormBase v. WS220
+Caenorhabditis elegans,Caenorhabditis elegans,WBcel235,71,Apr.2013,71,Apr.2013,ce11,Feb.2013,C. elegans Sequencing Consortium WBcel235
+Cat,Felis catus,CAT,54,May.2009,54,May.2009,felcat4,Dec.2008,NHGRI catChrV17e
+Cat,Felis catus,CAT,54,May.2009,64,Sep.2011,felcat5,Sep.2011,ICGSC Felis_catus-6.2
+Cat,Felis catus,Felis_catus_6.2,70,Jan.2013,70,Jan.2013,felcat5,Sep.2011,ICGSC Felis_catus-6.2
+Cat,Felis catus,Felis_catus_6.2,70,Jan.2013,78,Dec.2014,felCat8,Nov.2014,ICGSC Felis_catus_8.0
+Cave fish,Astyanax mexicanus,AstMex102,74,Dec.2013,74,Dec.2013,astMex1,NA,NA
+Chicken,Gallus gallus,WASHUC2,54,May.2009,54,May.2009,galGal3,May.2006,WUSTL Gallus-gallus-2.1
+Chicken,Gallus gallus,WASHUC2,54,May.2009,65,Dec.2011,galGal4,Nov.2011,ICGC Gallus-gallus-4.0
+Chicken,Gallus gallus,Galgal4,71,Apr.2013,71,Apr.2013,galGal4,Nov.2011,ICGC Gallus-gallus-4.0
+Chimpanzee,Pan troglodytes,CHIMP2.1,54,May.2009,54,May.2009,panTro2,Mar.2006,CGSC Build 2.1
+Chimpanzee,Pan troglodytes,CHIMP2.1,54,May.2009,60,Nov.2010,panTro3,Oct.2010,CGSC Build 2.1.3
+Chimpanzee,Pan troglodytes,CHIMP2.1,54,May.2009,61,Feb.2011,panTro4,Feb.2011,CGSC Build 2.1.4
+Chimpanzee,Pan troglodytes,CHIMP2.1.4,65,Dec.2011,65,Dec.2011,panTro4,Feb.2011,CGSC Build 2.1.4
+Chinese softshell turtle,Pelodiscus sinensis,PelSin_1.0,68,Jul.2012,68,Jul.2012,pelSin1,NA,NA
+Ciona intestinalis,Ciona intestinalis,JGI2,54,May.2009,54,May.2009,ci2,Mar.2005,JGI v2.0
+Ciona intestinalis,Ciona intestinalis,KH,66,Feb.2012,66,Feb.2012,ci2,Mar.2005,JGI v2.0
+Ciona savignyi,Ciona savignyi,CSAV2.0,54,May.2009,54,May.2009,cioSav2,NA,NA
+Cod,Gadus morhua,gadMor1,65,Dec.2011,65,Dec.2011,gadMor1,May.2010,Genofisk GadMor_May2010
+Coelacanth,Latimeria chalumnae,LatCha1,66,Feb.2012,66,Feb.2012,latCha1,Aug.2011,Broad Institute LatCha1
+Flycatcher,Ficedula albicollis,FicAlb_1.4,73,Sep.2013,73,Sep.2013,ficAlb1,NA,NA
+Cow,Bos taurus,Btau_4.0,54,May.2009,54,May.2009,bosTau4,Oct.2007,Baylor College of Medicine HGSC Btau_4.0
+Cow,Bos taurus,Btau_4.0,54,May.2009,57,Mar.2010,bosTau6,Nov.2009,University of Maryland v3.1
+Cow,Bos taurus,UMD3.1,64,Sep.2011,64,Sep.2011,bosTau6,Nov.2009,University of Maryland v3.1
+Cow,Bos taurus,UMD3.1,64,Sep.2011,65,Dec.2011,bosTau7,Oct.2011,Baylor College of Medicine HGSC Btau_4.6.1
+Cow,Bos taurus,UMD3.1,64,Sep.2011,76,Aug.2014,bosTau8,Jun.2014,University of Maryland v3.1.1
+Dog,Canis familiaris,CanFam2.0,54,May.2009,54,May.2009,canFam2,May.2005,Broad Institute v2.0
+Dog,Canis familiaris,CanFam2.0,54,May.2009,64,Sep.2011,canFam3,Sep.2011,Broad Institute v3.1
+Dog,Canis familiaris,CanFam3.1,68,Jul.2012,68,Jul.2012,canFam3,Sep.2011,Broad Institute v3.1
+Dog,Canis familiaris,NA,85,Jul.2016,85,Jul.2016,canFam3,Sep.2011,Broad Institute v3.1
+Dolphin,Tursiops truncatus,turTru1,54,May.2009,64,Sept.2011,NA,NA,NA
+Dolphin,Tursiops truncatus,turTru1,54,May.2009,65,Dec.2011,turTru2,Oct.2011,Baylor College of Medicine Ttru_1.4
+Ferret,Mustela putorius furo,MusPutFur1.0,69,Oct.2012,69,Oct.2012,musFur,Apr.2011,Ferret Genome Sequencing Consortium MusPutFur1.0
+Ferret,Mustela putorius furo,NA,85,Jul.2016,85,Jul.2016,musFur,Apr.2011,Ferret Genome Sequencing Consortium MusPutFur1.0
+Duck,Anas platyrhynchos,BGI_duck_1.0,73,Sep.2013,73,Sep.2013,anaPlat1,NA,NA
+Elephant,Loxodonta africana,BROADE1,54,May.2009,54,May.2009,NA,NA,NA
+Elephant,Loxodonta africana,BROADE1,54,May.2009,55,Jul.2009,loxAfr3,Jul.2009,Broad Institute LoxAfr3
+Elephant,Loxodonta africana,Loxafr3.0,58,May.2010,58,May.2010,loxAfr3,Jul.2009,Broad Institute LoxAfr3
+Fruitfly,Drosophila melanogaster,BDGP5.4,54,May.2009,54,May.2009,dm3,Apr.2006,BDGP Release 5
+Fruitfly,Drosophila melanogaster,BDGP5.13,58,May.2010,58,May.2010,dm3,Apr.2006,BDGP Release 5
+Fruitfly,Drosophila melanogaster,BDGP5.25,59,Aug.2010,59,Aug.2010,dm3,Apr.2006,BDGP Release 5
+Fruitfly,Drosophila melanogaster,BDGP5,65,Dec.2011,65,Dec.2011,dm3,Apr.2006,BDGP Release 5
+Fruitfly,Drosophila melanogaster,BDGP5,65,Dec.2011,76,Aug.2014,dm6,Aug.2014,BDGP Release 6 + ISO1 MT
+Fruitfly,Drosophila melanogaster ,BDGP6,79,Mar.2015,79,Mar.2015,dm6,Aug.2014,BDGP Release 6 + ISO1 MT
+Fugu,Takifugu rubripes,FUGU4.0,54,May.2009,54,May.2009,fr2,Oct.2004,JGI v4.0
+Fugu,Takifugu rubripes,FUGU4.0,54,May.2009,65,Dec.2011,fr3,Oct.2011,JGI v5.0
+Gibbon,Nomascus leucogenys,Nleu1.0,63,Jun.2011,63,Jun.2011,nomLeu2,Jun.2011,Gibbon Genome Sequencing Consortium Nleu1.1
+Gibbon,Nomascus leucogenys,Nleu1.0,63,Jun.2011,69,Oct.2012,nomLeu3,Oct.2012,Gibbon Genome Sequencing Consortium Nleu3.0
+Gorilla,Gorilla gorilla,gorGor1,54,May.2009,54,May.2009,NA,NA,NA
+Gorilla,Gorilla gorilla,gorGor2,58,May.2010,58,May.2010,NA,NA,NA
+Gorilla,Gorilla gorilla,gorGor3,59,Aug.2010,59,Aug.2010,NA,NA,NA
+Gorilla,Gorilla gorilla,gorGor3,59,Aug.2010,63,Jun.2011,gorGor3,May.2011,Wellcome Trust Sanger Institute gorGor3.1
+Gorilla,Gorilla gorilla,gorGor3.1,64,Sep.2011,64,Sep.2011,gorGor3,May.2011,Wellcome Trust Sanger Institute gorGor3.1
+Gorilla,Gorilla gorilla,gorGor3.1,64,Sep.2011,78,Dec.2014,gorGor4,Dec.2014,Wellcome Trust Sanger Institute gorGor4
+Guinea Pig,Cavia porcellus,cavPor3,54,May.2009,54,May.2009,cavPor3,Feb.2008,Broad Institute cavPor3
+Hedgehog,Erinaceus europaeus,eriEur1,54,May.2009,54,May.2009,eriEur1,Jun.2006,Broad Institute Draft_v1
+Hedgehog,Erinaceus europaeus,eriEur1,54,May.2009,67,May.2012,eriEur2,May.2012,Broad Institute EriEur2.0
+Horse,Equus caballus,EquCab2,54,May.2009,54,May.2009,equCab2,Sep.2007,Broad Institute EquCab2
+Human,Homo sapiens,NCBI36,54,May.2009,54,May.2009,hg19,Feb.2009,Genome Reference Consortium GRCh37
+Human,Homo sapiens,GRCh37,55,Jul.2009,55,Jul.2009,hg19,Feb.2009,Genome Reference Consortium GRCh37
+Human,Homo sapiens,GRCh37.p3,63,Jun.2011,63,Jun.2011,hg19,Feb.2009,Genome Reference Consortium GRCh37
+Human,Homo sapiens,GRCh37.p5,64,Sep.2011,64,Sep.2011,hg19,Feb.2009,Genome Reference Consortium GRCh37
+Human,Homo sapiens,GRCh37.p6,66,Feb.2012,66,Feb.2012,hg19,Feb.2009,Genome Reference Consortium GRCh37
+Human,Homo sapiens,GRCh37.p7,67,May.2012,67,May.2012,hg19,Feb.2009,Genome Reference Consortium GRCh37
+Human,Homo sapiens,GRCh37.p8,68,Jul.2012,68,Jul.2012,hg19,Feb.2009,Genome Reference Consortium GRCh37
+Human,Homo sapiens,GRCh37.p10,71,Apr.2013,71,Apr.2013,hg19,Feb.2009,Genome Reference Consortium GRCh37
+Human,Homo sapiens,GRCh37.p12,73,Sep.2013,73,Sep.2013,hg19,Feb.2009,Genome Reference Consortium GRCh37
+Human,Homo sapiens,GRCh37.p11,72,Jun.2013,72,Jun.2013,hg19,Feb.2009,Genome Reference Consortium GRCh37
+Human,Homo sapiens,GRCh37.p13,74,Dec.2013,74,Dec.2013,hg38,Dec.2013,Genome Reference Consortium GRCh38
+Human,Homo sapiens,GRCh38,76,Aug.2014,76,Aug.2014,hg38,Dec.2013,Genome Reference Consortium GRCh38
+Human,Homo sapiens,GRCh38.p2,79,Mar.2015,79,Mar.2015,hg38,Dec.2013,Genome Reference Consortium GRCh38
+Human,Homo sapiens,GRCh38.p3,81,Jul.2015,81,Jul.2015,hg38,Dec.2013,Genome Reference Consortium GRCh38
+Human,Homo sapiens,GRCh38.p5,83,Dec.2015,83,Dec.2015,hg38,Dec.2013,Genome Reference Consortium GRCh38
+Human,Homo sapiens,NA,85,Jul.2016,85,Jul.2016,hg38,Dec.2013,Genome Reference Consortium GRCh38
+Hyrax,Procavia capensis,proCap1,54,May.2009,54,May.2009,proCap1,Jul.2008,Baylor College of Medicine HGSC Procap1.0
+Kangaroo rat,Dipodomys ordii,dipOrd1,54,May.2009,54,May.2009,dipOrd1,Jul.2008,Baylor/Broad Institute DipOrd1.0
+Lamprey,Petromyzon marinus,Pmarinus_7.0,64,Sep.2011,64,Sep.2011,petMar2,Sep.2010,WUGSC 7.0
+Tenrec,Echinops telfairi,TENREC,54,May.2009,54,May.2009,echTel1,Jul.2005,Broad Institute echTel1
+Tenrec,Echinops telfairi,TENREC,54,May.2009,70,Jan.2013,echTel2,Nov.2012,Broad Institute EchTel2.0
+Macaque,Macaca mulatta,MMUL1.0,54,May.2009,54,May.2009,mMul1,NA,NA
+Marmoset,Callithrix jacchus,callJacc3,56,Sep.2009,56,Sep.2009,calJac3,Mar.2009,WUSTL Callithrix_jacchus-v3.2
+Marmoset,Callithrix jacchus,C_jacchus3.2.1,59,Aug.2010,59,Aug.2010,calJac3,Mar.2009,WUSTL Callithrix_jacchus-v3.2
+Medaka,Oryzias latipes,HdrR,54,May.2009,54,May.2009,oryLat2,Oct.2005,NIG v1.0
+Megabat,Pteropus vampyrus,pteVam1,54,May.2009,54,May.2009,pteVam1,Jul.2008,Broad Institute Pteval1.0
+Microbat,Myotis lucifugus,myoLuc1,54,May.2009,54,May.2009,NA,NA,NA
+Microbat,Myotis lucifugus,myoLuc1,54,May.2009,59,Aug.2010,myoLuc2,Jul.2010,Broad Institute MyoLuc2.0
+Microbat,Myotis lucifugus,Myoluc2.0,63,Jun.2011,63,Jun.2011,myoLuc2,Jul.2010,Broad Institute MyoLuc2.0
+Mouse,Mus musculus,NCBIm37,54,May.2009,54,May.2009,mm9,Jul.2007,NCBI Build 37
+Mouse,Mus musculus,NCBIm37,54,May.2009,65,Dec.2011,mm10,Dec.2011,Genome Reference Consortium GRCm38
+Mouse,Mus musculus,GRCm38,68,Jul.2012,68,Jul.2012,mm10,Dec.2011,Genome Reference Consortium GRCm38
+Mouse,Mus musculus,GRCm38.p1,70,Jan.2013,70,Jan.2013,mm10,Dec.2011,Genome Reference Consortium GRCm38
+Mouse,Mus musculus,GRCm38.p2,74,Dec.2013,74,Dec.2013,mm10,Dec.2011,Genome Reference Consortium GRCm38
+Mouse,Mus musculus,GRCm38.p3,78,Dec.2014,78,Dec.2014,mm10,Dec.2011,Genome Reference Consortium GRCm38
+Mouse,Mus musculus ,GRCm38.p4,81,Jul.2015,81,Jul.2015,mm10,Dec.2011,Genome Reference Consortium GRCm38
+Mouse lemur,Microcebus murinus,micMur1,54,May.2009,54,May.2009,micMur1,Jul.2007,Broad Institute MicMur1.0
+Mouse lemur,Microcebus murinus,micMur1,54,May.2009,80,May.2015,micMur2,May.2015,Baylor/Broad Institute Mmur_2.0
+Olive Baboon,Papio anubis,PapAnu2.0,76,Aug.2014,76,Aug.2014,papHam1,Nov.2008,Baylor College of Medicine HGSC Pham_1.0
+Opossum,Monodelphis domestica,monDom5,54,May.2009,54,May.2009,monDom5,Oct.2006,Broad Institute release MonDom5
+Orangutan,Pongo abelii,PPYG2,54,May.2009,54,May.2009,ponAbe2,Jul.2007,WUSTL Pongo_albelii-2.0.2
+Panda,Ailuropoda melanoleuca,ailMel1,60,Nov.2012,60,Nov.2012,ailMel1,Dec.2009,BGI-Shenzhen AilMel 1.0
+Pig,Sus scrofa,Sscrofa9,56,Sep.2009,56,Sep.2009,susScr2,Nov.2009,Swine Genome Sequencing Consortium Sscrofa9.2
+Pig,Sus scrofa,Sscrofa9,56,Sep.2009,64,Sep.2011,susScr3,Aug.2011,Swine Genome Sequencing Consortium Sscrofa10.2
+Pig,Sus scrofa,Sscrofa10.2,67,May.2012,67,May.2012,susScr3,Aug.2011,Swine Genome Sequencing Consortium Sscrofa10.2
+Pika,Ochotona princeps,OchPri2.0,54,May.2009,54,May.2009,ochPri2,Jul.2008,Broad Institute OchPri2
+Pika,Ochotona princeps,OchPri2.0,54,May.2009,67,May.2012,ochPri3,May.2012,Broad Institute OchPri3.0
+Platyfish,Xiphophorus maculatus,Xipmac4.4.2,69,Oct.2012,69,Oct.2012,NA,NA,NA
+Platypus,Ornithorhynchus anatinus,OANA5,54,May.2009,54,May.2009,ornAna2,Feb.2007,WUSTL v5.0.1
+Rabbit,Oryctolagus cuniculus,RABBIT,54,May.2009,54,May.2009,oryCun2,Apr.2009,Broad Institute release OryCun2
+Rabbit,Oryctolagus cuniculus,OryCun2.0,59,Aug.2010,59,Aug.2010,oryCun2,Apr.2009,Broad Institute release OryCun2
+Rat,Rattus norvegicus,RGSC3.4,54,May.2009,54,May.2009,rn4,Nov.2004,Baylor College of Medicine HGSC v3.4
+Rat,Rattus norvegicus,RGSC3.4,54,May.2009,67,May.2012,rn5,Mar.2012,RGSC Rnor_5.0
+Rat,Rattus norvegicus,Rnor_5.0,70,Jan.2013,70,Jan.2013,rn5,Mar.2012,RGSC Rnor_5.0
+Rat,Rattus norvegicus,Rnor_5.0,70,Jan.2013,76,Aug.2014,rn6,Jul.2014,RGSC Rnor_6.0
+Rat,Rattus norvegicus,Rnor_6.0,80,May.2015,80,May.2015,rn6,Jul.2014,RGSC Rnor_6.0
+Rat,Rattus norvegicus,NA,85,Jul.2016,85,Jul.2016,rn6,Jul.2014,RGSC Rnor_6.0
+Yeast,Saccharomyces cerevisiae,SGD1.01,54,May.2009,54,May.2009,sacCer2,Jun.2008,SGD June 2008 sequence
+Yeast,Saccharomyces cerevisiae,EF2,59,Aug.2010,59,Aug.2010,sacCer2,Jun.2008,SGD June 2008 sequence
+Yeast,Saccharomyces cerevisiae,EF2,59,Aug.2010,62,Apr.2011,sacCer3,Apr.2011,SGD June 2011 sequence
+Yeast,Saccharomyces cerevisiae,EF3,63,Jun.2011,63,Jun.2011,sacCer3,Apr.2011,SGD June 2011 sequence
+Yeast,Saccharomyces cerevisiae,EF4,65,Dec.2011,65,Dec.2011,sacCer3,Apr.2011,SGD June 2011 sequence
+Yeast,Saccharomyces cerevisiae,R64-1-1,75,Feb.2014,75,Feb.2014,sacCer3,Apr.2011,SGD June 2011 sequence
+Sheep,Ovis aries,Oar_v3.1,74,Dec.2013,74,Dec.2013,oviAri3,Aug.2012,ISGC Oar_v3.1
+Shrew,Sorex araneus,sorAra1,54,May.2009,54,May.2009,sorAra2,Aug.2008,Broad Institute SorAra2.0
+Sloth,Choloepus hoffmanni,choHof1,54,May.2009,54,May.2009,choHof1,Jul.2008,Broad Institute ChoHof1.0
+Spotted gar,Lepisosteus oculatus,LepOcu1,74,Dec.2013,74,Dec.2013,lepOcu1,NA,NA
+Squirrel,Ictidomys tridecemlineatus,speTri1,54,May.2009,54,May.2009,NA,NA,NA
+Squirrel,Ictidomys tridecemlineatus,speTri1,54,May.2009,65,Dec.2011,speTri2,Nov.2011,Broad Institute SpeTri2.0
+Squirrel,Ictidomys tridecemlineatus,spetri2,67,May.2012,67,May.2012,speTri2,Nov.2011,Broad Institute SpeTri2.0
+Stickleback,Gasterosteus aculeatus,BROADS1,54,May.2009,54,May.2009,gasAcu1,Feb.2006,Broad Institute Release 1.0
+Tarsier,Tarsius syrichta,tarSyr1,54,May.2009,54,May.2009,tarSyr1,Aug.2008,WUSTL/Broad Institute Tarsyr1.0
+Tarsier,Tarsius syrichta,tarSyr1,54,May.2009,73,Sep.2013,tarSyr2,Sep.2013,WashU Tarsius_syrichta-2.0.1
+Tasmanian Devil,Sarcophilus harrisii,Devil_refv7.0,64,Sep.2011,64,Sep.2011,sarHar1,Feb.2011,Wellcome Trust Sanger Institute Devil_refv7.0
+Tetraodon,Tetraodon nigroviridis,TETRAODON8.0,54,May.2009,54,May.2009,tetNig2,Mar.2007,Genoscope v7
+Tilapia,Oreochromis niloticus,Orenil1.0,67,May.2012,67,May.2012,oreNil2,Jan.2011,Broad Institute Release OreNil1.1
+Tree Shrew,Tupaia belangeri,tupBel1,54,May.2009,54,May.2009,tupBel1,Dec.2006,Broad Institute Tupbel1.0
+Turkey,Meleagris gallopavo,Turkey_2.01,57,Mar.2010,57,Mar.2010,melGal1,Dec.2009,Turkey Genome Consortium v2.01
+Turkey,Meleagris gallopavo,NA,59,Aug.2010,59,Aug.2010,melGal1,Dec.2009,Turkey Genome Consortium v2.01
+Turkey,Meleagris gallopavo,Turkey_2.01,61,Feb.2011,61,Feb.2011,melGal1,Dec.2009,Turkey Genome Consortium v2.01
+Vervet-AGM,Chlorocebus sabaeus,ChlSab1.1,77,Oct.2014,77,Oct.2014,chlSab1,NA,NA
+Wallaby,Macropus eugenii,Meug_1.0,55,Jul.2009,55,Jul.2009,macEug2,Sep.2009,Tammar Wallaby Genome Sequencing Consortium Meug_1.1
+Xenopus,Xenopus tropicalis,JGI4.1,54,May.2009,54,May.2009,xenTro3,Nov.2009,JGI v.4.2
+Xenopus,Xenopus tropicalis,JGI4.2,62,Apr.2011,62,Apr.2011,xenTro3,Nov.2009,JGI v.4.2
+Xenopus,Xenopus tropicalis,JGI4.2,62,Apr.2011,69,Oct.2012,xenTro7,Sep.2012,JGI v.7.0
+Zebra finch,Taeniopygia guttata,taeGut3.2.4,54,May.2009,54,May.2009,taeGut1,Jul.2008,WUSTL v3.2.4
+Zebra finch,Taeniopygia guttata,taeGut3.2.4,54,May.2009,71,Apr.2013,taeGut2,Feb.2013,WashU taeGut324
+Zebrafish,Danio rerio,Zv8,54,May.2009,54,May.2009,danRer6,Dec.2008,Sanger Institute Zv8
+Zebrafish,Danio rerio,Zv8,54,May.2009,59,Aug.2010,danRer7,Jul.2010,Sanger Institute Zv9
+Zebrafish,Danio rerio,Zv9,60,Nov.2010,60,Nov.2010,danRer7,Jul.2010,Sanger Institute Zv9
+Zebrafish,Danio rerio,Zv9,60,Nov.2010,77,Oct.2014,danRer10,Sep.2014,Genome Reference Consortium GRCz10
+Zebrafish,Danio rerio ,GRCz10,80,May.2015,80,May.2015,danRer10,Sep.2014,Genome Reference Consortium GRCz10

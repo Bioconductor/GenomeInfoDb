@@ -1,5 +1,5 @@
 import(methods)
-importFrom(utils, data, download.file, read.delim, read.table)
+importFrom(utils, data, download.file, read.delim, read.table, read.csv)
 importFrom(stats, setNames)
 importFrom(stats4, summary)
 
@@ -20,6 +20,11 @@ export(
     ## fetchExtendedChromInfoFromUCSC.R:
     fetchExtendedChromInfoFromUCSC,
 
+    ## mapGenomeBuilds.R
+    mapGenomeBuilds,
+    genomeBuilds,
+    listSpecies,
+    
     ## seqlevelsStyle.R:
     genomeStyles,
     extractSeqlevels,
