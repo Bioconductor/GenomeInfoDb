@@ -33,14 +33,11 @@ genomeBuilds <- function(species, style = c("UCSC", "Ensembl")) {
     else
         tbl <- tbl[, c("speciesShort", colkeep)]
     if (nrow(tbl) == 0L)
-        return(list())
+        return(data.frame())
 
+    tbl <- unique(na.omit(tbl))
     rownames(tbl) <- NULL
-    lst <- lapply(unique(tolower(tbl$speciesShort)),
-                  function(xx) unique(na.omit(tbl[tolower(tbl$speciesShort) ==
-                                                  xx, colkeep])))
-    names(lst) <- unique(tolower(tbl$speciesShort))
-    lst
+    tbl
 }
 
 mapGenomeBuilds <- function(genome, style = c("UCSC", "Ensembl") ){
@@ -68,13 +65,9 @@ mapGenomeBuilds <- function(genome, style = c("UCSC", "Ensembl") ){
     rowkeep <- ((tolower(tbl$ucscID) %in% genome) |
                 (tolower(tbl$ensemblID) %in% genome))
     if (sum(rowkeep) == 0)
-        return(list())
+        return(data.frame())
     tbl <- tbl[rowkeep, c("speciesShort", colkeep)]
 
     rownames(tbl) <- NULL
-    species = unique(tbl$speciesShort)
-    tbl = lapply(species,
-        function(xx) unique(tbl[tbl$speciesShort == xx,colkeep]))
-    names(tbl) = species
     tbl
 }

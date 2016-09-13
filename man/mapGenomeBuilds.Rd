@@ -47,7 +47,7 @@ listSpecies()
   default.
 }
 
-\value{A list of builds for a given species or genome in the specified
+\value{A data.frame of builds for a given species or genome in the specified
   \code{style}.  If \code{style == "UCSC"}, ucscID, ucscDate and
   ensemblID are given. If \code{style == "Ensembl"}, ensemblID,
   ensemblVersion, ensemblDate, and ucscID are given. The opposing ID is
@@ -67,8 +67,8 @@ listSpecies()
 
 listSpecies()
 
-genomeBuilds("Mouse")
-genomeBuilds(c("Mouse", "Dog", "Human"), style="Ensembl")
+genomeBuilds("mouse")
+genomeBuilds(c("Mouse", "dog", "human"), style="Ensembl")
 
 mapGenomeBuilds(c("canFam3", "GRCm38", "mm9"))
 mapGenomeBuilds(c("canFam3", "GRCm38", "mm9"), style="Ensembl")
