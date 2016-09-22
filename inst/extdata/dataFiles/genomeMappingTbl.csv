@@ -1,4 +1,4 @@
-speciesShort,speciesLong,ensemblID,origEnsemblVersion,origEnsemblDate,ensemblVersion,ensemblDate,ucscID,ucscDate,releaseName
+commonName,organism,ensemblID,origEnsemblVersion,origEnsemblDate,ensemblVersion,ensemblDate,ucscID,ucscDate,releaseName
 alpaca,vicugna pacos,vicPac1,54,May.2009,54,May.2009,vicPac1,Jul.2008,Broad Institute VicPac1.0
 alpaca,vicugna pacos,vicPac1,54,May.2009,71,Apr.2013,vicPac2,Mar.2013,Broad Institute Vicugna_pacos-2.0.1
 amazon molly,poecilia formosa,Poecilia_formosa-5.1.2,76,Aug.2014,76,Aug.2014,poeFor1,NA,NA

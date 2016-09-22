@@ -1,4 +1,4 @@
-test_listSpecies <- function(){
+test_listOrganisms <- function(){
 
     # check the file exists
     filename <- system.file(package="GenomeInfoDb",  "extdata",
@@ -7,14 +7,14 @@ test_listSpecies <- function(){
 
     # check format of file
     data <- read.csv(filename, header=TRUE, stringsAsFactors=FALSE)
-    checkIdentical(c("speciesShort", "speciesLong", "ensemblID",
+    checkIdentical(c("commonName", "organism", "ensemblID",
                      "origEnsemblVersion", "origEnsemblDate", "ensemblVersion",
                      "ensemblDate", "ucscID", "ucscDate", "releaseName"),
                    colnames(data))
 
-    # check helper function listSpecies
-    checkIdentical(class(listSpecies()), "character")
-    checkTrue(length(listSpecies()) > 0)
+    # check helper function listOrganisms
+    checkIdentical(class(listOrganisms()), "data.frame")
+    checkTrue(all(dim(listOrganisms()) != c(0,0)))
 
 }
 
@@ -29,37 +29,37 @@ test_genomeBuilds <- function(){
 
     # returns default style UCSC for mouse
     testBuild <- genomeBuilds("Mouse")
-    checkIdentical(unique(testBuild$speciesShort), "mouse")
+    checkIdentical(unique(testBuild$commonName), "mouse")
     tblid <- sort(unique(tolower(data$ucscID)[which(
-        tolower(data$speciesShort)=="mouse")]))
+        tolower(data$organism)==tolower("Mus musculus"))]))
     checkIdentical(tblid, sort(tolower(unique(testBuild$ucscID))))
 
     # test multiple spcies and specify ucsc
     testBuild <- genomeBuilds(c("Mouse", "Dog"), style="UCSC")
-    checkIdentical(unique(testBuild$speciesShort),c("dog","mouse"))
+    checkIdentical(unique(testBuild$commonName),c("dog","mouse"))
     tblid <- sort(unique(tolower(data$ucscID)[which(
-        tolower(data$speciesShort) =="mouse" |
-        tolower(data$speciesShort) =="dog")]))
+        tolower(data$organism) ==tolower("Mus musculus") |
+        tolower(data$commonName) =="dog")]))
     checkIdentical(tblid, sort(tolower(unique(testBuild$ucscID))))
 
     # test Ensembl style
     testBuild <- genomeBuilds(c("Mouse", "Dog"), style="Ensembl")
-    checkIdentical(unique(testBuild$speciesShort),c("dog","mouse"))
+    checkIdentical(unique(testBuild$commonName),c("dog","mouse"))
     tblid <- sort(unique(tolower(data$ensemblID)[which(
-        tolower(data$speciesShort) =="mouse" |
-        tolower(data$speciesShort) =="dog")]))
+        tolower(data$commonName) =="mouse" |
+        tolower(data$commonName) =="dog")]))
     checkIdentical(tblid, sort(tolower(unique(testBuild$ensemblID))))
 
     # test species not found
     testBuild <- genomeBuilds(c("Mouse", "NotHere"), style="Ensembl")
-    checkIdentical(unique(testBuild$speciesShort), "mouse")
+    checkIdentical(unique(testBuild$commonName), "mouse")
     warn <- tryCatch(genomeBuilds(c("Mouse", "NotHere"), style="Ensembl"),
                      warning=conditionMessage)
-    checkIdentical(warn, "'species' not found: nothere")
+    checkIdentical(warn, "'organism' not found: nothere")
     testBuild <- genomeBuilds("NotHere")
     checkTrue(all(dim(testBuild) == c(0L, 0L)))
     warn <- tryCatch(genomeBuilds("NotHere"), warning=conditionMessage)
-    checkIdentical(warn, "'species' not found: nothere")
+    checkIdentical(warn, "'organism' not found: nothere")
 
     # test style not found - ERROR
     checkException(genomeBuilds("Mouse", style="NotHere"))
@@ -75,14 +75,14 @@ test_mapGenomeBuilds <- function(){
 
     # returns default style UCSC
     testBuild <- mapGenomeBuilds("NCBIm37")
-    checkIdentical(unique(testBuild$speciesShort), "mouse")
+    checkIdentical(unique(testBuild$commonName), "mouse")
     idx = c(which(data$ensemblID == "NCBIm37"), which(data$ucscID == "NCBIm37"))
     checkIdentical(sort(unique(data$ucscID[idx])),
                    sort(unique(testBuild$ucscID)))
 
     # test multiple genome and specify ucsc
     testBuild <- mapGenomeBuilds(c("NCBIm37", "canFam3"), style="UCSC")
-    checkIdentical(unique(testBuild$speciesShort), c("dog", "mouse"))
+    checkIdentical(unique(testBuild$commonName), c("dog", "mouse"))
     buildVal <- sort(unique(testBuild$ucscID))
     idx = c(which(data$ensemblID == "NCBIm37"), which(data$ucscID == "NCBIm37"),
         which(data$ensemblID == "canFam3"), which(data$ucscID == "canFam3"))
@@ -90,7 +90,8 @@ test_mapGenomeBuilds <- function(){
 
     # test Ensembl style
     testBuild <- mapGenomeBuilds(c("NCBIm37", "canFam3"), style="Ensembl")
-    checkIdentical(unique(testBuild$speciesShort), c("dog", "mouse"))
+    checkIdentical(unique(testBuild$organism),
+                   c("Canis familiaris", "Mus musculus"))
     buildVal <- sort(unique(unique(testBuild$ensemblID)))
     idx = c(which(data$ensemblID == "NCBIm37"), which(data$ucscID == "NCBIm37"),
         which(data$ensemblID == "canFam3"), which(data$ucscID == "canFam3"))
@@ -98,7 +99,7 @@ test_mapGenomeBuilds <- function(){
 
     # test genome not found
     testBuild <- mapGenomeBuilds(c("canFam3", "NotHere"), style="Ensembl")
-    checkIdentical(unique(testBuild$speciesShort), "dog")
+    checkIdentical(unique(testBuild$commonName), "dog")
     warn <- tryCatch(mapGenomeBuilds(c("canFam3", "NotHere"), style="Ensembl"),
                      warning=conditionMessage)
     checkIdentical(warn, "'genome' not found: nothere")

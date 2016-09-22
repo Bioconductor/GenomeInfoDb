@@ -2,7 +2,7 @@
 
 \alias{mapGenomeBuilds}
 \alias{genomeBuilds}
-\alias{listSpecies}
+\alias{listOrganisms}
 
 \title{Mapping between UCSC and Ensembl Genome Builds}
 
@@ -13,15 +13,15 @@
 }
 
 \usage{
-genomeBuilds(species, style = c("UCSC", "Ensembl"))
+genomeBuilds(organism, style = c("UCSC", "Ensembl"))
 
 mapGenomeBuilds(genome, style = c("UCSC", "Ensembl"))
 
-listSpecies()
+listOrganisms()
 }
 
 \arguments{
-  \item{species}{A character vector of species' common names}
+  \item{organism}{A character vector of common names or organism}
   \item{genome}{A character vector of genomes equivalent to UCSC version
     or Ensembl Assemblies}
   \item{style}{A single value equivalent to "UCSC" or "Ensembl"
@@ -30,24 +30,25 @@ listSpecies()
 
 \details{
   \code{genomeBuilds} lists the currently available genomes for a given list of
-  species. The genomes can be shown as "UCSC" or "Ensembl" IDs determined
-  by \code{style}. \code{species} must be specified as a character
-  vector and match common names (i.e "Dog", "Mouse"). A list of
-  available species can be shown using \code{listSpecies()}.
+  organisms. The genomes can be shown as "UCSC" or "Ensembl" IDs determined
+  by \code{style}. \code{organism} must be specified as a character
+  vector and match common names (i.e "Dog", "Mouse") or organism name
+  (i.e "Homo sapiens", "Mus musculus") . A list of
+  available organisms can be shown using \code{listOrganisms()}.
 
   \code{mapGenomeBuilds} provides a mapping between "UCSC" builds and
   "Ensembl" builds. \code{genome} must be specified as a character
   vector and match either a "UCSC" ID or an "Ensembl"
   Id. \code{genomeBuilds} can be used to get a list of available build
-  Ids for a given species. NA's may be present in the output. This would
+  Ids for a given organism. NA's may be present in the output. This would
   occur when the current genome build removed a previously defined
-  genome for a species.
+  genome for an organism.
 
   In both functions, if \code{style} is not specified, "UCSC" is used as
   default.
 }
 
-\value{A data.frame of builds for a given species or genome in the specified
+\value{A data.frame of builds for a given organism or genome in the specified
   \code{style}.  If \code{style == "UCSC"}, ucscID, ucscDate and
   ensemblID are given. If \code{style == "Ensembl"}, ensemblID,
   ensemblVersion, ensemblDate, and ucscID are given. The opposing ID is
@@ -65,7 +66,7 @@ listSpecies()
 
 \examples{
 
-listSpecies()
+listOrganisms()
 
 genomeBuilds("mouse")
 genomeBuilds(c("Mouse", "dog", "human"), style="Ensembl")

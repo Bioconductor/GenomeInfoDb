@@ -23,7 +23,7 @@ export(
     ## mapGenomeBuilds.R
     mapGenomeBuilds,
     genomeBuilds,
-    listSpecies,
+    listOrganisms,
     
     ## seqlevelsStyle.R:
     genomeStyles,

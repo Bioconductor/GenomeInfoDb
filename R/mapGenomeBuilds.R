@@ -1,15 +1,19 @@
-listSpecies <- function(){
+listOrganisms <- function(){
 
     filename <- system.file(package="GenomeInfoDb",  "extdata",
                             "dataFiles", "genomeMappingTbl.csv")
     tbl <- read.csv(filename, header=TRUE, stringsAsFactors=FALSE)
-    sort(unique(tbl$speciesShort))
+    tbl_names <- unique(tbl[,1:2])
+    rownames(tbl_names) <- NULL
+    tbl_names[,2] = paste0(toupper(substring(tbl_names[,2], 1, 1)),
+                 substring(tbl_names[,2], 2, nchar(tbl_names[,2])))
+    tbl_names
 }
 
-genomeBuilds <- function(species, style = c("UCSC", "Ensembl")) {
+genomeBuilds <- function(organism, style = c("UCSC", "Ensembl")) {
 
-    if (!is.character(species))
-        stop("'species' must be a character vector")
+    if (!is.character(organism))
+        stop("'organism' must be a character vector")
     style <- match.arg(style)
 
     filename <- system.file(package="GenomeInfoDb",  "extdata",
@@ -21,22 +25,30 @@ genomeBuilds <- function(species, style = c("UCSC", "Ensembl")) {
                    Ensembl="ensemblID"
                )
 
-    fnd <- sapply(tolower(species), grep, tolower(tbl$speciesShort))
+    fnd1 <- sapply(tolower(organism), grep, tolower(tbl$commonName))
+    fnd2 <- sapply(tolower(organism), grep, tolower(tbl$organism))
+    fnd <- mapply(c, fnd1, fnd2)
     notFnd <- names(which(lengths(fnd) == 0))
     if (length(notFnd))
-        warning("'species' not found: ", paste(notFnd, collapse=", "),
+        warning("'organism' not found: ", paste(notFnd, collapse=", "),
                 call.=FALSE)
 
-    if (!missing(species))
-        tbl <- tbl[tolower(tbl$speciesShort) %in% tolower(species),
-                   c("speciesShort", colkeep)]
-    else
-        tbl <- tbl[, c("speciesShort", colkeep)]
+    if (!missing(organism)){
+        rowkeep <- apply(FUN=any, MARGIN=1, cbind(
+                         tolower(tbl$commonName) %in% tolower(organism),
+                         tolower(tbl$organism) %in% tolower(organism)
+                        ))             
+        tbl <- tbl[rowkeep,c("commonName", "organism", colkeep)]
+    }else
+        tbl <- tbl[,c("commonName", "organism", colkeep)]
+
     if (nrow(tbl) == 0L)
         return(data.frame())
 
     tbl <- unique(na.omit(tbl))
     rownames(tbl) <- NULL
+    tbl[,2] = paste0(toupper(substring(tbl[,2], 1, 1)),
+                 substring(tbl[,2], 2, nchar(tbl[,2])))
     tbl
 }
 
@@ -66,8 +78,10 @@ mapGenomeBuilds <- function(genome, style = c("UCSC", "Ensembl") ){
                 (tolower(tbl$ensemblID) %in% genome))
     if (sum(rowkeep) == 0)
         return(data.frame())
-    tbl <- tbl[rowkeep, c("speciesShort", colkeep)]
+    tbl <- tbl[rowkeep, c("commonName", "organism", colkeep)]
 
     rownames(tbl) <- NULL
+    tbl[,2] = paste0(toupper(substring(tbl[,2], 1, 1)),
+                 substring(tbl[,2], 2, nchar(tbl[,2])))
     tbl
 }
