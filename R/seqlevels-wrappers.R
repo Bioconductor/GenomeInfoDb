@@ -67,7 +67,7 @@ keepStandardChromosomes <- function(x, species=NULL)
 
     ## guess at style
     guess <- .guessSpeciesStyle(ori_seqlevels)
-    if (!is.na(guess))
+    if (!any(is.na(guess)))
         style <- unique(guess$style)
     else
         return(dropSeqlevels(x, seqlevels(x)))
