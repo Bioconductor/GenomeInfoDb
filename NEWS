@@ -1,30 +1,24 @@
-CHANGES IN VERSION 0.99.1
+CHANGES IN VERSION 1.10.0 
 ------------------------------
 
-SIGNIFICANT USER-VISIBLE CHANGES
-
-    o The Seqnames package will have functions which will be moved from 
-    AnnotationDbi , GenomicRanges
-
-   o List of 9 functions moved from AnnotationDbi
-     supportedSeqnameMappings, findSequenceRenamingMaps, 
-     supportedSeqnameStyles,  supportedSeqnames, 
-     extractSeqnameSet, testSeqnames, isSupportedSeqnamesStyle,
-     listAllSupportedStylesBySpecies, listAllSupportedSeqnameStyles.
-        
-   o makeSeqnameIds moved from GenomicRanges
-     
-   o keepStandardChromosomes moved from GenomicRanges 
-     
-   o rename:
-     keepStandardChromosomes -> keepChromosomes 
-
 NEW FEATURES
- 
-   o added new functions:
-     supportedOrganisms()  
-     supportedSeqnameMappingsWithGroup()  
-     extractSeqnameSetByGroup() 
+
+MODIFICATIONS
+
+BUG FIXES
+
+
+CHANGES IN VERSION 0.99.7
+----------------------------------
+
+MODIFICATIONS
+
+   o rename:
+     isSupportedSeqnames -> .isSupportedSeqnames
+     supportedSeqnameStyles -> .supportedSeqnameStyles
+     supportedSeqnameMappings -> .supportedSeqnameMappings
+     isSupportedSeqnamesStyle -> .isSupportedSeqnamesStyle
+
 
 CHANGES IN VERSION 0.99.6 
 ----------------------------------
@@ -38,7 +32,7 @@ NEW FEATURES
      seqnamesOrder() internally calls Herve's function makeSeqnameIds()
    o add seqnameStyles generic and method from GenomicRanges
 
-SIGNIFICANT USER-VISIBLE CHANGES
+MODIFICATIONS
 
    o rename:
      testSeqnames -> isSupportedSeqnames
@@ -52,26 +46,23 @@ DEPRECATED AND DEFUNCT
      listAllSupportedSeqnameStyles(), supportedOrganisms()
      supportedSeqnameMappingsWithGroup()
        
-DEPRECATED AND USED INTERNALLY(NOT EXPORTED)
-
    o deprecate supportedSeqnameMappings(), supportedSeqnameStyles(), 
      isSupportedSeqnamesStyle(),issupportedSeqnames()
 
-CHANGES IN VERSION 0.99.7
+
+CHANGES IN VERSION 0.99.17
 ----------------------------------
 
-SIGNIFICANT USER-VISIBLE CHANGES
+MODIFICATIONS
 
-   o rename:
-     isSupportedSeqnames -> .isSupportedSeqnames
-     supportedSeqnameStyles -> .supportedSeqnameStyles
-     supportedSeqnameMappings -> .supportedSeqnameMappings
-     isSupportedSeqnamesStyle -> .isSupportedSeqnamesStyle
+   o keepStandardChromosomes: Make 'species' argument optional and remove 
+     'style' argument.
+
 
 CHANGES IN VERSION 0.99.14
 ----------------------------------
 
-SIGNIFICANT USER-VISIBLE CHANGES
+MODIFICATIONS
 
    o rename:
      package: Seqnames --> GenomeInfoDb
@@ -88,10 +79,31 @@ SIGNIFICANT USER-VISIBLE CHANGES
      seqnamesStyle --> seqlevelsStyle
      "seqnameStyle<-" --> "seqlevelsStyle<-" 
 
-CHANGES IN VERSION 0.99.17
-----------------------------------
 
-SIGNIFICANT USER-VISIBLE CHANGES
+CHANGES IN VERSION 0.99.1
+------------------------------
 
-   o keepStandardChromosomes: Make 'species' argument optional and remove 
-     'style' argument.
+NEW FEATURES
+ 
+   o added new functions:
+     supportedOrganisms()  
+     supportedSeqnameMappingsWithGroup()  
+     extractSeqnameSetByGroup() 
+
+MODIFICATIONS
+
+    o The Seqnames package will have functions which will be moved from 
+    AnnotationDbi , GenomicRanges
+
+   o List of 9 functions moved from AnnotationDbi
+     supportedSeqnameMappings, findSequenceRenamingMaps, 
+     supportedSeqnameStyles,  supportedSeqnames, 
+     extractSeqnameSet, testSeqnames, isSupportedSeqnamesStyle,
+     listAllSupportedStylesBySpecies, listAllSupportedSeqnameStyles.
+        
+   o makeSeqnameIds moved from GenomicRanges
+     
+   o keepStandardChromosomes moved from GenomicRanges 
+     
+   o rename:
+     keepStandardChromosomes -> keepChromosomes 
