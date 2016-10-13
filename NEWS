@@ -3,9 +3,30 @@ CHANGES IN VERSION 1.10.0
 
 NEW FEATURES
 
+    o Add function mapGenomeBuilds() that maps between UCSC and Ensembl
+    builds. 
+
+    o Add function genomeBuilds() that list all the available UCSC or Ensembl
+    builds for a given organism[s] that can be used in mapGenomeBuilds() 
+
+    o Add listOrganism() that list all currently available organism[s] included
+    for use in genomeBuilds()
+
+DEPRECATED AND DEFUNCT
+
+    o After being deprecated, the species() method for GenomeDescription objects
+    is now defunct
+
 MODIFICATIONS
 
+    o Zebra finch is removed as option for
+    fetchExtendedChromInfoFromUCSC() as it is not support yet
+
+    o keepStandardChromosomes() chooses first style when multiple are matched
+
 BUG FIXES
+
+    o Fix WARNING occuring when determining style in keepStandardChromosomes() 
 
 
 CHANGES IN VERSION 0.99.7
