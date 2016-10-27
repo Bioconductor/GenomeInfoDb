@@ -28,7 +28,8 @@ cat,felis catus,Felis_catus_6.2,70,Jan.2013,78,Dec.2014,felCat8,Nov.2014,ICGSC F
 cave fish,astyanax mexicanus,AstMex102,74,Dec.2013,74,Dec.2013,astMex1,NA,NA
 chicken,gallus gallus,WASHUC2,54,May.2009,54,May.2009,galGal3,May.2006,WUSTL Gallus-gallus-2.1
 chicken,gallus gallus,WASHUC2,54,May.2009,65,Dec.2011,galGal4,Nov.2011,ICGC Gallus-gallus-4.0
-chicken,gallus gallus,Galgal4,71,Apr.2013,71,Apr.2013,galGal4,Nov.2011,ICGC Gallus-gallus-4.0
+chicken,gallus gallus,Galgal4,71,Apr.2013,85,Jul.2016,galGal4,Nov.2011,ICGC Gallus-gallus-4.0
+chicken,gallus gallus,Gallus_Gallus-5.0,86,Oct.2016,86,Oct.2016,galGal4,Nov.2011,ICGC Gallus-gallus-4.0
 chimpanzee,pan troglodytes,CHIMP2.1,54,May.2009,54,May.2009,panTro2,Mar.2006,CGSC Build 2.1
 chimpanzee,pan troglodytes,CHIMP2.1,54,May.2009,60,Nov.2010,panTro3,Oct.2010,CGSC Build 2.1.3
 chimpanzee,pan troglodytes,CHIMP2.1,54,May.2009,61,Feb.2011,panTro4,Feb.2011,CGSC Build 2.1.4
@@ -48,11 +49,9 @@ cow,bos taurus,UMD3.1,64,Sep.2011,76,Aug.2014,bosTau8,Jun.2014,University of Mar
 dog,canis familiaris,CanFam2.0,54,May.2009,54,May.2009,canFam2,May.2005,Broad Institute v2.0
 dog,canis familiaris,CanFam2.0,54,May.2009,64,Sep.2011,canFam3,Sep.2011,Broad Institute v3.1
 dog,canis familiaris,CanFam3.1,68,Jul.2012,68,Jul.2012,canFam3,Sep.2011,Broad Institute v3.1
-dog,canis familiaris,NA,85,Jul.2016,85,Jul.2016,canFam3,Sep.2011,Broad Institute v3.1
 dolphin,tursiops truncatus,turTru1,54,May.2009,64,Sept.2011,NA,NA,NA
 dolphin,tursiops truncatus,turTru1,54,May.2009,65,Dec.2011,turTru2,Oct.2011,Baylor College of Medicine Ttru_1.4
 ferret,mustela putorius furo,MusPutFur1.0,69,Oct.2012,69,Oct.2012,musFur,Apr.2011,Ferret Genome Sequencing Consortium MusPutFur1.0
-ferret,mustela putorius furo,NA,85,Jul.2016,85,Jul.2016,musFur,Apr.2011,Ferret Genome Sequencing Consortium MusPutFur1.0
 duck,anas platyrhynchos,BGI_duck_1.0,73,Sep.2013,73,Sep.2013,anaPlat1,NA,NA
 elephant,loxodonta africana,BROADE1,54,May.2009,54,May.2009,NA,NA,NA
 elephant,loxodonta africana,BROADE1,54,May.2009,55,Jul.2009,loxAfr3,Jul.2009,Broad Institute LoxAfr3
@@ -92,13 +91,14 @@ human,homo sapiens,GRCh38,76,Aug.2014,76,Aug.2014,hg38,Dec.2013,Genome Reference
 human,homo sapiens,GRCh38.p2,79,Mar.2015,79,Mar.2015,hg38,Dec.2013,Genome Reference Consortium GRCh38
 human,homo sapiens,GRCh38.p3,81,Jul.2015,81,Jul.2015,hg38,Dec.2013,Genome Reference Consortium GRCh38
 human,homo sapiens,GRCh38.p5,83,Dec.2015,83,Dec.2015,hg38,Dec.2013,Genome Reference Consortium GRCh38
-human,homo sapiens,NA,85,Jul.2016,85,Jul.2016,hg38,Dec.2013,Genome Reference Consortium GRCh38
+human,homo sapiens,GRCh38.p7,85,Jul.2016,85,Jul.2016,hg38,Dec.2013,Genome Reference Consortium GRCh38
 hyrax,procavia capensis,proCap1,54,May.2009,54,May.2009,proCap1,Jul.2008,Baylor College of Medicine HGSC Procap1.0
 kangaroo rat,dipodomys ordii,dipOrd1,54,May.2009,54,May.2009,dipOrd1,Jul.2008,Baylor/Broad Institute DipOrd1.0
 lamprey,petromyzon marinus,Pmarinus_7.0,64,Sep.2011,64,Sep.2011,petMar2,Sep.2010,WUGSC 7.0
 tenrec,echinops telfairi,TENREC,54,May.2009,54,May.2009,echTel1,Jul.2005,Broad Institute echTel1
 tenrec,echinops telfairi,TENREC,54,May.2009,70,Jan.2013,echTel2,Nov.2012,Broad Institute EchTel2.0
-macaque,macaca mulatta,MMUL1.0,54,May.2009,54,May.2009,mMul1,NA,NA
+macaque,macaca mulatta,MMUL1.0,54,May.2009,85,Jul.2016,mMul1,NA,NA
+macaque,macaca mulatta,Mmul_8.0.1,86,Oct.2016,86,Oct.2016,mMul1,NA,NA
 marmoset,callithrix jacchus,callJacc3,56,Sep.2009,56,Sep.2009,calJac3,Mar.2009,WUSTL Callithrix_jacchus-v3.2
 marmoset,callithrix jacchus,C_jacchus3.2.1,59,Aug.2010,59,Aug.2010,calJac3,Mar.2009,WUSTL Callithrix_jacchus-v3.2
 medaka,oryzias latipes,HdrR,54,May.2009,54,May.2009,oryLat2,Oct.2005,NIG v1.0
@@ -114,7 +114,8 @@ mouse,mus musculus,GRCm38.p2,74,Dec.2013,74,Dec.2013,mm10,Dec.2011,Genome Refere
 mouse,mus musculus,GRCm38.p3,78,Dec.2014,78,Dec.2014,mm10,Dec.2011,Genome Reference Consortium GRCm38
 mouse,mus musculus,GRCm38.p4,81,Jul.2015,81,Jul.2015,mm10,Dec.2011,Genome Reference Consortium GRCm38
 mouse lemur,microcebus murinus,micMur1,54,May.2009,54,May.2009,micMur1,Jul.2007,Broad Institute MicMur1.0
-mouse lemur,microcebus murinus,micMur1,54,May.2009,80,May.2015,micMur2,May.2015,Baylor/Broad Institute Mmur_2.0
+mouse lemur,microcebus murinus,micMur1,54,May.2009,85,Jul.2016,micMur2,May.2015,Baylor/Broad Institute Mmur_2.0
+mouse lemur,microcebus murinus,Mmur_2.0,86,Oct.2016,86,Oct.2016,micMur2,May.2015,Baylor/Broad Institute Mmur_2.0
 olive baboon,papio anubis,PapAnu2.0,76,Aug.2014,76,Aug.2014,papHam1,Nov.2008,Baylor College of Medicine HGSC Pham_1.0
 opossum,monodelphis domestica,monDom5,54,May.2009,54,May.2009,monDom5,Oct.2006,Broad Institute release MonDom5
 orangutan,pongo abelii,PPYG2,54,May.2009,54,May.2009,ponAbe2,Jul.2007,WUSTL Pongo_albelii-2.0.2
@@ -133,7 +134,6 @@ rat,rattus norvegicus,RGSC3.4,54,May.2009,67,May.2012,rn5,Mar.2012,RGSC Rnor_5.0
 rat,rattus norvegicus,Rnor_5.0,70,Jan.2013,70,Jan.2013,rn5,Mar.2012,RGSC Rnor_5.0
 rat,rattus norvegicus,Rnor_5.0,70,Jan.2013,76,Aug.2014,rn6,Jul.2014,RGSC Rnor_6.0
 rat,rattus norvegicus,Rnor_6.0,80,May.2015,80,May.2015,rn6,Jul.2014,RGSC Rnor_6.0
-rat,rattus norvegicus,NA,85,Jul.2016,85,Jul.2016,rn6,Jul.2014,RGSC Rnor_6.0
 yeast,saccharomyces cerevisiae,SGD1.01,54,May.2009,54,May.2009,sacCer2,Jun.2008,SGD June 2008 sequence
 yeast,saccharomyces cerevisiae,EF2,59,Aug.2010,59,Aug.2010,sacCer2,Jun.2008,SGD June 2008 sequence
 yeast,saccharomyces cerevisiae,EF2,59,Aug.2010,62,Apr.2011,sacCer3,Apr.2011,SGD June 2011 sequence
