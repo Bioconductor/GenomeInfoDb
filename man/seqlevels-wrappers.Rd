@@ -242,13 +242,18 @@ seqlevels(txdb)
 ## keepStandardChromosomes
 ## ---------------------------------------------------------------------
 
-## GRanges
+##
+## GRanges:
+##
 gr <- GRanges(c(paste0("chr",c(1:3)), "chr1_gl000191_random",
               "chr1_gl000192_random"), IRanges(1:5, width=3))
 gr
 keepStandardChromosomes(gr)
 
-## List-like objects
+##
+## List-like objects:
+##
+
 grl <- GRangesList(GRanges("chr1", IRanges(1:2, 5)),
                    GRanges(c("chr1_GL383519v1_alt", "chr1"), IRanges(5:6, 5)))
 ## List elements with mixed seqlevels are dropped by default:
@@ -256,7 +261,10 @@ keepStandardChromosomes(grl)
 ## To keep all list elements with ranges on standard chromosomes:
 grl[seqnames(grl) \%in\% standardChromosomes(grl)] 
 
+##
 ## Keep standard chromosomes of a particular style:
+##
+
 ## NCBI
 worm <- GRanges(c("I", "II", "foo", "X", "MT"), IRanges(1:5, width=5))
 keepStandardChromosomes(worm)
