@@ -59,23 +59,23 @@ restoreSeqlevels <- function(x)
     x
 }
 
-keepStandardChromosomes <- function(x, species=NULL)
+standardChromosomes <- function(x, species=NULL)
 {
     ori_seqlevels <- seqlevels(x)
     if(!length(ori_seqlevels))
-        return(x)
+        return(character())
 
     ## guess at style
     guess <- .guessSpeciesStyle(ori_seqlevels)
     if (!any(is.na(guess)))
         style <- unique(guess$style)
     else
-        return(dropSeqlevels(x, seqlevels(x)))
+        return(character())
     if (length(style) > 1)
         style <- style[1]
 
-    standard <- character(0)
-    if(missing(species)) {
+    standard <- character()
+    if (is.null(species)) {
         possible <- genomeStyles()
         ## extractSeqlevels will fail if no style-species match; 
         ## must check style match first
@@ -93,8 +93,14 @@ keepStandardChromosomes <- function(x, species=NULL)
         standard <- extractSeqlevels(species, style)
         standard <- intersect(ori_seqlevels,standard)
     }
-
-    seqlevels(x, force=TRUE) <- standard 
-    x 
+    standard 
 }
 
+keepStandardChromosomes <- function(x, species=NULL)
+{
+    standard <- standardChromosomes(x, species)
+    if (length(standard)) {
+        seqlevels(x, force=TRUE) <- standard 
+        x 
+    } else dropSeqlevels(x, seqlevels(x))
+}

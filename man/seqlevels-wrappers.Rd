@@ -7,6 +7,7 @@
 \alias{dropSeqlevels}
 \alias{renameSeqlevels}
 \alias{restoreSeqlevels}
+\alias{standardChromosomes}
 \alias{keepStandardChromosomes}
 
 \title{
@@ -22,6 +23,7 @@ keepSeqlevels(x, value)
 dropSeqlevels(x, value)
 renameSeqlevels(x, value)
 restoreSeqlevels(x)
+standardChromosomes(x, species=NULL)
 keepStandardChromosomes(x, species=NULL)
 }
 
@@ -69,6 +71,10 @@ keepStandardChromosomes(x, species=NULL)
            all others. If \code{value} does not match any seqlevels in \code{x}
            an empty object is returned.
 
+           When \code{x} is a GRangesList it is possible to have 'mixed'
+           list elements that have ranges from different chromosomes.
+           \code{keepSeqlevels} will not keep 'mixed' list elements 
+
     \item  \code{renameSeqlevels}: Rename the seqlevels in \code{x} to those in 
            \code{value}. If \code{value} is a named character vector, the names
            are used to map the new seqlevels to the old. When \code{value} is
@@ -79,13 +85,25 @@ keepStandardChromosomes(x, species=NULL)
            \code{seqlevels(txdb) <- seqlevels0(txdb)}, that is, restore the
            seqlevels in \code{x} back to the original values.
            Applicable only when \code{x} is a TxDb object.
+
+    \item  \code{standardChromosomes}: Lists the 'standard' chromosomes defined
+           as sequences in the assembly that are not scaffolds; also referred
+           to as an 'assembly molecule' in NCBI.  \code{standardChromosomes}
+           attempts to detect the seqlevel style and if more than one style is
+           matched, e.g., 'UCSC' and 'Ensembl', the first is chosen.
  
+           \code{x} must have a Seqinfo object.  \code{species} can be
+           specified as a character string; supported species are listed with
+           \code{names(genomeStyles())}.
+
+           When \code{x} contains seqlevels from multiple organisms all
+           those considered standard will be kept. For example, if 
+           seqlevels are "chr1" and "chr3R" from human and fly both will be
+           kept. If \code{species="Homo sapiens"} is specified then only 
+           "chr1" is kept.
+
     \item  \code{keepStandardChromosomes}: Subsetting operation that returns 
-           only the 'standard' Chromosomes. We define 'standard chromosomes' as
-           those which represent sequences in the assembly that are not
-           scaffolds. Also referred to as 'assembly molecule' on NCBI.  The
-           function attempts to detect the seqlevel style and if more than one
-           style is matched, e.g., 'UCSC' and 'Ensembl', the first is chosen.
+           only the 'standard' chromosomes.
  
            \code{x} must have a Seqinfo object.  \code{species} can be
            specified as a character string; supported species are listed with
@@ -114,7 +132,9 @@ keepStandardChromosomes(x, species=NULL)
 ## keepSeqlevels / dropSeqlevels 
 ## ---------------------------------------------------------------------
 
+##
 ## GRanges / GAlignments:
+##
 
 library(GenomicRanges)
 gr <- GRanges(c("chr1", "chr1", "chr2", "chr3"), IRanges(1:4, width=3))
@@ -133,14 +153,32 @@ gal <- readGAlignments(fl)
 seq2 <- keepSeqlevels(gal, c(foo="seq2"))
 seqlevels(seq2)
 
-## GRangesList / GAlignmentsList:
+##
+## List-like objects
+##
 
-grl <- split(gr, as.character(seqnames(gr)))
-dropSeqlevels(grl, c("chr1", "chr2"))
-galist <- split(gal, as.character(seqnames(gal)))
-keepSeqlevels(galist, "seq2")
+grl0 <- GRangesList(GRanges("chr1", IRanges(1:2, 5)),
+                    GRanges("chr5", IRanges(11, 18)),
+                    GRanges(c("chr4", "chr1"), IRanges(5:6, 5)))
+grl0
 
+grl1 <- grl0
+keepSeqlevels(grl1, "chr1")
+grl1  # grl0[[3]] was fully dropped!
+
+## To keep all ranges within each list element located on "chr2":
+grl2 <- grl0[seqnames(grl0) \%in\% "chr1"]
+grl2
+
+## The above subsetting doesn't drop any seqlevels:
+seqlevels(grl2)
+
+## To drop them:
+seqlevels(grl2) <- "chr1"
+
+##
 ## TxDb:
+##
 
 ## A TxDb cannot be directly subset with 'keepSeqlevels' 
 ## and 'dropSeqlevels'.
@@ -161,7 +199,9 @@ seqlevels(chr2L)
 ## renameSeqlevels 
 ## ---------------------------------------------------------------------
 
+##
 ## GAlignments:
+##
 
 seqlevels(gal)
 ## Rename 'seq2' to 'chr2' with a named vector.
@@ -174,7 +214,9 @@ gal2b <- renameSeqlevels(gal, c("seq1", "chr2"))
 gal3 <- renameSeqlevels(gal, c(foo="chr2"))
 identical(seqlevels(gal), seqlevels(gal3))
 
+##
 ## TxDb:
+##
 
 seqlevels(txdb)
 ## When the seqlevels of a TxDb are renamed, all future 
@@ -200,19 +242,23 @@ seqlevels(txdb)
 ## keepStandardChromosomes
 ## ---------------------------------------------------------------------
 
+## GRanges
 gr <- GRanges(c(paste0("chr",c(1:3)), "chr1_gl000191_random",
               "chr1_gl000192_random"), IRanges(1:5, width=3))
 gr
-
-## GRanges
 keepStandardChromosomes(gr)
 
-## GRangesList
-grl <- split(gr,seqnames(gr))
+## List-like objects
+grl <- GRangesList(GRanges("chr1", IRanges(1:2, 5)),
+                   GRanges(c("chr1_GL383519v1_alt", "chr1"), IRanges(5:6, 5)))
+## List elements with mixed seqlevels are dropped by default:
 keepStandardChromosomes(grl)
+## To keep all list elements with ranges on standard chromosomes:
+grl[seqnames(grl) \%in\% standardChromosomes(grl)] 
 
+## Keep standard chromosomes of a particular style:
 ## NCBI
-worm <- GRanges(c("I", "II", "wrong", "X", "MT"), IRanges(1:5, width=5))
+worm <- GRanges(c("I", "II", "foo", "X", "MT"), IRanges(1:5, width=5))
 keepStandardChromosomes(worm)
 
 ## UCSC

@@ -34,7 +34,7 @@ export(
 
     ## seqlevels-wrappers.R:
     keepSeqlevels, dropSeqlevels, renameSeqlevels, restoreSeqlevels,
-    keepStandardChromosomes,
+    standardChromosomes, keepStandardChromosomes,
 
     ## Seqinfo-class.R:
     Seqinfo,
