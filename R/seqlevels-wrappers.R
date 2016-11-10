@@ -10,8 +10,8 @@ keepSeqlevels <- function(x, value)
                 paste(sQuote(value[nomatch]), collapse=", "), "were ignored")
     if (is(x, "BSgenome"))
         stop("seqlevels cannot be dropped from a BSgenome object")
-    force <- is(x, "Seqinfo")
-    seqlevels(x, force=!force) <- value[!nomatch]
+    pruning.mode <- if (is(x, "Seqinfo")) "error" else "coarse"
+    seqlevels(x, pruning.mode=pruning.mode) <- value[!nomatch]
     x
 }
 
@@ -23,8 +23,9 @@ dropSeqlevels <- function(x, value)
                 paste(sQuote(value[nomatch]), collapse=", "), "were ignored")
     if (is(x, "BSgenome"))
         stop("seqlevels cannot be dropped from a BSgenome object")
-    force <- is(x, "Seqinfo")
-    seqlevels(x, force=!force) <- seqlevels(x)[!seqlevels(x) %in% value]
+    pruning.mode <- if (is(x, "Seqinfo")) "error" else "coarse"
+    seqlevels(x, pruning.mode=pruning.mode) <-
+        seqlevels(x)[!seqlevels(x) %in% value]
     x
 }
 
@@ -100,7 +101,7 @@ keepStandardChromosomes <- function(x, species=NULL)
 {
     standard <- standardChromosomes(x, species)
     if (length(standard)) {
-        seqlevels(x, force=TRUE) <- standard 
+        seqlevels(x, pruning.mode="coarse") <- standard 
         x 
     } else dropSeqlevels(x, seqlevels(x))
 }

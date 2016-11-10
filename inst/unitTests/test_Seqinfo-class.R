@@ -8,19 +8,19 @@ test_Seqinfo_seqlevels_subset <- function()
 {
     ## GRanges
     gr <- gr2
-    seqlevels(gr, force=TRUE) <- "chr2"
+    seqlevels(gr, pruning.mode="coarse") <- "chr2"
     checkIdentical("chr2", seqlevels(gr))
     checkIdentical(1L, length(gr))
     gr <- suppressWarnings(c(gr1, gr2, gr3))
 
     ## GRangesList
     grl <- GRangesList(gr1, gr2, gr3)
-    seqlevels(grl, force=TRUE) <- "chr1"
+    seqlevels(grl, pruning.mode="coarse") <- "chr1"
     checkIdentical("chr1", seqlevels(grl))
     checkIdentical(1L, length(grl))
 
     grl <- GRangesList(gr2)
-    seqlevels(grl, force=TRUE) <- "chr1"
+    seqlevels(grl, pruning.mode="coarse") <- "chr1"
     checkIdentical(0L, length(grl))
 }
 
@@ -53,7 +53,7 @@ test_Seqinfo_seqlevels_drop_add <- function()
 
     target <- GRangesList(GRanges("chr3", IRanges(1:3, 5),
     seqinfo=Seqinfo(c("chr2", "chr3"))))
-    seqlevels(grl, force=TRUE) <- new_seqlevels
+    seqlevels(grl, pruning.mode="coarse") <- new_seqlevels
     checkIdentical(target, grl)
 
     grl <- grl0 <- GRangesList(gr1, gr2, gr3)

@@ -38,13 +38,15 @@
 
 \usage{
 seqinfo(x)
-seqinfo(x, new2old=NULL, force=FALSE) <- value
+seqinfo(x, new2old=NULL, force=FALSE,
+        pruning.mode=c("error", "coarse", "fine", "tidy")) <- value
 
 seqnames(x)
 seqnames(x) <- value
 
 seqlevels(x)
-seqlevels(x, force=FALSE) <- value
+seqlevels(x, force=FALSE,
+          pruning.mode=c("error", "coarse", "fine", "tidy")) <- value
 sortSeqlevels(x, X.is.sexchrom=NA)
 seqlevelsInUse(x)
 seqlevels0(x)
@@ -77,7 +79,8 @@ genome(x) <- value
     Old sequence levels that are not represented in \code{new2old} will be
     dropped, but this will fail if those levels are in use (e.g. if \code{x}
     is a \link[GenomicRanges]{GRanges} object with ranges defined on those
-    sequence levels) unless \code{force=TRUE} is used (see below).
+    sequence levels) unless a pruning mode is specified via the
+    \code{pruning.mode} argument (see below).
 
     If \code{new2old=NULL}, then sequence levels can only be added to the
     existing ones, that is, \code{value} must have at least as many rows
@@ -86,21 +89,40 @@ genome(x) <- value
     identical to \code{seqlevels(x)}.
   }
   \item{force}{
-    Force dropping sequence levels currently in use. This is achieved by
-    dropping the elements in \code{x} where those levels are used (hence
-    typically reducing the length of \code{x}).
+    Deprecated in favor of the \code{pruning.mode} argument. See below.
+    Note that \code{force=TRUE} is equivalent to \code{pruning.mode="coarse"}.
+  }
+  \item{pruning.mode}{
+    When some of the seqlevels to drop from \code{x} are in use (i.e. have
+    ranges on them), the ranges on these sequences need to be removed before
+    the seqlevels can be dropped. The \code{pruning.mode} argument controls
+    how to \emph{prune} \code{x}, that is, how to remove the ranges in
+    \code{x} that are on these sequences. \code{pruning.mode} can be set to
+    \code{"error"}, \code{"coarse"}, \code{"fine"}, or \code{"tidy"}.
+    By default, it's set to \code{"error"}, in which case no pruning is done
+    and an error is raised. The other pruning modes do the following:
+    \itemize{
+        \item \code{"coarse"}: Remove the elements in \code{x} where the
+              seqlevels to drop are in use. Typically reduces the length of
+              \code{x}. Note that if \code{x} is a list-like object (e.g.
+              \link[GenomicRanges]{GRangesList},
+              \link[GenomicAlignments]{GAlignmentPairs}, or
+              \link[GenomicAlignments]{GAlignmentsList}), then any list
+              element in \code{x} where at least one of the sequence levels
+              to drop is in use is \emph{fully} dropped. In other words,
+              when \code{pruning.mode="coarse"} the \code{seqlevels} setter
+              will keep or drop \emph{full list elements} and not try to
+              change their content. This guarantees that the geometry of
+              the list elements is preserved, which is a desirable property
+              when they represent compound features (e.g. exons grouped by
+              transcript or paired-end reads).
+        \item \code{"fine"}: Not supported yet. Coming soon. Will only be
+              supported for list-like objects.
+        \item \code{"tidy"}: Not supported yet. Coming soon.
+    }
 
-    Note that if \code{x} is a list-like object (e.g.
-    \link[GenomicRanges]{GRangesList},
-    \link[GenomicAlignments]{GAlignmentPairs}, or
-    \link[GenomicAlignments]{GAlignmentsList}), then any list element in
-    \code{x} where at least one of the sequence levels to drop is used is
-    \emph{fully} dropped. In other words, the \code{seqlevels} setter always
-    keeps or drops \emph{full list elements} and never tries to change their
-    content. This guarantees that the geometry of the list elements is
-    preserved, which is a desirable property when they represent compound
-    features (e.g. exons grouped by transcript or paired-end reads).
-    See below for an example.
+    See the "B. DROP SEQLEVELS OF A LIST-LIKE OBJECT" section in the examples
+    below for an illustration of how to use \code{pruning.mode}.
   }
   \item{value}{
     Typically a \link{Seqinfo} object for the \code{seqinfo} setter.
@@ -250,7 +272,7 @@ seqlevels(gr)
 seqlevels(gr) <- seqlevelsInUse(gr)
 
 ## Drop some seqlevels in use:
-seqlevels(gr, force=TRUE) <- setdiff(seqlevels(gr), "chr3")
+seqlevels(gr, pruning.mode="coarse") <- setdiff(seqlevels(gr), "chr3")
 gr
 
 ## Rename/Add/Reorder:
@@ -262,24 +284,24 @@ seqlevels(gr)
 ## ---------------------------------------------------------------------
 
 grl0 <- GRangesList(GRanges("chr2", IRanges(3:2, 5)),
-                    GRanges("chr5", IRanges(11, 18)),
-                    GRanges(c("chr4", "chr2"), IRanges(7:6, 15)))
+                    GRanges(c("chr2", "chrMT"), IRanges(7:6, 15)),
+                    GRanges(c("chrY", "chrMT"), IRanges(17:16, 25)))
 grl0
 
 grl1 <- grl0
-seqlevels(grl1, force=TRUE) <- c("chr2", "chr5")
-grl1  # grl0[[3]] was fully dropped!
+seqlevels(grl1, pruning.mode="coarse") <- c("chr2", "chr5")
+grl1  # grl0[[2]] was fully dropped! (even if it had a range on chr2)
 
-## If what is desired is to drop the first range in grl0[[3]] only, or,
+## If what is desired is to drop the 2nd range in grl0[[2]] only, or,
 ## more generally speaking, to drop the ranges within each list element
-## that are located on one of the seqlevels to drop, then do:
+## that are located on the seqlevels to drop, then do:
 grl2 <- grl0[seqnames(grl0) \%in\% c("chr2", "chr5")]
 grl2
 
 ## Note that the above subsetting doesn't drop any seqlevel:
 seqlevels(grl2)
 
-## To drop them (no need to use 'force=TRUE' anymore):
+## To drop them (no need to use pruning.mode="coarse" anymore):
 seqlevels(grl2) <- c("chr2", "chr5")
 seqlevels(grl2)
 
@@ -311,11 +333,11 @@ tx <- transcripts(txdb)
 seqlevels(tx)
 
 ## Drop 'M', keep all others.
-seqlevels(tx, force=TRUE) <- seqlevels(tx)[seqlevels(tx) != "M"]
+seqlevels(tx, pruning.mode="coarse") <- seqlevels(tx)[seqlevels(tx) != "M"]
 seqlevels(tx)
 
 ## Drop all except 'ch3L' and 'ch3R'.
-seqlevels(tx, force=TRUE) <- c("ch3L", "ch3R")
+seqlevels(tx, pruning.mode="coarse") <- c("ch3L", "ch3R")
 seqlevels(tx)
 
 ## ---------------------------------------------------------------------
