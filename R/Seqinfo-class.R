@@ -385,7 +385,7 @@ setReplaceMethod("seqlevels", "Seqinfo",
             warning("'force' is ignored in \"seqlevels<-\" method ",
                     "for Seqinfo objects")
         pruning.mode <- match.arg(pruning.mode)
-        if (!identical(pruning.mode, "error"))
+        if (pruning.mode != "error")
             warning("'pruning.mode' is ignored in \"seqlevels<-\" method ",
                     "for Seqinfo objects")
         new2old <- getSeqlevelsReplacementMode(value, seqlevels(x))

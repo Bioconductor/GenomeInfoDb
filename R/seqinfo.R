@@ -44,10 +44,9 @@ getDanglingSeqlevels <- function(x, new2old=NULL, force=FALSE,
                       "but not both"))
         pruning.mode <- "coarse"
     }
-    if (!(pruning.mode %in% c("error", "coarse")))
-        stop("'pruning.mode=\"", pruning.mode, "\"' not supported yet")
     if (!is.character(new_seqlevels) || any(is.na(new_seqlevels)))
-        stop("the supplied 'seqlevels' must be a character vector with no NAs")
+        stop(wmsg("the supplied 'seqlevels' must be a character vector ",
+                  "with no NAs"))
     if (is.null(new2old))
         return(character(0))
     new_N <- length(new_seqlevels)
@@ -57,7 +56,7 @@ getDanglingSeqlevels <- function(x, new2old=NULL, force=FALSE,
     seqlevels_to_drop <- old_seqlevels[is.na(old2new)]
     seqlevels_in_use <- seqlevelsInUse(x)
     dangling_seqlevels <- intersect(seqlevels_to_drop, seqlevels_in_use)
-    if (pruning.mode == "error" && length(dangling_seqlevels) != 0L)
+    if (length(dangling_seqlevels) != 0L && pruning.mode == "error")
         stop(wmsg("The following seqlevels to drop are currently in use: ",
                   paste(dangling_seqlevels, collapse = ", "), ".\n",
                   "Please use the 'pruning.mode' argument to control how ",

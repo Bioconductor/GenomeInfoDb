@@ -97,9 +97,9 @@ genome(x) <- value
     ranges on them), the ranges on these sequences need to be removed before
     the seqlevels can be dropped. The \code{pruning.mode} argument controls
     how to \emph{prune} \code{x}, that is, how to remove the ranges in
-    \code{x} that are on these sequences. \code{pruning.mode} can be set to
-    \code{"error"}, \code{"coarse"}, \code{"fine"}, or \code{"tidy"}.
-    By default, it's set to \code{"error"}, in which case no pruning is done
+    \code{x} that are on these sequences. Four pruning modes are defined:
+    \code{"error"}, \code{"coarse"}, \code{"fine"}, and \code{"tidy"}.
+    \code{"error"} is the default. In this mode, no pruning is done
     and an error is raised. The other pruning modes do the following:
     \itemize{
         \item \code{"coarse"}: Remove the elements in \code{x} where the
@@ -109,20 +109,39 @@ genome(x) <- value
               \link[GenomicAlignments]{GAlignmentPairs}, or
               \link[GenomicAlignments]{GAlignmentsList}), then any list
               element in \code{x} where at least one of the sequence levels
-              to drop is in use is \emph{fully} dropped. In other words,
-              when \code{pruning.mode="coarse"} the \code{seqlevels} setter
-              will keep or drop \emph{full list elements} and not try to
-              change their content. This guarantees that the geometry of
-              the list elements is preserved, which is a desirable property
-              when they represent compound features (e.g. exons grouped by
-              transcript or paired-end reads).
-        \item \code{"fine"}: Not supported yet. Coming soon. Will only be
-              supported for list-like objects.
-        \item \code{"tidy"}: Not supported yet. Coming soon.
-    }
+              to drop is in use is \emph{fully} removed. In other words,
+              when \code{pruning.mode="coarse"}, the \code{seqlevels} setter
+              will keep or remove \emph{full list elements} and not try to
+              change their content. This guarantees that the exact ranges
+              (and their order) inside the individual list elements are
+              preserved. This can be a desirable property when the list
+              elements represent compound features like exons grouped by
+              transcript (stored in a \link[GenomicRanges]{GRangesList}
+              object as returned by
+              \code{\link[GenomicFeatures]{exonsBy}( , by="tx")}),
+              or paired-end or fusion reads, etc...
 
+        \item \code{"fine"}: Supported on list-like objects only. Removes
+              the ranges that are on the sequences to drop. This removal is
+              done within each list element of the original object \code{x}
+              and doesn't affect its length or the order of its list elements.
+              In other words, the pruned object is guaranteed to be
+              \emph{parallel} to the original object.
+
+        \item \code{"tidy"}: Like the \code{"fine"} pruning above but also
+              removes the list elements that become empty as the result of
+              the pruning. Note that this pruning mode is particularly well
+              suited on a \link[GenomicRanges]{GRangesList} object that
+              contains transcripts grouped by genes, as returned by
+              \code{\link[GenomicFeatures]{transcriptsBy}( , by="gene")}.
+              Finally note that, as a convenience, this pruning mode is
+              supported on non list-like objects (e.g.
+              \link[GenomicRanges]{GRanges} or
+              \link[GenomicAlignments]{GAlignments} objects) and, in this
+              case, is equivalent to the \code{"coarse"} mode.
+    }
     See the "B. DROP SEQLEVELS OF A LIST-LIKE OBJECT" section in the examples
-    below for an illustration of how to use \code{pruning.mode}.
+    below for an extensive illustration of these pruning modes.
   }
   \item{value}{
     Typically a \link{Seqinfo} object for the \code{seqinfo} setter.
@@ -283,27 +302,28 @@ seqlevels(gr)
 ## B. DROP SEQLEVELS OF A LIST-LIKE OBJECT
 ## ---------------------------------------------------------------------
 
-grl0 <- GRangesList(GRanges("chr2", IRanges(3:2, 5)),
-                    GRanges(c("chr2", "chrMT"), IRanges(7:6, 15)),
-                    GRanges(c("chrY", "chrMT"), IRanges(17:16, 25)))
+grl0 <- GRangesList(A=GRanges("chr2", IRanges(3:2, 5)),
+                    B=GRanges(c("chr2", "chrMT"), IRanges(7:6, 15)),
+                    C=GRanges(c("chrY", "chrMT"), IRanges(17:16, 25)),
+                    D=GRanges())
 grl0
 
 grl1 <- grl0
 seqlevels(grl1, pruning.mode="coarse") <- c("chr2", "chr5")
-grl1  # grl0[[2]] was fully dropped! (even if it had a range on chr2)
+grl1  # grl0[[2]] was fully removed! (even if it had a range on chr2)
 
-## If what is desired is to drop the 2nd range in grl0[[2]] only, or,
-## more generally speaking, to drop the ranges within each list element
-## that are located on the seqlevels to drop, then do:
-grl2 <- grl0[seqnames(grl0) \%in\% c("chr2", "chr5")]
-grl2
+## If what is desired is to remove the 2nd range in grl0[[2]] only (i.e.
+## the chrMT:6-15 range), or, more generally speaking, to remove the
+## ranges within each list element that are located on the seqlevels to
+## drop, then use pruning.mode="fine" or pruning.mode="tidy":
+grl2 <- grl0
+seqlevels(grl2, pruning.mode="fine") <- c("chr2", "chr5")
+grl2  # grl0[[2]] not removed, but chrMT:6-15 range removed from it
 
-## Note that the above subsetting doesn't drop any seqlevel:
-seqlevels(grl2)
-
-## To drop them (no need to use pruning.mode="coarse" anymore):
-seqlevels(grl2) <- c("chr2", "chr5")
-seqlevels(grl2)
+## Like pruning.mode="fine" but also removes grl0[[3]].
+grl3 <- grl0
+seqlevels(grl3, pruning.mode="tidy") <- c("chr2", "chr5")
+grl3
 
 ## ---------------------------------------------------------------------
 ## C. SORT SEQLEVELS IN "NATURAL" ORDER
