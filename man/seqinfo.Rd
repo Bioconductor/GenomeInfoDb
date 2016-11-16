@@ -95,12 +95,12 @@ genome(x) <- value
   \item{pruning.mode}{
     When some of the seqlevels to drop from \code{x} are in use (i.e. have
     ranges on them), the ranges on these sequences need to be removed before
-    the seqlevels can be dropped. The \code{pruning.mode} argument controls
-    how to \emph{prune} \code{x}, that is, how to remove the ranges in
-    \code{x} that are on these sequences. Four pruning modes are defined:
-    \code{"error"}, \code{"coarse"}, \code{"fine"}, and \code{"tidy"}.
-    \code{"error"} is the default. In this mode, no pruning is done
-    and an error is raised. The other pruning modes do the following:
+    the seqlevels can be dropped. We call this \emph{pruning}. The
+    \code{pruning.mode} argument controls how to \emph{prune} \code{x}.
+    Four pruning modes are currently defined: \code{"error"}, \code{"coarse"},
+    \code{"fine"}, and \code{"tidy"}. \code{"error"} is the default. In this
+    mode, no pruning is done and an error is raised. The other pruning modes
+    do the following:
     \itemize{
         \item \code{"coarse"}: Remove the elements in \code{x} where the
               seqlevels to drop are in use. Typically reduces the length of
@@ -132,7 +132,7 @@ genome(x) <- value
               removes the list elements that become empty as the result of
               the pruning. Note that this pruning mode is particularly well
               suited on a \link[GenomicRanges]{GRangesList} object that
-              contains transcripts grouped by genes, as returned by
+              contains transcripts grouped by gene, as returned by
               \code{\link[GenomicFeatures]{transcriptsBy}( , by="gene")}.
               Finally note that, as a convenience, this pruning mode is
               supported on non list-like objects (e.g.
@@ -140,7 +140,7 @@ genome(x) <- value
               \link[GenomicAlignments]{GAlignments} objects) and, in this
               case, is equivalent to the \code{"coarse"} mode.
     }
-    See the "B. DROP SEQLEVELS OF A LIST-LIKE OBJECT" section in the examples
+    See the "B. DROP SEQLEVELS FROM A LIST-LIKE OBJECT" section in the examples
     below for an extensive illustration of these pruning modes.
   }
   \item{value}{
@@ -252,38 +252,29 @@ genome(x) <- value
 }
 
 \examples{
+## Finding overlaps, comparing, and matching operations between objects
+## containing genomic ranges require the objects to have the same
+## seqlevels, or they fail. So before one can perform these operations,
+## it is often necessary to modify the seqlevels in some of the objects
+## involved in the operation so that all the objects have the same
+## seqlevels. This is typically done with the seqlevels() setter. It can
+## rename, drop, add and reorder seqlevels of an object. Examples below
+## show how to mofify the seqlevels of GRanges, GRangesList, and TxDb
+## objects but the approach is the same for any object that has seqlevels.
+
 ## ---------------------------------------------------------------------
-## A. MODIFY THE SEQLEVELS OF AN OBJECT
+## A. MODIFY THE SEQLEVELS OF A GRanges OBJECT
 ## ---------------------------------------------------------------------
-## Overlap and matching operations between objects require matching
-## seqlevels. Often the seqlevels in one must be modified to match 
-## the other. The seqlevels() function can rename, drop, add and reorder 
-## seqlevels of an object. Examples below are shown on TxDb 
-## and GRanges but the approach is the same for all objects that have
-## a 'Seqinfo' class.
-
-library(TxDb.Dmelanogaster.UCSC.dm3.ensGene)
-txdb <- TxDb.Dmelanogaster.UCSC.dm3.ensGene
-seqlevels(txdb)
-
-## Rename:
-seqlevels(txdb) <- sub("chr", "", seqlevels(txdb))
-seqlevels(txdb)
-
-seqlevels(txdb) <- paste0("CH", seqlevels(txdb))
-seqlevels(txdb)
-
-seqlevels(txdb)[seqlevels(txdb) == "CHM"] <- "M"
-seqlevels(txdb)
+library(GenomicRanges)
 
 gr <- GRanges(rep(c("chr2", "chr3", "chrM"), 2), IRanges(1:6, 10))
 
-## Add:
+## Add new seqlevels:
 seqlevels(gr) <- c("chr1", seqlevels(gr), "chr4")
 seqlevels(gr)
 seqlevelsInUse(gr)
 
-## Reorder:
+## Reorder existing seqlevels:
 seqlevels(gr) <- rev(seqlevels(gr))
 seqlevels(gr)
 
@@ -294,12 +285,12 @@ seqlevels(gr) <- seqlevelsInUse(gr)
 seqlevels(gr, pruning.mode="coarse") <- setdiff(seqlevels(gr), "chr3")
 gr
 
-## Rename/Add/Reorder:
+## Rename, add, and reorder the seqlevels all at once:
 seqlevels(gr) <- c("chr1", chr2="chr2", chrM="Mitochondrion")
 seqlevels(gr)
 
 ## ---------------------------------------------------------------------
-## B. DROP SEQLEVELS OF A LIST-LIKE OBJECT
+## B. DROP SEQLEVELS FROM A LIST-LIKE OBJECT
 ## ---------------------------------------------------------------------
 
 grl0 <- GRangesList(A=GRanges("chr2", IRanges(3:2, 5)),
@@ -325,8 +316,44 @@ grl3 <- grl0
 seqlevels(grl3, pruning.mode="tidy") <- c("chr2", "chr5")
 grl3
 
+library(TxDb.Dmelanogaster.UCSC.dm3.ensGene)
+txdb <- TxDb.Dmelanogaster.UCSC.dm3.ensGene
+## Pruning mode "coarse" is particularly well suited on a GRangesList
+## object that contains exons grouped by transcript:
+ex_by_tx <- exonsBy(txdb, by="tx")
+seqlevels(ex_by_tx)
+seqlevels(ex_by_tx, pruning.mode="coarse") <- "chr2L"
+seqlevels(ex_by_tx)
+## Pruning mode "tidy" is particularly well suited on a GRangesList
+## object that contains transcripts grouped by gene:
+tx_by_gene <- transcriptsBy(txdb, by="gene")
+seqlevels(tx_by_gene)
+seqlevels(tx_by_gene, pruning.mode="tidy") <- "chr2L"
+seqlevels(tx_by_gene)
+
 ## ---------------------------------------------------------------------
-## C. SORT SEQLEVELS IN "NATURAL" ORDER
+## C. RENAME THE SEQLEVELS OF A TxDb OBJECT
+## ---------------------------------------------------------------------
+
+library(TxDb.Dmelanogaster.UCSC.dm3.ensGene)
+txdb <- TxDb.Dmelanogaster.UCSC.dm3.ensGene
+seqlevels(txdb)
+
+seqlevels(txdb) <- sub("chr", "", seqlevels(txdb))
+seqlevels(txdb)
+
+seqlevels(txdb) <- paste0("CH", seqlevels(txdb))
+seqlevels(txdb)
+
+seqlevels(txdb)[seqlevels(txdb) == "CHM"] <- "M"
+seqlevels(txdb)
+
+## Restore original seqlevels:
+seqlevels(txdb) <- seqlevels0(txdb)
+seqlevels(txdb)
+
+## ---------------------------------------------------------------------
+## D. SORT SEQLEVELS IN "NATURAL" ORDER
 ## ---------------------------------------------------------------------
 
 sortSeqlevels(c("11", "Y", "1", "10", "9", "M", "2"))
@@ -346,7 +373,7 @@ seqlevels(gr) <- seqlevels
 sortSeqlevels(gr)
 
 ## ---------------------------------------------------------------------
-## D. SUBSET OBJECTS BY SEQLEVELS
+## E. SUBSET OBJECTS BY SEQLEVELS
 ## ---------------------------------------------------------------------
 
 tx <- transcripts(txdb)
@@ -359,16 +386,6 @@ seqlevels(tx)
 ## Drop all except 'ch3L' and 'ch3R'.
 seqlevels(tx, pruning.mode="coarse") <- c("ch3L", "ch3R")
 seqlevels(tx)
-
-## ---------------------------------------------------------------------
-## E. RESTORE ORIGINAL SEQLEVELS OF A TxDb OBJECT
-## ---------------------------------------------------------------------
-
-## Applicable to TxDb objects only.
-\dontrun{
-seqlevels(txdb) <- seqlevels0(txdb)
-seqlevels(txdb)
-}
 
 ## ---------------------------------------------------------------------
 ## F. FINDING METHODS

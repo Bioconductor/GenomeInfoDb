@@ -35,7 +35,7 @@ getDanglingSeqlevels <- function(x, new2old=NULL, force=FALSE,
         msg <- wmsg("In BioC 3.5, the 'force' argument was replaced by ",
                     "the more flexible 'pruning.mode' argument, and is ",
                     "deprecated. ",
-                    "See documentation for the supported pruning modes. ",
+                    "See ?seqinfo for the supported pruning modes. ",
                     "Note that 'force=TRUE' is equivalent to ",
                     "'pruning.mode=\"coarse\"'.")
         .Deprecated(msg=msg)
@@ -57,14 +57,18 @@ getDanglingSeqlevels <- function(x, new2old=NULL, force=FALSE,
     seqlevels_in_use <- seqlevelsInUse(x)
     dangling_seqlevels <- intersect(seqlevels_to_drop, seqlevels_in_use)
     if (length(dangling_seqlevels) != 0L && pruning.mode == "error")
-        stop(wmsg("The following seqlevels to drop are currently in use: ",
+        stop(wmsg("The following seqlevels are to be dropped but are ",
+                  "currently in use (i.e. have ranges on them): ",
                   paste(dangling_seqlevels, collapse = ", "), ".\n",
                   "Please use the 'pruning.mode' argument to control how ",
                   "to prune 'x', that is, how to remove the ranges in 'x' ",
                   "that are on these sequences. For example, do something ",
                   "like:\n\n",
                   "seqlevels(x, pruning.mode=\"coarse\") <- new_seqlevels\n\n",
-                  "See documentation for other supported pruning modes."))
+                  "or\n\n",
+                  "keepSeqlevels(x, new_seqlevels, ",
+                                "pruning.mode=\"coarse\")\n\n",
+                  "See ?seqinfo for a description of the pruning modes."))
     dangling_seqlevels
 }
 

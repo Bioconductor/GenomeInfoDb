@@ -2,30 +2,31 @@
 ### Convenience wrappers to the seqlevels() getter and setter
 ### -------------------------------------------------------------------------
 
-keepSeqlevels <- function(x, value)
+keepSeqlevels <- function(x, value,
+                          pruning.mode=c("error", "coarse", "fine", "tidy"))
 {
-    value <- unname(value)
-    if (any(nomatch <- !value %in% seqlevels(x)))
-        warning("invalid seqlevels", 
-                paste(sQuote(value[nomatch]), collapse=", "), "were ignored")
     if (is(x, "BSgenome"))
         stop("seqlevels cannot be dropped from a BSgenome object")
-    pruning.mode <- if (is(x, "Seqinfo")) "error" else "coarse"
-    seqlevels(x, pruning.mode=pruning.mode) <- value[!nomatch]
+    if (!is.null(names(value)))
+        warning("the names on the vector of supplied seqlevels were ignored")
+    value <- as.character(value)
+    is_invalid <- !(value %in% seqlevels(x))
+    if (any(is_invalid))
+        stop(wmsg("invalid seqlevels: ",
+                  paste(unique(value[is_invalid]), collapse=", ")))
+    seqlevels(x, pruning.mode=pruning.mode) <- value
     x
 }
 
-dropSeqlevels <- function(x, value)
+dropSeqlevels <- function(x, value,
+                          pruning.mode=c("error", "coarse", "fine", "tidy"))
 {
-    value <- unname(value)
-    if (any(nomatch <- !value %in% seqlevels(x)))
-        warning("invalid seqlevels", 
-                paste(sQuote(value[nomatch]), collapse=", "), "were ignored")
     if (is(x, "BSgenome"))
         stop("seqlevels cannot be dropped from a BSgenome object")
-    pruning.mode <- if (is(x, "Seqinfo")) "error" else "coarse"
-    seqlevels(x, pruning.mode=pruning.mode) <-
-        seqlevels(x)[!seqlevels(x) %in% value]
+    if (!is.null(names(value)))
+        warning("the names on the vector of supplied seqlevels were ignored")
+    keep_seqlevels <- setdiff(seqlevels(x), as.character(value))
+    seqlevels(x, pruning.mode=pruning.mode) <- keep_seqlevels
     x
 }
 
@@ -97,11 +98,9 @@ standardChromosomes <- function(x, species=NULL)
     standard 
 }
 
-keepStandardChromosomes <- function(x, species=NULL)
+keepStandardChromosomes <-
+    function(x, species=NULL, pruning.mode=c("error", "coarse", "fine", "tidy"))
 {
     standard <- standardChromosomes(x, species)
-    if (length(standard)) {
-        seqlevels(x, pruning.mode="coarse") <- standard 
-        x 
-    } else dropSeqlevels(x, seqlevels(x))
+    keepSeqlevels(x, standard, pruning.mode=pruning.mode)
 }

@@ -180,28 +180,35 @@ Humans have just 22 primary chromosomes - but here we have some extra seqlevels
 which we want to remove - there are several ways we can achieve this:
 
 \subsection{dropSeqlevels}  
-Here the second argument is the seqlevels that you want to drop.
+Here the second argument is the seqlevels that you want to drop. Because
+these seqlevels are in use (i.e. have ranges on them), the ranges on these
+sequences need to be removed before the seqlevels can be dropped. We call
+this {\it pruning}. The \Rcode{pruning.mode} argument controls how to prune
+\Rcode{gr}. Unlike for list-like objects (e.g. GRangesList) for which pruning
+can be done in various ways, pruning a GRanges object is straightforward and
+achieved by specifying \Rcode{pruning.mode="coarse"}.
 <<dropseqlevels>>=
-dropSeqlevels(gr,paste0("chr",23:35))
+dropSeqlevels(gr, paste0("chr",23:35), pruning.mode="coarse")
 @
 
 \subsection{keepSeqlevels}  
 Here the second argument is the seqlevels that you want to keep.
 <<keepseqlevels>>=
-keepSeqlevels(gr, paste0("chr",1:22))
+keepSeqlevels(gr, paste0("chr",1:22), pruning.mode="coarse")
 @
 
 \subsection{keepStandardChromosomes}  
 This function internally uses the pre-defined tables inside GenomeInfoDb to 
-find the correct seqlevels according to the style of the object. 
+find the correct seqlevels according to the sequence style of the object. 
 <<keepstdchr>>=
-keepStandardChromosomes(gr)
+keepStandardChromosomes(gr, pruning.mode="coarse")
 @
 One can also specify the optional species argument to bemore precise. 
 
 <<keepstdchr-2>>=
 plantgr <- GRanges(c(1:5,"MT","Pltd"), IRanges(1:7,width=5))
-keepStandardChromosomes(plantgr, species="Arabidopsis thaliana")
+keepStandardChromosomes(plantgr, species="Arabidopsis thaliana",
+                                 pruning.mode="coarse")
 @
 
 \section{Classes inside GenomeInfoDb package}
@@ -225,7 +232,7 @@ seqinfo(gendesc)
 bsgenomeName(gendesc)
 @
 
-\subsection{SeqInfo class}
+\subsection{Seqinfo class}
 
 <<Seqinfo-egs>>=
 ## Note that all the arguments (except 'genome') must have the

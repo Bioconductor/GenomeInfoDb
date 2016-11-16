@@ -19,12 +19,13 @@
 }
 
 \usage{
-keepSeqlevels(x, value)
-dropSeqlevels(x, value)
+keepSeqlevels(x, value, pruning.mode=c("error", "coarse", "fine", "tidy"))
+dropSeqlevels(x, value, pruning.mode=c("error", "coarse", "fine", "tidy"))
 renameSeqlevels(x, value)
 restoreSeqlevels(x)
 standardChromosomes(x, species=NULL)
-keepStandardChromosomes(x, species=NULL)
+keepStandardChromosomes(x, species=NULL,
+                        pruning.mode=c("error", "coarse", "fine", "tidy"))
 }
 
 \arguments{
@@ -43,6 +44,9 @@ keepStandardChromosomes(x, species=NULL)
     sequence levels to the old (names correspond to the old levels). When 
     \code{value} is unnamed, the replacement vector must the same length
     and in the same order as the original \code{seqlevels(x)}.
+  }
+  \item{pruning.mode}{
+    See \code{?seqinfo} for a description of the pruning modes.
   }
   \item{species}{
      The genus and species of the organism. Supported species can be seen with 
@@ -127,7 +131,6 @@ keepStandardChromosomes(x, species=NULL)
 \author{Valerie Obenchain, Sonali Arora}
 
 \examples{
-
 ## ---------------------------------------------------------------------
 ## keepSeqlevels / dropSeqlevels 
 ## ---------------------------------------------------------------------
@@ -140,9 +143,9 @@ library(GenomicRanges)
 gr <- GRanges(c("chr1", "chr1", "chr2", "chr3"), IRanges(1:4, width=3))
 seqlevels(gr)
 ## Keep only 'chr1'
-chr1 <- keepSeqlevels(gr, "chr1")
+gr1 <- keepSeqlevels(gr, "chr1", pruning.mode="coarse")
 ## Drop 'chr1'. Both 'chr2' and 'chr3' are kept.
-chr2 <- dropSeqlevels(gr, "chr1")
+gr2 <- dropSeqlevels(gr, "chr1", pruning.mode="coarse")
 
 library(Rsamtools)  # for the ex1.bam file
 library(GenomicAlignments)  # for readGAlignments()
@@ -150,50 +153,36 @@ library(GenomicAlignments)  # for readGAlignments()
 fl <- system.file("extdata", "ex1.bam", package="Rsamtools")
 gal <- readGAlignments(fl)
 ## If 'value' is named, the names are ignored.
-seq2 <- keepSeqlevels(gal, c(foo="seq2"))
+seq2 <- keepSeqlevels(gal, c(foo="seq2"), pruning.mode="coarse")
 seqlevels(seq2)
 
 ##
-## List-like objects
+## List-like objects:
 ##
 
-grl0 <- GRangesList(GRanges("chr1", IRanges(1:2, 5)),
-                    GRanges("chr5", IRanges(11, 18)),
-                    GRanges(c("chr4", "chr1"), IRanges(5:6, 5)))
-grl0
+grl0 <- GRangesList(A=GRanges("chr2", IRanges(3:2, 5)),
+                    B=GRanges(c("chr2", "chrMT"), IRanges(7:6, 15)),
+                    C=GRanges(c("chrY", "chrMT"), IRanges(17:16, 25)),
+                    D=GRanges())
+## See ?seqinfo for a description of the pruning modes.
+keepSeqlevels(grl0, "chr2", pruning.mode="coarse")
+keepSeqlevels(grl0, "chr2", pruning.mode="fine")
+keepSeqlevels(grl0, "chr2", pruning.mode="tidy")
 
-grl1 <- grl0
-keepSeqlevels(grl1, "chr1")
-grl1  # grl0[[3]] was fully dropped!
-
-## To keep all ranges within each list element located on "chr2":
-grl2 <- grl0[seqnames(grl0) \%in\% "chr1"]
-grl2
-
-## The above subsetting doesn't drop any seqlevels:
-seqlevels(grl2)
-
-## To drop them:
-seqlevels(grl2) <- "chr1"
-
-##
-## TxDb:
-##
-
-## A TxDb cannot be directly subset with 'keepSeqlevels' 
-## and 'dropSeqlevels'.
 library(TxDb.Dmelanogaster.UCSC.dm3.ensGene)
 txdb <- TxDb.Dmelanogaster.UCSC.dm3.ensGene
-seqlevels(txdb)
-\dontrun{
-keepSeqlevels(txdb, "chr2L") ## fails
-}
-
-## GRanges or GRangesLists extracted from the TxDb can be subset.
-txbygene <- transcriptsBy(txdb, "gene")
-seqlevels(txbygene)
-chr2L <- keepSeqlevels(txbygene, "chr2L")
-seqlevels(chr2L)
+## Pruning mode "coarse" is particularly well suited on a GRangesList
+## object that contains exons grouped by transcript:
+ex_by_tx <- exonsBy(txdb, by="tx")
+seqlevels(ex_by_tx)
+ex_by_tx2 <- keepSeqlevels(ex_by_tx, "chr2L", pruning.mode="coarse")
+seqlevels(ex_by_tx2)
+## Pruning mode "tidy" is particularly well suited on a GRangesList
+## object that contains transcripts grouped by gene:
+tx_by_gene <- transcriptsBy(txdb, by="gene")
+seqlevels(tx_by_gene)
+tx_by_gene2 <- keepSeqlevels(tx_by_gene, "chr2L", pruning.mode="tidy")
+seqlevels(tx_by_gene2)
 
 ## ---------------------------------------------------------------------
 ## renameSeqlevels 
@@ -212,7 +201,7 @@ gal2b <- renameSeqlevels(gal, c("seq1", "chr2"))
 ## Names that do not match existing seqlevels are ignored.
 ## This attempt at renaming does nothing.
 gal3 <- renameSeqlevels(gal, c(foo="chr2"))
-identical(seqlevels(gal), seqlevels(gal3))
+stopifnot(identical(gal, gal3))
 
 ##
 ## TxDb:
@@ -248,7 +237,7 @@ seqlevels(txdb)
 gr <- GRanges(c(paste0("chr",c(1:3)), "chr1_gl000191_random",
               "chr1_gl000192_random"), IRanges(1:5, width=3))
 gr
-keepStandardChromosomes(gr)
+keepStandardChromosomes(gr, pruning.mode="coarse")
 
 ##
 ## List-like objects:
@@ -256,26 +245,28 @@ keepStandardChromosomes(gr)
 
 grl <- GRangesList(GRanges("chr1", IRanges(1:2, 5)),
                    GRanges(c("chr1_GL383519v1_alt", "chr1"), IRanges(5:6, 5)))
-## List elements with mixed seqlevels are dropped by default:
-keepStandardChromosomes(grl)
-## To keep all list elements with ranges on standard chromosomes:
-grl[seqnames(grl) \%in\% standardChromosomes(grl)] 
+## Use pruning.mode="coarse" to drop list elements with mixed seqlevels:
+keepStandardChromosomes(grl, pruning.mode="coarse")
+## Use pruning.mode="tidy" to keep all list elements with ranges on
+## standard chromosomes:
+keepStandardChromosomes(grl, pruning.mode="tidy")
 
 ##
-## Keep standard chromosomes of a particular style:
+## The set of standard chromosomes should not be affected by the
+## particular seqlevel style currently in use:
 ##
 
 ## NCBI
 worm <- GRanges(c("I", "II", "foo", "X", "MT"), IRanges(1:5, width=5))
-keepStandardChromosomes(worm)
+keepStandardChromosomes(worm, pruning.mode="coarse")
 
 ## UCSC
 seqlevelsStyle(worm) <- "UCSC"
-keepStandardChromosomes(worm)
+keepStandardChromosomes(worm, pruning.mode="coarse")
 
 ## Ensembl
 seqlevelsStyle(worm) <- "Ensembl"
-keepStandardChromosomes(worm)
+keepStandardChromosomes(worm, pruning.mode="coarse")
 }
 
 \keyword{methods}
