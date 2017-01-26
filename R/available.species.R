@@ -131,7 +131,7 @@ if(!(taxId %in% validTaxIds)){
     ## throw away rows where the third column doesn't say 'scientific name'
     keep <- grepl('scientific name', species[[3]])
     species <- species[keep,1:2]
-    
+ 
     ## split second column by first space:
     rawSpec <- species[[2]]
     spltSpec <- strsplit(rawSpec, split=" ")
@@ -144,19 +144,18 @@ if(!(taxId %in% validTaxIds)){
         }
     }
     speciesDat <- unlist(lapply(spltSpec, .getRest))
-    specData <- data.frame(tax_id=species[[1]],
-                           genus=genusDat,
-                           species=speciesDat,
+    specData <- data.frame(tax_id=as.integer(species[[1]]), ## integer
+                           genus=as.factor(genusDat),       ## factor
+                           species=speciesDat,              ## character
                            stringsAsFactors=FALSE)
-    ## name columns
-    save(specData, file='specData.rda')
+    save(specData, file='specData.rda', compress="xz")
 }
-## .processTaxNamesFile()
-
 
 ## This function generates the speciesMap AND the validTaxIds
 .processSpeciesMapData <- function(){
-    species <- readLines(file('names.dmp','r'))
+    con <- file('names.dmp')
+    species <- readLines(con)
+    close(con)
     splt <- strsplit(species, split='\\t\\|\\t')
     ## Throw away elements where column 4 is not 'scientific name' or 'synonym'
     idx1 <- unlist(lapply(splt, function(x){grepl('scientific name', x[4])}))
@@ -164,14 +163,14 @@ if(!(taxId %in% validTaxIds)){
     idx <- idx1 | idx2
     splt <- splt[idx]
     ## and keep only 1st two elements
-    taxon <-  unlist(lapply(splt, function(x){x[1]}))
-    species <- unlist(lapply(splt, function(x){x[2]}))
-    speciesMap <- data.frame(taxon, species, stringsAsFactors=FALSE)
-    save(speciesMap, file='speciesMap.rda')
+    taxon <-  as.integer(unlist(lapply(splt, function(x){x[1]})))
+    species <- unlist(lapply(splt, function(x){x[2]})) 
+    speciesMap <- data.frame(taxon,    ## integer
+                             species,  ## character 
+                             stringsAsFactors=FALSE)
+    save(speciesMap, file='speciesMap.rda', compress="xz")
 
     ## Then get the valid Tax IDs.
-    validTaxIds <- as.integer(unique(speciesMap$taxon))
-    save(validTaxIds, file='validTaxIds.rda')
+    validTaxIds <- unique(speciesMap$taxon)  ## integer
+    save(validTaxIds, file='validTaxIds.rda', compress="xz")
 }
-
-
