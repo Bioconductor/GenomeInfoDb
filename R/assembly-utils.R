@@ -28,14 +28,14 @@
         .REFSEQ_ASSEMBLY_ACCESSION_PREFIX
 }
 
+.assembly_summary_cache <- new.env(parent=emptyenv())
+
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### fetch_assembly_summary()
 ###
 
 .PAIRED_ASM_COMP_LEVELS <- c("identical", "different", NA)
-
-.assembly_summary_cache <- new.env(parent=emptyenv())
 
 ### Performs some quick sanity checks on the assembly summary.
 .check_assembly_summary <- function(assembly_summary, genbank_or_refseq)
@@ -220,32 +220,21 @@ build_and_save_assembly_accessions_table <- function(dir=".", quiet=FALSE)
 ###   (b) an NCBI assembly name (e.g. "GRCh38").
 .lookup_refseq_assembly_accession <- function(assembly_accession)
 {
-    genbank_assembly_summary <- fetch_assembly_summary("genbank")
-    refseq_assembly_summary <- fetch_assembly_summary("refseq")
-
-    .get_answers <- function(idx1, idx2) {
-        ans2 <- refseq_assembly_summary$assembly_accession[idx2]
-        if (all(is.na(idx1)))
-            return(ans2)
-        ans1 <- genbank_assembly_summary$gbrs_paired_asm[idx1]
-        ans1 <- setdiff(ans1, "na")
-        union(ans1, ans2)
+    objname <- "assembly_accessions"
+    assembly_accessions <- try(get(objname, envir=.assembly_summary_cache,
+                                   inherits=FALSE), silent=TRUE)
+    if (is(assembly_accessions, "try-error")) {
+        filename <- paste0(objname, ".rda")
+        filepath <- system.file("extdata", filename, package="GenomeInfoDb")
+        load(filepath, envir=.assembly_summary_cache)
+        assembly_accessions <- get(objname, envir=.assembly_summary_cache,
+                                   inherits=FALSE)
     }
 
     if (.is_genbank_assembly_accession(assembly_accession)) {
-        idx1 <- match(assembly_accession,
-                      genbank_assembly_summary$assembly_accession)
-        idx2 <- which(refseq_assembly_summary$gbrs_paired_asm ==
-                      assembly_accession)
-        ans <- .get_answers(idx1, idx2)
-        if (length(ans) == 1L)
-            return(ans)
-        if (length(ans) >= 2L) {
-            warning("more than one RefSeq assembly accession found for ",
-                    "\"", assembly_accession, "\",\n  returning the 1st one")
-            return(ans[1L])
-        }
-        return(NA_character_)
+        idx <- match(assembly_accession,
+                     assembly_accessions[ , "genbank_accession"])
+        return(assembly_accessions[idx, "refseq_accession"])
     }
 
     ## If 'assembly_accession' is not a RefSeq or GenBank assembly accession,
@@ -253,12 +242,10 @@ build_and_save_assembly_accessions_table <- function(dir=".", quiet=FALSE)
     ## "Pan_troglodytes-2.1.4").
 
     ## Exact match.
-    idx1 <- which(genbank_assembly_summary$asm_name == assembly_accession)
-    idx2 <- which(refseq_assembly_summary$asm_name == assembly_accession)
-    ans <- .get_answers(idx1, idx2)
-    if (length(ans) == 1L)
-        return(ans)
-    if (length(ans) >= 2L)
+    idx <- which(assembly_accessions[ , "asm_name"] == assembly_accession)
+    if (length(idx) == 1L)
+        return(assembly_accessions[idx , "refseq_accession"])
+    if (length(idx) >= 2L)
         stop("more than one RefSeq assembly accession found for ",
              "\"", assembly_accession, "\"")
 
@@ -267,14 +254,11 @@ build_and_save_assembly_accessions_table <- function(dir=".", quiet=FALSE)
             "\"", assembly_accession, "\".\n",
             "  Searching again using ",
             "\"", assembly_accession, "\" as a regular expression.")
-    idx1 <- grep(assembly_accession, genbank_assembly_summary$asm_name,
-                 ignore.case=TRUE)
-    idx2 <- grep(assembly_accession, refseq_assembly_summary$asm_name,
-                 ignore.case=TRUE)
-    ans <- .get_answers(idx1, idx2)
-    if (length(ans) == 1L)
-        return(ans)
-    if (length(ans) >= 2L) 
+    idx <- grep(assembly_accession, assembly_accessions[ , "asm_name"],
+                ignore.case=TRUE)
+    if (length(idx) == 1L)
+        return(assembly_accessions[idx, "refseq_accession"])
+    if (length(idx) >= 2L) 
         stop("more than one RefSeq assembly accession found for regular ",
              "expression \"", assembly_accession, "\"")
 
