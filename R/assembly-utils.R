@@ -33,6 +33,10 @@
 ### fetch_assembly_summary()
 ###
 
+.PAIRED_ASM_COMP_LEVELS <- c("identical", "different", NA)
+
+.assembly_summary_cache <- new.env(parent=emptyenv())
+
 ### Performs some quick sanity checks on the assembly summary.
 .check_assembly_summary <- function(assembly_summary, genbank_or_refseq)
 {
@@ -50,8 +54,7 @@
 
     ## Check "paired_asm_comp" levels.
     paired_asm_comp <- assembly_summary[ , "paired_asm_comp"]
-    paired_asm_comp_levels <- c("identical", "different", NA)
-    stopifnot(all(paired_asm_comp %in% paired_asm_comp_levels))
+    stopifnot(all(paired_asm_comp %in% .PAIRED_ASM_COMP_LEVELS))
 
     ## Check gbrs_paired_asm/paired_asm_comp consistency.
     gbrs_paired_asm <- assembly_summary[ , "gbrs_paired_asm"]
@@ -73,11 +76,9 @@
     stopifnot(anyDuplicated(gbrs_paired_asm) == 0L)
 }
 
-.assembly_summary_cache <- new.env(parent=emptyenv())
-
 fetch_assembly_summary <- function(genbank_or_refseq, quiet=FALSE)
 {
-    objname <- paste0(genbank_or_refseq, "_assembly_summary")
+    objname <- paste0("assembly_summary_", genbank_or_refseq)
     ans <- try(get(objname, envir=.assembly_summary_cache, inherits=FALSE),
                silent=TRUE)
     if (!is(ans, "try-error"))
@@ -110,6 +111,8 @@ fetch_assembly_summary <- function(genbank_or_refseq, quiet=FALSE)
 ###
 ### Use this utility to update assembly_accessions dataset located in
 ### GenomeInfoDb package (in /inst/extdata/).
+### It will issue a warning that a small number of assemblies were dropped
+### (3 on Feb 2017). It's OK to ignore if the number is small.
 ###
 
 .make_assembly_accessions_table_from_assembly_summaries <-
@@ -135,16 +138,62 @@ fetch_assembly_summary <- function(genbank_or_refseq, quiet=FALSE)
 
     m1 <- match(genbank_accession, genbank_accession0)
     m2 <- match(refseq_accession, refseq_accession0)
-    paired_asm_comp1 <- genbank_assembly_summary[m1, "paired_asm_comp"]
-    paired_asm_comp2 <- refseq_assembly_summary[m2, "paired_asm_comp"]
     is_na1 <- is.na(m1)
     is_na2 <- is.na(m2)
+
+    ## Add "asm_name", "organism_name", and "taxid" columns.
+    asm_name1 <- genbank_assembly_summary[m1, "asm_name"]
+    organism_name1 <- genbank_assembly_summary[m1, "organism_name"]
+    taxid1 <- genbank_assembly_summary[m1, "taxid"]
+    ans1 <- data.frame(asm_name=asm_name1,
+                       organism_name=organism_name1,
+                       taxid=taxid1,
+                       stringsAsFactors=FALSE)
+    asm_name2 <- refseq_assembly_summary[m2, "asm_name"]
+    organism_name2 <- refseq_assembly_summary[m2, "organism_name"]
+    taxid2 <- refseq_assembly_summary[m2, "taxid"]
+    ans2 <- data.frame(asm_name=asm_name2,
+                       organism_name=organism_name2,
+                       taxid=taxid2,
+                       stringsAsFactors=FALSE)
+    disagrement_idx <- which(!(is_na1 | is_na2 |
+                               (asm_name1 == asm_name2 &
+                                organism_name1 == organism_name2 &
+                                taxid1 == taxid2)))
+    if (length(disagrement_idx) != 0L) {
+        warning(wmsg(length(disagrement_idx), " assemblies were dropped ",
+                     "because the asm_name, organism_name, and/or taxid ",
+                     "reported by GenBank and RefSeq do not agree"))
+        ans <- ans[-disagrement_idx, , drop=FALSE]
+        genbank_accession <- ans[ , "genbank_accession"]
+        refseq_accession <- ans[ , "refseq_accession"]
+        m1 <- m1[-disagrement_idx]
+        m2 <- m2[-disagrement_idx]
+        is_na1 <- is.na(m1)
+        is_na2 <- is.na(m2)
+        ans1 <- ans1[-disagrement_idx, , drop=FALSE]
+        ans2 <- ans2[-disagrement_idx, , drop=FALSE]
+    }
+    ans1[is_na1, c("asm_name", "organism_name", "taxid")] <-
+        ans2[is_na1, c("asm_name", "organism_name", "taxid")]
+    ## Turning the "organism_name" column into a factor makes it bigger in
+    ## memory and on disk. Not worth it.
+    #ans1[ , "organism_name"] <- factor(ans1[ , "organism_name"],
+    #                                   levels=unique(ans1[ , "organism_name"]))
+    ans <- cbind(ans, ans1)
+
+    ## Add "paired_asm_comp", "GCA_ftp_path", and "GCF_ftp_path" columns.
+    paired_asm_comp1 <- genbank_assembly_summary[m1, "paired_asm_comp"]
+    paired_asm_comp2 <- refseq_assembly_summary[m2, "paired_asm_comp"]
     stopifnot(all(is_na1 | is_na2 | paired_asm_comp1 == paired_asm_comp2))
     paired_asm_comp1[is_na1] <- paired_asm_comp2[is_na1]
+    paired_asm_comp <- factor(paired_asm_comp1,
+                              levels=.PAIRED_ASM_COMP_LEVELS)
 
     GCA_ftp_path <- genbank_assembly_summary[m1, "ftp_path"]
     GCF_ftp_path <- refseq_assembly_summary[m2, "ftp_path"]
-    cbind(ans, paired_asm_comp=paired_asm_comp1,
+
+    cbind(ans, paired_asm_comp=paired_asm_comp,
                GCA_ftp_path=GCA_ftp_path,
                GCF_ftp_path=GCF_ftp_path,
                stringsAsFactors=FALSE)
