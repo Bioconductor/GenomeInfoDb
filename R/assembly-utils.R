@@ -3,33 +3,21 @@
 ### -------------------------------------------------------------------------
 
 
-.GENBANK_ASSEMBLY_ACCESSION_PREFIX <- "GCA_"
-.REFSEQ_ASSEMBLY_ACCESSION_PREFIX <- "GCF_"
-
 .NCBI_ASSEMBLY_REPORTS_URL <-
     "https://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/"
 
-.GENBANK_GENOMES_URL <-
-    "https://ftp.ncbi.nlm.nih.gov/genbank/genomes/"
+.GENBANK_ASSEMBLY_ACCESSION_PREFIX <- "GCA_"
+.TOP_LEVEL_GCA_URL <- "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/"
+### Paths: genomes/all/GCA/xxx/xxx/xxx/
+
+.REFSEQ_ASSEMBLY_ACCESSION_PREFIX <- "GCF_"
+.TOP_LEVEL_GCF_URL <- "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/"
+### Paths: genomes/all/GCF/xxx/xxx/xxx/
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### fetch_assembly_report()
+### fetch_assembly_summary()
 ###
-
-.is_genbank_assembly_accession <- function(x)
-{
-    ## We use %in% instead of == to be NA-proof.
-    substr(x, 1L, nchar(.GENBANK_ASSEMBLY_ACCESSION_PREFIX)) %in%
-        .GENBANK_ASSEMBLY_ACCESSION_PREFIX
-}
-
-.is_refseq_assembly_accession <- function(x)
-{
-    ## We use %in% instead of == to be NA-proof.
-    substr(x, 1L, nchar(.REFSEQ_ASSEMBLY_ACCESSION_PREFIX)) %in%
-        .REFSEQ_ASSEMBLY_ACCESSION_PREFIX
-}
 
 ### Performs some quick sanity checks on the assembly summary.
 .check_assembly_summary <- function(assembly_summary, genbank_or_refseq)
@@ -69,7 +57,7 @@
 
 .assembly_summary_cache <- new.env(parent=emptyenv())
 
-.fetch_assembly_summary <- function(genbank_or_refseq)
+fetch_assembly_summary <- function(genbank_or_refseq)
 {
     objname <- paste0("assembly_summary_", genbank_or_refseq)
     ans <- try(get(objname, envir=.assembly_summary_cache, inherits=FALSE),
@@ -80,16 +68,16 @@
     url <- paste0(.NCBI_ASSEMBLY_REPORTS_URL, assembly_summary_filename)
     destfile <- tempfile()
     download.file(url, destfile, quiet=TRUE)
-    ans <- read.table(destfile, header=TRUE, sep="\t", quote="",
+    ans <- read.table(destfile, header=TRUE, sep="\t", quote="", skip=1L,
                                 comment.char="", stringsAsFactors=FALSE)
-    target_colnames <- c("X..assembly_accession", "bioproject", "biosample",
-                         "wgs_master", "refseq_category", "taxid",
-                         "species_taxid", "organism_name",
-                         "infraspecific_name", "isolate", "version_status",
-                         "assembly_level", "release_type", "genome_rep",
-                         "seq_rel_date", "asm_name", "submitter",
-                         "gbrs_paired_asm", "paired_asm_comp")
-    if (!identical(target_colnames, colnames(ans)))
+    expected_colnames <- c(
+        "X..assembly_accession", "bioproject", "biosample", "wgs_master",
+        "refseq_category", "taxid", "species_taxid", "organism_name",
+        "infraspecific_name", "isolate", "version_status", "assembly_level",
+        "release_type", "genome_rep", "seq_rel_date", "asm_name", "submitter",
+        "gbrs_paired_asm", "paired_asm_comp", "ftp_path",
+        "excluded_from_refseq")
+    if (!identical(expected_colnames, colnames(ans)))
         stop(url, " does not contain the expected fields")
     colnames(ans)[1L] <- "assembly_accession"
     .check_assembly_summary(ans, genbank_or_refseq)
@@ -97,27 +85,46 @@
     ans
 }
 
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### fetch_assembly_report()
+###
+
+.is_genbank_assembly_accession <- function(x)
+{
+    ## We use %in% instead of == to be NA-proof.
+    substr(x, 1L, nchar(.GENBANK_ASSEMBLY_ACCESSION_PREFIX)) %in%
+        .GENBANK_ASSEMBLY_ACCESSION_PREFIX
+}
+
+.is_refseq_assembly_accession <- function(x)
+{
+    ## We use %in% instead of == to be NA-proof.
+    substr(x, 1L, nchar(.REFSEQ_ASSEMBLY_ACCESSION_PREFIX)) %in%
+        .REFSEQ_ASSEMBLY_ACCESSION_PREFIX
+}
+
 ### 'assembly_accession' can be:
 ###   (a) a GenBank assembly accession (e.g. "GCA_000001405.15");
 ###   (b) an NCBI assembly name (e.g. "GRCh38").
 .lookup_refseq_assembly_accession <- function(assembly_accession)
 {
-    assembly_summary_genbank <- .fetch_assembly_summary("genbank")
-    assembly_summary_refseq <- .fetch_assembly_summary("refseq")
+    genbank_assembly_summary <- fetch_assembly_summary("genbank")
+    refseq_assembly_summary <- fetch_assembly_summary("refseq")
 
     .get_answers <- function(idx1, idx2) {
-        ans2 <- assembly_summary_refseq$assembly_accession[idx2]
+        ans2 <- refseq_assembly_summary$assembly_accession[idx2]
         if (all(is.na(idx1)))
             return(ans2)
-        ans1 <- assembly_summary_genbank$gbrs_paired_asm[idx1]
+        ans1 <- genbank_assembly_summary$gbrs_paired_asm[idx1]
         ans1 <- setdiff(ans1, "na")
         union(ans1, ans2)
     }
 
     if (.is_genbank_assembly_accession(assembly_accession)) {
         idx1 <- match(assembly_accession,
-                      assembly_summary_genbank$assembly_accession)
-        idx2 <- which(assembly_summary_refseq$gbrs_paired_asm ==
+                      genbank_assembly_summary$assembly_accession)
+        idx2 <- which(refseq_assembly_summary$gbrs_paired_asm ==
                       assembly_accession)
         ans <- .get_answers(idx1, idx2)
         if (length(ans) == 1L)
@@ -135,8 +142,8 @@
     ## "Pan_troglodytes-2.1.4").
 
     ## Exact match.
-    idx1 <- which(assembly_summary_genbank$asm_name == assembly_accession)
-    idx2 <- which(assembly_summary_refseq$asm_name == assembly_accession)
+    idx1 <- which(genbank_assembly_summary$asm_name == assembly_accession)
+    idx2 <- which(refseq_assembly_summary$asm_name == assembly_accession)
     ans <- .get_answers(idx1, idx2)
     if (length(ans) == 1L)
         return(ans)
@@ -149,9 +156,9 @@
             "\"", assembly_accession, "\".\n",
             "  Searching again using ",
             "\"", assembly_accession, "\" as a regular expression.")
-    idx1 <- grep(assembly_accession, assembly_summary_genbank$asm_name,
+    idx1 <- grep(assembly_accession, genbank_assembly_summary$asm_name,
                  ignore.case=TRUE)
-    idx2 <- grep(assembly_accession, assembly_summary_refseq$asm_name,
+    idx2 <- grep(assembly_accession, refseq_assembly_summary$asm_name,
                  ignore.case=TRUE)
     ans <- .get_answers(idx1, idx2)
     if (length(ans) == 1L)
