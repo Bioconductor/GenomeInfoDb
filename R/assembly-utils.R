@@ -14,6 +14,20 @@
 .TOP_LEVEL_GCF_URL <- "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/"
 ### Paths: genomes/all/GCF/xxx/xxx/xxx/
 
+.is_genbank_assembly_accession <- function(x)
+{
+    ## We use %in% instead of == to be NA-proof.
+    substr(x, 1L, nchar(.GENBANK_ASSEMBLY_ACCESSION_PREFIX)) %in%
+        .GENBANK_ASSEMBLY_ACCESSION_PREFIX
+}
+
+.is_refseq_assembly_accession <- function(x)
+{
+    ## We use %in% instead of == to be NA-proof.
+    substr(x, 1L, nchar(.REFSEQ_ASSEMBLY_ACCESSION_PREFIX)) %in%
+        .REFSEQ_ASSEMBLY_ACCESSION_PREFIX
+}
+
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### fetch_assembly_summary()
@@ -23,25 +37,26 @@
 .check_assembly_summary <- function(assembly_summary, genbank_or_refseq)
 {
     ## Check "assembly_accession" prefixes.
+    assembly_accession <- assembly_summary[ , "assembly_accession"]
     if (genbank_or_refseq == "genbank") {
         is_valid_accession <- .is_genbank_assembly_accession
     } else {
         is_valid_accession <- .is_refseq_assembly_accession
     }
-    stopifnot(all(is_valid_accession(assembly_summary$assembly_accession)))
+    stopifnot(all(is_valid_accession(assembly_accession)))
 
     ## Check "assembly_accession" uniqueness.
-    stopifnot(anyDuplicated(assembly_summary$assembly_accession) == 0L)
+    stopifnot(anyDuplicated(assembly_accession) == 0L)
 
     ## Check "paired_asm_comp" levels.
-    paired_asm_comp_levels <- c("identical", "different", "na")
-    stopifnot(all(assembly_summary$paired_asm_comp %in%
-                  paired_asm_comp_levels))
+    paired_asm_comp <- assembly_summary[ , "paired_asm_comp"]
+    paired_asm_comp_levels <- c("identical", "different", NA)
+    stopifnot(all(paired_asm_comp %in% paired_asm_comp_levels))
 
     ## Check gbrs_paired_asm/paired_asm_comp consistency.
-    gbrs_paired_asm <- assembly_summary$gbrs_paired_asm
-    idx1 <- which(gbrs_paired_asm %in% "na")
-    idx2 <- which(assembly_summary$paired_asm_comp %in% "na")
+    gbrs_paired_asm <- assembly_summary[ , "gbrs_paired_asm"]
+    idx1 <- which(is.na(gbrs_paired_asm))
+    idx2 <- which(is.na(paired_asm_comp))
     stopifnot(identical(idx1, idx2))
     if (length(idx1) != 0L)
         gbrs_paired_asm <- gbrs_paired_asm[-idx1]
@@ -53,13 +68,16 @@
         is_valid_accession <- .is_genbank_assembly_accession
     }
     stopifnot(all(is_valid_accession(gbrs_paired_asm)))
+
+    ## Check "gbrs_paired_asm" uniqueness.
+    stopifnot(anyDuplicated(gbrs_paired_asm) == 0L)
 }
 
 .assembly_summary_cache <- new.env(parent=emptyenv())
 
-fetch_assembly_summary <- function(genbank_or_refseq)
+fetch_assembly_summary <- function(genbank_or_refseq, quiet=FALSE)
 {
-    objname <- paste0("assembly_summary_", genbank_or_refseq)
+    objname <- paste0(genbank_or_refseq, "_assembly_summary")
     ans <- try(get(objname, envir=.assembly_summary_cache, inherits=FALSE),
                silent=TRUE)
     if (!is(ans, "try-error"))
@@ -67,9 +85,10 @@ fetch_assembly_summary <- function(genbank_or_refseq)
     assembly_summary_filename <- paste0(objname, ".txt")
     url <- paste0(.NCBI_ASSEMBLY_REPORTS_URL, assembly_summary_filename)
     destfile <- tempfile()
-    download.file(url, destfile, quiet=TRUE)
-    ans <- read.table(destfile, header=TRUE, sep="\t", quote="", skip=1L,
-                                comment.char="", stringsAsFactors=FALSE)
+    download.file(url, destfile, quiet=quiet)
+    ans <- read.table(destfile, header=TRUE, sep="\t", quote="",
+                                na.strings="na", skip=1L, comment.char="",
+                                stringsAsFactors=FALSE)
     expected_colnames <- c(
         "X..assembly_accession", "bioproject", "biosample", "wgs_master",
         "refseq_category", "taxid", "species_taxid", "organism_name",
@@ -87,22 +106,65 @@ fetch_assembly_summary <- function(genbank_or_refseq)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### fetch_assembly_report()
+### build_and_save_assembly_accessions_table()
+###
+### Use this utility to update assembly_accessions dataset located in
+### GenomeInfoDb package (in /inst/extdata/).
 ###
 
-.is_genbank_assembly_accession <- function(x)
+.make_assembly_accessions_table_from_assembly_summaries <-
+    function(genbank_assembly_summary, refseq_assembly_summary)
 {
-    ## We use %in% instead of == to be NA-proof.
-    substr(x, 1L, nchar(.GENBANK_ASSEMBLY_ACCESSION_PREFIX)) %in%
-        .GENBANK_ASSEMBLY_ACCESSION_PREFIX
+    genbank_accession0 <- genbank_assembly_summary[ , "assembly_accession"]
+    genbank_rs_paired_asm0 <- genbank_assembly_summary[ , "gbrs_paired_asm"]
+    refseq_accession0 <- refseq_assembly_summary[ , "assembly_accession"]
+    refseq_gb_paired_asm0 <- refseq_assembly_summary[ , "gbrs_paired_asm"]
+
+    df1 <- data.frame(genbank_accession=genbank_accession0,
+                      refseq_accession=genbank_rs_paired_asm0,
+                      stringsAsFactors=FALSE)
+    df2 <- data.frame(genbank_accession=refseq_gb_paired_asm0,
+                      refseq_accession=refseq_accession0,
+                      stringsAsFactors=FALSE)
+    ans <- merge.data.frame(df1, df2, all=TRUE)
+    genbank_accession <- ans[ , "genbank_accession"]
+    refseq_accession <- ans[ , "refseq_accession"]
+    if (anyDuplicated(genbank_accession, incomparables=NA)
+     || anyDuplicated(refseq_accession, incomparables=NA))
+        stop("GenomeInfoDb internal error")
+
+    m1 <- match(genbank_accession, genbank_accession0)
+    m2 <- match(refseq_accession, refseq_accession0)
+    paired_asm_comp1 <- genbank_assembly_summary[m1, "paired_asm_comp"]
+    paired_asm_comp2 <- refseq_assembly_summary[m2, "paired_asm_comp"]
+    is_na1 <- is.na(m1)
+    is_na2 <- is.na(m2)
+    stopifnot(all(is_na1 | is_na2 | paired_asm_comp1 == paired_asm_comp2))
+    paired_asm_comp1[is_na1] <- paired_asm_comp2[is_na1]
+
+    GCA_ftp_path <- genbank_assembly_summary[m1, "ftp_path"]
+    GCF_ftp_path <- refseq_assembly_summary[m2, "ftp_path"]
+    cbind(ans, paired_asm_comp=paired_asm_comp1,
+               GCA_ftp_path=GCA_ftp_path,
+               GCF_ftp_path=GCF_ftp_path,
+               stringsAsFactors=FALSE)
 }
 
-.is_refseq_assembly_accession <- function(x)
+### Saves "assembly_accessions.rda" in directory specified thru 'dir'.
+build_and_save_assembly_accessions_table <- function(dir=".", quiet=FALSE)
 {
-    ## We use %in% instead of == to be NA-proof.
-    substr(x, 1L, nchar(.REFSEQ_ASSEMBLY_ACCESSION_PREFIX)) %in%
-        .REFSEQ_ASSEMBLY_ACCESSION_PREFIX
+    gb_assembly_summary <- fetch_assembly_summary("genbank", quiet=quiet)
+    rs_assembly_summary <- fetch_assembly_summary("refseq", quiet=quiet)
+    assembly_accessions <-
+        .make_assembly_accessions_table_from_assembly_summaries(
+            gb_assembly_summary, rs_assembly_summary)
+    save(assembly_accessions, file=file.path(dir, "assembly_accessions.rda"))
 }
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### fetch_assembly_report()
+###
 
 ### 'assembly_accession' can be:
 ###   (a) a GenBank assembly accession (e.g. "GCA_000001405.15");
