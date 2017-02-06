@@ -6,13 +6,9 @@
 .NCBI_ASSEMBLY_REPORTS_URL <-
     "https://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/"
 
+.NCBI_ALL_ASSEMBLY_URL <- "ftp://ftp.ncbi.nlm.nih.gov/genomes/all"
 .GENBANK_ASSEMBLY_ACCESSION_PREFIX <- "GCA_"
-.TOP_LEVEL_GCA_URL <- "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/"
-### Paths: genomes/all/GCA/xxx/xxx/xxx/
-
 .REFSEQ_ASSEMBLY_ACCESSION_PREFIX <- "GCF_"
-.TOP_LEVEL_GCF_URL <- "https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/"
-### Paths: genomes/all/GCF/xxx/xxx/xxx/
 
 .is_genbank_assembly_accession <- function(x)
 {
@@ -282,11 +278,35 @@ build_and_save_assembly_accessions_table <- function(dir=".", quiet=FALSE)
     assembly_accession
 }
 
+### Returns https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/GCA_000001405.15_GRCh38_assembly_report.txt for GCA_000001405.15
 .make_assembly_report_URL <- function(assembly_accession)
 {
     assembly_accession <- .normarg_assembly_accession(assembly_accession)
-    assembly_report_filename <- paste0(assembly_accession, ".assembly.txt")
-    paste0(.NCBI_ASSEMBLY_REPORTS_URL, "All/", assembly_report_filename)
+    prefix <- substr(assembly_accession,
+                     1L, nchar(.GENBANK_ASSEMBLY_ACCESSION_PREFIX))
+    if (prefix == .GENBANK_ASSEMBLY_ACCESSION_PREFIX) {
+        url <- "GCA"
+    } else if (prefix == .REFSEQ_ASSEMBLY_ACCESSION_PREFIX) {
+        url <- "GCF"
+    } else {
+        stop(wmsg("don't know where to find assembly report for ",
+                  assembly_accession))
+    }
+    parts_end <- nchar(prefix) + (1:3) * 3L
+    parts <- substring(assembly_accession, parts_end - 2L, parts_end)
+    url <- paste0(.NCBI_ALL_ASSEMBLY_URL, "/", url, "/",
+                  paste0(parts, collapse="/"), "/")
+    listing <- list_ftp_dir(url)
+    idx <- which(paste0(assembly_accession, "_") ==
+                 substr(listing, 1L, nchar(assembly_accession)+1L))
+    if (length(idx) == 0L)
+        stop(wmsg("don't know where to find assembly report for ",
+                  assembly_accession))
+    if (length(idx) > 1L)
+        stop(wmsg("more than one assembly report found for ",
+                  assembly_accession))
+    part4 <- listing[[idx]]
+    paste0(url, part4, "/", part4, "_assembly_report.txt")
 }
 
 .fetch_assembly_report_from_URL <- function(url)

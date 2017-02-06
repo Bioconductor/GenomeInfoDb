@@ -47,3 +47,15 @@ mergeNamedAtomicVectors <- function(x, y, what=c("key", "values"))
     ans
 }
 
+### Uses RCurl to access and list the content of an FTP dir.
+list_ftp_dir <- function(url)
+{
+    doc <- getURL(url)  # from RCurl package
+    listing <- strsplit(doc, "\n", fixed=TRUE)[[1L]]
+    ## Keep field no. 8 only
+    pattern <- paste(c("^", rep.int("[^[:space:]]+[[:space:]]+", 8L)),
+                     collapse="")
+    listing <- sub(pattern, "", listing)
+    sub("[[:space:]].*$", "", listing)
+}
+
