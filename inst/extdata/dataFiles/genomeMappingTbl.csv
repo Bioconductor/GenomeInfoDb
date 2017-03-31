@@ -28,12 +28,14 @@ cat,felis catus,Felis_catus_6.2,70,Jan.2013,78,Dec.2014,felCat8,Nov.2014,ICGSC F
 cave fish,astyanax mexicanus,AstMex102,74,Dec.2013,74,Dec.2013,astMex1,NA,NA
 chicken,gallus gallus,WASHUC2,54,May.2009,54,May.2009,galGal3,May.2006,WUSTL Gallus-gallus-2.1
 chicken,gallus gallus,WASHUC2,54,May.2009,65,Dec.2011,galGal4,Nov.2011,ICGC Gallus-gallus-4.0
-chicken,gallus gallus,Galgal4,71,Apr.2013,85,Jul.2016,galGal4,Nov.2011,ICGC Gallus-gallus-4.0
-chicken,gallus gallus,Gallus_Gallus-5.0,86,Oct.2016,86,Oct.2016,galGal4,Nov.2011,ICGC Gallus-gallus-4.0
+chicken,gallus gallus,Galgal4,71,Apr.2013,82,Sep.2015,galGal4,Nov.2011,ICGC Gallus-gallus-4.0
+chicken,gallus gallus,Galgal4,71,Apr.2013,83,Dec.2015,galGal5,Dec.2015,ICGC Gallus-gallus-5.0
+chicken,gallus gallus,Gallus_Gallus-5.0,86,Oct.2016,86,Oct.2016,galGal5,Dec.2015,ICGC Gallus-gallus-5.0
 chimpanzee,pan troglodytes,CHIMP2.1,54,May.2009,54,May.2009,panTro2,Mar.2006,CGSC Build 2.1
 chimpanzee,pan troglodytes,CHIMP2.1,54,May.2009,60,Nov.2010,panTro3,Oct.2010,CGSC Build 2.1.3
 chimpanzee,pan troglodytes,CHIMP2.1,54,May.2009,61,Feb.2011,panTro4,Feb.2011,CGSC Build 2.1.4
 chimpanzee,pan troglodytes,CHIMP2.1.4,65,Dec.2011,65,Dec.2011,panTro4,Feb.2011,CGSC Build 2.1.4
+chimpanzee,pan troglodytes,CHIMP2.1.4,65,Dec.2011,85,Jul.2016,panTro5,May.2016,CGSC Build 3.0
 chinese softshell turtle,pelodiscus sinensis,PelSin_1.0,68,Jul.2012,68,Jul.2012,pelSin1,NA,NA
 ciona intestinalis,ciona intestinalis,JGI2,54,May.2009,54,May.2009,ci2,Mar.2005,JGI v2.0
 ciona intestinalis,ciona intestinalis,KH,66,Feb.2012,66,Feb.2012,ci2,Mar.2005,JGI v2.0
@@ -72,6 +74,7 @@ gorilla,gorilla gorilla,gorGor3,59,Aug.2010,59,Aug.2010,NA,NA,NA
 gorilla,gorilla gorilla,gorGor3,59,Aug.2010,63,Jun.2011,gorGor3,May.2011,Wellcome Trust Sanger Institute gorGor3.1
 gorilla,gorilla gorilla,gorGor3.1,64,Sep.2011,64,Sep.2011,gorGor3,May.2011,Wellcome Trust Sanger Institute gorGor3.1
 gorilla,gorilla gorilla,gorGor3.1,64,Sep.2011,78,Dec.2014,gorGor4,Dec.2014,Wellcome Trust Sanger Institute gorGor4
+gorilla,gorilla gorilla,gorGor3.1,64,Sep.2011,84,Mar.2016,gorGor5,Mar.2016,University of Washington GSMRT3
 guinea pig,cavia porcellus,cavPor3,54,May.2009,54,May.2009,cavPor3,Feb.2008,Broad Institute cavPor3
 hedgehog,erinaceus europaeus,eriEur1,54,May.2009,54,May.2009,eriEur1,Jun.2006,Broad Institute Draft_v1
 hedgehog,erinaceus europaeus,eriEur1,54,May.2009,67,May.2012,eriEur2,May.2012,Broad Institute EriEur2.0
@@ -113,6 +116,8 @@ mouse,mus musculus,GRCm38.p1,70,Jan.2013,70,Jan.2013,mm10,Dec.2011,Genome Refere
 mouse,mus musculus,GRCm38.p2,74,Dec.2013,74,Dec.2013,mm10,Dec.2011,Genome Reference Consortium GRCm38
 mouse,mus musculus,GRCm38.p3,78,Dec.2014,78,Dec.2014,mm10,Dec.2011,Genome Reference Consortium GRCm38
 mouse,mus musculus,GRCm38.p4,81,Jul.2015,81,Jul.2015,mm10,Dec.2011,Genome Reference Consortium GRCm38
+mouse,mus musculus,NA,87,Dec.2016,87,Dec.2016,mm10,Dec.2011,Genome Reference Consortium GRCm38
+mouse,mus musculus,GRCm38.p5,88,Mar.2017,88,Mar.2017,mm10,Dec.2011,Genome Reference Consortium GRCm38
 mouse lemur,microcebus murinus,micMur1,54,May.2009,54,May.2009,micMur1,Jul.2007,Broad Institute MicMur1.0
 mouse lemur,microcebus murinus,micMur1,54,May.2009,85,Jul.2016,micMur2,May.2015,Baylor/Broad Institute Mmur_2.0
 mouse lemur,microcebus murinus,Mmur_2.0,86,Oct.2016,86,Oct.2016,micMur2,May.2015,Baylor/Broad Institute Mmur_2.0
