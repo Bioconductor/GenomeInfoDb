@@ -1,3 +1,41 @@
+CHANGES IN VERSION 1.12.0 
+------------------------------
+
+NEW FEATURES
+
+    o Add function standardChromosomes()
+
+    o Seqlevels() setter now supports "fine" and "tidy" modes on GRangesList and
+    GAlignmentsList objects
+
+    o Add assembly_accessions dataset
+
+MODIFICATIONS
+
+    o Updated mapping table between UCSC and Ensembl to include recent builds
+
+    o Use https instead of http to fetch stuff from NCBI
+
+    o Replace 'force=TRUE' with 'pruning.mode="coarse"' in seqlevels() setter
+
+    o Add 'pruning.mode' argument to the keepSeqlevels(), dropSeqlevels(), and
+    keepStandardChromosomes() functions. IMPORTANT NOTE: Like for the
+    seqlevels() setter, the default pruning mode is "error", which means that
+    now these functions fail when some of the seqlevels to drop from 'x' are in
+    use. The old behavior was to silently prune 'x' (doing "coarse" pruning)
+
+    o Update files in data directory 
+
+    o Updated internal functions .lookup_refseq_assembly_accession() and
+    fetch_assembly_report() for speed and efficiency 
+
+    o move some files from GenomeInfoDb/data/ to GenomeInfoDbData annotation package
+
+BUG FIXES
+
+    o fetch_assembly_summary() updated to work with recent changes to format of
+    files assembly_summary_genbank.txt and assembly_summary_refseq.txt
+
 CHANGES IN VERSION 1.10.0 
 ------------------------------
 
