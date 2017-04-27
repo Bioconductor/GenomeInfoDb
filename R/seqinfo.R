@@ -24,26 +24,11 @@
 
 ### The dangling seqlevels in 'x' are those seqlevels that the user wants to
 ### drop but are in use.
-getDanglingSeqlevels <- function(x, new2old=NULL, force=FALSE,
+getDanglingSeqlevels <- function(x, new2old=NULL,
                             pruning.mode=c("error", "coarse", "fine", "tidy"),
                             new_seqlevels)
 {
-    if (!isTRUEorFALSE(force))
-        stop("'force' must be TRUE or FALSE")
     pruning.mode <- match.arg(pruning.mode)
-    if (force) {
-        msg <- wmsg("In BioC 3.5, the 'force' argument was replaced by ",
-                    "the more flexible 'pruning.mode' argument, and is ",
-                    "deprecated. ",
-                    "See ?seqinfo for the supported pruning modes. ",
-                    "Note that 'force=TRUE' is equivalent to ",
-                    "'pruning.mode=\"coarse\"'.")
-        .Deprecated(msg=msg)
-        if (pruning.mode != "error")
-            stop(wmsg("only one of 'force' or 'pruning.mode' can be used ",
-                      "but not both"))
-        pruning.mode <- "coarse"
-    }
     if (!is.character(new_seqlevels) || any(is.na(new_seqlevels)))
         stop(wmsg("the supplied 'seqlevels' must be a character vector ",
                   "with no NAs"))
@@ -166,7 +151,7 @@ sequenceGeometryHasChanged <- function(new_seqinfo, old_seqinfo, new2old=NULL)
 setGeneric("seqinfo", function(x) standardGeneric("seqinfo"))
 
 setGeneric("seqinfo<-", signature="x",
-    function(x, new2old=NULL, force=FALSE,
+    function(x, new2old=NULL,
              pruning.mode=c("error", "coarse", "fine", "tidy"),
              value)
         standardGeneric("seqinfo<-")
@@ -195,7 +180,7 @@ setGeneric("seqlevels", function(x) standardGeneric("seqlevels"))
 setMethod("seqlevels", "ANY", function(x) seqlevels(seqinfo(x)))
 
 setGeneric("seqlevels<-", signature="x",
-    function(x, force=FALSE,
+    function(x,
              pruning.mode=c("error", "coarse", "fine", "tidy"),
              value)
         standardGeneric("seqlevels<-")
@@ -204,7 +189,7 @@ setGeneric("seqlevels<-", signature="x",
 ### Default "seqlevels<-" method works on any object 'x' with working
 ### "seqinfo" and "seqinfo<-" methods.
 setReplaceMethod("seqlevels", "ANY",
-    function(x, force=FALSE,
+    function(x,
              pruning.mode=c("error", "coarse", "fine", "tidy"),
              value)
     {
@@ -221,8 +206,7 @@ setReplaceMethod("seqlevels", "ANY",
             new2old <- match(value, seqlevels(x))
         }
         ## Do the replacement.
-        seqinfo(x, new2old=new2old, force=force, pruning.mode=pruning.mode) <-
-            x_seqinfo
+        seqinfo(x, new2old=new2old, pruning.mode=pruning.mode) <- x_seqinfo
         x
     }
 )

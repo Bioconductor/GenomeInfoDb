@@ -377,13 +377,10 @@ setReplaceMethod("names", "Seqinfo",
 )
 
 setReplaceMethod("seqlevels", "Seqinfo",
-    function(x, force=FALSE,
+    function(x,
              pruning.mode=c("error", "coarse", "fine", "tidy"),
              value)
     {
-        if (!identical(force, FALSE))
-            warning("'force' is ignored in \"seqlevels<-\" method ",
-                    "for Seqinfo objects")
         pruning.mode <- match.arg(pruning.mode)
         if (pruning.mode != "error")
             warning("'pruning.mode' is ignored in \"seqlevels<-\" method ",

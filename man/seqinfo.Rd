@@ -38,14 +38,15 @@
 
 \usage{
 seqinfo(x)
-seqinfo(x, new2old=NULL, force=FALSE,
+seqinfo(x,
+        new2old=NULL,
         pruning.mode=c("error", "coarse", "fine", "tidy")) <- value
 
 seqnames(x)
 seqnames(x) <- value
 
 seqlevels(x)
-seqlevels(x, force=FALSE,
+seqlevels(x,
           pruning.mode=c("error", "coarse", "fine", "tidy")) <- value
 sortSeqlevels(x, X.is.sexchrom=NA)
 seqlevelsInUse(x)
@@ -87,10 +88,6 @@ genome(x) <- value
     as \code{seqinfo(x)} (i.e. \code{length(values) >= length(seqinfo(x))})
     and also \code{seqlevels(values)[seq_len(length(seqlevels(x)))]} must be
     identical to \code{seqlevels(x)}.
-  }
-  \item{force}{
-    Deprecated in favor of the \code{pruning.mode} argument. See below.
-    Note that \code{force=TRUE} is equivalent to \code{pruning.mode="coarse"}.
   }
   \item{pruning.mode}{
     When some of the seqlevels to drop from \code{x} are in use (i.e. have
