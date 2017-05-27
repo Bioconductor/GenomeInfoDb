@@ -5,6 +5,7 @@ F	F	T	3L	chr3L	3L
 F	F	T	3R	chr3R	3R
 F	F	T	4	chr4	4
 F	T	F	X	chrX	X
+F	T	F	Y	chrY	Y
 T	F	F	MT	chrM	dmel_mitochondrion_genome
 F	F	F	2LHet	chr2LHet	2LHet
 F	F	F	2Rhet	chr2RHet	2RHet
