@@ -95,6 +95,7 @@ human,homo sapiens,GRCh38.p2,79,Mar.2015,79,Mar.2015,hg38,Dec.2013,Genome Refere
 human,homo sapiens,GRCh38.p3,81,Jul.2015,81,Jul.2015,hg38,Dec.2013,Genome Reference Consortium GRCh38
 human,homo sapiens,GRCh38.p5,83,Dec.2015,83,Dec.2015,hg38,Dec.2013,Genome Reference Consortium GRCh38
 human,homo sapiens,GRCh38.p7,85,Jul.2016,85,Jul.2016,hg38,Dec.2013,Genome Reference Consortium GRCh38
+human,homo sapiens,GRCh38.p10,88,Mar.2017,88,Mar.2017,hg38,Dec.2013,Genome Reference Consortium GRCh38
 hyrax,procavia capensis,proCap1,54,May.2009,54,May.2009,proCap1,Jul.2008,Baylor College of Medicine HGSC Procap1.0
 kangaroo rat,dipodomys ordii,dipOrd1,54,May.2009,54,May.2009,dipOrd1,Jul.2008,Baylor/Broad Institute DipOrd1.0
 lamprey,petromyzon marinus,Pmarinus_7.0,64,Sep.2011,64,Sep.2011,petMar2,Sep.2010,WUGSC 7.0
@@ -116,8 +117,7 @@ mouse,mus musculus,GRCm38.p1,70,Jan.2013,70,Jan.2013,mm10,Dec.2011,Genome Refere
 mouse,mus musculus,GRCm38.p2,74,Dec.2013,74,Dec.2013,mm10,Dec.2011,Genome Reference Consortium GRCm38
 mouse,mus musculus,GRCm38.p3,78,Dec.2014,78,Dec.2014,mm10,Dec.2011,Genome Reference Consortium GRCm38
 mouse,mus musculus,GRCm38.p4,81,Jul.2015,81,Jul.2015,mm10,Dec.2011,Genome Reference Consortium GRCm38
-mouse,mus musculus,NA,87,Dec.2016,87,Dec.2016,mm10,Dec.2011,Genome Reference Consortium GRCm38
-mouse,mus musculus,GRCm38.p5,88,Mar.2017,88,Mar.2017,mm10,Dec.2011,Genome Reference Consortium GRCm38
+mouse,mus musculus,GRCm38.p5,87,Dec.2016,87,Dec.2016,mm10,Dec.2011,Genome Reference Consortium GRCm38
 mouse lemur,microcebus murinus,micMur1,54,May.2009,54,May.2009,micMur1,Jul.2007,Broad Institute MicMur1.0
 mouse lemur,microcebus murinus,micMur1,54,May.2009,85,Jul.2016,micMur2,May.2015,Baylor/Broad Institute Mmur_2.0
 mouse lemur,microcebus murinus,Mmur_2.0,86,Oct.2016,86,Oct.2016,micMur2,May.2015,Baylor/Broad Institute Mmur_2.0
@@ -130,6 +130,7 @@ pig,sus scrofa,Sscrofa9,56,Sep.2009,64,Sep.2011,susScr3,Aug.2011,Swine Genome Se
 pig,sus scrofa,Sscrofa10.2,67,May.2012,67,May.2012,susScr3,Aug.2011,Swine Genome Sequencing Consortium Sscrofa10.2
 pika,ochotona princeps,OchPri2.0,54,May.2009,54,May.2009,ochPri2,Jul.2008,Broad Institute OchPri2
 pika,ochotona princeps,OchPri2.0,54,May.2009,67,May.2012,ochPri3,May.2012,Broad Institute OchPri3.0
+pika,ochotona princeps,OchPri2.0-Ens,89,May.2017,89,May.2017,ochPri3,May.2012,Broad Institute OchPri3.0
 platyfish,xiphophorus maculatus,Xipmac4.4.2,69,Oct.2012,69,Oct.2012,NA,NA,NA
 platypus,ornithorhynchus anatinus,OANA5,54,May.2009,54,May.2009,ornAna2,Feb.2007,WUSTL v5.0.1
 rabbit,oryctolagus cuniculus,RABBIT,54,May.2009,54,May.2009,oryCun2,Apr.2009,Broad Institute release OryCun2
