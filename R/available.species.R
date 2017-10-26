@@ -5,7 +5,7 @@
 ## In February 2017 the mapping files in GenomeInfoDb/data/ were moved to the 
 ## GenomeInfoDbData annotation package.
 
-.lookupSpeciesFromTaxId <- function(id) {
+.lookupSpeciesFromTaxId <- function(id, all=FALSE) {
     if (!exists("specData")) {
      data(specData, package = "GenomeInfoDbData")
     }
@@ -32,7 +32,11 @@
             return(res[1,])
         } else {
             res <- res[!tooLong,]
-            return(res[1,])
+            if (all) {
+                return(res)
+            } else {
+                return(res[1,])
+            }
         }
     }
 }
