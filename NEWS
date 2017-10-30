@@ -1,5 +1,24 @@
+CHANGES IN VERSION 1.14.0
+-------------------------
+
+NEW FEATURES
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+DEPRECATED AND DEFUNCT
+
+    o Remove 'force' argument from seqinfo() and seqlevels() setters (the
+      argument got deprecated in BioC 3.5 in favor of new and more flexible
+      'pruning.mode' argument).
+
+BUG FIXES
+
+    o Add missing Y/chrY entry in seqlevel style db for Drosophila
+      melanogaster and Rattus norvegicus.
+
+
 CHANGES IN VERSION 1.12.0 
-------------------------------
+-------------------------
 
 NEW FEATURES
 
