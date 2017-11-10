@@ -18,8 +18,9 @@
 }
 
 \value{
-  A data frame with 1 row per species designation and two columns.  The
-  1st column is the taxonomy Id. The second columns is the species name.
+  A data frame with 1 row per species designation and three columns.  The
+  1st column is the taxonomy Id. The second columns is the genus and the
+  third is the species name.
 }
 
 \author{

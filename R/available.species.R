@@ -42,15 +42,19 @@
 }
 
 available.species <- function(){
-    if (!exists("speciesMap"))
-        data(speciesMap, package="GenomeInfoDbData")
-    speciesMap
+    if (!exists("specData"))
+        data(specData, package="GenomeInfoDbData")
+    specData
 }
 
 .getTaxonomyId <- function(species) {
     if (is.na(species)) {return(NA)} 
-    if (!exists("speciesMap"))
-        data(speciesMap, package="GenomeInfoDbData")
+    if (!exists("speciesMap")){
+        data(specData, package="GenomeInfoDbData")
+        specData$species[is.na(specData$species)] = ""
+        speciesMap = data.frame(taxon = specData[["tax_id"]],
+            species = trimws(paste(specData[["genus"]], specData[["species"]])))
+    }
     species <- gsub(" {2,}", " ", species)
     species <- gsub(",", " ", species, fixed=TRUE)
     idx <- match(species, speciesMap$species)
@@ -68,8 +72,10 @@ available.species <- function(){
 }
 
 .checkForAValidTaxonomyId <- function(taxId) {
-    if (!exists("validTaxIds"))
-        data(validTaxIds, package = "GenomeInfoDbData")
+    if (!exists("validTaxIds")){
+        data(specData, package = "GenomeInfoDbData")
+        validTaxIds = unique(specData$tax_id)
+    }
     validTaxIds <- c(validTaxIds, NA_integer_)
     if(!(taxId %in% validTaxIds)) {
           stop(wmsg(paste0("The taxonomy Id you have provided (",taxId,")",
