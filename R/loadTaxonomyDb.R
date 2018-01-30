@@ -81,7 +81,8 @@ lookup_tax_id_by_organism <- function(organism)
     as.integer(taxdb[["tax_id"]][[idx]])
 }
 
-.checkForAValidTaxonomyId <- function(tax_id)
+### NOT exported but used in the GenomicFeatures package.
+check_tax_id <- function(tax_id)
 {
     stopifnot(isSingleNumber(tax_id))
     if (!is.integer(tax_id))
