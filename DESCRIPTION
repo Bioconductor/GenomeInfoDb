@@ -5,7 +5,7 @@ Description: Contains data and functions that
 	sequence naming conventions (e.g., "chr1" versus "1"),
 	including a function that attempts to place sequence names in
 	their natural, rather than lexicographic, order.
-Version: 1.15.2
+Version: 1.15.4
 Encoding: UTF-8
 Author: Sonali Arora, Martin Morgan, Marc Carlson, H. Pagès
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
@@ -24,7 +24,7 @@ License: Artistic-2.0
 Collate: utils.R
 	rankSeqlevels.R
 	assembly-utils.R
-	available.species.R
+	loadTaxonomyDb.R
 	fetchExtendedChromInfoFromUCSC.R
 	fetchSequenceInfo.R
 	seqinfo.R

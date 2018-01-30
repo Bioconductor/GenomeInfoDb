@@ -27,7 +27,7 @@ export(
     mapGenomeBuilds,
     genomeBuilds,
     listOrganisms,
-    
+
     ## seqlevelsStyle.R:
     genomeStyles,
     extractSeqlevels,
@@ -96,6 +96,9 @@ exportMethods(
 ###
 
 export(
+    ## loadTaxonomyDb.R:
+    loadTaxonomyDb, available.species,
+
     ## seqinfo.R:
     seqinfo, "seqinfo<-",
     seqnames, "seqnames<-",
@@ -112,8 +115,7 @@ export(
 
     ## GenomeDescription-class.R:
     commonName, provider, providerVersion,
-    releaseDate, releaseName, bsgenomeName,
-    available.species
+    releaseDate, releaseName, bsgenomeName
 )
 
 exportMethods(
