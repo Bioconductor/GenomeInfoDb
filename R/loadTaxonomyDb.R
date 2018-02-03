@@ -1,8 +1,8 @@
 ### =========================================================================
-### Helpers to map between taxonomy ID, genus, and species
+### Helpers to map between taxonomy ID, genus, and organism
 ### -------------------------------------------------------------------------
 
-### In February 2017 the mapping files in GenomeInfoDb/data/ were moved to the 
+### In February 2017 the mapping files in GenomeInfoDb/data/ were moved to the
 ### GenomeInfoDbData annotation package.
 
 .TAXONOMY_DB_cache <- new.env(parent=emptyenv())
@@ -36,33 +36,31 @@ available.species <- function()
 }
 
 ### NOT exported but used in the GenomicFeatures package.
+### Not vectorized.
 lookup_organism_by_tax_id <- function(tax_id, all=FALSE)
 {
+    stopifnot(isSingleNumber(tax_id))
     taxdb <- loadTaxonomyDb()
     ## Find matches.
-    g <- taxdb[["tax_id"]] == tax_id
-    ans <- taxdb[g, , drop=FALSE]
-    if (nrow(ans) < 1) 
-        stop(wmsg("Cannot find a species to match the requested ",
+    idx <- which(taxdb[["tax_id"]] == tax_id)
+    if (length(idx) == 0L)
+        stop(wmsg("Cannot find an organism to match the requested ",
                   "taxonomy ID. Please provide the genus and species ",
                   "manually."))
-    if (nrow(ans) == 1)
+    ans <- taxdb[idx, , drop=FALSE]
+    if (nrow(ans) == 1L || all)
         return(ans)
-    ## nrow(ans) > 1
-    .tooLong <- function(x) {
-        splt <- unlist(strsplit(x, split=" "))
-        length(splt) > 1
-    }
-    tooLong <- unlist(lapply(ans[["species"]], .tooLong))
-    if (all(tooLong))
-        return(ans[1, ])
-    ans <- ans[!tooLong, , drop=FALSE]
-    if (!all)
-        ans <- ans[1, ]
-    ans
+    ## When nrow(ans) > 1 and 'all' is FALSE, we first reduce the set of
+    ## entries to keep single word species only, then pick up the first
+    ## entry.
+    idx1 <- which(lengths(strsplit(ans[["species"]], split=" ")) == 1L)
+    if (length(idx1) >= 1L)
+        ans <- ans[idx1, , drop=FALSE]
+    ans[1L, , drop=FALSE]
 }
 
 ### NOT exported but used in the GenomicFeatures package.
+### Not vectorized.
 lookup_tax_id_by_organism <- function(organism)
 {
     stopifnot(is.character(organism) || is.factor(organism),
@@ -82,18 +80,21 @@ lookup_tax_id_by_organism <- function(organism)
 }
 
 ### NOT exported but used in the GenomicFeatures package.
+### Vectorized.
 check_tax_id <- function(tax_id)
 {
-    stopifnot(isSingleNumber(tax_id))
+    stopifnot(is.numeric(tax_id))
     if (!is.integer(tax_id))
         tax_id <- as.integer(tax_id)
     taxdb <- loadTaxonomyDb()
-    if (!(tax_id %in% taxdb[["tax_id"]])) {
-          stop(wmsg("The taxonomy ID you have provided (", tax_id, ") ",
-                    "is not in our list of valid taxonomy IDs. ",
-                    "Please check to make sure that your taxonomy ID ",
-                    "is legitimate and if so, then please tell ",
-                    "us about it so that we can update our list."))
+    bad_idx <- which(!(tax_id %in% taxdb[["tax_id"]]))
+    if (length(bad_idx) != 0L) {
+          bad_ids <- paste0(unique(tax_id[bad_idx]), collapse=", ")
+          stop(wmsg("Unknown taxonomy IDs: ", bad_ids,
+                    "\n\n  These taxonomy IDs are not in our list of valid ",
+                    "taxonomy IDs. Please check to make sure that the ",
+                    "supplied taxonomy IDs are legitimate and if so, then ",
+                    "please tell us about it so that we can update our list."))
     }
 }
 
