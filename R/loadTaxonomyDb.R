@@ -1,5 +1,5 @@
 ### =========================================================================
-### Helpers to map between taxonomy ID, genus, and organism
+### Helpers to map between taxonomy ID and organism
 ### -------------------------------------------------------------------------
 
 ### In February 2017 the mapping files in GenomeInfoDb/data/ were moved to the
