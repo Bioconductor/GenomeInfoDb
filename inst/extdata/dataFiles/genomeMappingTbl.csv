@@ -3,6 +3,7 @@ algerian mouse,mus spretus,SPRET_EiJ_v1,86,Oct.2016,86,Oct.2016,NA,NA,NA
 alpaca,vicugna pacos,vicPac1,54,May.2009,54,May.2009,vicPac1,Jul.2008,Broad Institute VicPac1.0
 alpaca,vicugna pacos,vicPac1,54,May.2009,71,Apr.2013,vicPac2,Mar.2013,Broad Institute Vicugna_pacos-2.0.1
 amazon molly,poecilia formosa,Poecilia_formosa-5.1.2,76,Aug.2014,76,Aug.2014,poeFor1,NA,NA
+amur tiger,panthera tigris altaica,PanTig1.0,93,Jul.2018,93,Jul.2018,NA,NA,NA
 angola colobus,colobus angolensis palliatus,Cang.pa_1.0,91,Dec.2017,91,Dec.2017,colAng1,NA,NA
 anole lizard,anolis carolinensis,AnoCar1.0,54,May.2009,54,May.2009,anoCar1,Feb.2007,Broad Institute AnoCar1
 anole lizard,anolis carolinensis,AnoCar1.0,54,May.2009,58,May.2010,anoCar2,May.2010,Broad Institute AnoCar2
@@ -33,6 +34,7 @@ cat,felis catus,CAT,54,May.2009,64,Sep.2011,felcat5,Sep.2011,ICGSC Felis_catus-6
 cat,felis catus,Felis_catus_6.2,70,Jan.2013,70,Jan.2013,felcat5,Sep.2011,ICGSC Felis_catus-6.2
 cat,felis catus,Felis_catus_6.2,70,Jan.2013,78,Dec.2014,felCat8,Nov.2014,ICGSC Felis_catus_8.0
 cat,felis catus,Felis_catus_8.0,91,Dec.2017,91,Dec.2017,felCat8,Nov.2014,ICGSC Felis_catus_8.0
+cat,felis catus,Felis_catus_9.0,93,Jul.2018,93,Jul.2018,felCat8,Nov.2014,ICGSC Felis_catus_8.0
 cave fish,astyanax mexicanus,AstMex102,74,Dec.2013,74,Dec.2013,astMex1,NA,NA
 chicken,gallus gallus,WASHUC2,54,May.2009,54,May.2009,galGal3,May.2006,WUSTL Gallus-gallus-2.1
 chicken,gallus gallus,WASHUC2,54,May.2009,65,Dec.2011,galGal4,Nov.2011,ICGC Gallus-gallus-4.0
@@ -120,10 +122,12 @@ human,homo sapiens,GRCh38.p7,85,Jul.2016,85,Jul.2016,hg38,Dec.2013,Genome Refere
 human,homo sapiens,GRCh38.p10,88,Mar.2017,88,Mar.2017,hg38,Dec.2013,Genome Reference Consortium GRCh38
 human,homo sapiens,GRCh38.p12,92,Apr.2018,92,Apr.2018,hg38,Dec.2013,Genome Reference Consortium GRCh38
 hyrax,procavia capensis,proCap1,54,May.2009,54,May.2009,proCap1,Jul.2008,Baylor College of Medicine HGSC Procap1.0
+inshore hagfish,eptatretus burgeri,Eburgeri_3.2,93,Jul.2018,93,Jul.2018,NA,NA,NA
 kangaroo rat,dipodomys ordii,dipOrd1,54,May.2009,54,May.2009,dipOrd1,Jul.2008,Baylor/Broad Institute DipOrd1.0
 kangaroo rat,dipodomys ordii,Dord_2.0,90,Aug.2017,90,Aug.2017,dipOrd1,Jul.2008,Baylor/Broad Institute DipOrd1.0
 lamprey,petromyzon marinus,Pmarinus_7.0,64,Sep.2011,64,Sep.2011,petMar2,Sep.2010,WUGSC 7.0
 lamprey,petromyzon marinus,Pmarinus_7.0,64,Sep.2011,91,Dec.2017,petMar3,Dec.2017,University of Kentucky Pmar_germline 1.0
+leopard,panthera pardus,PanPar1.0,93,Jul.2018,93,Jul.2018,NA,NA,NA
 lesser egyptian jerboa,jaculus jaculus,JacJac1.0,90,Aug.2017,90,Aug.2017,jacJac1,NA,NA
 tenrec,echinops telfairi,TENREC,54,May.2009,54,May.2009,echTel1,Jul.2005,Broad Institute echTel1
 tenrec,echinops telfairi,TENREC,54,May.2009,70,Jan.2013,echTel2,Nov.2012,Broad Institute EchTel2.0
