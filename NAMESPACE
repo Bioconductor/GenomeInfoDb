@@ -40,7 +40,7 @@ export(
     standardChromosomes, keepStandardChromosomes,
 
     ## Seqinfo-class.R:
-    Seqinfo,
+    Seqinfo, checkCompatibleSeqinfo,
 
     ## GenomeDescription-classR:
     GenomeDescription

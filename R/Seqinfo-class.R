@@ -649,3 +649,10 @@ setMethod("intersect", c("Seqinfo", "Seqinfo"), function(x, y) {
   merge(x, y)[intersect(seqnames(x), seqnames(y))]
 })
 
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### checkCompatibleSeqinfo()
+###
+
+checkCompatibleSeqinfo <- function(x, y) merge(seqinfo(x), seqinfo(y))
+

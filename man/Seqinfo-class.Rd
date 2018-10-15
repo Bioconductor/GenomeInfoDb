@@ -37,6 +37,8 @@
 \alias{merge,Seqinfo,Seqinfo-method}
 \alias{intersect,Seqinfo,Seqinfo-method}
 
+\alias{checkCompatibleSeqinfo}
+
 \title{Seqinfo objects}
 
 \description{
@@ -197,6 +199,13 @@
       overlap operations.
     }
   }
+
+  A convenience wrapper, \code{checkCompatibleSeqinfo()}, is provided
+  for checking whether 2 objects have compatible seqinfo components
+  or not. \code{checkCompatibleSeqinfo(x, y)} is equivalent to
+  \code{merge(seqinfo(x), seqinfo(y))} so will work on any objects
+  \code{x} and \code{y} that support \code{\link{seqinfo}()}.
+
 }
 
 \author{H. Pagès}
@@ -305,6 +314,17 @@ if (interactive()) {
 stopifnot(identical(x, merge(x, Seqinfo())))
 stopifnot(identical(x, merge(Seqinfo(), x)))
 stopifnot(identical(x, merge(x, x)))
+
+## ---------------------------------------------------------------------
+## D. checkCompatibleSeqinfo()
+## ---------------------------------------------------------------------
+
+library(GenomicRanges)
+gr1 <- GRanges("chr3:15-25", seqinfo=x)
+gr2 <- GRanges("chr3:105-115", seqinfo=y)
+if (interactive()) {
+  checkCompatibleSeqinfo(gr1, gr2)  # raises an error
+}
 }
 
 \keyword{methods}
