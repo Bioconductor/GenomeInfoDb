@@ -1,3 +1,16 @@
+CHANGES IN VERSION 1.18.0
+-------------------------
+
+NEW FEATURES
+
+    o Add checkCompatibleSeqinfo().
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o Update genomeMappingTbl.csv, the db used internally by genomeBuilds()
+      and family.
+
+
 CHANGES IN VERSION 1.14.0
 -------------------------
 
