@@ -51,18 +51,20 @@ test_genomeBuilds <- function(){
     checkIdentical(tblid, sort(tolower(unique(testBuild$ensemblID))))
 
     # test species not found
-    testBuild <- genomeBuilds(c("Mouse", "NotHere"), style="Ensembl")
+    testBuild <- suppressWarnings({
+        genomeBuilds(c("Mouse", "NotHere"), style="Ensembl")
+    })
     checkIdentical(unique(testBuild$commonName), "mouse")
     warn <- tryCatch(genomeBuilds(c("Mouse", "NotHere"), style="Ensembl"),
                      warning=conditionMessage)
     checkIdentical(warn, "'organism' not found: nothere")
-    testBuild <- genomeBuilds("NotHere")
+    testBuild <- suppressWarnings(genomeBuilds("NotHere"))
     checkTrue(all(dim(testBuild) == c(0L, 0L)))
     warn <- tryCatch(genomeBuilds("NotHere"), warning=conditionMessage)
     checkIdentical(warn, "'organism' not found: nothere")
 
     # test style not found - ERROR
-    checkException(genomeBuilds("Mouse", style="NotHere"))
+    checkException(genomeBuilds("Mouse", style="NotHere"), silent=TRUE)
 
 }
 
@@ -98,12 +100,15 @@ test_mapGenomeBuilds <- function(){
     checkIdentical(sort(unique(data$ensemblID[idx])), buildVal)
 
     # test genome not found
-    testBuild <- mapGenomeBuilds(c("canFam3", "NotHere"), style="Ensembl")
+    testBuild <- suppressWarnings({
+        mapGenomeBuilds(c("canFam3", "NotHere"), style="Ensembl")
+    })
+        
     checkIdentical(unique(testBuild$commonName), "dog")
     warn <- tryCatch(mapGenomeBuilds(c("canFam3", "NotHere"), style="Ensembl"),
                      warning=conditionMessage)
     checkIdentical(warn, "'genome' not found: nothere")
-    testBuild <- mapGenomeBuilds("NotHere")
+    testBuild <- suppressWarnings(mapGenomeBuilds("NotHere"))
     checkTrue(all(dim(testBuild) == c(0L, 0L)))
     warn <- tryCatch(mapGenomeBuilds("NotHere"), warning=conditionMessage)
     checkIdentical(warn, "'genome' not found: nothere")

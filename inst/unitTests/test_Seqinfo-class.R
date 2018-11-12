@@ -80,7 +80,7 @@ test_Seqinfo.merge <- function()
 
     y <- Seqinfo(seqnames=c("chrM", "chr4", "chr3"),
                  seqlengths=c(15, NA, 300))
-    got <- merge(x, y)
+    got <- suppressWarnings(merge(x, y))
     want <- Seqinfo(seqnames=c("chr1", "chr2", "chr3", "chrM", "chr4"),
                     seqlengths=c(100, 200, 300, 15, NA),
                     isCircular=c(NA, FALSE, FALSE, TRUE, NA))
