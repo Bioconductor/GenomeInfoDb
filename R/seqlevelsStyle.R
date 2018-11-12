@@ -17,7 +17,7 @@
     function()
 {
     filePath <- .getDatadir()
-    files <- dir(filePath, full.names=TRUE)
+    files <- dir(filePath, full.names=TRUE, pattern =".txt$")
     setNames(files, sub(".txt$", "", basename(files)))
 }
 
