@@ -180,22 +180,28 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
     ans
 }
 
-fetch_ensembl_chromNames_from_UCSC <- function(genome, chromAliases, UCSC_seqlevels)
+fetch_ensembl_chromNames_from_UCSC <- function(genome, chromAliases, UCSC_seqlevels, duplicated_contigs)
 {
     ensembl_seqlevels <- rep(NA_character_, length(UCSC_seqlevels))
     names(ensembl_seqlevels) <- UCSC_seqlevels
 
-    ## 1. fill in what is already proided by the package `GenomeInfoDb`
-    org <- mapGenomeBuilds(genome)[1,"organism"]
+    ## 1. fill in what is already provided by the package `GenomeInfoDb`
+    org <- suppressWarnings(mapGenomeBuilds(genome)[1,"organism"])
     if (!is.null(org)) {
-        chroms <- genomeStyles(org)
-        ensembl_seqlevels[chroms$UCSC] <- chroms$Ensembl
+        ## org2 <- .normalize_organism(org)
+        ## available_orgs <- names(.getNamedFiles())
+        ## if (org2 %in% available_orgs) {
+        chroms <- try(genomeStyles(org), silent=TRUE)
+        if (!is(chroms, "try-error")) {
+            chroms <- chroms[chroms$UCSC %in% names(ensembl_seqlevels),]
+            ensembl_seqlevels[chroms$UCSC] <- chroms$Ensembl
+        }
     }
 
     ## 2. fetch info from UCSC
     for (tbl in chromAliases) {
-        ucsc_wo_e <- names(ensembl_seqlevels)[which(is.na(ensembl_seqlevels))]
-        if (length(ucsc_wo_e)) {
+        uscs_seqlevels_without_ensembl <- names(ensembl_seqlevels)[which(is.na(ensembl_seqlevels))]
+        if (length(uscs_seqlevels_without_ensembl)) {
             if (tbl == "chromAlias") {
                 colnames <- c("alias", "chrom", "source")
             } else if (tbl == "ucscToEnsembl") {
@@ -205,9 +211,10 @@ fetch_ensembl_chromNames_from_UCSC <- function(genome, chromAliases, UCSC_seqlev
             if ("source" %in% colnames(chroms)) {
                 chroms <- chroms[grep("ensembl", chroms[,"source"]),c("chrom", "alias")]
             }
+            chroms <- chroms[!chroms$alias %in% duplicated_contigs,]
             rownames(chroms) <- chroms$chrom
-            ucsc_wo_e <- ucsc_wo_e[ucsc_wo_e %in% rownames(chroms)]
-            ensembl_seqlevels[ucsc_wo_e] <- chroms[ucsc_wo_e, "alias"]
+            uscs_seqlevels_without_ensembl <- uscs_seqlevels_without_ensembl[uscs_seqlevels_without_ensembl %in% rownames(chroms)]
+            ensembl_seqlevels[uscs_seqlevels_without_ensembl] <- chroms[uscs_seqlevels_without_ensembl, "alias"]
         }
     }
     as.character(ensembl_seqlevels)
@@ -222,6 +229,7 @@ standard_fetch_extended_ChromInfo_from_UCSC <- function(
                                   unmapped_seqs,
                                   goldenPath_url,
                                   chromAliases,
+                                  duplicated_contigs,
                                   quiet)
 {
     chrominfo <- fetch_table_from_UCSC(genome,
@@ -303,9 +311,11 @@ standard_fetch_extended_ChromInfo_from_UCSC <- function(
         ans[sort(unmapped_idx), ] <- ans[unmapped_idx, , drop=FALSE]
     }
     ## add mapping to ensembl chromosomes from UCSC tables
-    Ensembl_seqlevels <- fetch_ensembl_chromNames_from_UCSC(genome=genome,
-            chromAliases=chromAliases, UCSC_seqlevels=ans$UCSC_seqlevel)
-    ans <- cbind(ans, Ensembl_seqlevels)
+    Ensembl_seqlevel <- fetch_ensembl_chromNames_from_UCSC(genome=genome,
+            chromAliases=chromAliases, UCSC_seqlevels=ans$UCSC_seqlevel,
+            duplicated_contigs=duplicated_contigs)
+    if (!all(is.na(Ensembl_seqlevel)))
+        ans <- cbind(ans, Ensembl_seqlevel, stringsAsFactors=FALSE)
     rownames(ans) <- NULL
     ans
 }
@@ -320,8 +330,7 @@ SUPPORTED_UCSC_GENOMES <- list(
         circ_seqs="chrM",
         assembly_accession="GCF_000001405.26",
         special_mappings=c(chrM="MT"),
-        chromAlias="chromAlias",
-        ucscToEnsembl="ucscToEnsembl"
+        get_Ensembl_seqlevels_from=c("chromAlias","ucscToEnsembl")
     ),
 
     hg19=list(
@@ -339,8 +348,7 @@ SUPPORTED_UCSC_GENOMES <- list(
                            chr6_ssto_hap7="HSCHR6_MHC_SSTO_CTG1",
                            chr17_ctg5_hap1="HSCHR17_1_CTG5"),
         unmapped_seqs=list(`assembled-molecule`="chrM"),
-        chromAlias="chromAlias",
-        ucscToEnsembl="ucscToEnsembl"
+        get_Ensembl_seqlevels_from=c("chromAlias","ucscToEnsembl")
     ),
 
     hg18=list(
@@ -353,9 +361,8 @@ SUPPORTED_UCSC_GENOMES <- list(
             `assembled-molecule`="chrM",
             `pseudo-scaffold`=paste0("chr",
                 c("5_h2_hap1", "6_qbl_hap2",
-                  paste0(c((1:22)[-c(12, 14, 20)], "X"), "_random")))),
-        chromAlias=NULL,
-        ucscToEnsembl="ucscToEnsembl"
+                  paste0(c((1:22)[-c(12, 14, 20)], "X"), "_random"))))
+        ## , get_Ensembl_seqlevels_from="ucscToEnsembl"
         ),
 
 ### Chimp
@@ -364,17 +371,14 @@ SUPPORTED_UCSC_GENOMES <- list(
         circ_seqs="chrM",
         assembly_accession="GCF_000001515.5",
         special_mappings=c(chrM="MT"),
-        chromAlias="chromAlias",
-        ucscToEnsembl="ucscToEnsembl"
+        get_Ensembl_seqlevels_from=c("chromAlias","ucscToEnsembl")
     ),
 
     panTro3=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         circ_seqs="chrM",
         assembly_accession="GCA_000001515.3",
-        unmapped_seqs=list(`assembled-molecule`="chrM"),
-        chromAlias=NULL,
-        ucscToEnsembl=NULL
+        unmapped_seqs=list(`assembled-molecule`="chrM")
     ),
 
     panTro2=list(
@@ -385,9 +389,7 @@ SUPPORTED_UCSC_GENOMES <- list(
         unmapped_seqs=list(
             `pseudo-scaffold`=c("chr6_hla_hap1", paste0("chr",
                 c(1, "2a", "2b", 3:20, 22, "X", "Y"), "_random"),
-                "chrUn")),
-        chromAlias=NULL,
-        ucscToEnsembl=NULL
+                "chrUn"))
     ),
 
 ### Cow
@@ -396,17 +398,14 @@ SUPPORTED_UCSC_GENOMES <- list(
         circ_seqs="chrM",
         assembly_accession="GCF_000003055.5",
         special_mappings=c(chrM="MT"),
-        chromAlias="chromAlias",
-        ucscToEnsembl=NULL
+        get_Ensembl_seqlevels_from="chromAlias"
     ),
 
     bosTau7=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         circ_seqs="chrM",
         assembly_accession="GCF_000003205.5",
-        unmapped_seqs=list(`assembled-molecule`="chrM"),
-        chromAlias=NULL,
-        ucscToEnsembl=NULL
+        unmapped_seqs=list(`assembled-molecule`="chrM")
     ),
 
     bosTau6=list(
@@ -414,8 +413,7 @@ SUPPORTED_UCSC_GENOMES <- list(
         circ_seqs="chrM",
         assembly_accession="GCF_000003055.4",
         special_mappings=c(chrM="MT"),
-        chromAlias="chromAlias",
-        ucscToEnsembl="ucscToEnsembl"
+        get_Ensembl_seqlevels_from=c("chromAlias","ucscToEnsembl")
     ),
 
 ### Dog
@@ -427,30 +425,24 @@ SUPPORTED_UCSC_GENOMES <- list(
                            chr4="chr04", chr5="chr05", chr6="chr06",
                            chr7="chr07", chr8="chr08", chr9="chr09",
                            chrM="MT"),
-        chromAlias="chromAlias",
-        ucscToEnsembl=NULL
+        get_Ensembl_seqlevels_from="chromAlias"
     ),
 
     canFam2=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
-        circ_seqs="chrM",
-        chromAlias=NULL,
-        ucscToEnsembl=NULL
+        circ_seqs="chrM"
     ),
 
     canFam1=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
-        circ_seqs="chrM",
-        chromAlias=NULL,
-        ucscToEnsembl=NULL
+        circ_seqs="chrM"
     ),
 
 ### Ferret
     musFur1=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         assembly_accession="GCF_000215625.1",
-        chromAlias="chromAlias",
-        ucscToEnsembl=NULL
+        get_Ensembl_seqlevels_from="chromAlias"
     ),
 
 ### Mouse
@@ -460,8 +452,7 @@ SUPPORTED_UCSC_GENOMES <- list(
         assembly_accession="GCF_000001635.20",
         AssemblyUnits=c("C57BL/6J", "non-nuclear"),
         special_mappings=c(chrM="MT"),
-        chromAlias="chromAlias",
-        ucscToEnsembl="ucscToEnsembl"
+        get_Ensembl_seqlevels_from=c("chromAlias","ucscToEnsembl")
     ),
 
     mm9=list(
@@ -472,9 +463,7 @@ SUPPORTED_UCSC_GENOMES <- list(
         special_mappings=c(chrM="MT"),
         unmapped_seqs=list(
             `pseudo-scaffold`=paste0("chr",
-                c(1, 3:5, 7:9, 13, 16:17, "X", "Y", "Un"), "_random")),
-        chromAlias=NULL,
-        ucscToEnsembl=NULL
+                c(1, 3:5, 7:9, 13, 16:17, "X", "Y", "Un"), "_random"))
     ),
 
     mm8=list(
@@ -485,9 +474,7 @@ SUPPORTED_UCSC_GENOMES <- list(
         unmapped_seqs=list(
             `assembled-molecule`="chrM",
             `pseudo-scaffold`=paste0("chr",
-                c(1, 5, 7:10, 13, 15, 17, "X", "Y", "Un"), "_random")),
-        chromAlias=NULL,
-        ucscToEnsembl=NULL
+                c(1, 5, 7:10, 13, 15, 17, "X", "Y", "Un"), "_random"))
     ),
 
 ### Pig
@@ -496,17 +483,14 @@ SUPPORTED_UCSC_GENOMES <- list(
         circ_seqs="chrM",
         assembly_accession="GCF_000003025.5",
         special_mappings=c(chrM="MT"),
-        chromAlias="chromAlias",
-        ucscToEnsembl=NULL
+        get_Ensembl_seqlevels_from="chromAlias"
     ),
 
     susScr2=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         circ_seqs="chrM",
         assembly_accession="GCF_000003025.3",
-        unmapped_seqs=list(`assembled-molecule`="chrM"),
-        chromAlias=NULL,
-        ucscToEnsembl=NULL
+        unmapped_seqs=list(`assembled-molecule`="chrM")
     ),
 
 ### Rat
@@ -515,8 +499,10 @@ SUPPORTED_UCSC_GENOMES <- list(
         circ_seqs="chrM",
         assembly_accession="GCF_000001895.5",
         special_mappings=c(chrM="MT"),
-        chromAlias="chromAlias",
-        ucscToEnsembl=NULL
+        get_Ensembl_seqlevels_from="chromAlias"
+        ## https://github.com/ucscGenomeBrowser/kent/blob/master/src/hg/makeDb/doc/rn6.txt
+        ## LINES 856:864
+        , duplicated_contigs=c("AABR07023006.1","AABR07022518.1")
     ),
 
 ### Rhesus
@@ -524,17 +510,13 @@ SUPPORTED_UCSC_GENOMES <- list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         circ_seqs="chrM",
         assembly_accession="GCA_000230795.1",
-        unmapped_seqs=list(`assembled-molecule`="chrM"),
-        chromAlias=NULL,
-        ucscToEnsembl=NULL
+        unmapped_seqs=list(`assembled-molecule`="chrM")
     ),
 
     rheMac2=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         assembly_accession="GCF_000002255.3",
-        unmapped_seqs=list(`pseudo-scaffold`="chrUr"),
-        chromAlias=NULL,
-        ucscToEnsembl=NULL
+        unmapped_seqs=list(`pseudo-scaffold`="chrUr")
     ),
 
 ### Chicken
@@ -545,8 +527,7 @@ SUPPORTED_UCSC_GENOMES <- list(
         special_mappings=c(chrLGE22C19W28_E50C23="ChrE22C19W28_E50C23",
                            chrLGE64="ChrE64",
                            chrM="MT"),
-        chromAlias="chromAlias",
-        ucscToEnsembl="ucscToEnsembl"
+        get_Ensembl_seqlevels_from=c("chromAlias","ucscToEnsembl")
     ),
 
     galGal3=list(
@@ -559,9 +540,7 @@ SUPPORTED_UCSC_GENOMES <- list(
         unmapped_seqs=list(
             `pseudo-scaffold`=paste0("chr",
                 c(1:2, 4:8, 10:13, 16:18, 20, 22, 25, 28, "W", "Z",
-                  "E22C19W28_E50C23", "E64", "Un"), "_random")),
-        chromAlias=NULL,
-        ucscToEnsembl=NULL
+                  "E22C19W28_E50C23", "E64", "Un"), "_random"))
     ),
 
 ### Stickleback
@@ -569,8 +548,7 @@ SUPPORTED_UCSC_GENOMES <- list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         circ_seqs="chrM",
         #assembly_accession="GCA_000180675.1"
-        chromAlias="chromAlias",
-        ucscToEnsembl=NULL
+        get_Ensembl_seqlevels_from="chromAlias"
     ),
 
 ### Zebra finch
@@ -594,8 +572,7 @@ SUPPORTED_UCSC_GENOMES <- list(
         circ_seqs="chrM",
         assembly_accession="GCF_000002035.4",
         special_mappings=c(chrM="MT"),
-        chromAlias="chromAlias",
-        ucscToEnsembl=NULL
+        get_Ensembl_seqlevels_from="chromAlias"
     ),
 
     #Too messy!
@@ -611,9 +588,7 @@ SUPPORTED_UCSC_GENOMES <- list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         assembly_accession="GCF_000002195.1",
         special_mappings=setNames(paste0("LG", 1:16), paste0("Group", 1:16)),
-        unmapped_seqs=list(`pseudo-scaffold`="GroupUn"),
-        chromAlias=NULL,
-        ucscToEnsembl=NULL
+        unmapped_seqs=list(`pseudo-scaffold`="GroupUn")
     ),
 
 ### D. melanogaster
@@ -621,9 +596,9 @@ SUPPORTED_UCSC_GENOMES <- list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         circ_seqs="chrM",
         assembly_accession="GCF_000001215.4",
-        special_mappings=c(chrM="MT"),
-        chromAlias="chromAlias",
-        ucscToEnsembl=NULL
+        ## special_mappings=c(chrM="MT"),
+        special_mappings=c(chrM="mitochondrion_genome"),
+        get_Ensembl_seqlevels_from="chromAlias"
     ),
 
     dm3=list(
@@ -631,40 +606,30 @@ SUPPORTED_UCSC_GENOMES <- list(
         circ_seqs="chrM",
         assembly_accession="GCF_000001215.2",
         special_mappings=c(chrM="MT", chrU="Un"),
-        unmapped_seqs=list(`pseudo-scaffold`="chrUextra"),
-        chromAlias=NULL,
-        ucscToEnsembl=NULL
+        unmapped_seqs=list(`pseudo-scaffold`="chrUextra")
     ),
 
 ### C. elegans
     ce10=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
-        circ_seqs="chrM",
-        chromAlias=NULL,
-        ucscToEnsembl=NULL
+        circ_seqs="chrM"
     ),
 
     ce6=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         circ_seqs="chrM",
         assembly_accession="GCF_000002985.1",
-        special_mappings=c(chrM="MT"),
-        chromAlias=NULL,
-        ucscToEnsembl=NULL
+        special_mappings=c(chrM="MT")
     ),
 
     ce4=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
-        circ_seqs="chrM",
-        chromAlias=NULL,
-        ucscToEnsembl=NULL
+        circ_seqs="chrM"
     ),
 
     ce2=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
-        circ_seqs="chrM",
-        chromAlias=NULL,
-        ucscToEnsembl=NULL
+        circ_seqs="chrM"
     ),
 
 ### Yeast
@@ -673,15 +638,12 @@ SUPPORTED_UCSC_GENOMES <- list(
         circ_seqs="chrM",
         assembly_accession="GCF_000146045.2",
         special_mappings=c(chrM="MT"),
-        chromAlias="chromAlias",
-        ucscToEnsembl=NULL
+        get_Ensembl_seqlevels_from="chromAlias"
     ),
 
     sacCer2=list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
-        circ_seqs=c("chrM", "2micron"),
-        chromAlias=NULL,
-        ucscToEnsembl=NULL
+        circ_seqs=c("chrM", "2micron")
     )
     ## more to come...
 )
@@ -706,7 +668,8 @@ fetchExtendedChromInfoFromUCSC <- function(genome,
         special_mappings=supported_genome$special_mappings,
         unmapped_seqs=supported_genome$unmapped_seqs,
         goldenPath_url=goldenPath_url,
-        chromAliases=c(supported_genome$chromAlias, supported_genome$ucscToEnsembl),
+        chromAliases=supported_genome$get_Ensembl_seqlevels_from,
+        duplicated_contigs=supported_genome$duplicated_contigs,
         quiet=quiet)
 }
 
