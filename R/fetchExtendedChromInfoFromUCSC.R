@@ -181,6 +181,7 @@ standard_fetch_extended_ChromInfo_from_UCSC <- function(
                                   AssemblyUnits,
                                   special_mappings,
                                   unmapped_seqs,
+                                  drop_unmapped,
                                   goldenPath_url,
                                   quiet)
 {
@@ -228,13 +229,32 @@ standard_fetch_extended_ChromInfo_from_UCSC <- function(
                             special_mappings=special_mappings)
     if (length(unmapped_seqs) != 0L)
         stopifnot(all(is.na(m)[unmapped_idx]))
-    unexpectedly_unmapped_idx <-
-        which(is.na(m) & !(UCSC_seqlevel %in% unmapped_seqs))
-    if (length(unexpectedly_unmapped_idx) != 0L) {
-        in1string <- paste0(UCSC_seqlevel[unexpectedly_unmapped_idx],
-                            collapse=", ")
-        stop(wmsg("cannot map the following UCSC seqlevel(s) to an ",
-                  "NCBI seqlevel: ", in1string))
+    if (isTRUE(drop_unmapped)) {
+        keep_idx <- which(!is.na(m))
+        ans <- S4Vectors:::extract_data_frame_rows(ans, keep_idx)
+        m <- m[keep_idx]
+        ## Before we drop the unmapped UCSC seqlevels, we want to make sure
+        ## that all the NCBI seqlevels are reverse mapped. For example, in
+        ## the case of hg38, the chromInfo table at UCSC contains sequences
+        ## that belong to GRCh38.p12 but not to GRCh38. So we want to make
+        ## sure that after we drop these "foreign sequences", we are left
+        ## with a one-to-one mapping between UCSC seqlevels and the 455 NCBI
+        ## seqlevels that are in the assembly report for GRCh38.
+        idx <- setdiff(seq_along(NCBI_seqlevel), m)
+        if (length(idx) != 0L) {
+            in1string <- paste0(NCBI_seqlevel[idx], collapse=", ")
+            stop(wmsg("no UCSC seqlevel could be mapped to the following ",
+                      "NCBI seqlevel(s): ", in1string))
+        }
+    } else {
+        unexpectedly_unmapped_idx <-
+            which(is.na(m) & !(UCSC_seqlevel %in% unmapped_seqs))
+        if (length(unexpectedly_unmapped_idx) != 0L) {
+            in1string <- paste0(UCSC_seqlevel[unexpectedly_unmapped_idx],
+                                collapse=", ")
+            stop(wmsg("cannot map the following UCSC seqlevel(s) to an ",
+                      "NCBI seqlevel: ", in1string))
+        }
     }
     GenBankAccn[which(GenBankAccn == "na")] <- NA_character_
     SequenceRole <- factor(assembly_report[ , "SequenceRole"],
@@ -272,7 +292,11 @@ SUPPORTED_UCSC_GENOMES <- list(
         FUN="standard_fetch_extended_ChromInfo_from_UCSC",
         circ_seqs="chrM",
         assembly_accession="GCF_000001405.26",
-        special_mappings=c(chrM="MT")
+        special_mappings=c(chrM="MT"),
+        ## The chromInfo table at UCSC contains sequences that belong to
+        ## GRCh38.p12 but not to GRCh38. Because we want to map hg38 to
+        ## GRCh38 and not to GRCh38.p12, we drop these sequences.
+        drop_unmapped=TRUE
     ),
 
     hg19=list(
@@ -590,6 +614,7 @@ fetchExtendedChromInfoFromUCSC <- function(genome,
         AssemblyUnits=supported_genome$AssemblyUnits,
         special_mappings=supported_genome$special_mappings,
         unmapped_seqs=supported_genome$unmapped_seqs,
+        drop_unmapped=supported_genome$drop_unmapped,
         goldenPath_url=goldenPath_url,
         quiet=quiet)
 }
