@@ -1,3 +1,23 @@
+CHANGES IN VERSION 1.20.0
+-------------------------
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o Update genomeMappingTbl.csv, the db used internally by genomeBuilds()
+      and family.
+
+BUG FIXES
+
+    o Fix bug in seqlevelsStyle()
+      (see https://github.com/Bioconductor/GenomeInfoDb/issues/3 for more
+      information)
+
+    o Fix fetchExtendedChromInfoFromUCSC("hg38"), which got broken by a
+      recent change on the UCSC side
+      (see https://support.bioconductor.org/p/117808/#117831 for more
+      information)
+
+
 CHANGES IN VERSION 1.18.0
 -------------------------
 
