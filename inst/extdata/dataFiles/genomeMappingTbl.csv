@@ -1,26 +1,38 @@
 commonName,organism,ensemblID,origEnsemblVersion,origEnsemblDate,ensemblVersion,ensemblDate,ucscID,ucscDate,releaseName
+abingdon island giant tortoise,chelonoidis abingdonii,ASM359739v1,96,Apr.2019,96,Apr.2019,NA,NA,NA
 agassiz's desert tortoise,gopherus agassizii,ASM289641v1,95,Jan.2019,95,Jan.2019,NA,NA,NA
 algerian mouse,mus spretus,SPRET_EiJ_v1,86,Oct.2016,86,Oct.2016,NA,NA,NA
 alpaca,vicugna pacos,vicPac1,54,May.2009,54,May.2009,vicPac1,Jul.2008,Broad Institute VicPac1.0
 alpaca,vicugna pacos,vicPac1,54,May.2009,71,Apr.2013,vicPac2,Mar.2013,Broad Institute Vicugna_pacos-2.0.1
+alpine marmot,marmota marmota marmota,marMar2.1,96,Apr.2019,96,Apr.2019,NA,NA,NA
 amazon molly,poecilia formosa,Poecilia_formosa-5.1.2,76,Aug.2014,76,Aug.2014,poeFor1,NA,NA
+american beaver,castor canadensis,C.can_genome_v1.0,96,Apr.2019,96,Apr.2019,NA,NA,NA
+american bison,bison bison bison,Bison_UMD1.0,96,Apr.2019,96,Apr.2019,NA,NA,NA
 american black bear,ursus americanus,ASM334442v1,95,Jan.2019,95,Jan.2019,NA,NA,NA
+american mink,neovison vison,NNQGG.v01,96,Apr.2019,96,Apr.2019,NA,NA,NA
 angola colobus,colobus angolensis palliatus,Cang.pa_1.0,91,Dec.2017,91,Dec.2017,colAng1,NA,NA
 anole lizard,anolis carolinensis,AnoCar1.0,54,May.2009,54,May.2009,anoCar1,Feb.2007,Broad Institute AnoCar1
 anole lizard,anolis carolinensis,AnoCar1.0,54,May.2009,58,May.2010,anoCar2,May.2010,Broad Institute AnoCar2
 anole lizard,anolis carolinensis,AnoCar2.0,61,Feb.2011,61,Feb.2011,anoCar2,May.2010,Broad Institute AnoCar2
+arctic ground squirrel,urocitellus parryii,ASM342692v1,96,Apr.2019,96,Apr.2019,NA,NA,NA
+argentine black and white tegu,salvator merianae,HLtupMer3,96,Apr.2019,96,Apr.2019,NA,NA,NA
 armadillo,dasypus novemcinctus,ARMA,54,May.2009,54,May.2009,NA,NA,NA
 armadillo,dasypus novemcinctus,ARMA,54,May.2009,65,Dec.2011,dasNov3,Dec.2011,Broad institute DasNov3
 armadillo,dasypus novemcinctus,dasNov2,58,May.2012,58,May.2012,dasNov3,Dec.2011,Broad institute DasNov3
 armadillo,dasypus novemcinctus,Dasnov3.0,74,Dec.2013,74,Dec.2013,dasNov3,Dec.2011,Broad institute DasNov3
 armadillo,dasypus novemcinctus,NA,85,Jul.2016,85,Jul.2016,dasNov3,Dec.2011,Broad institute DasNov3
 asian bonytongue,scleropages formosus,ASM162426v1,94,Oct.2018,94,Oct.2018,NA,NA,NA
+australian saltwater crocodile,crocodylus porosus,CroPor_comp1,96,Apr.2019,96,Apr.2019,NA,NA,NA
 ballan wrasse,labrus bergylta,BallGen_V1,94,Oct.2018,94,Oct.2018,NA,NA,NA
+bengalese finch,lonchura striata domestica,LonStrDom1,96,Apr.2019,96,Apr.2019,NA,NA,NA
 bicolor damselfish,stegastes partitus,Stegastes_partitus-1.0.2,94,Oct.2018,94,Oct.2018,NA,NA,NA
 black snub-nosed monkey,rhinopithecus bieti,ASM169854v1,91,Dec.2017,91,Dec.2017,NA,NA,NA
+blue tit,cyanistes caeruleus,cyaCae2,96,Apr.2019,96,Apr.2019,NA,NA,NA
+blue-crowned manakin,lepidothrix coronata,Lepidothrix_coronata-1.0,96,Apr.2019,96,Apr.2019,NA,NA,NA
 squirrel monkey,saimiri boliviensis boliviensis,SaiBol1.0,91,Dec.2017,91,Dec.2017,saiBol1,Oct.2011,Broad Institute SaiBol1.0
 bonobo,pan paniscus,panpan1.1,91,Dec.2017,91,Dec.2017,panPan2,Dec.2015,Max-Planck Institute for Evolutionary Anthropology panpan1.1
 brazillian guinea pig,cavia aperea,CavAp1.0,90,Aug.2017,90,Aug.2017,NA,NA,NA
+budgerigar,melopsittacus undulatus,Melopsittacus_undulatus_6.3,96,Apr.2019,96,Apr.2019,NA,NA,NA
 burton's mouthbrooder,haplochromis burtoni,AstBur1.0,94,Oct.2018,94,Oct.2018,NA,NA,NA
 bushbaby,otolemur garnettii,otoGar1,54,May.2009,54,May.2009,NA,NA,NA
 bushbaby,otolemur garnettii,otoGar1,54,May.2009,62,Apr.2011,otoGar3,Mar.2011,Broad Institute OtoGar3
@@ -42,6 +54,7 @@ cat,felis catus,Felis_catus_8.0,91,Dec.2017,91,Dec.2017,felCat8,Nov.2014,ICGSC F
 cat,felis catus,Felis_catus_9.0,93,Jul.2018,93,Jul.2018,felCat8,Nov.2014,ICGSC Felis_catus_8.0
 cave fish,astyanax mexicanus,AstMex102,74,Dec.2013,74,Dec.2013,astMex1,NA,NA
 cave fish,astyanax mexicanus,Astyanax_mexicanus-2.0,94,Oct.2018,94,Oct.2018,astMex1,NA,NA
+central bearded dragon,pogona vitticeps,pvi1.1,96,Apr.2019,96,Apr.2019,NA,NA,NA
 channel catfish,ictalurus punctatus,IpCoco_1.2,94,Oct.2018,94,Oct.2018,NA,NA,NA
 chicken,gallus gallus,WASHUC2,54,May.2009,54,May.2009,galGal3,May.2006,WUSTL Gallus-gallus-2.1
 chicken,gallus gallus,WASHUC2,54,May.2009,65,Dec.2011,galGal4,Nov.2011,ICGC Gallus-gallus-4.0
@@ -50,6 +63,7 @@ chicken,gallus gallus,Galgal4,71,Apr.2013,83,Dec.2015,galGal5,Dec.2015,ICGC Gall
 chicken,gallus gallus,Gallus_Gallus-5.0,86,Oct.2016,86,Oct.2016,galGal5,Dec.2015,ICGC Gallus-gallus-5.0
 chicken,gallus gallus,Gallus_Gallus-5.0,86,Oct.2016,92,Apr.2018,galGal6,Mar.2018,ICGC Gallus-gallus-5.0
 chicken,gallus gallus,GRCg6a,95,Jan.2019,95,Jan.2019,galGal6,Mar.2018,GRCg6 Gallus-gallus-6.0
+chilean tinamou,nothoprocta perdicaria,notPer1,96,Apr.2019,96,Apr.2019,NA,NA,NA
 chimpanzee,pan troglodytes,CHIMP2.1,54,May.2009,54,May.2009,panTro2,Mar.2006,CGSC Build 2.1
 chimpanzee,pan troglodytes,CHIMP2.1,54,May.2009,60,Nov.2010,panTro3,Oct.2010,CGSC Build 2.1.3
 chimpanzee,pan troglodytes,CHIMP2.1,54,May.2009,61,Feb.2011,panTro4,Feb.2011,CGSC Build 2.1.4
@@ -59,6 +73,7 @@ chimpanzee,pan troglodytes,Pan_tro_3.0,91,Dec.2017,91,Dec.2017,panTro5,May.2016,
 chimpanzee,pan troglodytes,Pan_tro_3.0,91,Dec.2017,92,Apr.2018,panTro6,Jan.2018,Clint_PTRv2
 chinese hamster CHOK1GS,cricetulus griseus,CHOK1GS_HDv1,90,Aug.2017,90,Aug.2017,criGri1,Jul.2013,Beijing Genomics Institution-Shenzhen C_griseus_v1.0
 chinese hamster CriGri,cricetulus griseus,CriGri_1.0,90,Aug.2017,90,Aug.2017,criGri1,Jul.2013,Beijing Genomics Institution-Shenzhen C_griseus_v1.0
+chinese hamster PICR,cricetulus griseus,CriGri-PICR,96,Apr.2019,96,Apr.2019,NA,NA,NA
 chinese softshell turtle,pelodiscus sinensis,PelSin_1.0,68,Jul.2012,68,Jul.2012,pelSin1,NA,NA
 ciona intestinalis,ciona intestinalis,JGI2,54,May.2009,54,May.2009,ci2,Mar.2005,JGI v2.0
 ciona intestinalis,ciona intestinalis,KH,66,Feb.2012,66,Feb.2012,ci2,Mar.2005,JGI v2.0
@@ -68,6 +83,7 @@ clown anemonefish,amphiprion ocellaris,AmpOce1.0,94,Oct.2018,94,Oct.2018,NA,NA,N
 cod,gadus morhua,gadMor1,65,Dec.2011,65,Dec.2011,gadMor1,May.2010,Genofisk GadMor_May2010
 coelacanth,latimeria chalumnae,LatCha1,66,Feb.2012,66,Feb.2012,latCha1,Aug.2011,Broad Institute LatCha1
 flycatcher,ficedula albicollis,FicAlb_1.4,73,Sep.2013,73,Sep.2013,ficAlb1,NA,NA
+common canary,serinus canaria,SCA1,96,Apr.2019,96,Apr.2019,NA,NA,NA
 coquerel's sifaka,propithecus coquereli,Pcoq_1.0,91,Dec.2017,91,Dec.2017,NA,NA,NA
 cow,bos taurus,Btau_4.0,54,May.2009,54,May.2009,bosTau4,Oct.2007,Baylor College of Medicine HGSC Btau_4.0
 cow,bos taurus,Btau_4.0,54,May.2009,57,Mar.2010,bosTau6,Nov.2009,University of Maryland v3.1
@@ -77,6 +93,8 @@ cow,bos taurus,UMD3.1,64,Sep.2011,76,Aug.2014,bosTau8,Jun.2014,University of Mar
 cow,bos taurus,ARS-UCD1.2,95,Jan2019,95,Jan2019,bosTau8,Jun.2014,University of Maryland v3.1.1
 crab-eating macaque,macaca fascicularis,Macaca_fascicularis_5.0,91,Dec.2017,91,Dec.2017,macFas5,Jun.2013,Washington University Macaca_fascicularis_5.0
 damara mole rat,fukomys damarensis,DMR_v1.0,90,Aug.2017,90,Aug.2017,NA,NA,NA
+dark-eyed junco,junco hyemalis,ASM382977v1,96,Apr.2019,96,Apr.2019,NA,NA,NA
+daurian ground squirrel,spermophilus dauricus,ASM240643v1,96,Apr.2019,96,Apr.2019,NA,NA,NA
 degu,octodon degus,OctDeg1.0,90,Aug.2017,90,Aug.2017,octDeg1,NA,NA
 dingo,canis lupus dingo,ASM325472v1,95,Jan2019,95,Jan2019,NA,NA,NA
 dog,canis familiaris,CanFam2.0,54,May.2009,54,May.2009,canFam2,May.2005,Broad Institute v2.0
@@ -87,11 +105,13 @@ dolphin,tursiops truncatus,turTru1,54,May.2009,65,Dec.2011,turTru2,Oct.2011,Bayl
 donkey,qquus asinus asinus,ASM303372v1,95,Jan2019,95,Jan2019,NA,NA,NA
 drill,mandrillus leucophaeus,Mleu.le_1.0,91,Dec.2017,91,Dec.2017,NA,NA,NA
 ferret,mustela putorius furo,MusPutFur1.0,69,Oct.2012,69,Oct.2012,musFur,Apr.2011,Ferret Genome Sequencing Consortium MusPutFur1.0
-duck,anas platyrhynchos,BGI_duck_1.0,73,Sep.2013,73,Sep.2013,anaPlat1,NA,NA
+duck,anas platyrhynchos,BGI_duck_1.0,73,Sep.2013,95,Jan.2019,anaPlat1,NA,NA
+duck,anas platyrhynchos,CAU_duck1.0,96,Apr.2019,96,Apr.2019,anaPlat1,NA,NA
 eastern happy,astatotilapia calliptera,fAstCal1.2,94,Oct.2018,94,Oct.2018,NA,NA,NA
 elephant,loxodonta africana,BROADE1,54,May.2009,54,May.2009,NA,NA,NA
 elephant,loxodonta africana,BROADE1,54,May.2009,55,Jul.2009,loxAfr3,Jul.2009,Broad Institute LoxAfr3
 elephant,loxodonta africana,Loxafr3.0,58,May.2010,58,May.2010,loxAfr3,Jul.2009,Broad Institute LoxAfr3
+emu,dromaius novaehollandiae,droNov1,96,Apr.2019,96,Apr.2019,NA,NA,NA
 fruitfly,drosophila melanogaster,BDGP5.4,54,May.2009,54,May.2009,dm3,Apr.2006,BDGP Release 5
 fruitfly,drosophila melanogaster,BDGP5.13,58,May.2010,58,May.2010,dm3,Apr.2006,BDGP Release 5
 fruitfly,drosophila melanogaster,BDGP5.25,59,Aug.2010,59,Aug.2010,dm3,Apr.2006,BDGP Release 5
@@ -101,12 +121,14 @@ fruitfly,drosophila melanogaster,BDGP6,79,Mar.2015,79,Mar.2015,dm6,Aug.2014,BDGP
 fugu,takifugu rubripes,FUGU4.0,54,May.2009,54,May.2009,fr2,Oct.2004,JGI v4.0
 fugu,takifugu rubripes,FUGU4.0,54,May.2009,65,Dec.2011,fr3,Oct.2011,JGI v5.0
 fugu,takifugu rubripes,FUGU5,94,Oct.2018,94,Oct.2018,fr3,Oct.2011,JGI v5.0
+gelada,theropithecus gelada,Tgel_1.0,96,Apr.2019,96,Apr.2019,NA,NA,NA
 gibbon,nomascus leucogenys,Nleu1.0,63,Jun.2011,63,Jun.2011,nomLeu2,Jun.2011,Gibbon Genome Sequencing Consortium Nleu1.1
 gibbon,nomascus leucogenys,Nleu1.0,63,Jun.2011,69,Oct.2012,nomLeu3,Oct.2012,Gibbon Genome Sequencing Consortium Nleu3.0
 gibbon,nomascus leucogenys,Nleu_3.0,91,Dec.2017,91,Dec.2017,nomLeu3,Oct.2012,Gibbon Genome Sequencing Consortium Nleu3.0
 goat,capra hircus,ARS1,92,Apr.2018,92,Apr.2018,capHir1,NA,NA
 golden hamster,mesocricetus auratus,MesAur1.0,90,Aug.2017,90,Aug.2017,mesAur1,NA,NA
 golden snub-nosed monkey,rhinopithecus roxellana,Rrox_v1,91,Dec.2017,90,Dec.2017,rhiRox1,Oct.2014,Novogene Rrox_v1
+golden-collared manakin,manacus vitellinus,ASM171598v2,96,Apr.2019,96,Apr.2019,NA,NA,NA
 gorilla,gorilla gorilla,gorGor1,54,May.2009,54,May.2009,NA,NA,NA
 gorilla,gorilla gorilla,gorGor2,58,May.2010,58,May.2010,NA,NA,NA
 gorilla,gorilla gorilla,gorGor3,59,Aug.2010,59,Aug.2010,NA,NA,NA
@@ -115,13 +137,17 @@ gorilla,gorilla gorilla,gorGor3.1,64,Sep.2011,64,Sep.2011,gorGor3,May.2011,Wellc
 gorilla,gorilla gorilla,gorGor3.1,64,Sep.2011,78,Dec.2014,gorGor4,Dec.2014,Wellcome Trust Sanger Institute gorGor4
 gorilla,gorilla gorilla,gorGor3.1,64,Sep.2011,84,Mar.2016,gorGor5,Mar.2016,University of Washington GSMRT3
 gorilla,gorilla gorilla,gorGor4,91,Dec.2017,91,Dec.2017,gorGor5,Mar.2016,University of Washington GSMRT3
+great tit,parus major,Parus_major1.1,96,Apr.2019,96,Apr.2019,NA,NA,NA
+great spotted kiwi,apteryx haastii,aptHaa1,96,Apr.2019,96,Apr.2019,NA,NA,NA
 greater amberjack,seriola dumerili,Sdu_1.0,94,Oct.2018,94,Oct.2018,NA,NA,NA
+greater bamboo lemur,prolemur simus,Prosim_1.0,96,Apr.2019,96,Apr.2019,NA,NA,NA
 guinea pig,cavia porcellus,cavPor3,54,May.2009,54,May.2009,cavPor3,Feb.2008,Broad Institute cavPor3
 guinea pig,cavia porcellus,Cavpor3.0,90,Aug.2017,90,Aug.2017,cavPor3,Feb.2008,Broad Institute cavPor3
 guppy,poecilia reticulata,Guppy_female_1.0_MT,94,Oct.2018,94,Oct.2018,NA,NA,NA
 hagfish,eptatretus burgeri,Eburgeri_3.2,93,Jul.2018,93,Jul.2018,NA,NA,NA
 hedgehog,erinaceus europaeus,eriEur1,54,May.2009,54,May.2009,eriEur1,Jun.2006,Broad Institute Draft_v1
 hedgehog,erinaceus europaeus,eriEur1,54,May.2009,67,May.2012,eriEur2,May.2012,Broad Institute EriEur2.0
+helmeted guineafowl,numida meleagris,NumMel1.0,96,Apr.2019,96,Apr.2019,NA,NA,NA
 horse,equus caballus,EquCab2,54,May.2009,54,May.2009,equCab2,Sep.2007,Broad Institute EquCab2
 horse,equus caballus,EquCab3.0,95,Jan.2019,95,Jan.2019,equCab2,Sep.2007,Broad Institute EquCab2
 human,homo sapiens,NCBI36,54,May.2009,54,May.2009,hg19,Feb.2009,Genome Reference Consortium GRCh37
@@ -148,20 +174,24 @@ japanese medaka hni,oryzias latipes,ASM223471v1,94,Oct.2018,94,Oct.2018,NA,NA,NA
 japanese medaga hsok,oryzias latipes,ASM223469v1,94,Oct.2018,94,Oct.2018,NA,NA,NA
 japanese medaka hdrr,oryzias latipes,HdrR,54,May.2009,54,May.2009,oryLat2,Oct.2005,NIG v1.0
 japanese medaka hdrr,oryzias latipes,ASM223467v1,94,Oct.2018,94,Oct.2018,oryLat2,Oct.2005,NIG v1.0
+japanese quail ,coturnix japonica,Coturnix_japonica_2.0,96,Apr.2019,96,Apr.2019,NA,NA,NA
 kangaroo rat,dipodomys ordii,dipOrd1,54,May.2009,54,May.2009,dipOrd1,Jul.2008,Baylor/Broad Institute DipOrd1.0
 kangaroo rat,dipodomys ordii,Dord_2.0,90,Aug.2017,90,Aug.2017,dipOrd1,Jul.2008,Baylor/Broad Institute DipOrd1.0
 koala,phascolarctos cinereus,phaCin_tgac_v2.0,95,Jan.2019,95,Jan.2019,NA,NA,NA
+koala,phascolarctos cinereus,phaCin_unsw_v4.1,96,Apr.2019,96,Apr.2019,NA,NA,NA
 lamprey,petromyzon marinus,Pmarinus_7.0,64,Sep.2011,64,Sep.2011,petMar2,Sep.2010,WUGSC 7.0
 lamprey,petromyzon marinus,Pmarinus_7.0,64,Sep.2011,91,Dec.2017,petMar3,Dec.2017,University of Kentucky Pmar_germline 1.0
 leopard,panthera pardus,PanPar1.0,93,Jul.2018,93,Jul.2018,NA,NA,NA
 lesser egyptian jerboa,jaculus jaculus,JacJac1.0,90,Aug.2017,90,Aug.2017,jacJac1,NA,NA
 tenrec,echinops telfairi,TENREC,54,May.2009,54,May.2009,echTel1,Jul.2005,Broad Institute echTel1
 tenrec,echinops telfairi,TENREC,54,May.2009,70,Jan.2013,echTel2,Nov.2012,Broad Institute EchTel2.0
+little spotted kiwi ,apteryx owenii,aptOwe1,96,Apr.2019,96,Apr.2019,NA,NA,NA
 chincilla,chinchilla lanigera,ChiLan1.0,90,Aug.2017,90,Aug.2017,chiLan1,NA,NA
 lyretail cichlid,neolamprologus brichardi,NeoBri1.0,94,Oct.2018,94,Oct.2018,NA,NA,NA
 ma's night monkey,aotus nancymaae,Anan_2.0,91,Dec.2017,91,Dec.2017,NA,NA,NA
 macaque,macaca mulatta,MMUL1.0,54,May.2009,85,Jul.2016,mMul1,NA,NA
 macaque,macaca mulatta,Mmul_8.0.1,86,Oct.2016,86,Oct.2016,mMul1,NA,NA
+mainland tiger snake,notechis scutatus,TS10Xv2-PRI,96,Apr.2019,96,Apr.2019,NA,NA,NA
 makobe island cichlid,pundamilia nyererei,PunNye1.0,94,Oct.2018,94,Oct.2018,NA,NA,NA
 mangrove rivulus,kryptolebias marmoratus,ASM164957v1,94,Oct.2018,94,Oct.2018,NA,NA,NA
 marmoset,callithrix jacchus,callJacc3,56,Sep.2009,56,Sep.2009,calJac3,Mar.2009,WUSTL Callithrix_jacchus-v3.2
@@ -172,6 +202,7 @@ microbat,myotis lucifugus,myoLuc1,54,May.2009,54,May.2009,NA,NA,NA
 microbat,myotis lucifugus,myoLuc1,54,May.2009,59,Aug.2010,myoLuc2,Jul.2010,Broad Institute MyoLuc2.0
 microbat,myotis lucifugus,Myoluc2.0,63,Jun.2011,63,Jun.2011,myoLuc2,Jul.2010,Broad Institute MyoLuc2.0
 midas cichlid,amphilophus citrinellus,Midas_v5,94,Oct.2018,94,Oct.2018,NA,NA,NA
+mongolian gerbil ,meriones unguiculatus,MunDraft-v1.0,96,Apr.2019,96,Apr.2019,NA,NA,NA
 monterrey platyfish,xiphophorus couchianus,Xiphophorus_couchianus-4.0.1,94,Oct.2018,94,Oct.2018,NA,NA,NA
 mouse,mus musculus,NCBIm37,54,May.2009,54,May.2009,mm9,Jul.2007,NCBI Build 37
 mouse,mus musculus,NCBIm37,54,May.2009,65,Dec.2011,mm10,Dec.2011,Genome Reference Consortium GRCm38
@@ -189,9 +220,11 @@ mouse lemur,microcebus murinus,Mmur_3.0,91,Dec.2017,91,Dec.2017,micMur2,May.2015
 mummichog,fundulus heteroclitus,Fundulus_heteroclitus-3.0.2,94,Oct.2018,94,Oct.2018,NA,NA,NA
 naked mole-rat female,heterocephalus glaber,HetGla_female_1.0,90,Aug.2017,90,Aug.2017,hetGla2,Jan.2012,Broad Institute HetGla_female_1.0
 naked mole-rat male,heterocephalus glaber,HetGla_1.0,90,Aug.2017,90,Aug.2017,hetGla1,Jul.2011,Beijing Genomics Institute HetGla_1.0
-deer mouse,peromyscus maniculatus bairdii,Pman_1.0,90,Aug.2017,90,Aug.2017,perManBai1,NA,NA
+deer mouse,peromyscus maniculatus bairdii,Pman_1.0,90,Aug.2017,95,Jan.2019,perManBai1,NA,NA
+deer mouse,peromyscus maniculatus bairdii,HU_Pman_2.1,96,Apr.2019,96,Apr.2019,perManBai1,NA,NA
 northern pike,esox lucius,Eluc_V3,94,Oct.2018,94,Oct.2018,NA,NA,NA
 ocean sunfish,mola mola,ASM169857v1,94,Oct.2018,94,Oct.2018,NA,NA,NA
+okarito brown kiwi,apteryx rowi,aptRow1,96,Apr.2019,96,Apr.2019,NA,NA,NA
 olive baboon,papio anubis,PapAnu2.0,76,Aug.2014,76,Aug.2014,papHam1,Nov.2008,Baylor College of Medicine HGSC Pham_1.0
 olive baboon,papio anubis,Panu_3.0,91,Dec.2017,91,Dec.2017,papHam1,Nov.2008,Baylor College of Medicine HGSC Pham_1.0
 opossum,monodelphis domestica,monDom5,54,May.2009,54,May.2009,monDom5,Oct.2006,Broad Institute release MonDom5
@@ -211,6 +244,7 @@ pig-tailed macaque,macaca nemestrina,Mnem_1.0,91,Dec.2017,91,Dec.2017,NA,NA,NA
 pika,ochotona princeps,OchPri2.0,54,May.2009,54,May.2009,ochPri2,Jul.2008,Broad Institute OchPri2
 pika,ochotona princeps,OchPri2.0,54,May.2009,67,May.2012,ochPri3,May.2012,Broad Institute OchPri3.0
 pika,ochotona princeps,OchPri2.0-Ens,89,May.2017,89,May.2017,ochPri3,May.2012,Broad Institute OchPri3.0
+pink-footed goose,anser brachyrhynchus,ASM259213v1,96,Apr.2019,96,Apr.2019,NA,NA,NA
 platyfish,xiphophorus maculatus,Xipmac4.4.2,69,Oct.2012,69,Oct.2012,xipMac1,NA,NA
 platyfish,xiphophorus maculatus,X_maculatus-5.0-male,94,Oct.2018,94,Oct.2018,xipMac1,NA,NA
 platypus,ornithorhynchus anatinus,OANA5,54,May.2009,54,May.2009,ornAna2,Feb.2007,WUSTL v5.0.1
@@ -225,6 +259,7 @@ rat,rattus norvegicus,Rnor_5.0,70,Jan.2013,76,Aug.2014,rn6,Jul.2014,RGSC Rnor_6.
 rat,rattus norvegicus,Rnor_6.0,80,May.2015,80,May.2015,rn6,Jul.2014,RGSC Rnor_6.0
 red fox,vulpes vulpes,VulVul2.2,95,Jan.2019,95,Jan.2019,NA,NA,NA
 red-bellied piranha,pygocentrus nattereri,Pygocentrus_nattereri-1.0.2,94,Oct.2018,94,Oct.2018,NA,NA,NA
+ruff,calidris pugnax,ASM143184v1,96,Apr.2019,96,Apr.2019,NA,NA,NA
 ryukyu mouse,mus caroli,CAROLI_EIJ_v1.1,90,Aug.2017,90,Aug.2017,NA,NA,NA
 yeast,saccharomyces cerevisiae,SGD1.01,54,May.2009,54,May.2009,sacCer2,Jun.2008,SGD June 2008 sequence
 yeast,saccharomyces cerevisiae,EF2,59,Aug.2010,59,Aug.2010,sacCer2,Jun.2008,SGD June 2008 sequence
@@ -240,12 +275,14 @@ shrew,sorex araneus,sorAra1,54,May.2009,54,May.2009,sorAra2,Aug.2008,Broad Insti
 shrew mouse,mus pahari,PAHARI_EIJ_v1.1,90,Aug.2017,90,Aug.2017,NA,NA,NA
 sloth,choloepus hoffmanni,choHof1,54,May.2009,54,May.2009,choHof1,Jul.2008,Broad Institute ChoHof1.0
 sooty mangabey,cercocebus atys,Caty_1.0,91,Dec.2017,91,Dec.2017,NA,NA,NA
-spiny chromis,acanthochromis polyacanthusASM210954v1,,94,Oct.2018,94,Oct.2018,NA,NA,NA
+spiny chromis,acanthochromis polyacanthusASM210954v1,ASM210954v1,94,Oct.2018,94,Oct.2018,NA,NA,NA
+spoon-billed sandpiper,calidris pygmaea,ASM369795v1,96,Apr.2019,96,Apr.2019,NA,NA,NA
 spotted gar,lepisosteus oculatus,LepOcu1,74,Dec.2013,74,Dec.2013,lepOcu1,NA,NA
 squirrel,ictidomys tridecemlineatus,speTri1,54,May.2009,54,May.2009,NA,NA,NA
 squirrel,ictidomys tridecemlineatus,speTri1,54,May.2009,65,Dec.2011,speTri2,Nov.2011,Broad Institute SpeTri2.0
 squirrel,ictidomys tridecemlineatus,spetri2,67,May.2012,67,May.2012,speTri2,Nov.2011,Broad Institute SpeTri2.0
 squirrel,ictidomys tridecemlineatus,SpeTri2.0,90,Aug.2017,90,Aug.2017,speTri2,Nov.2011,Broad Institute SpeTri2.0
+steppe mouse,mus spicilegus,MUSP714,96,Apr.2019,96,Apr.2019,NA,NA,NA
 stickleback,gasterosteus aculeatus,BROADS1,54,May.2009,54,May.2009,gasAcu1,Feb.2006,Broad Institute Release 1.0
 swamp eel,monopterus albus,M_albus_1.0,94,Oct.2018,94,Oct.2018,NA,NA,NA
 tarsier,tarsius syrichta,tarSyr1,54,May.2009,54,May.2009,tarSyr1,Aug.2008,WUSTL/Broad Institute Tarsyr1.0
@@ -263,10 +300,13 @@ turbot,scophthalmus maximus,ASM318616v1,94,Oct.2018,94,Oct.2018,NA,NA,NA
 turkey,meleagris gallopavo,Turkey_2.01,57,Mar.2010,57,Mar.2010,melGal1,Dec.2009,Turkey Genome Consortium v2.01
 turkey,meleagris gallopavo,NA,59,Aug.2010,59,Aug.2010,melGal1,Dec.2009,Turkey Genome Consortium v2.01
 turkey,meleagris gallopavo,Turkey_2.01,61,Feb.2011,61,Feb.2011,melGal1,Dec.2009,Turkey Genome Consortium v2.01
+ugandan red colobus ,piliocolobus tephrosceles,ASM277652v2,96,Apr.2019,96,Apr.2019,NA,NA,NA
 upper galilee mountains blind mole rat,nannospalax galili,S.galili_v1.0,90,Aug.2017,90,Aug.2017,nanGal1,NA,NA
 vervet-agm,chlorocebus sabaeus,ChlSab1.1,77,Oct.2014,77,Oct.2014,chlSab1,NA,NA
 wallaby,macropus eugenii,Meug_1.0,55,Jul.2009,55,Jul.2009,macEug2,Sep.2009,Tammar Wallaby Genome Sequencing Consortium Meug_1.1
 western mosquitofish,gambusia affinis,ASM309773v1,94,Oct.2018,94,Oct.2018,NA,NA,NA
+white-throated sparrow,zonotrichia albicollis,Zonotrichia_albicollis-1.0.1,96,Apr.2019,96,Apr.2019,NA,NA,NA
+wild yak,bos mutus,BosGru_v2.0,96,Apr.2019,96,Apr.2019,NA,NA,NA
 xenopus,xenopus tropicalis,JGI4.1,54,May.2009,54,May.2009,xenTro3,Nov.2009,JGI v.4.2
 xenopus,xenopus tropicalis,JGI4.2,62,Apr.2011,62,Apr.2011,xenTro3,Nov.2009,JGI v.4.2
 xenopus,xenopus tropicalis,JGI4.2,62,Apr.2011,69,Oct.2012,xenTro7,Sep.2012,JGI v.7.0
