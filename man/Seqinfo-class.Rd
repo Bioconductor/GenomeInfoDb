@@ -81,7 +81,7 @@
       They are also called the \emph{sequence levels} or the \emph{keys}
       of the Seqinfo object.
 
-      Note that, in general, the end-user should not try to alter the
+      Note that, in general, the end user should not try to alter the
       sequence levels with \code{seqnames(x) <- value}. The recommended way
       to do this is with \code{seqlevels(x) <- value} as described below.
     }
