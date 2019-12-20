@@ -108,11 +108,11 @@ fetchExtendedChromInfoFromUCSC(genome,
   additional column:
   \itemize{
     \item \code{Ensembl_seqlevel}: Character vector. This information is
-  obtained from tables provided by UCSC Genome Browser (tables
-  chromAlias or ucscToEnsembl). It is merged with Ensembl chromosome
-  names provided by \code{genomeStyles}. It can contain NAs for missing
-  mapping between UCSC and Ensembl names. If all values are NA, then
-  column is not returned.
+          obtained from tables provided by UCSC Genome Browser (tables
+          chromAlias or ucscToEnsembl). It is merged with Ensembl chromosome
+          names provided by \code{genomeStyles}. It can contain NAs for missing
+          mapping between UCSC and Ensembl names. If all values are NA, then
+          column is not returned.
   }
 }
 
