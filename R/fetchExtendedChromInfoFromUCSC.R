@@ -7,10 +7,12 @@
 ### Some low-level helpers.
 ###
 
-.fetch_table_from_UCSC <- function(genome, table="chromInfo", colnames,
+### NOT exported but used in the GenomicFeatures package.
+fetch_table_from_UCSC <- function(genome, table="chromInfo", colnames,
         goldenPath_url="http://hgdownload.cse.ucsc.edu/goldenPath")
 {
-    url <- paste(goldenPath_url, genome, "database", paste0(table, ".txt.gz"), sep="/")
+    url <- paste(goldenPath_url, genome,
+                 "database", paste0(table, ".txt.gz"), sep="/")
     destfile <- tempfile()
     download.file(url, destfile, quiet=TRUE)
     if (missing(colnames)) {
@@ -25,7 +27,7 @@
     }
 }
 
-### Used in BSgenome!
+### NOT exported but used in the BSgenome package.
 fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
 {
     assembly_report <- fetch_assembly_report(assembly,
@@ -214,8 +216,8 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
                 ## 'tbl' is "ucscToEnsembl"
                 colnames <- c("chrom", "alias")
             }
-            chroms <- .fetch_table_from_UCSC(genome, tbl, colnames,
-                                             goldenPath_url=goldenPath_url)
+            chroms <- fetch_table_from_UCSC(genome, tbl, colnames,
+                                            goldenPath_url=goldenPath_url)
             if ("source" %in% colnames(chroms)) {
                 idx <- grep("ensembl", chroms[ , "source"])
                 chroms <- chroms[idx, c("chrom", "alias")]
@@ -246,10 +248,10 @@ standard_fetch_extended_ChromInfo_from_UCSC <- function(
                                   goldenPath_url,
                                   quiet)
 {
-    chrominfo <- .fetch_table_from_UCSC(genome,
-                              table="chromInfo",
-                              colnames=c("chrom", "size", "fileName"),
-                              goldenPath_url=goldenPath_url)
+    chrominfo <- fetch_table_from_UCSC(genome,
+                             table="chromInfo",
+                             colnames=c("chrom", "size", "fileName"),
+                             goldenPath_url=goldenPath_url)
     UCSC_seqlevel <- chrominfo[ , "chrom"]
     circular_idx <- match(circ_seqs, UCSC_seqlevel)
     if (any(is.na(circular_idx)))
