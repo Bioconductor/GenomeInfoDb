@@ -102,6 +102,18 @@ fetchExtendedChromInfoFromUCSC(genome,
   column, that is, \code{assembled-molecule}s first, then \code{alt-scaffold}s,
   etc, and NAs last. Then within each group they are sorted by UCSC seqlevel
   rank as determined by \code{\link{rankSeqlevels}()}.
+
+  If the UCSC Genome Browser provides tables to convert UCSC chromosome
+  names to Ensembl chromosome names, the returned data frame has 1
+  additional column:
+  \itemize{
+    \item \code{Ensembl_seqlevel}: Character vector. This information is
+  obtained from tables provided by UCSC Genome Browser (tables
+  chromAlias or ucscToEnsembl). It is merged with Ensembl chromosome
+  names provided by \code{genomeStyles}. It can contain NAs for missing
+  mapping between UCSC and Ensembl names. If all values are NA, then
+  column is not returned.
+  }
 }
 
 \note{
