@@ -20,6 +20,9 @@ export(
     orderSeqlevels,
     rankSeqlevels,
 
+    ## UCSC-utils.R:
+    get_chrom_sizes_from_UCSC,
+
     ## fetchExtendedChromInfoFromUCSC.R:
     fetchExtendedChromInfoFromUCSC,
 
