@@ -4,10 +4,12 @@
 ###   o ASSEMBLED_MOLECULES: Character vector with no NAs, no empty strings,
 ###                          and no duplicates.
 ### Can also define:
+###   o CIRC_SEQS:           Character vector (subset of ASSEMBLED_MOLECULES).
 ###   o GET_CHROM_SIZES:     Function with 1 argument. Must return a 2-column
 ###                          data.frame with columns "chrom" and "size".
-GENOME <- "calJac3"
-ASSEMBLED_MOLECULES <- paste0("chr", c(1:22, "X", "Y"))
+GENOME <- "hg17"
+ASSEMBLED_MOLECULES <- paste0("chr", c(1:22, "X", "Y", "M"))
+CIRC_SEQS <- "chrM"
 
 library(IRanges)       # for CharacterList()
 library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
@@ -28,14 +30,17 @@ library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
     m3 <- matrix(unlist(tmp[idx3]), ncol=3L, byrow=TRUE)
     m31 <- match(m3[ , 1L], ASSEMBLED_MOLECULES)
     stopifnot(!anyNA(m31))
-    stopifnot(all(m3[ , 3L] == "random"))
-    oo3 <- order(m31, m3[ , 2L])
+    m33 <- match(m3[ , 3L], paste0("hap", 1:2))
+    stopifnot(!anyNA(m33))
+    oo3 <- order(m31, m33, m3[ , 2L])
     idx3 <- idx3[oo3]
 
     idx2 <- which(npart == 2L)
     m2 <- matrix(unlist(tmp[idx2]), ncol=2L, byrow=TRUE)
-    stopifnot(all(m2[ , 1L] == "chrUn"))
-    oo2 <- order(m2[ , 2L])
+    m21 <- match(m2[ , 1L], ASSEMBLED_MOLECULES)
+    stopifnot(!anyNA(m21))
+    stopifnot(all(m2[ , 2L] == "random"))
+    oo2 <- order(m21)
     idx2 <- idx2[oo2]
 
     c(idx1, idx3, idx2)

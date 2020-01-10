@@ -16,12 +16,15 @@ import(GenomeInfoDbData)
 ###
 
 export(
+    ## utils.R:
+    DEFAULT_CIRC_SEQS,
+
     ## rankSeqlevels.R:
     orderSeqlevels,
     rankSeqlevels,
 
     ## UCSC-utils.R:
-    get_chrom_sizes_from_UCSC,
+    get_chrom_info_from_UCSC,
 
     ## fetchExtendedChromInfoFromUCSC.R:
     fetchExtendedChromInfoFromUCSC,

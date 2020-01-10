@@ -40,14 +40,14 @@ fetch_chrom_sizes_from_UCSC <- function(genome,
                           goldenPath.url=goldenPath.url)
 }
 
-.cached_chrom_sizes <- new.env(parent=emptyenv())
+.cached_chrom_info <- new.env(parent=emptyenv())
 
-.get_chrom_sizes_from_missing_script <- function(genome,
+.get_chrom_info_from_missing_script <- function(genome,
     assembled.molecules.only=FALSE,
     goldenPath.url=getOption("UCSC.goldenPath.url"),
     recache=FALSE)
 {
-    ans <- .cached_chrom_sizes[[genome]]
+    ans <- .cached_chrom_info[[genome]]
     if (is.null(ans) || recache) {
         ans <- try(suppressWarnings(
                        fetch_chrom_sizes_from_UCSC(genome,
@@ -57,37 +57,44 @@ fetch_chrom_sizes_from_UCSC <- function(genome,
             stop(wmsg("unknown genome: ", genome))
         oo <- orderSeqlevels(ans[ , "chrom"])
         ans <- S4Vectors:::extract_data_frame_rows(ans, oo)
-        .cached_chrom_sizes[[genome]] <- ans
+        ans$is_circular <- make_circ_flags_from_circ_seqs(ans[ , "chrom"])
+        .cached_chrom_info[[genome]] <- ans
     }
     if (assembled.molecules.only)
-        warning(wmsg("'assembled.molecules' was ignored (don't ",
-                     "know what the assembled molecules are ",
-                     "for the ", genome, " genome)"))
+        warning(wmsg("'assembled.molecules' was ignored (don't know what ",
+                     "the assembled molecules are for genome ", genome, ")"))
     ans
 }
 
-.get_chrom_sizes_from_script <- function(genome, script_path,
+.get_chrom_info_from_script <- function(genome, script_path,
     assembled.molecules.only=FALSE,
     goldenPath.url=getOption("UCSC.goldenPath.url"),
     recache=FALSE)
 {
     ## Placeholders. Will actually get defined when we source the script.
-    GENOME <- NULL               # expected to be a single string
-    ASSEMBLED_MOLECULES <- NULL  # expected to be a character vector
-    GET_CHROM_SIZES <- NULL      # expected to be NULL (i.e. not defined)
-                                 # or a function with 1 argument
+    GENOME <- NULL               # Expected to be a single string.
+    ASSEMBLED_MOLECULES <- NULL  # Expected to be a character vector with no
+                                 # NAs, no empty strings, and no duplicates.
+    CIRC_SEQS <- NULL            # Expected to be NULL or a subset of
+                                 # ASSEMBLED_MOLECULES.
+    GET_CHROM_SIZES <- NULL      # Expected to be NULL (i.e. not defined)
+                                 # or a function with 1 argument.
     source(script_path, local=TRUE)
 
     ## Check script sanity.
     if (!identical(GENOME, genome))
-        stop(wmsg(script_path, " script does not seem to be ",
-                  "for the ", genome, " genome"))
+        stop(wmsg(script_path, ": script does not seem ",
+                  "to be for genome ", genome))
     stopifnot(is.character(ASSEMBLED_MOLECULES),
               !anyNA(ASSEMBLED_MOLECULES),
               all(nzchar(ASSEMBLED_MOLECULES)),
               !anyDuplicated(ASSEMBLED_MOLECULES))
+    if (!is.null(CIRC_SEQS))
+        stopifnot(is.character(CIRC_SEQS),
+                  !anyDuplicated(CIRC_SEQS),
+                  all(CIRC_SEQS %in% ASSEMBLED_MOLECULES))
 
-    ans <- .cached_chrom_sizes[[genome]]
+    ans <- .cached_chrom_info[[genome]]
     if (is.null(ans) || recache) {
         if (is.null(GET_CHROM_SIZES)) {
             ans <- fetch_chrom_sizes_from_UCSC(genome,
@@ -104,7 +111,9 @@ fetch_chrom_sizes_from_UCSC <- function(genome,
                       identical(ans[seq_along(ASSEMBLED_MOLECULES), "chrom"],
                                 ASSEMBLED_MOLECULES))
         }
-        .cached_chrom_sizes[[genome]] <- ans
+        ans$is_circular <- make_circ_flags_from_circ_seqs(ans[ , "chrom"],
+                                                          CIRC_SEQS)
+        .cached_chrom_info[[genome]] <- ans
     }
     if (assembled.molecules.only) {
         i <- seq_along(ASSEMBLED_MOLECULES)
@@ -113,9 +122,9 @@ fetch_chrom_sizes_from_UCSC <- function(genome,
     ans
 }
 
-### Returns a 2-column data.frame with columns "chrom" (character)
-### and "size" (integer).
-get_chrom_sizes_from_UCSC <- function(genome,
+### Returns a 3-column data.frame with columns "chrom" (character), "size"
+### (integer), and "is_circular" (logical).
+get_chrom_info_from_UCSC <- function(genome,
     assembled.molecules.only=FALSE,
     goldenPath.url=getOption("UCSC.goldenPath.url"),
     recache=FALSE)
@@ -130,15 +139,15 @@ get_chrom_sizes_from_UCSC <- function(genome,
         stop(wmsg("'recache' must be TRUE or FALSE"))
 
     script_name <- paste0(genome, ".R")
-    script_path <- system.file("scripts", "UCSC_chrom_sizes", script_name,
+    script_path <- system.file("UCSC_chrom_info", script_name,
                                package="GenomeInfoDb")
     if (!identical(script_path, "")) {
-        ans <- .get_chrom_sizes_from_script(genome, script_path,
+        ans <- .get_chrom_info_from_script(genome, script_path,
                     assembled.molecules.only=assembled.molecules.only,
                     goldenPath.url=goldenPath.url,
                     recache=recache)
     } else {
-        ans <- .get_chrom_sizes_from_missing_script(genome,
+        ans <- .get_chrom_info_from_missing_script(genome,
                     assembled.molecules.only=assembled.molecules.only,
                     goldenPath.url=goldenPath.url,
                     recache=recache)

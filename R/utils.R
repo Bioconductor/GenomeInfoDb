@@ -1,7 +1,51 @@
 ### =========================================================================
-### Some low-level (non exported) general purpose utility functions.
+### Miscellaneous low-level utils
 ### -------------------------------------------------------------------------
 
+
+### Global character vector to hold default names for circular sequences.
+### This is exported!
+DEFAULT_CIRC_SEQS <- c(
+    ## Mitochondrial genome
+    "chrM", "MT", "MtDNA", "mit", "Mito", "mitochondrion",
+    "dmel_mitochondrion_genome",
+    ## Chloroplast genome
+    "Pltd", "ChrC", "Pt", "chloroplast", "Chloro",
+    ## Plasmid (yeast)
+    "2micron", "2-micron", "2uM"
+)
+
+### AFAIK UCSC doesn't flag circular sequences.
+### As of Sep 21, 2010 (Ensembl release 59), Ensembl was still not flagging
+### circular sequences in their db (see this thread for the details
+### http://lists.ensembl.org/pipermail/dev/2010-September/000139.html),
+### NOT exported but used in the GenomicFeatures package.
+make_circ_flags_from_circ_seqs <- function(seqlevels, circ_seqs=NULL)
+{
+    if (!is.character(seqlevels))
+        stop(wmsg("'seqlevels' must be a character vector"))
+    if (is.null(circ_seqs)) {
+        ## The user did NOT specify the 'circ_seqs' argument.
+        seqlevels <- tolower(seqlevels)
+        circ_seqs <- tolower(DEFAULT_CIRC_SEQS)
+        circ_flags <- rep.int(NA, length(seqlevels))
+        circ_flags[seqlevels %in% circ_seqs] <- TRUE
+    } else {
+        ## The user specified the 'circ_seqs' argument.
+        if (!is.character(circ_seqs) ||
+            any(circ_seqs %in% c(NA_character_, "")))
+            stop(wmsg("'circ_seqs' must be a character vector with no NAs ",
+                      "and no empty strings"))
+        bad_circ_seqs <- setdiff(circ_seqs, seqlevels)
+        if (length(bad_circ_seqs) != 0L) {
+            in1string <- paste0(bad_circ_seqs, collapse=", ")
+            stop(wmsg("'circ_seqs' contains unrecognized chromosome names: ",
+                      in1string))
+        }
+        circ_flags <- seqlevels %in% circ_seqs
+    }
+    circ_flags
+}
 
 ### Note that, strictly speaking, mergeNamedAtomicVectors() is not
 ### commutative, i.e., in general 'z1 <- mergeNamedAtomicVectors(x, y)' is

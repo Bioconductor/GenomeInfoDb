@@ -4,10 +4,12 @@
 ###   o ASSEMBLED_MOLECULES: Character vector with no NAs, no empty strings,
 ###                          and no duplicates.
 ### Can also define:
+###   o CIRC_SEQS:           Character vector (subset of ASSEMBLED_MOLECULES).
 ###   o GET_CHROM_SIZES:     Function with 1 argument. Must return a 2-column
 ###                          data.frame with columns "chrom" and "size".
-GENOME <- "galGal6"
-ASSEMBLED_MOLECULES <- paste0("chr", c(1:28, 30:33, "M", "W", "Z"))
+GENOME <- "susScr11"
+ASSEMBLED_MOLECULES <- paste0("chr", c(1:18, "X", "Y", "M"))
+CIRC_SEQS <- "chrM"
 
 library(IRanges)       # for CharacterList()
 library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
