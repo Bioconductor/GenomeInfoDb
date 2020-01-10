@@ -1,12 +1,12 @@
 ### Should work as a standlone, self-contained script.
 ### Must define at least:
-###   o ASSEMBLY:            Single non-empty string.
+###   o GENOME:              Single non-empty string.
 ###   o ASSEMBLED_MOLECULES: Character vector with no NAs, no empty strings,
 ###                          and no duplicates.
 ### Can also define:
 ###   o GET_CHROM_SIZES:     Function with 1 argument. Must return a 2-column
 ###                          data.frame with columns "chrom" and "size".
-ASSEMBLY <- "hg38"
+GENOME <- "hg38"
 ASSEMBLED_MOLECULES <- paste0("chr", c(1:22, "X", "Y", "M"))
 
 library(IRanges)       # for CharacterList()
@@ -48,7 +48,7 @@ library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
 
 GET_CHROM_SIZES <- function(goldenPath.url=getOption("UCSC.goldenPath.url"))
 {
-    chrom_sizes <- GenomeInfoDb:::fetch_chrom_sizes_from_UCSC(ASSEMBLY,
+    chrom_sizes <- GenomeInfoDb:::fetch_chrom_sizes_from_UCSC(GENOME,
                                               goldenPath.url=goldenPath.url)
     oo <- .order_seqlevels(chrom_sizes[ , "chrom"])
     S4Vectors:::extract_data_frame_rows(chrom_sizes, oo)
