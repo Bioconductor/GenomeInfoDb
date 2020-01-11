@@ -23,6 +23,9 @@ export(
     orderSeqlevels,
     rankSeqlevels,
 
+    ## NCBI-utils.R:
+    get_chrom_info_from_NCBI,
+
     ## UCSC-utils.R:
     get_chrom_info_from_UCSC,
 

@@ -1,6 +1,7 @@
 ### =========================================================================
-### Some low-level (non exported) utility functions.
+### Some low-level utilities to fetch data from NCBI
 ### -------------------------------------------------------------------------
+###
 
 
 .NCBI_ASSEMBLY_REPORTS_URL <-
@@ -72,6 +73,7 @@
     stopifnot(anyDuplicated(gbrs_paired_asm) == 0L)
 }
 
+### NOT exported.
 fetch_assembly_summary <- function(genbank_or_refseq, quiet=FALSE)
 {
     objname <- paste0("assembly_summary_", genbank_or_refseq)
@@ -195,6 +197,7 @@ fetch_assembly_summary <- function(genbank_or_refseq, quiet=FALSE)
                stringsAsFactors=FALSE)
 }
 
+### NOT exported.
 ### Saves "assembly_accessions.rda" in directory specified thru 'dir'.
 build_and_save_assembly_accessions_table <- function(dir=".", quiet=FALSE)
 {
@@ -321,6 +324,7 @@ build_and_save_assembly_accessions_table <- function(dir=".", quiet=FALSE)
     read.table(url, sep="\t", col.names=colnames, stringsAsFactors=FALSE)
 }
 
+### NOT exported.
 ### See .normarg_assembly_accession() for how 'assembly_accession' can be
 ### specified. In addition, here 'assembly_accession' can be the URL to an
 ### assembly report (a.k.a. full sequence report). Examples of such URLs:
@@ -345,5 +349,162 @@ fetch_assembly_report <- function(assembly_accession, AssemblyUnits=NULL)
         ans <- ans[idx, , drop=FALSE]
     }
     ans
+}
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### get_chrom_info_from_NCBI()
+###
+
+.NCBI_genome2accession <- new.env(parent=emptyenv())
+.NCBI_accession2assembly <- new.env(parent=emptyenv())
+
+.load_NCBI_assemblies <- function()
+{
+    db_path <- system.file("NCBI_assemblies", package="GenomeInfoDb")
+    db_files <- list.files(db_path, pattern="\\.R$", full.names=TRUE)
+
+    ## Placeholders. Will actually get defined when we source the
+    ## assembly files.
+    ORGANISM <- NULL    # Expected to be a single string.
+    ASSEMBLIES <- NULL  # Expected to be a list with one list element per
+                        # assembly.
+    expected_names <- c("genome", "assembly_accession", "date", "circ_seqs")
+    for (db_file in db_files) {
+        source(db_file, local=TRUE)
+        ## Sanity checks.
+        stopifnot(isSingleString(ORGANISM))
+        stopifnot(is.list(ASSEMBLIES))
+        for (assembly in ASSEMBLIES) {
+            stopifnot(is.list(assembly),
+                      identical(names(assembly), expected_names))
+
+            genome <- assembly$genome
+            stopifnot(isSingleString(genome))
+            genome <- tolower(genome)
+            accession <- assembly$assembly_accession
+            stopifnot(isSingleString(accession))
+            .NCBI_genome2accession[[genome]] <-
+                c(.NCBI_genome2accession[[genome]], accession)
+
+            stopifnot(isSingleString(assembly$date))
+            circ_seqs <- assembly$circ_seqs
+            if (!is.null(circ_seqs))
+                stopifnot(is.character(circ_seqs),
+                          !anyNA(circ_seqs),
+                          all(nzchar(circ_seqs)),
+                          !anyDuplicated(circ_seqs))
+            assembly$organism <- ORGANISM
+            .NCBI_accession2assembly[[accession]] <- assembly
+        }
+    }
+}
+
+.lookup_NCBI_genome2accession <- function(genome)
+{
+    if (length(.NCBI_genome2accession) == 0L)
+        .load_NCBI_assemblies()
+    .NCBI_genome2accession[[tolower(genome)]]
+}
+
+.lookup_NCBI_accession2assembly <- function(accession)
+{
+    if (length(.NCBI_accession2assembly) == 0L)
+        .load_NCBI_assemblies()
+    .NCBI_accession2assembly[[accession]]
+}
+
+.format_assembly_report <- function(assembly_report, circ_seqs=NULL)
+{
+    drop_columns <- c("AssignedMolecule", "AssignedMoleculeLocationOrType")
+    ans <- assembly_report[ , !(colnames(assembly_report) %in% drop_columns)]
+    sequence_role <- factor(ans[ , "SequenceRole"],
+                            levels=c("assembled-molecule",
+                                     "alt-scaffold",
+                                     "unlocalized-scaffold",
+                                     "unplaced-scaffold",
+                                     "pseudo-scaffold"))
+    ans[ , "SequenceRole"] <- sequence_role
+    oo <- order(as.integer(sequence_role))
+    ans <- S4Vectors:::extract_data_frame_rows(ans, oo)
+    ans[ , "Relationship"] <- factor(ans[ , "Relationship"])
+    ans[ , "AssemblyUnit"] <- factor(ans[ , "AssemblyUnit"])
+    na_idx <- which(ans[ , "UCSCStyleName"] %in% "na")
+    ans[na_idx , "UCSCStyleName"] <- NA_character_
+    is_circular <- make_circ_flags_from_circ_seqs(ans[ , "SequenceName"],
+                                                  circ_seqs=circ_seqs)
+    stopifnot(all(ans[which(is_circular), "SequenceRole"] %in%
+                  "assembled-molecule"))
+    ans$is_circular <- is_circular
+    ans
+}
+
+.NCBI_cached_chrom_info <- new.env(parent=emptyenv())
+
+.get_NCBI_chrom_info_for_known_assembly <- function(accession, circ_seqs=NULL,
+    assembled.molecules.only=FALSE,
+    recache=FALSE)
+{
+    ans <- .NCBI_cached_chrom_info[[accession]]
+    if (is.null(ans) || recache) {
+        assembly_report <- fetch_assembly_report(accession)
+        ans <- .format_assembly_report(assembly_report, circ_seqs=circ_seqs)
+        .NCBI_cached_chrom_info[[accession]] <- ans
+    }
+    if (assembled.molecules.only) {
+        keep_idx <- which(ans[ , "SequenceRole"] %in% "assembled-molecule")
+        ans <- S4Vectors:::extract_data_frame_rows(ans, keep_idx)
+    }
+    ans
+}
+
+### Return an 8-column data.frame with columns "SequenceName" (character),
+### "SequenceRole" (factor),  "GenBankAccn" (character), "Relationship"
+### (factor), "RefSeqAccn" (character), "AssemblyUnit" (factor),
+### "SequenceLength" (integer), "UCSCStyleName" (character).
+get_chrom_info_from_NCBI <- function(genome,
+    assembled.molecules.only=FALSE,
+    recache=FALSE)
+{
+    if (!isSingleString(genome))
+        stop(wmsg("'genome' must be a single string"))
+    if (!isTRUEorFALSE(assembled.molecules.only))
+        stop(wmsg("'assembled.molecules.only' must be TRUE or FALSE"))
+    if (!isTRUEorFALSE(recache))
+        stop(wmsg("'recache' must be TRUE or FALSE"))
+
+    ## First see if the user supplied a supported assembly accession
+    ## instead of the name of a genome assembly.
+    assembly <- .lookup_NCBI_accession2assembly(genome)
+    if (!is.null(assembly)) {
+        ## Yes s/he did.
+        accession <- genome
+        circ_seqs <- assembly$circ_seqs
+    } else {
+        ## No s/he didn't.
+        ## Now see if s/he supplied the name of a supported genome assembly.
+        accession <- .lookup_NCBI_genome2accession(genome)
+        if (!is.null(accession)) {
+            ## Yes s/he did.
+            if (length(accession) > 1L) {
+                in1string <- paste0(accession, collapse=", ")
+                warning(wmsg("Genome ", genome, " is mapped to more ",
+                             "then one assembly (", in1string, "). ",
+                             "The first one was selected."))
+                accession <- accession[[1L]]
+            }
+            assembly <- .lookup_NCBI_accession2assembly(accession)
+            circ_seqs <- assembly$circ_seqs
+        } else {
+            ## No s/he didn't.
+            ## The we assume that 'genome' is an assembly accession.
+            accession <- genome
+            circ_seqs <- NULL
+        }
+    }
+    .get_NCBI_chrom_info_for_known_assembly(accession,
+            circ_seqs=circ_seqs,
+            assembled.molecules.only=assembled.molecules.only,
+            recache=recache)
 }
 
