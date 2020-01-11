@@ -40,14 +40,19 @@ fetch_chrom_sizes_from_UCSC <- function(genome,
                           goldenPath.url=goldenPath.url)
 }
 
-.cached_chrom_info <- new.env(parent=emptyenv())
 
-.get_chrom_info_from_missing_script <- function(genome,
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### get_chrom_info_from_UCSC()
+###
+
+.UCSC_cached_chrom_info <- new.env(parent=emptyenv())
+
+.get_UCSC_chrom_info_from_missing_script <- function(genome,
     assembled.molecules.only=FALSE,
     goldenPath.url=getOption("UCSC.goldenPath.url"),
     recache=FALSE)
 {
-    ans <- .cached_chrom_info[[genome]]
+    ans <- .UCSC_cached_chrom_info[[genome]]
     if (is.null(ans) || recache) {
         ans <- try(suppressWarnings(
                        fetch_chrom_sizes_from_UCSC(genome,
@@ -58,7 +63,7 @@ fetch_chrom_sizes_from_UCSC <- function(genome,
         oo <- orderSeqlevels(ans[ , "chrom"])
         ans <- S4Vectors:::extract_data_frame_rows(ans, oo)
         ans$is_circular <- make_circ_flags_from_circ_seqs(ans[ , "chrom"])
-        .cached_chrom_info[[genome]] <- ans
+        .UCSC_cached_chrom_info[[genome]] <- ans
     }
     if (assembled.molecules.only)
         warning(wmsg("'assembled.molecules' was ignored (don't know what ",
@@ -66,7 +71,7 @@ fetch_chrom_sizes_from_UCSC <- function(genome,
     ans
 }
 
-.get_chrom_info_from_script <- function(genome, script_path,
+.get_UCSC_chrom_info_from_script <- function(genome, script_path,
     assembled.molecules.only=FALSE,
     goldenPath.url=getOption("UCSC.goldenPath.url"),
     recache=FALSE)
@@ -94,7 +99,7 @@ fetch_chrom_sizes_from_UCSC <- function(genome,
                   !anyDuplicated(CIRC_SEQS),
                   all(CIRC_SEQS %in% ASSEMBLED_MOLECULES))
 
-    ans <- .cached_chrom_info[[genome]]
+    ans <- .UCSC_cached_chrom_info[[genome]]
     if (is.null(ans) || recache) {
         if (is.null(GET_CHROM_SIZES)) {
             ans <- fetch_chrom_sizes_from_UCSC(genome,
@@ -113,16 +118,16 @@ fetch_chrom_sizes_from_UCSC <- function(genome,
         }
         ans$is_circular <- make_circ_flags_from_circ_seqs(ans[ , "chrom"],
                                                           CIRC_SEQS)
-        .cached_chrom_info[[genome]] <- ans
+        .UCSC_cached_chrom_info[[genome]] <- ans
     }
     if (assembled.molecules.only) {
-        i <- seq_along(ASSEMBLED_MOLECULES)
-        ans <- S4Vectors:::extract_data_frame_rows(ans, i)
+        keep_idx <- seq_along(ASSEMBLED_MOLECULES)
+        ans <- S4Vectors:::extract_data_frame_rows(ans, keep_idx)
     }
     ans
 }
 
-### Returns a 3-column data.frame with columns "chrom" (character), "size"
+### Return a 3-column data.frame with columns "chrom" (character), "size"
 ### (integer), and "is_circular" (logical).
 get_chrom_info_from_UCSC <- function(genome,
     assembled.molecules.only=FALSE,
@@ -141,13 +146,13 @@ get_chrom_info_from_UCSC <- function(genome,
     script_name <- paste0(genome, ".R")
     script_path <- system.file("UCSC_chrom_info", script_name,
                                package="GenomeInfoDb")
-    if (!identical(script_path, "")) {
-        ans <- .get_chrom_info_from_script(genome, script_path,
+    if (identical(script_path, "")) {
+        ans <- .get_UCSC_chrom_info_from_missing_script(genome,
                     assembled.molecules.only=assembled.molecules.only,
                     goldenPath.url=goldenPath.url,
                     recache=recache)
     } else {
-        ans <- .get_chrom_info_from_missing_script(genome,
+        ans <- .get_UCSC_chrom_info_from_script(genome, script_path,
                     assembled.molecules.only=assembled.molecules.only,
                     goldenPath.url=goldenPath.url,
                     recache=recache)
