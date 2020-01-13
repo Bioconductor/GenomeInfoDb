@@ -137,8 +137,9 @@ UCSC_registered_genomes <- function()
         .UCSC_cached_chrom_info[[genome]] <- ans
     }
     if (assembled.molecules.only)
-        warning(wmsg("'assembled.molecules' was ignored (don't know what ",
-                     "the assembled molecules are for genome ", genome, ")"))
+        warning(wmsg("'assembled.molecules' was ignored for unregistered ",
+                     "genome ", genome, " (don't know what the assembled ",
+                     "molecules are for unregistered genomes)"))
     ans
 }
 

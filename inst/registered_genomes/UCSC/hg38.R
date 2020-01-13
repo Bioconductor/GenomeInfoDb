@@ -33,7 +33,7 @@ library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
     m3 <- matrix(unlist(tmp[idx3]), ncol=3L, byrow=TRUE)
     m31 <- match(m3[ , 1L], ASSEMBLED_MOLECULES)
     stopifnot(!anyNA(m31))
-    m33 <- match(m3[ , 3L], c("random", "alt", "fix"))
+    m33 <- match(m3[ , 3L], c("alt", "random", "fix"))
     stopifnot(!anyNA(m33))
     oo3 <- order(m33, m31, m3[ , 2L])
     idx3 <- idx3[oo3]
