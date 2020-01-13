@@ -8,9 +8,9 @@
 ###   o CIRC_SEQS:           Character vector (subset of ASSEMBLED_MOLECULES).
 ###   o GET_CHROM_SIZES:     Function with 1 argument. Must return a 2-column
 ###                          data.frame with columns "chrom" and "size".
-GENOME <- "galGal6"
+GENOME <- "galGal5"
 ORGANISM <- "Gallus gallus"
-ASSEMBLED_MOLECULES <- paste0("chr", c(1:28, 30:33, "W", "Z", "M"))
+ASSEMBLED_MOLECULES <- paste0("chr", c(1:28, 30:33, "W", "Z", "LGE64", "M"))
 
 CIRC_SEQS <- "chrM"
 
@@ -33,7 +33,7 @@ library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
     m4 <- matrix(unlist(tmp[idx4]), ncol=4L, byrow=TRUE)
     m41 <- match(m4[ , 1L], ASSEMBLED_MOLECULES)
     stopifnot(!anyNA(m41))
-    stopifnot(all(m4[ , 2L] == "NW"))
+    stopifnot(all(m4[ , 2L] == "NT"))
     stopifnot(all(m4[ , 4L] == "random"))
     oo4 <- order(m41, m4[ , 3L])
     idx4 <- idx4[oo4]
@@ -41,7 +41,7 @@ library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
     idx3 <- which(npart == 3L)
     m3 <- matrix(unlist(tmp[idx3]), ncol=3L, byrow=TRUE)
     stopifnot(all(m3[ , 1L] == "chrUn"))
-    stopifnot(all(m3[ , 2L] == "NW"))
+    stopifnot(all(m3[ , 2L] == "NT"))
     oo3 <- order(m3[ , 3L])
     idx3 <- idx3[oo3]
 

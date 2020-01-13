@@ -1,7 +1,7 @@
 ORGANISM <- "Bos taurus"
 
 ### List of assemblies by date.
-### Yep, different genome assemblies can have the same name!
+### Yep, different genome assemblies can have the same name! (don't ask me why)
 ### Lookup by genome name will pick-up the first in the list.
 ASSEMBLIES <- list(
     list(genome="Bos_taurus_UMD_3.1",
