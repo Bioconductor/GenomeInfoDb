@@ -132,7 +132,7 @@ UCSC_registered_genomes <- function()
                            goldenPath.url=goldenPath.url)),
                    silent=TRUE)
         if (inherits(ans, "try-error"))
-            stop(wmsg("unknown genome: ", genome))
+            stop(wmsg("unknown UCSC genome assembly: ", genome))
         oo <- orderSeqlevels(ans[ , "chrom"])
         ans <- S4Vectors:::extract_data_frame_rows(ans, oo)
         ans$is_circular <- make_circ_flags_from_circ_seqs(ans[ , "chrom"])
