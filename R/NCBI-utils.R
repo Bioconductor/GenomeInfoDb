@@ -371,6 +371,9 @@ fetch_assembly_report <- function(assembly_accession, AssemblyUnits=NULL)
 
     ## Sanity checks.
     stopifnot(isSingleString(ORGANISM))
+    inferred_basename <- paste0(chartr(" ", "_", ORGANISM), ".R")
+    stopifnot(identical(inferred_basename, basename(file_path)))
+
     stopifnot(is.list(ASSEMBLIES))
 
     expected_names <- c("genome", "assembly_accession", "date", "circ_seqs")
