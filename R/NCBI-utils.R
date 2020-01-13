@@ -459,16 +459,18 @@ NCBI_registered_genomes <- function()
 {
     drop_columns <- c("AssignedMolecule", "AssignedMoleculeLocationOrType")
     ans <- assembly_report[ , !(colnames(assembly_report) %in% drop_columns)]
-    sequence_role <- factor(ans[ , "SequenceRole"],
-                            levels=c("assembled-molecule",
-                                     "alt-scaffold",
-                                     "unlocalized-scaffold",
-                                     "unplaced-scaffold",
-                                     "pseudo-scaffold"))
+    SequenceRole_levels <- c("assembled-molecule",
+                             "alt-scaffold",
+                             "unlocalized-scaffold",
+                             "unplaced-scaffold",
+                             "pseudo-scaffold")
+    sequence_role <- factor(ans[ , "SequenceRole"], levels=SequenceRole_levels)
     ans[ , "SequenceRole"] <- sequence_role
     oo <- order(as.integer(sequence_role))
     ans <- S4Vectors:::extract_data_frame_rows(ans, oo)
-    ans[ , "Relationship"] <- factor(ans[ , "Relationship"])
+    Relationship_levels <- c("=", "<>")
+    ans[ , "Relationship"] <- factor(ans[ , "Relationship"],
+                                     levels=Relationship_levels)
     ans[ , "AssemblyUnit"] <- factor(ans[ , "AssemblyUnit"])
     na_idx <- which(ans[ , "UCSCStyleName"] %in% "na")
     ans[na_idx , "UCSCStyleName"] <- NA_character_
