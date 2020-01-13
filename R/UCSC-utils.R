@@ -135,7 +135,12 @@ UCSC_registered_genomes <- function()
             stop(wmsg("unknown UCSC genome assembly: ", genome))
         oo <- orderSeqlevels(ans[ , "chrom"])
         ans <- S4Vectors:::extract_data_frame_rows(ans, oo)
-        ans$is_circular <- make_circ_flags_from_circ_seqs(ans[ , "chrom"])
+
+        ## Add columns "assembled" and "circular".
+        assembled <- rep.int(NA, nrow(ans))
+        circular <- make_circ_flags_from_circ_seqs(ans[ , "chrom"])
+        ans <- cbind(ans, assembled=assembled, circular=circular)
+
         .UCSC_cached_chrom_info[[genome]] <- ans
     }
     if (assembled.molecules.only)
@@ -155,6 +160,8 @@ UCSC_registered_genomes <- function()
         stop(wmsg(script_path, ": script does not seem ",
                   "to be for genome ", genome))
     ASSEMBLED_MOLECULES <- vars$ASSEMBLED_MOLECULES
+    nb_assembled <- length(ASSEMBLED_MOLECULES)
+    assembled_idx <- seq_len(nb_assembled)
 
     ans <- .UCSC_cached_chrom_info[[genome]]
     if (is.null(ans) || recache) {
@@ -162,30 +169,35 @@ UCSC_registered_genomes <- function()
         if (is.null(GET_CHROM_SIZES)) {
             ans <- fetch_chrom_sizes_from_UCSC(genome,
                                                goldenPath.url=goldenPath.url)
-            stopifnot(nrow(ans) == length(ASSEMBLED_MOLECULES))
+            stopifnot(nrow(ans) == nb_assembled)
             oo <- match(ASSEMBLED_MOLECULES, ans[ , "chrom"])
+            stopifnot(!anyNA(oo))
             ans <- S4Vectors:::extract_data_frame_rows(ans, oo)
         } else {
             ans <- GET_CHROM_SIZES(goldenPath.url=goldenPath.url)
             stopifnot(is.data.frame(ans),
                       identical(sapply(ans, class),
                                 c(chrom="character", size="integer")),
-                      identical(ans[seq_along(ASSEMBLED_MOLECULES), "chrom"],
+                      identical(head(ans[ , "chrom"], n=nb_assembled),
                                 ASSEMBLED_MOLECULES))
         }
-        ans$is_circular <- make_circ_flags_from_circ_seqs(ans[ , "chrom"],
-                                                          vars$CIRC_SEQS)
+
+        ## Add columns "assembled" and "circular".
+        assembled <- logical(nrow(ans))
+        assembled[assembled_idx] <- TRUE
+        circular <- make_circ_flags_from_circ_seqs(ans[ , "chrom"],
+                                                   vars$CIRC_SEQS)
+        ans <- cbind(ans, assembled=assembled, circular=circular)
+
         .UCSC_cached_chrom_info[[genome]] <- ans
     }
-    if (assembled.molecules.only) {
-        keep_idx <- seq_along(ASSEMBLED_MOLECULES)
-        ans <- S4Vectors:::extract_data_frame_rows(ans, keep_idx)
-    }
+    if (assembled.molecules.only)
+        ans <- S4Vectors:::extract_data_frame_rows(ans, assembled_idx)
     ans
 }
 
-### Return a 3-column data.frame with columns "chrom" (character), "size"
-### (integer), and "is_circular" (logical).
+### Return a 4-column data.frame with columns "chrom" (character), "size"
+### (integer), "assembled" (logical), and "circular" (logical).
 get_chrom_info_from_UCSC <- function(genome,
     assembled.molecules.only=FALSE,
     goldenPath.url=getOption("UCSC.goldenPath.url"),

@@ -84,11 +84,12 @@ UCSC_registered_genomes()
 }
 
 \value{
-  \code{get_chrom_info_from_UCSC}: A 3-column data frame with columns:
+  \code{get_chrom_info_from_UCSC}: A 4-column data frame with columns:
   \enumerate{
     \item \code{chrom} (character).
     \item \code{size} (integer).
-    \item \code{is_circular} (logical).
+    \item \code{assembled} (logical).
+    \item \code{circular} (logical).
   }
 
   \code{UCSC_registered_genomes}: A data frame summarizing all the UCSC

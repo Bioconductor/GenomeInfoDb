@@ -1,5 +1,6 @@
 import(methods)
-importFrom(utils, data, download.file, read.delim, read.table, read.csv)
+importFrom(utils, data, download.file, read.delim, read.table, read.csv,
+                  as.roman)
 importFrom(stats, setNames)
 importFrom(stats4, summary)
 

@@ -82,7 +82,7 @@ NCBI_registered_genomes()
     \item \code{AssemblyUnit} (factor).
     \item \code{SequenceLength} (integer).
     \item \code{UCSCStyleName} (character).
-    \item \code{is_circular} (logical).
+    \item \code{circular} (logical).
   }
 
   \code{NCBI_registered_genomes}: A data frame summarizing all the NCBI

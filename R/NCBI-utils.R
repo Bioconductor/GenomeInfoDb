@@ -474,11 +474,11 @@ NCBI_registered_genomes <- function()
     ans[ , "AssemblyUnit"] <- factor(ans[ , "AssemblyUnit"])
     na_idx <- which(ans[ , "UCSCStyleName"] %in% "na")
     ans[na_idx , "UCSCStyleName"] <- NA_character_
-    is_circular <- make_circ_flags_from_circ_seqs(ans[ , "SequenceName"],
-                                                  circ_seqs=circ_seqs)
-    stopifnot(all(ans[which(is_circular), "SequenceRole"] %in%
+    circular <- make_circ_flags_from_circ_seqs(ans[ , "SequenceName"],
+                                               circ_seqs=circ_seqs)
+    stopifnot(all(ans[which(circular), "SequenceRole"] %in%
                   "assembled-molecule"))
-    ans$is_circular <- is_circular
+    ans$circular <- circular
     ans
 }
 
