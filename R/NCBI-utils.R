@@ -429,7 +429,8 @@ NCBI_registered_genomes <- function()
     )
     listData$circ_seqs <- CharacterList(lapply(genomes, `[[`, "circ_seqs"))
     ans <- S4Vectors:::new_DataFrame(listData, nrows=length(genomes))
-    ans[order(ans$organism), , drop=FALSE]
+    oo <- order(ans$organism, ans$date)
+    as.data.frame(ans[oo, , drop=FALSE])
 }
 
 .lookup_NCBI_genome2accession <- function(genome)
@@ -478,7 +479,7 @@ NCBI_registered_genomes <- function()
 
 .NCBI_cached_chrom_info <- new.env(parent=emptyenv())
 
-.get_NCBI_chrom_info_for_known_assembly <- function(accession, circ_seqs=NULL,
+.get_NCBI_chrom_info_from_accession <- function(accession, circ_seqs=NULL,
     assembled.molecules.only=FALSE,
     recache=FALSE)
 {
@@ -510,8 +511,8 @@ get_chrom_info_from_NCBI <- function(genome,
     if (!isTRUEorFALSE(recache))
         stop(wmsg("'recache' must be TRUE or FALSE"))
 
-    ## First see if the user supplied a supported assembly accession
-    ## instead of the name of a genome assembly.
+    ## First see if the user supplied the assembly accession of a registered
+    ## genome assembly instead of its name.
     assembly <- .lookup_NCBI_accession2assembly(genome)
     if (!is.null(assembly)) {
         ## Yes s/he did.
@@ -519,7 +520,7 @@ get_chrom_info_from_NCBI <- function(genome,
         circ_seqs <- assembly$circ_seqs
     } else {
         ## No s/he didn't.
-        ## Now see if s/he supplied the name of a supported genome assembly.
+        ## Now see if s/he supplied the name of a registered genome assembly.
         accession <- .lookup_NCBI_genome2accession(genome)
         if (!is.null(accession)) {
             ## Yes s/he did.
@@ -534,12 +535,13 @@ get_chrom_info_from_NCBI <- function(genome,
             circ_seqs <- assembly$circ_seqs
         } else {
             ## No s/he didn't.
-            ## The we assume that 'genome' is an assembly accession.
+            ## So now we just assume that 'genome' is an assembly accession
+            ## (an unregistered one).
             accession <- genome
             circ_seqs <- NULL
         }
     }
-    .get_NCBI_chrom_info_for_known_assembly(accession,
+    .get_NCBI_chrom_info_from_accession(accession,
             circ_seqs=circ_seqs,
             assembled.molecules.only=assembled.molecules.only,
             recache=recache)

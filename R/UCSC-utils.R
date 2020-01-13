@@ -108,7 +108,9 @@ UCSC_registered_genomes <- function()
     )
     listData$circ_seqs <- CharacterList(lapply(genomes, `[[`, "CIRC_SEQS"))
     ans <- S4Vectors:::new_DataFrame(listData, nrows=length(genomes))
-    ans[order(ans$organism), , drop=FALSE]
+    genome_trailing_digits <- sub("(.*[^0-9])([0-9]*)$", "\\2", ans$genome)
+    oo <- order(ans$organism, as.integer(genome_trailing_digits))
+    as.data.frame(ans[oo, , drop=FALSE])
 }
 
 

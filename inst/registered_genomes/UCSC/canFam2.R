@@ -8,9 +8,9 @@
 ###   o CIRC_SEQS:           Character vector (subset of ASSEMBLED_MOLECULES).
 ###   o GET_CHROM_SIZES:     Function with 1 argument. Must return a 2-column
 ###                          data.frame with columns "chrom" and "size".
-GENOME <- "monDom5"
-ORGANISM <- "Monodelphis domestica"
-ASSEMBLED_MOLECULES <- paste0("chr", c(1:8, "X", "M"))
+GENOME <- "canFam2"
+ORGANISM <- "Canis lupus familiaris"
+ASSEMBLED_MOLECULES <- paste0("chr", c(1:38, "X", "M"))
 
 CIRC_SEQS <- "chrM"
 
