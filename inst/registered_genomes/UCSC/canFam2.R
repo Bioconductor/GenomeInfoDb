@@ -18,16 +18,11 @@ library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
 
 .order_seqlevels <- function(seqlevels)
 {
-    idx_chrUn <- match("chrUn", seqlevels)
-    stopifnot(!anyNA(idx_chrUn))
-
-    idx1 <- which(seqlevels != "chrUn")
-    stopifnot(length(idx1) == length(ASSEMBLED_MOLECULES))
-    oo1 <- match(ASSEMBLED_MOLECULES, seqlevels[idx1])
-    stopifnot(!anyNA(oo1))
-    idx1 <- idx1[oo1]
-
-    c(idx1, idx_chrUn)
+    ordered_seqlevels <- c(ASSEMBLED_MOLECULES, "chrUn")
+    stopifnot(length(seqlevels) == length(ordered_seqlevels))
+    idx <- match(ordered_seqlevels, seqlevels)
+    stopifnot(!anyNA(idx))
+    idx
 }
 
 GET_CHROM_SIZES <- function(goldenPath.url=getOption("UCSC.goldenPath.url"))

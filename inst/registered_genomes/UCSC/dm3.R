@@ -8,9 +8,9 @@
 ###   o CIRC_SEQS:           Character vector (subset of ASSEMBLED_MOLECULES).
 ###   o GET_CHROM_SIZES:     Function with 1 argument. Must return a 2-column
 ###                          data.frame with columns "chrom" and "size".
-GENOME <- "canFam1"
-ORGANISM <- "Canis lupus familiaris"
-ASSEMBLED_MOLECULES <- paste0("chr", c(1:38, "X", "M"))
+GENOME <- "dm3"
+ORGANISM <- "Drosophila melanogaster"
+ASSEMBLED_MOLECULES <- paste0("chr", c("2L", "2R", "3L", "3R", "4", "X", "M"))
 
 CIRC_SEQS <- "chrM"
 
@@ -18,7 +18,9 @@ library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
 
 .order_seqlevels <- function(seqlevels)
 {
-    ordered_seqlevels <- c(ASSEMBLED_MOLECULES, "chrUn")
+    het <- c("chr2LHet", "chr2RHet", "chr3LHet", "chr3RHet",
+             "chrXHet", "chrYHet")
+    ordered_seqlevels <- c(ASSEMBLED_MOLECULES, het, "chrU", "chrUextra")
     stopifnot(length(seqlevels) == length(ordered_seqlevels))
     idx <- match(ordered_seqlevels, seqlevels)
     stopifnot(!anyNA(idx))
