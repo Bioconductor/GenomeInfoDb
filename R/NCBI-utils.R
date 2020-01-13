@@ -353,66 +353,103 @@ fetch_assembly_report <- function(assembly_accession, AssemblyUnits=NULL)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### get_chrom_info_from_NCBI()
+### Load and access db of NCBI registered genomes
 ###
 
 .NCBI_genome2accession <- new.env(parent=emptyenv())
 .NCBI_accession2assembly <- new.env(parent=emptyenv())
 
-.load_NCBI_assemblies <- function()
+.load_NCBI_registered_genome <- function(file_path)
 {
-    db_path <- system.file("NCBI_assemblies", package="GenomeInfoDb")
-    db_files <- list.files(db_path, pattern="\\.R$", full.names=TRUE)
-
     ## Placeholders. Will actually get defined when we source the
     ## assembly files.
     ORGANISM <- NULL    # Expected to be a single string.
     ASSEMBLIES <- NULL  # Expected to be a list with one list element per
                         # assembly.
+
+    source(file_path, local=TRUE)
+
+    ## Sanity checks.
+    stopifnot(isSingleString(ORGANISM))
+    stopifnot(is.list(ASSEMBLIES))
+
     expected_names <- c("genome", "assembly_accession", "date", "circ_seqs")
-    for (db_file in db_files) {
-        source(db_file, local=TRUE)
-        ## Sanity checks.
-        stopifnot(isSingleString(ORGANISM))
-        stopifnot(is.list(ASSEMBLIES))
-        for (assembly in ASSEMBLIES) {
-            stopifnot(is.list(assembly),
-                      identical(names(assembly), expected_names))
+    for (assembly in ASSEMBLIES) {
+        stopifnot(is.list(assembly),
+                  identical(names(assembly), expected_names))
 
-            genome <- assembly$genome
-            stopifnot(isSingleString(genome))
-            genome <- tolower(genome)
-            accession <- assembly$assembly_accession
-            stopifnot(isSingleString(accession))
-            .NCBI_genome2accession[[genome]] <-
-                c(.NCBI_genome2accession[[genome]], accession)
+        genome <- assembly$genome
+        stopifnot(isSingleString(genome))
+        genome <- tolower(genome)
 
-            stopifnot(isSingleString(assembly$date))
-            circ_seqs <- assembly$circ_seqs
-            if (!is.null(circ_seqs))
-                stopifnot(is.character(circ_seqs),
-                          !anyNA(circ_seqs),
-                          all(nzchar(circ_seqs)),
-                          !anyDuplicated(circ_seqs))
-            assembly$organism <- ORGANISM
-            .NCBI_accession2assembly[[accession]] <- assembly
-        }
+        accession <- assembly$assembly_accession
+        stopifnot(isSingleString(accession),
+                  is.null(.NCBI_accession2assembly[[accession]]))
+
+        .NCBI_genome2accession[[genome]] <-
+            c(.NCBI_genome2accession[[genome]], accession)
+
+        stopifnot(isSingleString(assembly$date))
+
+        circ_seqs <- assembly$circ_seqs
+        if (!is.null(circ_seqs))
+            stopifnot(is.character(circ_seqs),
+                      !anyNA(circ_seqs),
+                      all(nzchar(circ_seqs)),
+                      !anyDuplicated(circ_seqs))
+
+        assembly$organism <- ORGANISM
+        .NCBI_accession2assembly[[accession]] <- assembly
     }
+}
+
+.load_NCBI_registered_genomes <- function()
+{
+    dir_path <- system.file("registered_genomes", "NCBI",
+                             package="GenomeInfoDb")
+    file_paths <- list.files(dir_path, pattern="\\.R$", full.names=TRUE)
+    for (file_path in file_paths)
+        .load_NCBI_registered_genome(file_path)
+}
+
+NCBI_registered_genomes <- function()
+{
+    if (length(.NCBI_accession2assembly) == 0L)
+        .load_NCBI_registered_genomes()
+    genomes <- unname(as.list(.NCBI_accession2assembly, all.names=TRUE))
+    colnames <- c("organism", "genome", "assembly_accession", "date")
+    listData <- lapply(setNames(colnames, colnames),
+        function(colname) {
+            col <- vapply(genomes, `[[`, character(1), colname)
+            if (colname == "organism")
+                col <- factor(col)  # order of levels will dictate order
+                                    # of rows in final DataFrame
+            col
+        }
+    )
+    listData$circ_seqs <- CharacterList(lapply(genomes, `[[`, "circ_seqs"))
+    ans <- S4Vectors:::new_DataFrame(listData, nrows=length(genomes))
+    ans[order(ans$organism), , drop=FALSE]
 }
 
 .lookup_NCBI_genome2accession <- function(genome)
 {
     if (length(.NCBI_genome2accession) == 0L)
-        .load_NCBI_assemblies()
+        .load_NCBI_registered_genomes()
     .NCBI_genome2accession[[tolower(genome)]]
 }
 
 .lookup_NCBI_accession2assembly <- function(accession)
 {
     if (length(.NCBI_accession2assembly) == 0L)
-        .load_NCBI_assemblies()
+        .load_NCBI_registered_genomes()
     .NCBI_accession2assembly[[accession]]
 }
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### get_chrom_info_from_NCBI()
+###
 
 .format_assembly_report <- function(assembly_report, circ_seqs=NULL)
 {

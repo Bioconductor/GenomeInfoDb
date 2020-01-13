@@ -24,9 +24,11 @@ export(
     rankSeqlevels,
 
     ## NCBI-utils.R:
+    NCBI_registered_genomes,
     get_chrom_info_from_NCBI,
 
     ## UCSC-utils.R:
+    UCSC_registered_genomes,
     get_chrom_info_from_UCSC,
 
     ## fetchExtendedChromInfoFromUCSC.R:
