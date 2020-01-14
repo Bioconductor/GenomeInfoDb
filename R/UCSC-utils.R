@@ -93,21 +93,23 @@ registered_UCSC_genomes <- function()
     dir_path <- system.file("registered_genomes", "UCSC",
                              package="GenomeInfoDb")
     file_paths <- list.files(dir_path, pattern="\\.R$", full.names=TRUE)
-    genomes <- lapply(file_paths,
+    assemblies <- lapply(file_paths,
         function(file_path)
             as.list(.parse_script_for_registered_UCSC_genome(file_path)))
-    colnames <- c("ORGANISM", "GENOME")
-    listData <- lapply(setNames(colnames, tolower(colnames)),
-        function(colname) {
-            col <- vapply(genomes, `[[`, character(1), colname)
-            if (colname == "ORGANISM")
-                col <- factor(col)  # order of levels will dictate order
-                                    # of rows in final DataFrame
-            col
-        }
-    )
-    listData$circ_seqs <- CharacterList(lapply(genomes, `[[`, "CIRC_SEQS"))
-    ans <- S4Vectors:::new_DataFrame(listData, nrows=length(genomes))
+    colnames <- c("ORGANISM", "GENOME", "CIRC_SEQS")
+    make_col <- function(colname) {
+        col0 <- lapply(assemblies, `[[`, colname)
+        if (colname == "CIRC_SEQS")
+            return(CharacterList(col0))
+        stopifnot(all(lengths(col0) == 1L))
+        col <- as.character(unlist(col0, use.names=FALSE))
+        if (colname == "ORGANISM")
+            col <- factor(col)  # order of levels will dictate order
+                                # of rows in final DataFrame
+        col
+    }
+    listData <- lapply(setNames(colnames, tolower(colnames)), make_col)
+    ans <- S4Vectors:::new_DataFrame(listData, nrows=length(assemblies))
     genome_trailing_digits <- sub("(.*[^0-9])([0-9]*)$", "\\2", ans$genome)
     oo <- order(ans$organism, as.integer(genome_trailing_digits))
     as.data.frame(ans[oo, , drop=FALSE])

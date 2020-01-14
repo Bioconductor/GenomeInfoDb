@@ -257,7 +257,7 @@ build_and_save_assembly_accessions_table <- function(dir=".", quiet=FALSE)
                 ignore.case=TRUE)
     if (length(idx) == 1L)
         return(assembly_accessions[idx, "refseq_accession"])
-    if (length(idx) >= 2L) 
+    if (length(idx) >= 2L)
         stop("more than one RefSeq assembly accession found for regular ",
              "expression \"", assembly_accession, "\"")
 
@@ -319,7 +319,7 @@ build_and_save_assembly_accessions_table <- function(dir=".", quiet=FALSE)
     ## by NCBI in the assembly report.
     colnames <- c("SequenceName", "SequenceRole", "AssignedMolecule",
                   "AssignedMoleculeLocationOrType", "GenBankAccn",
-                  "Relationship", "RefSeqAccn", "AssemblyUnit" , 
+                  "Relationship", "RefSeqAccn", "AssemblyUnit" ,
                   "SequenceLength", "UCSCStyleName")
     read.table(url, sep="\t", col.names=colnames, na.strings=c("NA", "na"),
                stringsAsFactors=FALSE)
@@ -377,10 +377,17 @@ fetch_assembly_report <- function(assembly_accession, AssemblyUnits=NULL)
 
     stopifnot(is.list(ASSEMBLIES))
 
-    expected_names <- c("genome", "assembly_accession", "date", "circ_seqs")
+    required_fields <- c("genome", "assembly_accession", "date", "circ_seqs")
     for (assembly in ASSEMBLIES) {
+
+        ## Check required fields.
+
         stopifnot(is.list(assembly),
-                  identical(names(assembly), expected_names))
+                  is.character(names(assembly)),
+                  !anyNA(names(assembly)),
+                  all(nzchar(names(assembly))),
+                  !anyDuplicated(names(assembly)),
+                  all(required_fields %in% names(assembly)))
 
         genome <- assembly$genome
         stopifnot(isSingleString(genome))
@@ -403,6 +410,14 @@ fetch_assembly_report <- function(assembly_accession, AssemblyUnits=NULL)
                       !anyDuplicated(circ_seqs))
 
         assembly$organism <- ORGANISM
+
+        ## Optional fields.
+
+        infraspecific_name <- assembly$infraspecific_name
+        if (!is.null(infraspecific_name))
+            stopifnot(isSingleString(infraspecific_name),
+                      isSingleString(names(infraspecific_name)))
+
         .NCBI_accession2assembly[[accession]] <- assembly
     }
 }
@@ -420,20 +435,38 @@ registered_NCBI_genomes <- function()
 {
     if (length(.NCBI_accession2assembly) == 0L)
         .load_registered_NCBI_genomes()
-    genomes <- unname(as.list(.NCBI_accession2assembly, all.names=TRUE))
-    colnames <- c("organism", "genome", "assembly_accession", "date")
-    listData <- lapply(setNames(colnames, colnames),
-        function(colname) {
-            col <- vapply(genomes, `[[`, character(1), colname)
-            if (colname == "organism")
-                col <- factor(col)  # order of levels will dictate order
-                                    # of rows in final DataFrame
-            col
+    assemblies <- unname(as.list(.NCBI_accession2assembly, all.names=TRUE))
+    colnames <- c("organism", "genome", "assembly_accession",
+                  "infraspecific_name", "date", "circ_seqs")
+    make_col <- function(colname) {
+        col0 <- lapply(assemblies, `[[`, colname)
+        if (colname == "circ_seqs")
+            return(CharacterList(col0))
+        if (colname == "infraspecific_name") {
+            stopifnot(all(lengths(col0) <= 1L))
+            col <- rep.int(NA_character_, length(col0))
+            idx1 <- which(lengths(col0) == 1L)
+            if (length(idx1) != 0L) {
+                col1 <- unlist(col0)
+                stopifnot(is.character(col1))
+                col1_names <- names(col1)
+                stopifnot(is.character(col1_names),
+                          !anyNA(col1_names),
+                          all(nzchar(col1_names)))
+                col[idx1] <- paste(col1_names, col1, sep=":")
+            }
+            return(factor(col))
         }
-    )
-    listData$circ_seqs <- CharacterList(lapply(genomes, `[[`, "circ_seqs"))
-    ans <- S4Vectors:::new_DataFrame(listData, nrows=length(genomes))
-    oo <- order(ans$organism, ans$date)
+        stopifnot(all(lengths(col0) == 1L))
+        col <- as.character(unlist(col0, use.names=FALSE))
+        if (colname == "organism")
+            col <- factor(col)  # order of levels will dictate order
+                                # of rows in final DataFrame
+        col
+    }
+    listData <- lapply(setNames(colnames, colnames), make_col)
+    ans <- S4Vectors:::new_DataFrame(listData, nrows=length(assemblies))
+    oo <- order(ans$organism, ans$infraspecific_name, ans$date)
     as.data.frame(ans[oo, , drop=FALSE])
 }
 
@@ -460,6 +493,7 @@ registered_NCBI_genomes <- function()
 {
     drop_columns <- c("AssignedMolecule", "AssignedMoleculeLocationOrType")
     ans <- assembly_report[ , !(colnames(assembly_report) %in% drop_columns)]
+    ans[ , "SequenceName"] <- as.character(ans[ , "SequenceName"])
     SequenceRole_levels <- c("assembled-molecule",
                              "alt-scaffold",
                              "unlocalized-scaffold",
