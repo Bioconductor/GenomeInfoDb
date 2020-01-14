@@ -8,7 +8,7 @@
 ###   o CIRC_SEQS:           Character vector (subset of ASSEMBLED_MOLECULES).
 ###   o GET_CHROM_SIZES:     Function with 1 argument. Must return a 2-column
 ###                          data.frame with columns "chrom" and "size".
-GENOME <- "danRer6"
+GENOME <- "danRer5"
 ORGANISM <- "Danio rerio"
 ASSEMBLED_MOLECULES <- paste0("chr", c(1:25, "M"))
 
@@ -31,7 +31,7 @@ library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
 
     idx2 <- which(npart == 2L)
     m2 <- matrix(unlist(tmp[idx2]), ncol=2L, byrow=TRUE)
-    stopifnot(all(m2[ , 1L] == "Zv8"))
+    stopifnot(all(m2[ , 1L] == "Zv7"))
 
     idx2_scaffold <- which(substr(m2[ , 2L], 1L, 8L) == "scaffold")
     idx2_NA <- which(substr(m2[ , 2L], 1L, 2L) == "NA")

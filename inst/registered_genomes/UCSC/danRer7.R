@@ -38,11 +38,15 @@ library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
     stopifnot(length(idx2_scaffold) + length(idx2_NA) == length(idx2))
 
     m22_scaffold <- m2[idx2_scaffold, 2L]
-    oo2_scaffold <- order(as.integer(substr(m22_scaffold, 9L, nchar(m22_scaffold))))
+    suffix <- as.integer(substr(m22_scaffold, 9L, nchar(m22_scaffold)))
+    stopifnot(!anyNA(suffix))
+    oo2_scaffold <- order(suffix)
     idx2_scaffold <- idx2[idx2_scaffold[oo2_scaffold]]
 
     m22_NA <- m2[idx2_NA, 2L]
-    oo2_NA <- order(as.integer(substr(m22_NA, 3L, nchar(m22_NA))))
+    suffix <- as.integer(substr(m22_NA, 3L, nchar(m22_NA)))
+    stopifnot(!anyNA(suffix))
+    oo2_NA <- order(suffix)
     idx2_NA <- idx2[idx2_NA[oo2_NA]]
 
     c(idx1, idx2_scaffold, idx2_NA)

@@ -8,9 +8,11 @@
 ###   o CIRC_SEQS:           Character vector (subset of ASSEMBLED_MOLECULES).
 ###   o GET_CHROM_SIZES:     Function with 1 argument. Must return a 2-column
 ###                          data.frame with columns "chrom" and "size".
-GENOME <- "danRer6"
-ORGANISM <- "Danio rerio"
-ASSEMBLED_MOLECULES <- paste0("chr", c(1:25, "M"))
+GENOME <- "taeGut2"
+ORGANISM <- "Taeniopygia guttata"
+ASSEMBLED_MOLECULES <- paste0("chr", c(1, "1A", "1B", 2:4, "4A", 5:28,
+                                       "Z", "LGE22", "LG2", "LG5",
+                                       "M"))
 
 CIRC_SEQS <- "chrM"
 
@@ -21,7 +23,7 @@ library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
 {
     tmp <- CharacterList(strsplit(seqlevels, "_"))
     npart <- lengths(tmp)
-    stopifnot(all(npart <= 2L))
+    stopifnot(all(npart <= 3L))
 
     idx1 <- which(npart == 1L)
     stopifnot(length(idx1) == length(ASSEMBLED_MOLECULES))
@@ -29,27 +31,21 @@ library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
     stopifnot(!anyNA(oo1))
     idx1 <- idx1[oo1]
 
+    idx3 <- which(npart == 3L)
+    m3 <- matrix(unlist(tmp[idx3]), ncol=3L, byrow=TRUE)
+    m31 <- match(m3[ , 1L], ASSEMBLED_MOLECULES)
+    stopifnot(!anyNA(m31))
+    stopifnot(all(m3[ , 3L] == "random"))
+    oo3 <- order(m31, m3[ , 2L])
+    idx3 <- idx3[oo3]
+
     idx2 <- which(npart == 2L)
     m2 <- matrix(unlist(tmp[idx2]), ncol=2L, byrow=TRUE)
-    stopifnot(all(m2[ , 1L] == "Zv8"))
+    stopifnot(all(m2[ , 1L] == "chrUn"))
+    oo2 <- order(m2[ , 2L])
+    idx2 <- idx2[oo2]
 
-    idx2_scaffold <- which(substr(m2[ , 2L], 1L, 8L) == "scaffold")
-    idx2_NA <- which(substr(m2[ , 2L], 1L, 2L) == "NA")
-    stopifnot(length(idx2_scaffold) + length(idx2_NA) == length(idx2))
-
-    m22_scaffold <- m2[idx2_scaffold, 2L]
-    suffix <- as.integer(substr(m22_scaffold, 9L, nchar(m22_scaffold)))
-    stopifnot(!anyNA(suffix))
-    oo2_scaffold <- order(suffix)
-    idx2_scaffold <- idx2[idx2_scaffold[oo2_scaffold]]
-
-    m22_NA <- m2[idx2_NA, 2L]
-    suffix <- as.integer(substr(m22_NA, 3L, nchar(m22_NA)))
-    stopifnot(!anyNA(suffix))
-    oo2_NA <- order(suffix)
-    idx2_NA <- idx2[idx2_NA[oo2_NA]]
-
-    c(idx1, idx2_scaffold, idx2_NA)
+    c(idx1, idx3, idx2)
 }
 
 GET_CHROM_SIZES <- function(goldenPath.url=getOption("UCSC.goldenPath.url"))

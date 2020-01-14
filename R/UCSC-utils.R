@@ -179,7 +179,10 @@ UCSC_registered_genomes <- function()
                       identical(sapply(ans, class),
                                 c(chrom="character", size="integer")),
                       identical(head(ans[ , "chrom"], n=nb_assembled),
-                                ASSEMBLED_MOLECULES))
+                                ASSEMBLED_MOLECULES),
+                      !anyNA(ans[ , "chrom"]),
+                      all(nzchar(ans[ , "chrom"])),
+                      !anyDuplicated(ans[ , "chrom"]))
         }
 
         ## Add columns "assembled" and "circular".
