@@ -16,7 +16,6 @@ ASSEMBLED_MOLECULES <- paste0("chr", c(1:24, 26:28, 32, "W", "Z",
 
 CIRC_SEQS <- "chrM"
 
-library(IRanges)       # for CharacterList()
 library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
 
 .order_seqlevels <- function(seqlevels)

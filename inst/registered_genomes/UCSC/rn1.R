@@ -8,21 +8,18 @@
 ###   o CIRC_SEQS:           Character vector (subset of ASSEMBLED_MOLECULES).
 ###   o GET_CHROM_SIZES:     Function with 1 argument. Must return a 2-column
 ###                          data.frame with columns "chrom" and "size".
-GENOME <- "galGal3"
-ORGANISM <- "Gallus gallus"
-ASSEMBLED_MOLECULES <- paste0("chr", c(1:28, 32, "W", "Z",
-                                       "E22C19W28_E50C23", "E64",
-                                       "M"))
+GENOME <- "rn1"
+ORGANISM <- "Rattus norvegicus"
+ASSEMBLED_MOLECULES <- paste0("chr", c(1:20, "X"))
 
-CIRC_SEQS <- "chrM"
+CIRC_SEQS <- character(0)
 
 library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
 
 .order_seqlevels <- function(seqlevels)
 {
-    random <- paste0("chr", c(1:2, 4:8, 10:13, 16:18, 20, 22, 25, 28, "W", "Z",
-                              "E22C19W28_E50C23", "E64", "Un"), "_random")
-    ordered_seqlevels <- c(ASSEMBLED_MOLECULES, random)
+    random <- paste0("chr", c(1:20, "X", "Un"), "_random")
+    ordered_seqlevels <- c(ASSEMBLED_MOLECULES, random, "chrUn")
     stopifnot(length(seqlevels) == length(ordered_seqlevels))
     idx <- match(ordered_seqlevels, seqlevels)
     stopifnot(!anyNA(idx))
