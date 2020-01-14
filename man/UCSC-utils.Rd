@@ -1,7 +1,7 @@
 \name{UCSC-utils}
 
 \alias{get_chrom_info_from_UCSC}
-\alias{UCSC_registered_genomes}
+\alias{registered_UCSC_genomes}
 
 \title{
   Get chromosome information of a UCSC genome assembly
@@ -16,7 +16,7 @@
   depending on whether a genome assembly is \emph{registered} or not in
   the \pkg{GenomeInfoDb} package. See below for the details.
 
-  Use \code{UCSC_registered_genomes} to list all the UCSC genome
+  Use \code{registered_UCSC_genomes} to list all the UCSC genome
   assemblies currently registered in the \pkg{GenomeInfoDb} package.
 }
 
@@ -26,7 +26,7 @@ get_chrom_info_from_UCSC(genome,
                          goldenPath.url=getOption("UCSC.goldenPath.url"),
                          recache=FALSE)
 
-UCSC_registered_genomes()
+registered_UCSC_genomes()
 }
 
 \arguments{
@@ -92,7 +92,7 @@ UCSC_registered_genomes()
     \item \code{circular} (logical).
   }
 
-  \code{UCSC_registered_genomes}: A data frame summarizing all the UCSC
+  \code{registered_UCSC_genomes}: A data frame summarizing all the UCSC
   genome assemblies currently \emph{registered} in the \pkg{GenomeInfoDb}
   package.
 }
@@ -120,7 +120,7 @@ get_chrom_info_from_UCSC("hg19", assembled.molecules.only=TRUE)
 get_chrom_info_from_UCSC("panTro6", assembled.molecules.only=TRUE)
 
 ## List of UCSC genome assemblies currently registered in the package:
-UCSC_registered_genomes()
+registered_UCSC_genomes()
 }
 
 \keyword{manip}

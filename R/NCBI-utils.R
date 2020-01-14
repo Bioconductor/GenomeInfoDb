@@ -353,13 +353,13 @@ fetch_assembly_report <- function(assembly_accession, AssemblyUnits=NULL)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Load and access db of NCBI registered genomes
+### Load and access db of registered NCBI genomes
 ###
 
 .NCBI_genome2accession <- new.env(parent=emptyenv())
 .NCBI_accession2assembly <- new.env(parent=emptyenv())
 
-.load_NCBI_registered_genome <- function(file_path)
+.load_registered_NCBI_genome <- function(file_path)
 {
     ## Placeholders. Will actually get defined when we source the
     ## assembly files.
@@ -406,19 +406,19 @@ fetch_assembly_report <- function(assembly_accession, AssemblyUnits=NULL)
     }
 }
 
-.load_NCBI_registered_genomes <- function()
+.load_registered_NCBI_genomes <- function()
 {
     dir_path <- system.file("registered_genomes", "NCBI",
                              package="GenomeInfoDb")
     file_paths <- list.files(dir_path, pattern="\\.R$", full.names=TRUE)
     for (file_path in file_paths)
-        .load_NCBI_registered_genome(file_path)
+        .load_registered_NCBI_genome(file_path)
 }
 
-NCBI_registered_genomes <- function()
+registered_NCBI_genomes <- function()
 {
     if (length(.NCBI_accession2assembly) == 0L)
-        .load_NCBI_registered_genomes()
+        .load_registered_NCBI_genomes()
     genomes <- unname(as.list(.NCBI_accession2assembly, all.names=TRUE))
     colnames <- c("organism", "genome", "assembly_accession", "date")
     listData <- lapply(setNames(colnames, colnames),
@@ -439,14 +439,14 @@ NCBI_registered_genomes <- function()
 .lookup_NCBI_genome2accession <- function(genome)
 {
     if (length(.NCBI_genome2accession) == 0L)
-        .load_NCBI_registered_genomes()
+        .load_registered_NCBI_genomes()
     .NCBI_genome2accession[[tolower(genome)]]
 }
 
 .lookup_NCBI_accession2assembly <- function(accession)
 {
     if (length(.NCBI_accession2assembly) == 0L)
-        .load_NCBI_registered_genomes()
+        .load_registered_NCBI_genomes()
     .NCBI_accession2assembly[[accession]]
 }
 

@@ -1,7 +1,7 @@
 \name{NCBI-utils}
 
 \alias{get_chrom_info_from_NCBI}
-\alias{NCBI_registered_genomes}
+\alias{registered_NCBI_genomes}
 
 \title{
   Get chromosome information of an NCBI genome assembly
@@ -16,7 +16,7 @@
   depending on whether a genome assembly is \emph{registered} or not in
   the \pkg{GenomeInfoDb} package. See below for the details.
 
-  Use \code{NCBI_registered_genomes} to list all the NCBI genome
+  Use \code{registered_NCBI_genomes} to list all the NCBI genome
   assemblies currently registered in the \pkg{GenomeInfoDb} package.
 }
 
@@ -25,7 +25,7 @@ get_chrom_info_from_NCBI(genome,
                          assembled.molecules.only=FALSE,
                          recache=FALSE)
 
-NCBI_registered_genomes()
+registered_NCBI_genomes()
 }
 
 \arguments{
@@ -85,7 +85,7 @@ NCBI_registered_genomes()
     \item \code{circular} (logical).
   }
 
-  \code{NCBI_registered_genomes}: A data frame summarizing all the NCBI
+  \code{registered_NCBI_genomes}: A data frame summarizing all the NCBI
   genome assemblies currently \emph{registered} in the \pkg{GenomeInfoDb}
   package.
 }
@@ -113,7 +113,7 @@ get_chrom_info_from_NCBI("GRCh37", assembled.molecules.only=TRUE)
 get_chrom_info_from_NCBI("R64")
 
 ## List of NCBI genome assemblies currently registered in the package:
-NCBI_registered_genomes()
+registered_NCBI_genomes()
 }
 
 \keyword{manip}

@@ -42,10 +42,10 @@ fetch_chrom_sizes_from_UCSC <- function(genome,
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### UCSC_registered_genomes()
+### registered_UCSC_genomes()
 ###
 
-.parse_script_for_UCSC_registered_genome <- function(script_path)
+.parse_script_for_registered_UCSC_genome <- function(script_path)
 {
     ## Placeholders. Will actually get defined when we source the script.
     GENOME <- NULL               # Expected to be a single string.
@@ -88,14 +88,14 @@ fetch_chrom_sizes_from_UCSC <- function(genome,
          GET_CHROM_SIZES=GET_CHROM_SIZES)
 }
 
-UCSC_registered_genomes <- function()
+registered_UCSC_genomes <- function()
 {
     dir_path <- system.file("registered_genomes", "UCSC",
                              package="GenomeInfoDb")
     file_paths <- list.files(dir_path, pattern="\\.R$", full.names=TRUE)
     genomes <- lapply(file_paths,
         function(file_path)
-            as.list(.parse_script_for_UCSC_registered_genome(file_path)))
+            as.list(.parse_script_for_registered_UCSC_genome(file_path)))
     colnames <- c("ORGANISM", "GENOME")
     listData <- lapply(setNames(colnames, tolower(colnames)),
         function(colname) {
@@ -120,7 +120,7 @@ UCSC_registered_genomes <- function()
 
 .UCSC_cached_chrom_info <- new.env(parent=emptyenv())
 
-.get_UCSC_chrom_info_for_unregistered_genome <- function(genome,
+.get_chrom_info_for_unregistered_UCSC_genome <- function(genome,
     assembled.molecules.only=FALSE,
     goldenPath.url=getOption("UCSC.goldenPath.url"),
     recache=FALSE)
@@ -146,16 +146,16 @@ UCSC_registered_genomes <- function()
     if (assembled.molecules.only)
         warning(wmsg("'assembled.molecules' was ignored for unregistered ",
                      "genome ", genome, " (don't know what the assembled ",
-                     "molecules are for unregistered genomes)"))
+                     "molecules are for unregistered UCSC genomes)"))
     ans
 }
 
-.get_UCSC_chrom_info_for_registered_genome <- function(genome, script_path,
+.get_chrom_info_for_registered_UCSC_genome <- function(genome, script_path,
     assembled.molecules.only=FALSE,
     goldenPath.url=getOption("UCSC.goldenPath.url"),
     recache=FALSE)
 {
-    vars <- .parse_script_for_UCSC_registered_genome(script_path)
+    vars <- .parse_script_for_registered_UCSC_genome(script_path)
     if (!identical(vars$GENOME, genome))
         stop(wmsg(script_path, ": script does not seem ",
                   "to be for genome ", genome))
@@ -219,12 +219,12 @@ get_chrom_info_from_UCSC <- function(genome,
     script_path <- system.file("registered_genomes", "UCSC", script_name,
                                package="GenomeInfoDb")
     if (identical(script_path, "")) {
-        ans <- .get_UCSC_chrom_info_for_unregistered_genome(genome,
+        ans <- .get_chrom_info_for_unregistered_UCSC_genome(genome,
                     assembled.molecules.only=assembled.molecules.only,
                     goldenPath.url=goldenPath.url,
                     recache=recache)
     } else {
-        ans <- .get_UCSC_chrom_info_for_registered_genome(genome, script_path,
+        ans <- .get_chrom_info_for_registered_UCSC_genome(genome, script_path,
                     assembled.molecules.only=assembled.molecules.only,
                     goldenPath.url=goldenPath.url,
                     recache=recache)

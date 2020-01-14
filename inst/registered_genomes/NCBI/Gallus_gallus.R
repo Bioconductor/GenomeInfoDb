@@ -28,6 +28,6 @@ ASSEMBLIES <- list(
     list(genome="GRCg6a",
          assembly_accession="GCF_000002315.6",
          date="2018/03/27",
-         circ_seqs="MT"),
+         circ_seqs="MT")
 )
 
