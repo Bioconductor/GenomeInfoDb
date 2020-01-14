@@ -321,7 +321,8 @@ build_and_save_assembly_accessions_table <- function(dir=".", quiet=FALSE)
                   "AssignedMoleculeLocationOrType", "GenBankAccn",
                   "Relationship", "RefSeqAccn", "AssemblyUnit" , 
                   "SequenceLength", "UCSCStyleName")
-    read.table(url, sep="\t", col.names=colnames, stringsAsFactors=FALSE)
+    read.table(url, sep="\t", col.names=colnames, na.strings=c("NA", "na"),
+               stringsAsFactors=FALSE)
 }
 
 ### NOT exported.

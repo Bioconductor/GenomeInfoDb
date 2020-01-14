@@ -8,6 +8,7 @@
 ###   o CIRC_SEQS:           Character vector (subset of ASSEMBLED_MOLECULES).
 ###   o GET_CHROM_SIZES:     Function with 1 argument. Must return a 2-column
 ###                          data.frame with columns "chrom" and "size".
+###   o NCBI_LINKER:         Named list.
 GENOME <- "panTro2"
 ORGANISM <- "Pan troglodytes"
 ASSEMBLED_MOLECULES <- paste0("chr", c(1, "2a", "2b", 3:22, "X", "Y", "M"))
@@ -53,4 +54,21 @@ GET_CHROM_SIZES <- function(goldenPath.url=getOption("UCSC.goldenPath.url"))
     oo <- .order_seqlevels(chrom_sizes[ , "chrom"])
     S4Vectors:::extract_data_frame_rows(chrom_sizes, oo)
 }
+
+### Valid NCBI_LINKER components:
+### - assembly_accession: single non-empty string.
+### - AssemblyUnits: character vector.
+### - special_mappings: named character vector.
+### - unmapped_seqs: named list of character vectors.
+### - drop_unmapped: TRUE or FALSE.
+NCBI_LINKER <- list(
+    assembly_accession="GCF_000001515.3",
+    special_mappings=c(chrM="MT"),
+    unmapped_seqs=list(
+        `pseudo-scaffold`=
+            c("chr6_hla_hap1",
+              paste0("chr", c(1, "2a", "2b", 3:20, 22, "X", "Y"), "_random"),
+              "chrUn")
+    )
+)
 

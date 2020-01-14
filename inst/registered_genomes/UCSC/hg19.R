@@ -8,6 +8,7 @@
 ###   o CIRC_SEQS:           Character vector (subset of ASSEMBLED_MOLECULES).
 ###   o GET_CHROM_SIZES:     Function with 1 argument. Must return a 2-column
 ###                          data.frame with columns "chrom" and "size".
+###   o NCBI_LINKER:         Named list.
 GENOME <- "hg19"
 ORGANISM <- "Homo sapiens"
 ASSEMBLED_MOLECULES <- paste0("chr", c(1:22, "X", "Y", "M"))
@@ -55,4 +56,25 @@ GET_CHROM_SIZES <- function(goldenPath.url=getOption("UCSC.goldenPath.url"))
     oo <- .order_seqlevels(chrom_sizes[ , "chrom"])
     S4Vectors:::extract_data_frame_rows(chrom_sizes, oo)
 }
+
+### Valid NCBI_LINKER components:
+### - assembly_accession: single non-empty string.
+### - AssemblyUnits: character vector.
+### - special_mappings: named character vector.
+### - unmapped_seqs: named list of character vectors.
+### - drop_unmapped: TRUE or FALSE.
+NCBI_LINKER <- list(
+    assembly_accession="GCF_000001405.13",
+    ## Special renaming of the 9 alternate scaffolds:
+    special_mappings=c(chr4_ctg9_hap1="HSCHR4_1_CTG9",
+                       chr6_apd_hap1="HSCHR6_MHC_APD_CTG1",
+                       chr6_cox_hap2="HSCHR6_MHC_COX_CTG1",
+                       chr6_dbb_hap3="HSCHR6_MHC_DBB_CTG1",
+                       chr6_mann_hap4="HSCHR6_MHC_MANN_CTG1",
+                       chr6_mcf_hap5="HSCHR6_MHC_MCF_CTG1",
+                       chr6_qbl_hap6="HSCHR6_MHC_QBL_CTG1",
+                       chr6_ssto_hap7="HSCHR6_MHC_SSTO_CTG1",
+                       chr17_ctg5_hap1="HSCHR17_1_CTG5"),
+    unmapped_seqs=list(`assembled-molecule`="chrM")
+)
 

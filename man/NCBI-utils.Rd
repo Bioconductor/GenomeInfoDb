@@ -74,15 +74,17 @@ registered_NCBI_genomes()
 \value{
   \code{get_chrom_info_from_NCBI}: A 9-column data frame with columns:
   \enumerate{
-    \item \code{SequenceName} (character).
-    \item \code{SequenceRole} (factor).
-    \item \code{GenBankAccn} (character).
-    \item \code{Relationship} (factor).
-    \item \code{RefSeqAccn} (character).
-    \item \code{AssemblyUnit} (factor).
-    \item \code{SequenceLength} (integer).
-    \item \code{UCSCStyleName} (character).
-    \item \code{circular} (logical).
+    \item \code{SequenceName}: character.
+    \item \code{SequenceRole}: factor.
+    \item \code{GenBankAccn}: character.
+    \item \code{Relationship}: factor.
+    \item \code{RefSeqAccn}: character.
+    \item \code{AssemblyUnit}: factor.
+    \item \code{SequenceLength}: integer. Note that this column **can**
+          contain NAs! For example this is the case for assembly Amel_HAv3.1
+          where the length of sequence MT is missing.
+    \item \code{UCSCStyleName}: character.
+    \item \code{circular}: logical.
   }
 
   \code{registered_NCBI_genomes}: A data frame summarizing all the NCBI

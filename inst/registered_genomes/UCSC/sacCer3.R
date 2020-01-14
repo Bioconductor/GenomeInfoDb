@@ -8,9 +8,21 @@
 ###   o CIRC_SEQS:           Character vector (subset of ASSEMBLED_MOLECULES).
 ###   o GET_CHROM_SIZES:     Function with 1 argument. Must return a 2-column
 ###                          data.frame with columns "chrom" and "size".
+###   o NCBI_LINKER:         Named list.
 GENOME <- "sacCer3"
 ORGANISM <- "Saccharomyces cerevisiae"
 ASSEMBLED_MOLECULES <- paste0("chr", c(as.character(as.roman(1:16)), "M"))
 
 CIRC_SEQS <- "chrM"
+
+### Valid NCBI_LINKER components:
+### - assembly_accession: single non-empty string.
+### - AssemblyUnits: character vector.
+### - special_mappings: named character vector.
+### - unmapped_seqs: named list of character vectors.
+### - drop_unmapped: TRUE or FALSE.
+NCBI_LINKER <- list(
+    assembly_accession="GCF_000146045.2",
+    special_mappings=c(chrM="MT")
+)
 
