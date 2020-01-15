@@ -362,62 +362,105 @@ fetch_assembly_report <- function(assembly_accession, AssemblyUnits=NULL)
 
 .load_registered_NCBI_genome <- function(file_path)
 {
+    filename <- basename(file_path)
+    if (substr(filename, nchar(filename)-1L, nchar(filename)) != ".R")
+        stop(wmsg("name of genome registration file '", filename, "' must ",
+                  "have extension .R"))
+    if (grepl(" ", filename, fixed=TRUE))
+        stop(wmsg("name of genome registration file '", filename, "' must ",
+                  "not contain spaces"))
+
     ## Placeholders. Will actually get defined when we source the
     ## assembly files.
     ORGANISM <- NULL    # Expected to be a single string.
     ASSEMBLIES <- NULL  # Expected to be a list with one list element per
                         # assembly.
-
     source(file_path, local=TRUE)
 
-    ## Sanity checks.
-    stopifnot(isSingleString(ORGANISM))
-    inferred_basename <- paste0(chartr(" ", "_", ORGANISM), ".R")
-    stopifnot(identical(inferred_basename, basename(file_path)))
+    ## Check ORGANISM.
+    stop_if <- function(notok, ...) {
+        if (notok)
+            stop("Error in NCBI genome registration file '", filename,
+                 "':\n  ", wmsg(...))
+    }
+    stop_if(is.null(ORGANISM), "'ORGANISM' must be defined")
+    stop_if(!isSingleString(ORGANISM), "'ORGANISM' must be a single string")
+    stop_if(grepl("_", ORGANISM, fixed=TRUE),
+            "spaces must be used instead of underscores in 'ORGANISM' ")
+    target <- chartr("_", " ", substr(filename, 1L, nchar(filename)-2L))
+    stop_if(!identical(target, ORGANISM),
+            "'ORGANISM' must match filename ",
+            "(with spaces in place of underscores)")
 
-    stopifnot(is.list(ASSEMBLIES))
+    ## Check ASSEMBLIES.
+    stop_if(is.null(ASSEMBLIES), "'ASSEMBLIES' must be defined")
+    stop_if(!is.list(ASSEMBLIES), "'ASSEMBLIES' must be a list of lists")
 
     required_fields <- c("genome", "assembly_accession", "date", "circ_seqs")
-    for (assembly in ASSEMBLIES) {
+    for (i in seq_along(ASSEMBLIES)) {
+        assembly <- ASSEMBLIES[[i]]
 
         ## Check required fields.
 
-        stopifnot(is.list(assembly),
-                  is.character(names(assembly)),
-                  !anyNA(names(assembly)),
-                  all(nzchar(names(assembly))),
-                  !anyDuplicated(names(assembly)),
-                  all(required_fields %in% names(assembly)))
+        stop_if(!is.list(assembly),
+                "'ASSEMBLIES[[", i, "]]' must be a named list")
+        assembly_fields <- names(assembly)
+        stop_if(!is.character(assembly_fields),
+                "'ASSEMBLIES[[", i, "]]' must be a named list")
+        stop_if(anyNA(assembly_fields) ||
+                !all(nzchar(assembly_fields)) ||
+                anyDuplicated(assembly_fields),
+                "the names on 'ASSEMBLIES[[", i, "]]' must ",
+                "not contain NAs, empty strings, or duplicates")
+        stop_if(!all(required_fields %in% names(assembly)),
+                "'ASSEMBLIES[[", i, "]]' must have fields: ",
+                paste(paste0("\"", required_fields, "\""), collapse=", "))
 
+        ## Check "genome" field (required).
         genome <- assembly$genome
-        stopifnot(isSingleString(genome))
+        stop_if(!isSingleString(genome) || genome == "",
+                "\"genome\" field in 'ASSEMBLIES[[", i, "]]' must ",
+                "be a single non-empty string")
         genome <- tolower(genome)
 
+        ## Check "accession" field (required).
         accession <- assembly$assembly_accession
-        stopifnot(isSingleString(accession),
-                  is.null(.NCBI_accession2assembly[[accession]]))
+        stop_if(!isSingleString(accession) || accession == "",
+                "\"accession\" field in 'ASSEMBLIES[[", i, "]]' must ",
+                "be a single non-empty string")
+        stop_if(!is.null(.NCBI_accession2assembly[[accession]]),
+                "assembly accession ", accession, " used more than once")
+
+        ## Check "date" field (required).
+        date <- assembly$date
+        stop_if(!isSingleString(date) || date == "",
+                "\"date\" field in 'ASSEMBLIES[[", i, "]]' must ",
+                "be a single non-empty string")
+
+        ## Check "circ_seqs" field (required).
+        circ_seqs <- assembly$circ_seqs
+        stop_if(!is.character(circ_seqs),
+                "\"circ_seqs\" field in 'ASSEMBLIES[[", i, "]]' must ",
+                "be a character vector")
+        stop_if(anyNA(circ_seqs) ||
+                !all(nzchar(circ_seqs)) ||
+                anyDuplicated(circ_seqs),
+                "\"circ_seqs\" field in 'ASSEMBLIES[[", i, "]]' must ",
+                "not contain NAs, empty strings, or duplicates")
+
+        ## Check optional fields.
+        infraspecific_name <- assembly$infraspecific_name
+        if (!is.null(infraspecific_name)) {
+            stop_if(!isSingleString(infraspecific_name) ||
+                    infraspecific_name == "" ||
+                    !isSingleString(names(infraspecific_name)),
+              "\"infraspecific_name\" field in 'ASSEMBLIES[[", i, "]]' must ",
+              "be a single non-empty named string")
+        }
 
         .NCBI_genome2accession[[genome]] <-
             c(.NCBI_genome2accession[[genome]], accession)
-
-        stopifnot(isSingleString(assembly$date))
-
-        circ_seqs <- assembly$circ_seqs
-        if (!is.null(circ_seqs))
-            stopifnot(is.character(circ_seqs),
-                      !anyNA(circ_seqs),
-                      all(nzchar(circ_seqs)),
-                      !anyDuplicated(circ_seqs))
-
         assembly$organism <- ORGANISM
-
-        ## Optional fields.
-
-        infraspecific_name <- assembly$infraspecific_name
-        if (!is.null(infraspecific_name))
-            stopifnot(isSingleString(infraspecific_name),
-                      isSingleString(names(infraspecific_name)))
-
         .NCBI_accession2assembly[[accession]] <- assembly
     }
 }
