@@ -140,7 +140,8 @@ fetch_chrom_sizes_from_UCSC <- function(genome,
          ORGANISM=ORGANISM,
          ASSEMBLED_MOLECULES=ASSEMBLED_MOLECULES,
          CIRC_SEQS=CIRC_SEQS,
-         GET_CHROM_SIZES=GET_CHROM_SIZES)
+         GET_CHROM_SIZES=GET_CHROM_SIZES,
+         NCBI_LINKER=NCBI_LINKER)
 }
 
 registered_UCSC_genomes <- function()
@@ -149,19 +150,34 @@ registered_UCSC_genomes <- function()
                              package="GenomeInfoDb")
     file_paths <- list.files(dir_path, pattern="\\.R$", full.names=TRUE)
     assemblies <- lapply(file_paths, .parse_script_for_registered_UCSC_genome)
-    colnames <- c("ORGANISM", "GENOME", "CIRC_SEQS")
-    make_col <- function(colname) {
-        col0 <- lapply(assemblies, `[[`, colname)
-        if (colname == "CIRC_SEQS")
+
+    colnames <- c("organism", "genome", "based_on_NCBI_genome", "circ_seqs")
+    make_col <- function(j) {
+        colname <- colnames[[j]]
+        if (colname == "based_on_NCBI_genome") {
+            col <- vapply(assemblies,
+                function(assembly) {
+                    linker <- assembly$NCBI_LINKER
+                    if (is.null(linker))
+                        return(NA_character_)
+                    accession <- linker$assembly_accession
+                    lookup_NCBI_accession2assembly(accession)$genome
+                }, character(1), USE.NAMES=FALSE)
+            return(col)
+        }
+        COLNAME <- toupper(colname)
+        col0 <- lapply(assemblies, `[[`, COLNAME)
+        if (colname == "circ_seqs")
             return(CharacterList(col0))
         stopifnot(all(lengths(col0) == 1L))
         col <- as.character(unlist(col0, use.names=FALSE))
-        if (colname == "ORGANISM")
+        if (colname == "organism")
             col <- factor(col)  # order of levels will dictate order
                                 # of rows in final DataFrame
         col
     }
-    listData <- lapply(setNames(colnames, tolower(colnames)), make_col)
+
+    listData <- lapply(setNames(seq_along(colnames), colnames), make_col)
     ans <- S4Vectors:::new_DataFrame(listData, nrows=length(assemblies))
     genome_trailing_digits <- sub("(.*[^0-9])([0-9]*)$", "\\2", ans$genome)
     oo <- order(ans$organism, as.integer(genome_trailing_digits))

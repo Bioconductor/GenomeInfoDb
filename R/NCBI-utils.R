@@ -420,7 +420,6 @@ fetch_assembly_report <- function(assembly_accession, AssemblyUnits=NULL)
         stop_if(!isSingleString(genome) || genome == "",
                 "\"genome\" field in 'ASSEMBLIES[[", i, "]]' must ",
                 "be a single non-empty string")
-        genome <- tolower(genome)
 
         ## Check "accession" field (required).
         accession <- assembly$assembly_accession
@@ -457,6 +456,7 @@ fetch_assembly_report <- function(assembly_accession, AssemblyUnits=NULL)
               "be a single non-empty named string")
         }
 
+        genome <- tolower(genome)
         .NCBI_genome2accession[[genome]] <-
             c(.NCBI_genome2accession[[genome]], accession)
         assembly$organism <- ORGANISM
@@ -478,6 +478,7 @@ registered_NCBI_genomes <- function()
     if (length(.NCBI_accession2assembly) == 0L)
         .load_registered_NCBI_genomes()
     assemblies <- unname(as.list(.NCBI_accession2assembly, all.names=TRUE))
+
     colnames <- c("organism", "genome", "assembly_accession",
                   "infraspecific_name", "date", "circ_seqs")
     make_col <- function(colname) {
@@ -506,6 +507,7 @@ registered_NCBI_genomes <- function()
                                 # of rows in final DataFrame
         col
     }
+
     listData <- lapply(setNames(colnames, colnames), make_col)
     ans <- S4Vectors:::new_DataFrame(listData, nrows=length(assemblies))
     oo <- order(ans$organism, ans$infraspecific_name, ans$date)
@@ -514,6 +516,7 @@ registered_NCBI_genomes <- function()
 
 lookup_NCBI_genome2accession <- function(genome)
 {
+    stopifnot(isSingleString(genome))
     if (length(.NCBI_genome2accession) == 0L)
         .load_registered_NCBI_genomes()
     .NCBI_genome2accession[[tolower(genome)]]
@@ -521,6 +524,7 @@ lookup_NCBI_genome2accession <- function(genome)
 
 lookup_NCBI_accession2assembly <- function(accession)
 {
+    stopifnot(isSingleString(accession))
     if (length(.NCBI_accession2assembly) == 0L)
         .load_registered_NCBI_genomes()
     .NCBI_accession2assembly[[accession]]
