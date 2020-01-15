@@ -26,11 +26,11 @@ export(
 
     ## NCBI-utils.R:
     registered_NCBI_genomes,
-    get_chrom_info_from_NCBI,
+    getChromInfoFromNCBI,
 
     ## UCSC-utils.R:
     registered_UCSC_genomes,
-    get_chrom_info_from_UCSC,
+    getChromInfoFromUCSC,
 
     ## fetchExtendedChromInfoFromUCSC.R:
     fetchExtendedChromInfoFromUCSC,

@@ -1,6 +1,6 @@
-\name{NCBI-utils}
+\name{getChromInfoFromNCBI}
 
-\alias{get_chrom_info_from_NCBI}
+\alias{getChromInfoFromNCBI}
 \alias{registered_NCBI_genomes}
 
 \title{
@@ -8,11 +8,11 @@
 }
 
 \description{
-  \code{get_chrom_info_from_NCBI} returns chromosome information like
+  \code{getChromInfoFromNCBI} returns chromosome information like
   sequence names, sizes and circularity flags for a given NCBI genome
   assembly e.g. GRCh38, ARS-UCD1.2, R64, etc...
 
-  Note that \code{get_chrom_info_from_NCBI} behaves slightly differently
+  Note that \code{getChromInfoFromNCBI} behaves slightly differently
   depending on whether a genome assembly is \emph{registered} or not in
   the \pkg{GenomeInfoDb} package. See below for the details.
 
@@ -21,9 +21,9 @@
 }
 
 \usage{
-get_chrom_info_from_NCBI(genome,
-                         assembled.molecules.only=FALSE,
-                         recache=FALSE)
+getChromInfoFromNCBI(genome,
+                     assembled.molecules.only=FALSE,
+                     recache=FALSE)
 
 registered_NCBI_genomes()
 }
@@ -45,7 +45,7 @@ registered_NCBI_genomes()
     mitochondrial chromosome) and plasmids only. No scaffolds.
   }
   \item{recache}{
-    \code{get_chrom_info_from_NCBI} uses a cache mechanism so the
+    \code{getChromInfoFromNCBI} uses a cache mechanism so the
     chromosome information of a given genome assembly only gets downloaded
     once during the current R session (note that the caching is done
     in memory so cached information does NOT persist across sessions).
@@ -72,7 +72,7 @@ registered_NCBI_genomes()
 }
 
 \value{
-  \code{get_chrom_info_from_NCBI}: A 9-column data frame with columns:
+  \code{getChromInfoFromNCBI}: A 9-column data frame with columns:
   \enumerate{
     \item \code{SequenceName}: character.
     \item \code{SequenceRole}: factor.
@@ -98,7 +98,7 @@ registered_NCBI_genomes()
 
 \seealso{
   \itemize{
-    \item \code{\link{get_chrom_info_from_UCSC}} for getting chromosome
+    \item \code{\link{getChromInfoFromUCSC}} for getting chromosome
           information for a UCSC genome assembly.
 
     \item \code{\link{fetchExtendedChromInfoFromUCSC}} for fetching extended
@@ -110,9 +110,9 @@ registered_NCBI_genomes()
 
 \examples{
 ## Internet access required!
-get_chrom_info_from_NCBI("GRCh37")
-get_chrom_info_from_NCBI("GRCh37", assembled.molecules.only=TRUE)
-get_chrom_info_from_NCBI("R64")
+getChromInfoFromNCBI("GRCh37")
+getChromInfoFromNCBI("GRCh37", assembled.molecules.only=TRUE)
+getChromInfoFromNCBI("R64")
 
 ## List of NCBI genome assemblies currently registered in the package:
 registered_NCBI_genomes()

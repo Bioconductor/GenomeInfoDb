@@ -1,6 +1,6 @@
 This folder contains "registration files" for UCSC genome assemblies.
 
-These files are used by the get_chrom_info_from_UCSC() function defined in
+These files are used by the getChromInfoFromUCSC() function defined in
 the GenomeInfoDb package.
 
 There must be one file per assembly.
@@ -38,7 +38,7 @@ Additionally, it can also define any (or both) of the following variables:
     - unmapped_seqs: named list of character vectors.
     - drop_unmapped: TRUE or FALSE.
 
-All the above variables are recognized by get_chrom_info_from_UCSC(). They
+All the above variables are recognized by getChromInfoFromUCSC(). They
 must be defined at the top-level of the script and their names must be in
 UPPER CASE.
 

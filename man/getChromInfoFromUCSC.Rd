@@ -1,6 +1,6 @@
-\name{UCSC-utils}
+\name{getChromInfoFromUCSC}
 
-\alias{get_chrom_info_from_UCSC}
+\alias{getChromInfoFromUCSC}
 \alias{registered_UCSC_genomes}
 
 \title{
@@ -8,11 +8,11 @@
 }
 
 \description{
-  \code{get_chrom_info_from_UCSC} returns chromosome information like
+  \code{getChromInfoFromUCSC} returns chromosome information like
   sequence names, sizes and circularity flags for a given UCSC genome
   assembly e.g. hg19, panTro6, sacCer3, etc...
 
-  Note that \code{get_chrom_info_from_UCSC} behaves slightly differently
+  Note that \code{getChromInfoFromUCSC} behaves slightly differently
   depending on whether a genome assembly is \emph{registered} or not in
   the \pkg{GenomeInfoDb} package. See below for the details.
 
@@ -21,10 +21,10 @@
 }
 
 \usage{
-get_chrom_info_from_UCSC(genome,
-                         assembled.molecules.only=FALSE,
-                         goldenPath.url=getOption("UCSC.goldenPath.url"),
-                         recache=FALSE)
+getChromInfoFromUCSC(genome,
+                     assembled.molecules.only=FALSE,
+                     goldenPath.url=getOption("UCSC.goldenPath.url"),
+                     recache=FALSE)
 
 registered_UCSC_genomes()
 }
@@ -52,7 +52,7 @@ registered_UCSC_genomes()
     where the chromosome sizes are expected to be found.
   }
   \item{recache}{
-    \code{get_chrom_info_from_UCSC} uses a cache mechanism so the
+    \code{getChromInfoFromUCSC} uses a cache mechanism so the
     chromosome sizes of a given genome assembly only get downloaded
     once during the current R session (note that the caching is done
     in memory so cached information does NOT persist across sessions).
@@ -84,7 +84,7 @@ registered_UCSC_genomes()
 }
 
 \value{
-  \code{get_chrom_info_from_UCSC}: A 4-column data frame with columns:
+  \code{getChromInfoFromUCSC}: A 4-column data frame with columns:
   \enumerate{
     \item \code{chrom}: character.
     \item \code{size}: integer.
@@ -103,7 +103,7 @@ registered_UCSC_genomes()
 
 \seealso{
   \itemize{
-    \item \code{\link{get_chrom_info_from_NCBI}} for getting chromosome
+    \item \code{\link{getChromInfoFromNCBI}} for getting chromosome
           information of an NCBI genome assembly.
 
     \item \code{\link{fetchExtendedChromInfoFromUCSC}} for fetching extended
@@ -115,9 +115,9 @@ registered_UCSC_genomes()
 
 \examples{
 ## Internet access required!
-get_chrom_info_from_UCSC("hg19")
-get_chrom_info_from_UCSC("hg19", assembled.molecules.only=TRUE)
-get_chrom_info_from_UCSC("panTro6", assembled.molecules.only=TRUE)
+getChromInfoFromUCSC("hg19")
+getChromInfoFromUCSC("hg19", assembled.molecules.only=TRUE)
+getChromInfoFromUCSC("panTro6", assembled.molecules.only=TRUE)
 
 ## List of UCSC genome assemblies currently registered in the package:
 registered_UCSC_genomes()
