@@ -377,16 +377,17 @@ fetch_assembly_report <- function(assembly_accession, AssemblyUnits=NULL)
                         # assembly.
     source(file_path, local=TRUE)
 
-    ## Check ORGANISM.
     stop_if <- function(notok, ...) {
         if (notok)
             stop("Error in NCBI genome registration file '", filename,
                  "':\n  ", wmsg(...))
     }
+
+    ## Check ORGANISM.
     stop_if(is.null(ORGANISM), "'ORGANISM' must be defined")
     stop_if(!isSingleString(ORGANISM), "'ORGANISM' must be a single string")
     stop_if(grepl("_", ORGANISM, fixed=TRUE),
-            "spaces must be used instead of underscores in 'ORGANISM' ")
+            "underscores are not allowed in 'ORGANISM' (use spaces instead)")
     target <- chartr("_", " ", substr(filename, 1L, nchar(filename)-2L))
     stop_if(!identical(target, ORGANISM),
             "'ORGANISM' must match filename ",
@@ -399,8 +400,6 @@ fetch_assembly_report <- function(assembly_accession, AssemblyUnits=NULL)
     required_fields <- c("genome", "assembly_accession", "date", "circ_seqs")
     for (i in seq_along(ASSEMBLIES)) {
         assembly <- ASSEMBLIES[[i]]
-
-        ## Check required fields.
 
         stop_if(!is.list(assembly),
                 "'ASSEMBLIES[[", i, "]]' must be a named list")
@@ -513,14 +512,14 @@ registered_NCBI_genomes <- function()
     as.data.frame(ans[oo, , drop=FALSE])
 }
 
-.lookup_NCBI_genome2accession <- function(genome)
+lookup_NCBI_genome2accession <- function(genome)
 {
     if (length(.NCBI_genome2accession) == 0L)
         .load_registered_NCBI_genomes()
     .NCBI_genome2accession[[tolower(genome)]]
 }
 
-.lookup_NCBI_accession2assembly <- function(accession)
+lookup_NCBI_accession2assembly <- function(accession)
 {
     if (length(.NCBI_accession2assembly) == 0L)
         .load_registered_NCBI_genomes()
@@ -596,7 +595,7 @@ get_chrom_info_from_NCBI <- function(genome,
 
     ## First see if the user supplied the assembly accession of a registered
     ## genome assembly instead of its name.
-    assembly <- .lookup_NCBI_accession2assembly(genome)
+    assembly <- lookup_NCBI_accession2assembly(genome)
     if (!is.null(assembly)) {
         ## Yes s/he did.
         accession <- genome
@@ -604,7 +603,7 @@ get_chrom_info_from_NCBI <- function(genome,
     } else {
         ## No s/he didn't.
         ## Now see if s/he supplied the name of a registered genome assembly.
-        accession <- .lookup_NCBI_genome2accession(genome)
+        accession <- lookup_NCBI_genome2accession(genome)
         if (!is.null(accession)) {
             ## Yes s/he did.
             if (length(accession) > 1L) {
@@ -614,7 +613,7 @@ get_chrom_info_from_NCBI <- function(genome,
                              "The first one was selected."))
                 accession <- accession[[1L]]
             }
-            assembly <- .lookup_NCBI_accession2assembly(accession)
+            assembly <- lookup_NCBI_accession2assembly(accession)
             circ_seqs <- assembly$circ_seqs
         } else {
             ## No s/he didn't.

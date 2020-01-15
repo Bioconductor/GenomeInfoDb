@@ -1,17 +1,6 @@
-### Should work as a standlone, self-contained script.
-### Must define at least:
-###   o GENOME:              Single non-empty string.
-###   o ORGANISM:            Single non-empty string.
-###   o ASSEMBLED_MOLECULES: Character vector with no NAs, no empty strings,
-###                          and no duplicates.
-### Can also define:
-###   o CIRC_SEQS:           Character vector (subset of ASSEMBLED_MOLECULES).
-###   o GET_CHROM_SIZES:     Function with 1 argument. Must return a 2-column
-###                          data.frame with columns "chrom" and "size".
 GENOME <- "rn5"
 ORGANISM <- "Rattus norvegicus"
 ASSEMBLED_MOLECULES <- paste0("chr", c(1:20, "X", "M"))
-
 CIRC_SEQS <- "chrM"
 
 library(IRanges)       # for CharacterList()
@@ -53,4 +42,9 @@ GET_CHROM_SIZES <- function(goldenPath.url=getOption("UCSC.goldenPath.url"))
     oo <- .order_seqlevels(chrom_sizes[ , "chrom"])
     S4Vectors:::extract_data_frame_rows(chrom_sizes, oo)
 }
+
+NCBI_LINKER <- list(
+    assembly_accession="GCA_000001895.3",
+    special_mappings=c(chrM="MT")
+)
 

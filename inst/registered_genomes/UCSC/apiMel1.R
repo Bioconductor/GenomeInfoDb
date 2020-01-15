@@ -1,17 +1,6 @@
-### Should work as a standlone, self-contained script.
-### Must define at least:
-###   o GENOME:              Single non-empty string.
-###   o ORGANISM:            Single non-empty string.
-###   o ASSEMBLED_MOLECULES: Character vector with no NAs, no empty strings,
-###                          and no duplicates.
-### Can also define:
-###   o CIRC_SEQS:           Character vector (subset of ASSEMBLED_MOLECULES).
-###   o GET_CHROM_SIZES:     Function with 1 argument. Must return a 2-column
-###                          data.frame with columns "chrom" and "size".
 GENOME <- "apiMel1"
 ORGANISM <- "Apis mellifera"
 ASSEMBLED_MOLECULES <- character(0)
-
 CIRC_SEQS <- character(0)
 
 library(IRanges)       # for CharacterList()

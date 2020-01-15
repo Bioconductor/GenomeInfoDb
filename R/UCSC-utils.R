@@ -47,39 +47,94 @@ fetch_chrom_sizes_from_UCSC <- function(genome,
 
 .parse_script_for_registered_UCSC_genome <- function(script_path)
 {
-    ## Placeholders. Will actually get defined when we source the script.
-    GENOME <- NULL               # Expected to be a single string.
-    ORGANISM <- NULL             # Expected to be a single string.
-    ASSEMBLED_MOLECULES <- NULL  # Expected to be a character vector with no
-                                 # NAs, no empty strings, and no duplicates.
-    CIRC_SEQS <- NULL            # Expected to be NULL or a subset of
-                                 # ASSEMBLED_MOLECULES.
-    GET_CHROM_SIZES <- NULL      # Expected to be NULL (i.e. not defined)
-                                 # or a function with 1 argument.
+    filename <- basename(script_path)
+    if (substr(filename, nchar(filename)-1L, nchar(filename)) != ".R")
+        stop(wmsg("name of genome registration file '", filename, "' must ",
+                  "have extension .R"))
+    if (grepl(" ", filename, fixed=TRUE))
+        stop(wmsg("name of genome registration file '", filename, "' must ",
+                  "not contain spaces"))
 
+    ## Placeholders. Will actually get defined when we source the script.
+    ## See README.TXT in inst/registered_genomes/UCSC/ for the list of
+    ## variables.
+    GENOME <- ORGANISM <- ASSEMBLED_MOLECULES <- CIRC_SEQS <- NULL
+    GET_CHROM_SIZES <- NCBI_LINKER <- NULL
     source(script_path, local=TRUE)
 
-    ## Check script sanity.
+    stop_if <- function(notok, ...) {
+        if (notok)
+            stop("Error in UCSC genome registration file '", filename,
+                 "':\n  ", wmsg(...))
+    }
 
-    stopifnot(isSingleString(GENOME))
+    ## Check GENOME.
+    stop_if(is.null(GENOME), "'GENOME' must be defined")
+    stop_if(!isSingleString(GENOME), "'GENOME' must be a single string")
+    target <- substr(filename, 1L, nchar(filename)-2L)
+    stop_if(!identical(target, GENOME), "'GENOME' must match filename")
 
-    stopifnot(isSingleString(ORGANISM))
+    ## Check ORGANISM.
+    stop_if(is.null(ORGANISM), "'ORGANISM' must be defined")
+    stop_if(!isSingleString(ORGANISM), "'ORGANISM' must be a single string")
+    stop_if(grepl("_", ORGANISM, fixed=TRUE),
+            "underscores are not allowed in 'ORGANISM' (use spaces instead)")
 
-    ASSEMBLED_MOLECULES <- ASSEMBLED_MOLECULES
-    stopifnot(is.character(ASSEMBLED_MOLECULES),
-              !anyNA(ASSEMBLED_MOLECULES),
-              all(nzchar(ASSEMBLED_MOLECULES)),
-              !anyDuplicated(ASSEMBLED_MOLECULES))
+    ## Check ASSEMBLED_MOLECULES.
+    stop_if(is.null(ASSEMBLED_MOLECULES),
+            "'ASSEMBLED_MOLECULES' must be defined")
+    stop_if(!is.character(ASSEMBLED_MOLECULES),
+            "'ASSEMBLED_MOLECULES' must be a character vector")
+    stop_if(anyNA(ASSEMBLED_MOLECULES) ||
+            !all(nzchar(ASSEMBLED_MOLECULES)) ||
+            anyDuplicated(ASSEMBLED_MOLECULES),
+            "'ASSEMBLED_MOLECULES' must ",
+            "not contain NAs, empty strings, or duplicates")
 
-    CIRC_SEQS <- CIRC_SEQS
-    if (!is.null(CIRC_SEQS))
-        stopifnot(is.character(CIRC_SEQS),
-                  !anyDuplicated(CIRC_SEQS),
-                  all(CIRC_SEQS %in% ASSEMBLED_MOLECULES))
+    ## Check CIRC_SEQS.
+    stop_if(is.null(CIRC_SEQS),
+            "'CIRC_SEQS' must be defined")
+    stop_if(!is.character(CIRC_SEQS),
+            "'CIRC_SEQS' must be a character vector")
+    stop_if(anyDuplicated(CIRC_SEQS),
+            "'CIRC_SEQS' must not contain duplicates")
+    stop_if(!all(CIRC_SEQS %in% ASSEMBLED_MOLECULES),
+            "'CIRC_SEQS' must be a subset of 'ASSEMBLED_MOLECULES'")
 
-    GET_CHROM_SIZES <- GET_CHROM_SIZES
-    if (!is.null(GET_CHROM_SIZES))
-        stopifnot(is.function(GET_CHROM_SIZES))
+    ## Check GET_CHROM_SIZES.
+    if (!is.null(GET_CHROM_SIZES)) {
+        stop_if(!is.function(GET_CHROM_SIZES),
+                "when defined, 'GET_CHROM_SIZES' must be a function")
+    }
+
+    ## Check NCBI_LINKER.
+    if (!is.null(NCBI_LINKER)) {
+        stop_if(!is.list(NCBI_LINKER),
+                "when defined, 'NCBI_LINKER' must be a named list")
+        linker_fields <- names(NCBI_LINKER)
+        stop_if(!is.character(linker_fields),
+                "when defined, 'NCBI_LINKER' must be a named list")
+        stop_if(anyNA(linker_fields) ||
+                !all(nzchar(linker_fields)) ||
+                anyDuplicated(linker_fields),
+                "the names on 'NCBI_LINKER' must ",
+                "not contain NAs, empty strings, or duplicates")
+        stop_if(!("assembly_accession" %in% linker_fields),
+                "'NCBI_LINKER' must have field \"assembly_accession\"")
+        accession <- NCBI_LINKER$assembly_accession
+        stop_if(!isSingleString(accession) || accession == "",
+                "\"assembly_accession\" field in 'NCBI_LINKER' must ",
+                "be a single non-empty string")
+        assembly <- lookup_NCBI_accession2assembly(accession)
+        stop_if(is.null(assembly),
+                "\"assembly_accession\" field in 'NCBI_LINKER' must ",
+                "be associated with a registered NCBI genome")
+        stop_if(!identical(ORGANISM, assembly$organism),
+                "the NCBI genome associated with the \"assembly_accession\" ",
+                "field in 'NCBI_LINKER' is registered for an organism ",
+                "(\"", assembly$organism, "\") that differs from 'ORGANISM' ",
+                "(\"", ORGANISM, "\")")
+    }
 
     list(GENOME=GENOME,
          ORGANISM=ORGANISM,
@@ -93,9 +148,7 @@ registered_UCSC_genomes <- function()
     dir_path <- system.file("registered_genomes", "UCSC",
                              package="GenomeInfoDb")
     file_paths <- list.files(dir_path, pattern="\\.R$", full.names=TRUE)
-    assemblies <- lapply(file_paths,
-        function(file_path)
-            as.list(.parse_script_for_registered_UCSC_genome(file_path)))
+    assemblies <- lapply(file_paths, .parse_script_for_registered_UCSC_genome)
     colnames <- c("ORGANISM", "GENOME", "CIRC_SEQS")
     make_col <- function(colname) {
         col0 <- lapply(assemblies, `[[`, colname)
@@ -152,24 +205,22 @@ registered_UCSC_genomes <- function()
     ans
 }
 
-.get_chrom_info_for_registered_UCSC_genome <- function(genome, script_path,
+.get_chrom_info_for_registered_UCSC_genome <- function(script_path,
     assembled.molecules.only=FALSE,
     goldenPath.url=getOption("UCSC.goldenPath.url"),
     recache=FALSE)
 {
     vars <- .parse_script_for_registered_UCSC_genome(script_path)
-    if (!identical(vars$GENOME, genome))
-        stop(wmsg(script_path, ": script does not seem ",
-                  "to be for genome ", genome))
+    GENOME <- vars$GENOME
     ASSEMBLED_MOLECULES <- vars$ASSEMBLED_MOLECULES
     nb_assembled <- length(ASSEMBLED_MOLECULES)
     assembled_idx <- seq_len(nb_assembled)
 
-    ans <- .UCSC_cached_chrom_info[[genome]]
+    ans <- .UCSC_cached_chrom_info[[GENOME]]
     if (is.null(ans) || recache) {
         GET_CHROM_SIZES <- vars$GET_CHROM_SIZES
         if (is.null(GET_CHROM_SIZES)) {
-            ans <- fetch_chrom_sizes_from_UCSC(genome,
+            ans <- fetch_chrom_sizes_from_UCSC(GENOME,
                                                goldenPath.url=goldenPath.url)
             stopifnot(nrow(ans) == nb_assembled)
             oo <- match(ASSEMBLED_MOLECULES, ans[ , "chrom"])
@@ -194,7 +245,7 @@ registered_UCSC_genomes <- function()
                                                    vars$CIRC_SEQS)
         ans <- cbind(ans, assembled=assembled, circular=circular)
 
-        .UCSC_cached_chrom_info[[genome]] <- ans
+        .UCSC_cached_chrom_info[[GENOME]] <- ans
     }
     if (assembled.molecules.only)
         ans <- S4Vectors:::extract_data_frame_rows(ans, assembled_idx)
@@ -226,7 +277,7 @@ get_chrom_info_from_UCSC <- function(genome,
                     goldenPath.url=goldenPath.url,
                     recache=recache)
     } else {
-        ans <- .get_chrom_info_for_registered_UCSC_genome(genome, script_path,
+        ans <- .get_chrom_info_for_registered_UCSC_genome(script_path,
                     assembled.molecules.only=assembled.molecules.only,
                     goldenPath.url=goldenPath.url,
                     recache=recache)

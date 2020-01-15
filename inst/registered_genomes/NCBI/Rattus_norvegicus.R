@@ -1,0 +1,20 @@
+ORGANISM <- "Rattus norvegicus"
+
+### List of assemblies by date.
+ASSEMBLIES <- list(
+    list(genome="RGSC_v3.4",
+         assembly_accession="GCF_000001895.3",  # rn4
+         date="2004/12/13",
+         circ_seqs="MT"),
+
+    list(genome="Rnor_5.0",
+         assembly_accession="GCA_000001895.3",  # rn5
+         date="2012/03/16",
+         circ_seqs="MT"),
+
+    list(genome="Rnor_6.0",
+         assembly_accession="GCA_000001895.4",  # rn6
+         date="2014/07/01",
+         circ_seqs="MT")
+)
+
