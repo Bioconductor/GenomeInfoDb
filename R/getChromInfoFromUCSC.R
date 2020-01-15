@@ -114,7 +114,8 @@ registered_UCSC_genomes <- function()
     file_paths <- list.files(dir_path, pattern="\\.R$", full.names=TRUE)
     assemblies <- lapply(file_paths, .parse_script_for_registered_UCSC_genome)
 
-    colnames <- c("organism", "genome", "based_on_NCBI_genome", "circ_seqs")
+    colnames <- c("organism", "genome", "based_on_NCBI_genome",
+                  "assembly_accession", "circ_seqs")
     make_col <- function(j) {
         colname <- colnames[[j]]
         if (colname == "based_on_NCBI_genome") {
@@ -125,6 +126,16 @@ registered_UCSC_genomes <- function()
                         return(NA_character_)
                     accession <- linker$assembly_accession
                     lookup_NCBI_accession2assembly(accession)$genome
+                }, character(1), USE.NAMES=FALSE)
+            return(col)
+        }
+        if (colname == "assembly_accession") {
+            col <- vapply(assemblies,
+                function(assembly) {
+                    linker <- assembly$NCBI_LINKER
+                    if (is.null(linker))
+                        return(NA_character_)
+                    linker$assembly_accession
                 }, character(1), USE.NAMES=FALSE)
             return(col)
         }
