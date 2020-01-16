@@ -43,7 +43,6 @@ GET_CHROM_SIZES <- function(goldenPath.url=getOption("UCSC.goldenPath.url"))
 NCBI_LINKER <- list(
     assembly_accession="GCF_000001635.18",
     AssemblyUnits=c("C57BL/6J", "non-nuclear"),
-    special_mappings=c(chrM="MT"),
     unmapped_seqs=list(
         `pseudo-scaffold`=
             paste0("chr", c(1, 3:5, 7:9, 13, 16:17, "X", "Y", "Un"), "_random")

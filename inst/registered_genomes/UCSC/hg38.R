@@ -50,7 +50,6 @@ GET_CHROM_SIZES <- function(goldenPath.url=getOption("UCSC.goldenPath.url"))
 
 NCBI_LINKER <- list(
     assembly_accession="GCF_000001405.26",
-    special_mappings=c(chrM="MT"),
     ## The chromInfo table at UCSC contains sequences that belong to
     ## GRCh38.p12 but not to GRCh38. Because we want to map hg38 to
     ## GRCh38 and not to GRCh38.p12, we drop these sequences.

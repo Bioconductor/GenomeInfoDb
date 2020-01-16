@@ -23,7 +23,7 @@
 \usage{
 getChromInfoFromUCSC(genome,
                      assembled.molecules.only=FALSE,
-                     bind.NCBI.cols=FALSE,
+                     add.NCBI.cols=FALSE,
                      goldenPath.url=getOption("UCSC.goldenPath.url"),
                      recache=FALSE)
 
@@ -48,7 +48,7 @@ registered_UCSC_genomes()
     \emph{registered} genome assemblies. When used on an \emph{unregistered}
     genome assembly, \code{assembled.molecules.only} is ignored with a warning.
   }
-  \item{bind.NCBI.cols}{
+  \item{add.NCBI.cols}{
     \code{TRUE} or \code{FALSE} (the default). If \code{TRUE} then
     additional columns containing data from NCBI are bound to the result.
     This can be useful to map UCSC sequence names to NCBI sequence names.
@@ -99,8 +99,8 @@ registered_UCSC_genomes()
     \item \code{assembled}: logical.
     \item \code{circular}: logical.
   }
-  If \code{bind.NCBI.cols} is set to \code{TRUE}, then the 6 following
-  columns are bound to the result:
+  If \code{add.NCBI.cols} is set to \code{TRUE}, then the 6 following
+  columns are added to the result:
   \itemize{
     \item \code{SequenceName}: character.
     \item \code{SequenceRole}: factor.
@@ -141,7 +141,7 @@ getChromInfoFromUCSC("panTro6", assembled.molecules.only=TRUE)
 
 ## Map the hg38 sequences to their corresponding sequences in
 ## the GRCh38 assembly:
-getChromInfoFromUCSC("hg38", bind.NCBI.cols=TRUE)[c(1, 5)]
+getChromInfoFromUCSC("hg38", add.NCBI.cols=TRUE)[c(1, 5)]
 
 ## List of UCSC genome assemblies currently registered in the package:
 registered_UCSC_genomes()
