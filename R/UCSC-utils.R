@@ -2,9 +2,10 @@
 ### Some low-level utilities to fetch data from the UCSC Genome Browser
 ### -------------------------------------------------------------------------
 ###
+### Unless stated otherwise, nothing in this file is exported.
+###
 
 
-### NOT exported.
 fetch_table_from_UCSC <- function(genome, table,
     colnames=NULL, col2class=NULL,
     goldenPath.url=getOption("UCSC.goldenPath.url"))
@@ -29,14 +30,26 @@ fetch_table_from_UCSC <- function(genome, table,
     }
 }
 
-### NOT exported.
 fetch_chrom_sizes_from_UCSC <- function(genome,
     goldenPath.url=getOption("UCSC.goldenPath.url"))
 {
     col2class <- c(chrom="character", size="integer", fileName="NULL")
-    fetch_table_from_UCSC(genome, "chromInfo",
-                          colnames=names(col2class),
-                          col2class=col2class,
-                          goldenPath.url=goldenPath.url)
+    ans <- fetch_table_from_UCSC(genome, "chromInfo",
+                                 colnames=names(col2class),
+                                 col2class=col2class,
+                                 goldenPath.url=goldenPath.url)
+    ## Should never happen!
+    ans_chroms <- ans[ , "chrom"]
+    if (anyNA(ans_chroms) ||
+        !all(nzchar(ans_chroms)) ||
+        anyDuplicated(ans_chroms))
+        stop(wmsg("invalid data in 'chromInfo' table for UCSC genome ",
+                  genome, ": 'chrom' column contains NAs, empty strings, ",
+                  "or duplicates"))
+    ans_sizes <- ans[ , "size"]
+    if (anyNA(ans_sizes) || any(ans_sizes < 0L))
+        stop(wmsg("invalid data in 'chromInfo' table for UCSC genome ",
+                  genome, ": 'size' column contains NAs or negative values"))
+    ans
 }
 

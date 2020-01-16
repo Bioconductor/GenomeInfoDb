@@ -21,6 +21,11 @@ ASSEMBLIES <- list(
     list(genome="Pan_tro 3.0",
          assembly_accession="GCF_000001515.7",  # panTro5
          date="2016/05/03",
+         circ_seqs="MT"),
+
+    list(genome="Clint_PTRv2",
+         assembly_accession="GCA_002880755.3",  # panTro6
+         date="2018/01/19",
          circ_seqs="MT")
 )
 

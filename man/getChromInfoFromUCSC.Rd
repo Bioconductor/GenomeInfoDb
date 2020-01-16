@@ -23,6 +23,7 @@
 \usage{
 getChromInfoFromUCSC(genome,
                      assembled.molecules.only=FALSE,
+                     bind.NCBI.cols=FALSE,
                      goldenPath.url=getOption("UCSC.goldenPath.url"),
                      recache=FALSE)
 
@@ -46,6 +47,13 @@ registered_UCSC_genomes()
     Note that \code{assembled.molecules.only=TRUE} is supported only for
     \emph{registered} genome assemblies. When used on an \emph{unregistered}
     genome assembly, \code{assembled.molecules.only} is ignored with a warning.
+  }
+  \item{bind.NCBI.cols}{
+    \code{TRUE} or \code{FALSE} (the default). If \code{TRUE} then
+    additional columns containing data from NCBI are bound to the result.
+    This can be useful to map UCSC sequence names to NCBI sequence names.
+    Note that this is only supported for \emph{registered} UCSC genomes
+    based on an NCBI genome!
   }
   \item{goldenPath.url}{
     A single string specifying the URL to the UCSC goldenPath location
@@ -91,6 +99,18 @@ registered_UCSC_genomes()
     \item \code{assembled}: logical.
     \item \code{circular}: logical.
   }
+  If \code{bind.NCBI.cols} is set to \code{TRUE}, then the 6 following
+  columns are bound to the result:
+  \itemize{
+    \item \code{SequenceName}: character.
+    \item \code{SequenceRole}: factor.
+    \item \code{GenBankAccn}: character.
+    \item \code{Relationship}: factor.
+    \item \code{RefSeqAccn}: character.
+    \item \code{AssemblyUnit}: factor.
+  }
+  Note that these additional columns are obtained with
+  \code{\link{getChromInfoFromNCBI}} and their names are preserved.
 
   \code{registered_UCSC_genomes}: A data frame summarizing all the UCSC
   genome assemblies currently \emph{registered} in the \pkg{GenomeInfoDb}
@@ -118,6 +138,10 @@ registered_UCSC_genomes()
 getChromInfoFromUCSC("hg19")
 getChromInfoFromUCSC("hg19", assembled.molecules.only=TRUE)
 getChromInfoFromUCSC("panTro6", assembled.molecules.only=TRUE)
+
+## Map the hg38 sequences to their corresponding sequences in
+## the GRCh38 assembly:
+getChromInfoFromUCSC("hg38", bind.NCBI.cols=TRUE)[c(1, 5)]
 
 ## List of UCSC genome assemblies currently registered in the package:
 registered_UCSC_genomes()

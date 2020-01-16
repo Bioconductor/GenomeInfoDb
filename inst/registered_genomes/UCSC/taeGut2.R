@@ -46,3 +46,8 @@ GET_CHROM_SIZES <- function(goldenPath.url=getOption("UCSC.goldenPath.url"))
     S4Vectors:::extract_data_frame_rows(chrom_sizes, oo)
 }
 
+NCBI_LINKER <- list(
+    assembly_accession="GCA_000151805.2",
+    special_mappings=c(chrM="MT")
+)
+

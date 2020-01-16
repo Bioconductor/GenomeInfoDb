@@ -23,7 +23,7 @@ ASSEMBLIES <- list(
          circ_seqs="MT"),
 
     list(genome="GRCz11",
-         assembly_accession="GCF_000002035.6",  # danRer11
+         assembly_accession="GCA_000002035.4",  # danRer11
          date="2017/05/09",
          circ_seqs="MT")
 )

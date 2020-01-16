@@ -55,7 +55,7 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
 ### fetchExtendedChromInfoFromUCSC()
 ###
 
-.safe_match <- function(query, NCBI_accn)
+..safe_match <- function(query, NCBI_accn)
 {
     hits <- findMatches(query, NCBI_accn)
     q_hits <- queryHits(hits)
@@ -85,7 +85,7 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
     query <- sub("-", ".", UCSC_seqlevel, fixed=TRUE)
     query <- paste0(query, accn_suffix)
     names(query) <- UCSC_seqlevel
-    .safe_match(tolower(query), tolower(NCBI_accn))
+    ..safe_match(tolower(query), tolower(NCBI_accn))
 }
 
 .match_UCSC_seqlevel_part2_to_NCBI_accn <- function(UCSC_seqlevel, NCBI_accn,
@@ -105,7 +105,7 @@ fetch_GenBankAccn2seqlevel_from_NCBI <- function(assembly, AssemblyUnits=NULL)
         query[unversioned_idx] <- paste0(query[unversioned_idx], ".1")
     query <- paste0(accn_prefix, query)
     names(query) <- UCSC_seqlevel[idx2]
-    ans[idx2] <- .safe_match(tolower(query), tolower(NCBI_accn))
+    ans[idx2] <- ..safe_match(tolower(query), tolower(NCBI_accn))
     ans
 }
 

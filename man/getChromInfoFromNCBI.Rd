@@ -23,6 +23,7 @@
 \usage{
 getChromInfoFromNCBI(genome,
                      assembled.molecules.only=FALSE,
+                     assembly.units=NULL,
                      recache=FALSE)
 
 registered_NCBI_genomes()
@@ -37,12 +38,24 @@ registered_NCBI_genomes()
   }
   \item{assembled.molecules.only}{
     If \code{FALSE} (the default) then chromosome information is returned
-    for all the sequences in the assembly, that is, for all the chromosomes,
-    plasmids, and scaffolds.
+    for all the sequences in the assembly (unless \code{assembly.units}
+    is specified, see below), that is, for all the chromosomes, plasmids,
+    and scaffolds.
 
     If \code{TRUE} then chromosome information is returned only for the
     \emph{assembled molecules}. These are the chromosomes (including the
     mitochondrial chromosome) and plasmids only. No scaffolds.
+  }
+  \item{assembly.units}{
+    If \code{NULL} (the default) then chromosome information is returned
+    for all the sequences in the assembly (unless
+    \code{assembled.molecules.only} is set to \code{TRUE}, see above),
+    that is, for all the chromosomes, plasmids, and scaffolds.
+
+    \code{assembly.units} can be set to a character vector containing
+    the names of \emph{Assembly Units} (e.g. \code{"non-nuclear"}) in
+    which case chromosome information is returned only for the sequences
+    that belong to these Assembly Units.
   }
   \item{recache}{
     \code{getChromInfoFromNCBI} uses a cache mechanism so the
@@ -112,7 +125,9 @@ registered_NCBI_genomes()
 ## Internet access required!
 getChromInfoFromNCBI("GRCh37")
 getChromInfoFromNCBI("GRCh37", assembled.molecules.only=TRUE)
-getChromInfoFromNCBI("R64")
+
+getChromInfoFromNCBI("TAIR10.1")
+getChromInfoFromNCBI("TAIR10.1", assembly.units="non-nuclear")
 
 ## List of NCBI genome assemblies currently registered in the package:
 registered_NCBI_genomes()

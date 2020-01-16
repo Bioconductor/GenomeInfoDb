@@ -52,8 +52,8 @@ NCBI_LINKER <- list(
                        chr22_h2_hap1="Hs22_111678_36"),
     unmapped_seqs=list(
         `assembled-molecule`="chrM",
-        `pseudo-scaffold`=paste0("chr",
-            c("5_h2_hap1", "6_qbl_hap2",
-              paste0(c((1:22)[-c(12, 14, 20)], "X"), "_random"))))
+        `alt-scaffold`=c("chr5_h2_hap1", "chr6_qbl_hap2"),
+        `pseudo-scaffold`=
+            paste0("chr", c((1:22)[-c(12, 14, 20)], "X"), "_random"))
 )
 

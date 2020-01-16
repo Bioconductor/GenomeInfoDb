@@ -2,6 +2,8 @@
 ### Some low-level utilities to fetch data from NCBI
 ### -------------------------------------------------------------------------
 ###
+### Unless stated otherwise, nothing in this file is exported.
+###
 
 
 .NCBI_ASSEMBLY_REPORTS_URL <-
@@ -73,7 +75,6 @@
     stopifnot(anyDuplicated(gbrs_paired_asm) == 0L)
 }
 
-### NOT exported.
 fetch_assembly_summary <- function(genbank_or_refseq, quiet=FALSE)
 {
     objname <- paste0("assembly_summary_", genbank_or_refseq)
@@ -197,7 +198,6 @@ fetch_assembly_summary <- function(genbank_or_refseq, quiet=FALSE)
                stringsAsFactors=FALSE)
 }
 
-### NOT exported.
 ### Saves "assembly_accessions.rda" in directory specified thru 'dir'.
 build_and_save_assembly_accessions_table <- function(dir=".", quiet=FALSE)
 {
@@ -325,7 +325,6 @@ build_and_save_assembly_accessions_table <- function(dir=".", quiet=FALSE)
                stringsAsFactors=FALSE)
 }
 
-### NOT exported.
 ### See .normarg_assembly_accession() for how 'assembly_accession' can be
 ### specified. In addition, here 'assembly_accession' can be the URL to an
 ### assembly report (a.k.a. full sequence report). Examples of such URLs:

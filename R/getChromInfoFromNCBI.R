@@ -197,6 +197,7 @@ lookup_NCBI_accession2assembly <- function(accession)
                              "unplaced-scaffold",
                              "pseudo-scaffold")
     sequence_role <- factor(ans[ , "SequenceRole"], levels=SequenceRole_levels)
+    stopifnot(identical(is.na(sequence_role), is.na(ans[ , "SequenceRole"])))
     ans[ , "SequenceRole"] <- sequence_role
     oo <- order(as.integer(sequence_role))
     ans <- S4Vectors:::extract_data_frame_rows(ans, oo)
@@ -204,8 +205,12 @@ lookup_NCBI_accession2assembly <- function(accession)
     ans[ , "Relationship"] <- factor(ans[ , "Relationship"],
                                      levels=Relationship_levels)
     ans[ , "AssemblyUnit"] <- factor(ans[ , "AssemblyUnit"])
-    na_idx <- which(ans[ , "UCSCStyleName"] %in% "na")
-    ans[na_idx , "UCSCStyleName"] <- NA_character_
+    UCSCStyleName <- ans[ , "UCSCStyleName"]
+    if (!is.character(UCSCStyleName))
+        UCSCStyleName <- as.character(UCSCStyleName)
+    na_idx <- which(UCSCStyleName %in% "na")
+    UCSCStyleName[na_idx] <- NA_character_
+    ans[ , "UCSCStyleName"] <- UCSCStyleName
     circular <- make_circ_flags_from_circ_seqs(ans[ , "SequenceName"],
                                                circ_seqs=circ_seqs)
     stopifnot(all(ans[which(circular), "SequenceRole"] %in%
@@ -218,6 +223,7 @@ lookup_NCBI_accession2assembly <- function(accession)
 
 .get_NCBI_chrom_info_from_accession <- function(accession, circ_seqs=NULL,
     assembled.molecules.only=FALSE,
+    assembly.units=NULL,
     recache=FALSE)
 {
     ans <- .NCBI_cached_chrom_info[[accession]]
@@ -230,21 +236,49 @@ lookup_NCBI_accession2assembly <- function(accession)
         keep_idx <- which(ans[ , "SequenceRole"] %in% "assembled-molecule")
         ans <- S4Vectors:::extract_data_frame_rows(ans, keep_idx)
     }
+    if (!is.null(assembly.units)) {
+        lower_case_units <- tolower(assembly.units)
+        ans_assembly_units <- ans[ , "AssemblyUnit"]
+        ## "Primary Assembly" and "non-nuclear" are **always** considered valid
+        ## Assembly Units regardless of whether they appear in the AssemblyUnit
+        ## column or not.
+        valid_assembly_units <- tolower(c("Primary Assembly",
+                                          "non-nuclear",
+                                          levels(ans_assembly_units)))
+        bad_idx <- which(!(lower_case_units %in% valid_assembly_units))
+        if (length(bad_idx) != 0L) {
+            in1string <- paste0(assembly.units[bad_idx], collapse=", ")
+            stop(wmsg("invalid Assembly Units: ", in1string))
+        }
+        keep_idx <- which(tolower(ans_assembly_units) %in% lower_case_units)
+        ans <- S4Vectors:::extract_data_frame_rows(ans, keep_idx)
+    }
     ans
 }
 
 ### Return an 8-column data.frame with columns "SequenceName" (character),
 ### "SequenceRole" (factor),  "GenBankAccn" (character), "Relationship"
 ### (factor), "RefSeqAccn" (character), "AssemblyUnit" (factor),
-### "SequenceLength" (integer), "UCSCStyleName" (character).
+### "SequenceLength" (integer), "UCSCStyleName" (character),
+### and "circular" (logical).
 getChromInfoFromNCBI <- function(genome,
     assembled.molecules.only=FALSE,
+    assembly.units=NULL,
     recache=FALSE)
 {
     if (!isSingleString(genome))
         stop(wmsg("'genome' must be a single string"))
     if (!isTRUEorFALSE(assembled.molecules.only))
         stop(wmsg("'assembled.molecules.only' must be TRUE or FALSE"))
+    if (!is.null(assembly.units)) {
+        if (!is.character(assembly.units))
+            stop(wmsg("'assembly.units' must be NULL or a character vector"))
+        if (anyNA(assembly.units) ||
+            !all(nzchar(assembly.units)) ||
+            anyDuplicated(assembly.units))
+            stop(wmsg("'assembly.units' cannot contain NAs, empty strings, ",
+                      "or duplicates"))
+    }
     if (!isTRUEorFALSE(recache))
         stop(wmsg("'recache' must be TRUE or FALSE"))
 
@@ -264,7 +298,7 @@ getChromInfoFromNCBI <- function(genome,
             if (length(accession) > 1L) {
                 in1string <- paste0(accession, collapse=", ")
                 warning(wmsg("Genome ", genome, " is mapped to more ",
-                             "then one assembly (", in1string, "). ",
+                             "than one assembly (", in1string, "). ",
                              "The first one was selected."))
                 accession <- accession[[1L]]
             }
@@ -281,6 +315,7 @@ getChromInfoFromNCBI <- function(genome,
     .get_NCBI_chrom_info_from_accession(accession,
             circ_seqs=circ_seqs,
             assembled.molecules.only=assembled.molecules.only,
+            assembly.units=assembly.units,
             recache=recache)
 }
 

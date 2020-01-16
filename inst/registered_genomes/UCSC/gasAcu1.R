@@ -22,3 +22,13 @@ GET_CHROM_SIZES <- function(goldenPath.url=getOption("UCSC.goldenPath.url"))
     S4Vectors:::extract_data_frame_rows(chrom_sizes, oo)
 }
 
+### UCSC claims that gasAcu1 is based on the GCA_000180675.1 assembly:
+###     https://genome.ucsc.edu/cgi-bin/hgGateway?db=gasAcu1
+### but none of the sequences in gasAcu1 actually corresponds to a
+### sequence in GCA_000180675.1 (which is made of contigs only).
+#NCBI_LINKER <- list(
+#    assembly_accession="GCA_000180675.1",
+#    unmapped_seqs=list(`assembled-molecule`="chrM",
+#                       `pseudo-scaffold`="chrUn")
+#)
+
