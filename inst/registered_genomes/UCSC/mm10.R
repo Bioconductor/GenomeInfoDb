@@ -48,3 +48,5 @@ NCBI_LINKER <- list(
     AssemblyUnits=c("C57BL/6J", "non-nuclear")
 )
 
+ENSEMBL_LINKER <- "ucscToEnsembl"
+

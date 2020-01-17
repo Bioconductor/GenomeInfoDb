@@ -199,21 +199,21 @@
     NCBI_seqlevels <- NCBI_chrom_info[ , "SequenceName"]
     NCBI_gbkaccns <- NCBI_chrom_info[ , "GenBankAccn"]
     NCBI_refseqaccns <- NCBI_chrom_info[ , "RefSeqAccn"]
-    m <- .map_UCSC_seqlevels_to_NCBI_seqlevels(UCSC_seqlevels, NCBI_seqlevels,
-                                     NCBI_ucsc_names,
-                                     NCBI_gbkaccns, NCBI_refseqaccns,
-                                     special_mappings=special_mappings)
-    m_is_NA <- is.na(m)
-    mapped_idx <- which(!m_is_NA)
+    oo <- .map_UCSC_seqlevels_to_NCBI_seqlevels(UCSC_seqlevels, NCBI_seqlevels,
+                                      NCBI_ucsc_names,
+                                      NCBI_gbkaccns, NCBI_refseqaccns,
+                                      special_mappings=special_mappings)
+    oo_is_NA <- is.na(oo)
+    mapped_idx <- which(!oo_is_NA)
 
     if (length(unmapped_seqs) != 0L)
-        stopifnot(all(m_is_NA[unmapped_idx]))
+        stopifnot(all(oo_is_NA[unmapped_idx]))
 
     if (isTRUE(drop_unmapped)) {
         UCSC_chrom_info <-
             S4Vectors:::extract_data_frame_rows(UCSC_chrom_info, mapped_idx)
-        m <- m[mapped_idx]
-        mapped_idx <- seq_along(m)
+        oo <- oo[mapped_idx]
+        mapped_idx <- seq_along(oo)
         ## Before we drop the unmapped UCSC seqlevels, we want to make sure
         ## that all the NCBI seqlevels are reverse mapped. For example, in
         ## the case of hg38, the chromInfo table at UCSC contains sequences
@@ -221,7 +221,7 @@
         ## sure that after we drop these "foreign sequences", we are left
         ## with a one-to-one mapping between UCSC seqlevels and the 455 NCBI
         ## seqlevels that are in the assembly report for GRCh38.
-        idx <- setdiff(seq_along(NCBI_seqlevels), m)
+        idx <- setdiff(seq_along(NCBI_seqlevels), oo)
         if (length(idx) != 0L) {
             in1string <- paste0(NCBI_seqlevels[idx], collapse=", ")
             stop(wmsg("no UCSC seqlevel could be mapped to the following ",
@@ -229,7 +229,7 @@
         }
     } else {
         unexpectedly_unmapped_idx <-
-            which(m_is_NA & !(UCSC_seqlevels %in% unmapped_seqs))
+            which(oo_is_NA & !(UCSC_seqlevels %in% unmapped_seqs))
         if (length(unexpectedly_unmapped_idx) != 0L) {
             in1string <- paste0(UCSC_seqlevels[unexpectedly_unmapped_idx],
                                 collapse=", ")
@@ -238,7 +238,7 @@
         }
     }
 
-    NCBI_chrom_info <- NCBI_chrom_info[m, ]
+    NCBI_chrom_info <- S4Vectors:::extract_data_frame_rows(NCBI_chrom_info, oo)
 
     ## NCBI columns "circular", "SequenceLength", and "UCSCStyleName"
     ## are expected to be redundant with UCSC columns "circular", "size",
@@ -270,6 +270,149 @@
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### .add_ensembl_column()
+###
+
+.fetch_ucscToEnsembl_table <- function(genome,
+    goldenPath.url=getOption("UCSC.goldenPath.url"))
+{
+    col2class <- c(ucsc="character", ensembl="character")
+    fetch_table_from_UCSC(genome, "ucscToEnsembl",
+                          colnames=names(col2class),
+                          col2class=col2class,
+                          goldenPath.url=goldenPath.url)
+}
+
+### Filters and reformats the chromAlias data to so it's returned in the
+### same format as the ucscToEnsembl table (i.e. 2-column data frame with
+### columns "ucsc" and "ensembl").
+.fetch_ucsc2ensembl_from_chromAlias_table <- function(genome,
+    goldenPath.url=getOption("UCSC.goldenPath.url"))
+{
+    col2class <- c(ensembl="character", ucsc="character", source="factor")
+    chromAlias <- fetch_table_from_UCSC(genome, "chromAlias",
+                                        colnames=names(col2class),
+                                        col2class=col2class,
+                                        goldenPath.url=goldenPath.url)
+    ## Filters and reformats.
+    keep_idx <- grep("ensembl", chromAlias[ , "source"], fixed=TRUE)
+    ucsc2ensembl <- chromAlias[keep_idx, c("ucsc", "ensembl")]
+
+    ## In some **very rare** situations, it seems that the chromAlias table
+    ## can contain ambiguous ucsc-to-ensembl mappings where a given UCSC
+    ## chromosome name is mapped to more than one Ensembl name. For example
+    ## this happens for rn6 where unplaced scaffold chrUn_AABR07022993v1 is
+    ## mapped to Ensembl names AABR07022518.1, AABR07023006.1, AABR07022993.1.
+    ## Note that as of Jan 2020, the chromAlias table for rn6 is the only
+    ## known case of ambiguous ucsc-to-ensembl mapping.
+    if (anyDuplicated(ucsc2ensembl[ , "ucsc"])) {
+        ## The disambiguation algorithm below assumes that the ambiguous
+        ## ucsc-to-ensembl mappings are of the form xxYYY-to-ZZZ where
+        ## ZZZ is a GenBank accession, YYY a GenBank accession where the
+        ## dot (".") has been replaced with a "v" and xx can be any suffix.
+        ## To disambiguate, we only keep mappings where YYY and ZZZ are the
+        ## same (modulo the dot/v substitution).
+        idx <- which(duplicated(ucsc2ensembl[ , "ucsc"]) |
+                     duplicated(ucsc2ensembl[ , "ucsc"], fromLast=TRUE))
+        ensembl <- chartr(".", "v", ucsc2ensembl[idx , "ensembl"])
+        ucsc <- ucsc2ensembl[idx , "ucsc"]
+        ucsc_nc <- nchar(ucsc)
+        ucsc_suffix <- substr(ucsc, ucsc_nc - nchar(ensembl) + 1L, ucsc_nc)
+        ok <- ucsc_suffix == ensembl
+        if (sum(ok) == 0L)
+            stop(wmsg("failed to disambiguate 'ucsc2ensembl'"))
+        if (!all(ucsc %in% ucsc[ok]))
+            stop(wmsg("failed to disambiguate 'ucsc2ensembl'"))
+        if (anyDuplicated(ucsc[ok]))
+            stop(wmsg("failed to disambiguate 'ucsc2ensembl'"))
+        drop_idx <- idx[!ok]
+        ucsc2ensembl <- ucsc2ensembl[-drop_idx, , drop=FALSE]
+    }
+    ucsc2ensembl
+}
+
+.try_to_fetch_ucscToEnsembl <- function(genome,
+    goldenPath.url=getOption("UCSC.goldenPath.url"))
+{
+    message("Trying 'ucscToEnsembl' ... ", appendLF=FALSE)
+    ucscToEnsembl <- try(
+        suppressWarnings(
+            .fetch_ucscToEnsembl_table(genome, goldenPath.url=goldenPath.url)
+        ), silent=TRUE)
+    if (inherits(ucscToEnsembl, "try-error")) {
+        message("FAILED! (table does not exist)")
+        return(NULL)
+    }
+    message("OK")
+    ucscToEnsembl
+}
+
+.try_to_fetch_ucsc2ensembl_from_chromAlias <- function(genome,
+    goldenPath.url=getOption("UCSC.goldenPath.url"))
+{
+    message("Trying 'chromAlias' ... ", appendLF=FALSE)
+    ucsc2ensembl <- try(
+        suppressWarnings(
+            .fetch_ucsc2ensembl_from_chromAlias_table(genome,
+                                                goldenPath.url=goldenPath.url)
+        ), silent=TRUE)
+    if (inherits(ucsc2ensembl, "try-error")) {
+        message("FAILED! (table does not exist)")
+        return(NULL)
+    }
+    if (nrow(ucsc2ensembl) == 0L) {
+        message("FAILED! (table exists but has no Ensembl information)")
+        return(NULL)
+    }
+    message("OK")
+    ucsc2ensembl
+}
+
+.fetch_Ensembl_column <- function(UCSC_chroms, genome, table=NA,
+    goldenPath.url=getOption("UCSC.goldenPath.url"))
+{
+    if (identical(table, "ucscToEnsembl")) {
+        ucsc2ensembl <- .fetch_ucscToEnsembl_table(genome,
+                                                goldenPath.url=goldenPath.url)
+    } else if (identical(table, "chromAlias")) {
+        ucsc2ensembl <- .fetch_ucsc2ensembl_from_chromAlias_table(genome,
+                                                goldenPath.url=goldenPath.url)
+    } else if (identical(table, NA)) {
+        table <- "ucscToEnsembl"
+        ucsc2ensembl <- .try_to_fetch_ucscToEnsembl(genome,
+                                      goldenPath.url=goldenPath.url)
+        if (is.null(ucsc2ensembl)) {
+            table <- "chromAlias"
+            ucsc2ensembl <- .try_to_fetch_ucsc2ensembl_from_chromAlias(genome,
+                                      goldenPath.url=goldenPath.url)
+            if (is.null(ucsc2ensembl)) {
+                warning(wmsg("No Ensembl sequence names could be found ",
+                             "for UCSC genome ", genome))
+                return(rep.int(NA_character_, length(UCSC_chroms)))
+            }
+        }
+    } else {
+        stop(wmsg("supplied 'table' is not supported"))
+    }
+    oo <- match(UCSC_chroms, ucsc2ensembl[ , "ucsc"])
+    if (is.null(table) && anyNA(oo))
+        warning(wmsg("incomplete data in '", table, "' table for ",
+                     "UCSC genome ", genome, ": some UCSC sequence ",
+                     "names are missing"))
+    ucsc2ensembl[oo , "ensembl"]
+}
+
+.add_ensembl_column <- function(UCSC_chrom_info, genome, table=NA,
+    goldenPath.url=getOption("UCSC.goldenPath.url"))
+{
+    ensembl <- .fetch_Ensembl_column(UCSC_chrom_info[ , "chrom"],
+                                     genome, table=table,
+                                     goldenPath.url=goldenPath.url)
+    cbind(UCSC_chrom_info, ensembl=ensembl, stringsAsFactors=FALSE)
+}
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### registered_UCSC_genomes()
 ###
 
@@ -287,7 +430,7 @@
     ## See README.TXT in inst/registered_genomes/UCSC/ for the list of
     ## variables.
     GENOME <- ORGANISM <- ASSEMBLED_MOLECULES <- CIRC_SEQS <- NULL
-    GET_CHROM_SIZES <- NCBI_LINKER <- NULL
+    GET_CHROM_SIZES <- NCBI_LINKER <- ENSEMBL_LINKER <- NULL
     source(script_path, local=TRUE)
 
     stop_if <- function(notok, ...) {
@@ -364,12 +507,20 @@
                 "from 'ORGANISM' (\"", ORGANISM, "\")")
     }
 
+    ## Check ENSEMBL_LINKER.
+    if (!is.null(ENSEMBL_LINKER)) {
+        stop_if(!isSingleString(ENSEMBL_LINKER) || ENSEMBL_LINKER == "",
+                "when defined, 'ENSEMBL_LINKER' must ",
+                "be a single non-empty string")
+    }
+
     list(GENOME=GENOME,
          ORGANISM=ORGANISM,
          ASSEMBLED_MOLECULES=ASSEMBLED_MOLECULES,
          CIRC_SEQS=CIRC_SEQS,
          GET_CHROM_SIZES=GET_CHROM_SIZES,
-         NCBI_LINKER=NCBI_LINKER)
+         NCBI_LINKER=NCBI_LINKER,
+         ENSEMBL_LINKER=ENSEMBL_LINKER)
 }
 
 registered_UCSC_genomes <- function()
@@ -380,7 +531,7 @@ registered_UCSC_genomes <- function()
     assemblies <- lapply(file_paths, .parse_script_for_registered_UCSC_genome)
 
     colnames <- c("organism", "genome", "based_on_NCBI_genome",
-                  "assembly_accession", "circ_seqs")
+                  "assembly_accession", "with_Ensembl", "circ_seqs")
     make_col <- function(j) {
         colname <- colnames[[j]]
         if (colname == "based_on_NCBI_genome") {
@@ -402,6 +553,14 @@ registered_UCSC_genomes <- function()
                         return(NA_character_)
                     linker$assembly_accession
                 }, character(1), USE.NAMES=FALSE)
+            return(col)
+        }
+        if (colname == "with_Ensembl") {
+            col <- vapply(assemblies,
+                function(assembly) {
+                    linker <- assembly$ENSEMBL_LINKER
+                    !is.null(linker)
+                }, logical(1), USE.NAMES=FALSE)
             return(col)
         }
         COLNAME <- toupper(colname)
@@ -432,6 +591,7 @@ registered_UCSC_genomes <- function()
 
 .get_chrom_info_for_unregistered_UCSC_genome <- function(genome,
     assembled.molecules.only=FALSE,
+    add.ensembl.col=FALSE,
     goldenPath.url=getOption("UCSC.goldenPath.url"),
     recache=FALSE)
 {
@@ -453,30 +613,58 @@ registered_UCSC_genomes <- function()
 
         .UCSC_cached_chrom_info[[genome]] <- ans
     }
+    if (isTRUE(add.ensembl.col)) {
+        warning(wmsg("'add.ensembl.col' got ignored for unregistered ",
+                     "UCSC genome ", genome, "."),
+                     "\n  ",
+                wmsg("Use 'add.ensembl.col=\"force\"' to try adding ",
+                     "the \"ensembl\" column anyway."))
+    } else if (identical(add.ensembl.col, "force")) {
+        ans <- .add_ensembl_column(ans, genome,
+                                   goldenPath.url=goldenPath.url)
+    }
     if (assembled.molecules.only)
-        warning(wmsg("'assembled.molecules' was ignored for unregistered ",
+        warning(wmsg("'assembled.molecules' got ignored for unregistered ",
                      "UCSC genome ", genome, " (don't know what the ",
-                     "assembled molecules are for unregistered UCSC genomes)"))
+                     "assembled molecules are for an unregistered UCSC ",
+                     "genome)"))
     ans
 }
 
-.get_NCBI_linker <- function(add.NCBI.cols, NCBI_LINKER, GENOME)
+.get_NCBI_linker <- function(add.NCBI.cols, linker, GENOME)
 {
     if (is.list(add.NCBI.cols))
         return(add.NCBI.cols)
-    if (!add.NCBI.cols)
+    if (isFALSE(add.NCBI.cols))
         return(NULL)
-    if (is.null(NCBI_LINKER))
-        warning(wmsg("'add.NCBI.cols' was ignored for registered ",
-                     "UCSC genome ", GENOME, " ('add.NCBI.cols=TRUE' is ",
-                     "only supported for registered UCSC genomes based on ",
-                     "an NCBI genome)"))
-    NCBI_LINKER
+    if (is.null(linker))
+        warning(wmsg("'add.NCBI.cols' got ignored for registered ",
+                     "UCSC genome ", GENOME, " (additional NCBI columns ",
+                     "are only available for registered UCSC genomes ",
+                     "based on an NCBI genome)"))
+    linker
+}
+
+.get_Ensembl_linker <- function(add.ensembl.col, linker, GENOME)
+{
+    if (identical(add.ensembl.col, "force"))
+        return(NA)
+    if (isFALSE(add.ensembl.col))
+        return(NULL)
+    if (is.null(linker))
+        warning(wmsg("'add.ensembl.col' got ignored for registered ",
+                     "UCSC genome ", GENOME, " (genome was registered ",
+                     "with no Ensembl sequence names linked to it)."),
+                     "\n  ",
+                wmsg("Use 'add.ensembl.col=\"force\"' to try adding ",
+                     "the \"ensembl\" column anyway."))
+    linker
 }
 
 .get_chrom_info_for_registered_UCSC_genome <- function(script_path,
     assembled.molecules.only=FALSE,
     add.NCBI.cols=FALSE,
+    add.ensembl.col=FALSE,
     goldenPath.url=getOption("UCSC.goldenPath.url"),
     recache=FALSE)
 {
@@ -518,9 +706,19 @@ registered_UCSC_genomes <- function()
 
         .UCSC_cached_chrom_info[[GENOME]] <- ans
     }
-    linker <- .get_NCBI_linker(add.NCBI.cols, vars$NCBI_LINKER, GENOME)
-    if (!is.null(linker))
-        ans <- do.call(.add_NCBI_columns, c(list(ans), linker))
+
+    ## Add NCBI cols.
+    NCBI_linker <- .get_NCBI_linker(add.NCBI.cols, vars$NCBI_LINKER, GENOME)
+    if (!is.null(NCBI_linker))
+        ans <- do.call(.add_NCBI_columns, c(list(ans), NCBI_linker))
+
+    ## Add Ensembl col.
+    Ensemb_linker <- .get_Ensembl_linker(add.ensembl.col, vars$ENSEMBL_LINKER,
+                                         GENOME)
+    if (!is.null(Ensemb_linker))
+        ans <- .add_ensembl_column(ans, GENOME, table=Ensemb_linker,
+                                   goldenPath.url=goldenPath.url)
+
     if (assembled.molecules.only)
         ans <- S4Vectors:::extract_data_frame_rows(ans, assembled_idx)
     ans
@@ -531,6 +729,7 @@ registered_UCSC_genomes <- function()
 getChromInfoFromUCSC <- function(genome,
     assembled.molecules.only=FALSE,
     add.NCBI.cols=FALSE,
+    add.ensembl.col=FALSE,
     goldenPath.url=getOption("UCSC.goldenPath.url"),
     recache=FALSE)
 {
@@ -541,8 +740,12 @@ getChromInfoFromUCSC <- function(genome,
     if (!(isTRUEorFALSE(add.NCBI.cols) ||
           is.list(add.NCBI.cols) && !is.null(names(add.NCBI.cols))))
         stop(wmsg("'add.NCBI.cols' must be TRUE or FALSE ",
-                  "(experts can also supply a named list ",
-                  "representing an \"NCBI linker\")"))
+                  "(experts can also supply an \"NCBI linker\" ",
+                  "as a named list)"))
+    if (!(isTRUEorFALSE(add.ensembl.col) ||
+          identical(add.ensembl.col, "force")))
+        stop(wmsg("'add.ensembl.col' must be TRUE or FALSE ",
+                  "(experts can also use \"force\")"))
     if (!isSingleString(goldenPath.url))
         stop(wmsg("'goldenPath.url' must be a single string"))
     if (!isTRUEorFALSE(recache))
@@ -553,18 +756,20 @@ getChromInfoFromUCSC <- function(genome,
                                package="GenomeInfoDb")
     if (identical(script_path, "")) {
         if (!isFALSE(add.NCBI.cols))
-            warning(wmsg("'add.NCBI.cols' was ignored for unregistered ",
-                    "UCSC genome ", genome, " ('add.NCBI.cols=TRUE' is ",
-                    "only supported for registered UCSC genomes based on ",
-                    "an NCBI genome)"))
+            warning(wmsg("'add.NCBI.cols' got ignored for unregistered ",
+                         "UCSC genome ", genome, " (additional NCBI columns ",
+                         "are only available for registered UCSC genomes ",
+                         "based on an NCBI genome)"))
         ans <- .get_chrom_info_for_unregistered_UCSC_genome(genome,
                     assembled.molecules.only=assembled.molecules.only,
+                    add.ensembl.col=add.ensembl.col,
                     goldenPath.url=goldenPath.url,
                     recache=recache)
     } else {
         ans <- .get_chrom_info_for_registered_UCSC_genome(script_path,
                     assembled.molecules.only=assembled.molecules.only,
                     add.NCBI.cols=add.NCBI.cols,
+                    add.ensembl.col=add.ensembl.col,
                     goldenPath.url=goldenPath.url,
                     recache=recache)
     }

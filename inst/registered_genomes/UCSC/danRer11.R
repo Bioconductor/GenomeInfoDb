@@ -47,3 +47,5 @@ NCBI_LINKER <- list(
     assembly_accession="GCA_000002035.4"
 )
 
+ENSEMBL_LINKER <- "ucscToEnsembl"
+

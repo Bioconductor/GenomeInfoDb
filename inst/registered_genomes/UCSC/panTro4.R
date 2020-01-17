@@ -49,3 +49,5 @@ NCBI_LINKER <- list(
     special_mappings=c(chrM="MT")
 )
 
+ENSEMBL_LINKER <- "ucscToEnsembl"
+

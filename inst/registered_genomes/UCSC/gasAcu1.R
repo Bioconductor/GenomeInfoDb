@@ -32,3 +32,5 @@ GET_CHROM_SIZES <- function(goldenPath.url=getOption("UCSC.goldenPath.url"))
 #                       `pseudo-scaffold`="chrUn")
 #)
 
+ENSEMBL_LINKER <- "chromAlias"  # chrM not mapped to Ensembl!
+

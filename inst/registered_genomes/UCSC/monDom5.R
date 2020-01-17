@@ -28,3 +28,5 @@ NCBI_LINKER <- list(
     unmapped_seqs=list(`pseudo-scaffold`="chrUn")
 )
 
+ENSEMBL_LINKER <- "chromAlias"
+

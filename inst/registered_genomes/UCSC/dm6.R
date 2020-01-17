@@ -49,3 +49,5 @@ NCBI_LINKER <- list(
     special_mappings=c(chrM="mitochondrion_genome")
 )
 
+ENSEMBL_LINKER <- "chromAlias"  # chrM not mapped to Ensembl!
+

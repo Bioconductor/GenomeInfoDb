@@ -24,6 +24,7 @@
 getChromInfoFromUCSC(genome,
                      assembled.molecules.only=FALSE,
                      add.NCBI.cols=FALSE,
+                     add.ensembl.col=FALSE,
                      goldenPath.url=getOption("UCSC.goldenPath.url"),
                      recache=FALSE)
 
@@ -32,8 +33,8 @@ registered_UCSC_genomes()
 
 \arguments{
   \item{genome}{
-    A single string specifying the name of a UCSC genome assembly (e.g.
-    \code{"panTro6"}).
+    A single string specifying the name of a UCSC genome assembly
+    (e.g. \code{"panTro6"}).
   }
   \item{assembled.molecules.only}{
     If \code{FALSE} (the default) then chromosome information is returned
@@ -54,6 +55,11 @@ registered_UCSC_genomes()
     This can be useful to map UCSC sequence names to NCBI sequence names.
     Note that this is only supported for \emph{registered} UCSC genomes
     based on an NCBI genome!
+  }
+  \item{add.ensembl.col}{
+    \code{TRUE} or \code{FALSE} (the default). Whether or not the
+    Ensembl sequence names should be added to the result (in column
+    \code{ensembl}).
   }
   \item{goldenPath.url}{
     A single string specifying the URL to the UCSC goldenPath location
@@ -92,14 +98,14 @@ registered_UCSC_genomes()
 }
 
 \value{
-  \code{getChromInfoFromUCSC}: A 4-column data frame with columns:
+  For \code{getChromInfoFromUCSC}: A 4-column data frame with columns:
   \enumerate{
     \item \code{chrom}: character.
     \item \code{size}: integer.
     \item \code{assembled}: logical.
     \item \code{circular}: logical.
   }
-  If \code{add.NCBI.cols} is set to \code{TRUE}, then the 6 following
+  If \code{add.NCBI.cols} is \code{TRUE}, then the 6 following
   columns are added to the result:
   \itemize{
     \item \code{SequenceName}: character.
@@ -111,8 +117,10 @@ registered_UCSC_genomes()
   }
   Note that these additional columns are obtained with
   \code{\link{getChromInfoFromNCBI}} and their names are preserved.
+  If \code{add.ensembl.col} is \code{TRUE}, the column \code{ensembl}
+  is added to the result.
 
-  \code{registered_UCSC_genomes}: A data frame summarizing all the UCSC
+  For \code{registered_UCSC_genomes}: A data frame summarizing all the UCSC
   genome assemblies currently \emph{registered} in the \pkg{GenomeInfoDb}
   package.
 }
@@ -142,6 +150,9 @@ getChromInfoFromUCSC("panTro6", assembled.molecules.only=TRUE)
 ## Map the hg38 sequences to their corresponding sequences in
 ## the GRCh38 assembly:
 getChromInfoFromUCSC("hg38", add.NCBI.cols=TRUE)[c(1, 5)]
+
+## Map the hg19 sequences to the Ensembl sequence names:
+getChromInfoFromUCSC("hg19", add.ensembl.col=TRUE)
 
 ## List of UCSC genome assemblies currently registered in the package:
 registered_UCSC_genomes()

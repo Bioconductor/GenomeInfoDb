@@ -26,3 +26,5 @@ GET_CHROM_SIZES <- function(goldenPath.url=getOption("UCSC.goldenPath.url"))
     S4Vectors:::extract_data_frame_rows(chrom_sizes, oo)
 }
 
+ENSEMBL_LINKER <- "chromAlias"
+

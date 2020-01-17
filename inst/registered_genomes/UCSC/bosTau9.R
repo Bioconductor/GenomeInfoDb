@@ -40,3 +40,5 @@ NCBI_LINKER <- list(
     assembly_accession="GCA_002263795.2"
 )
 
+ENSEMBL_LINKER <- "chromAlias"  # chrM not mapped to Ensembl!
+

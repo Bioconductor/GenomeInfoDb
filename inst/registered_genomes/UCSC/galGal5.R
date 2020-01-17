@@ -49,3 +49,5 @@ NCBI_LINKER <- list(
     assembly_accession="GCF_000002315.4"
 )
 
+ENSEMBL_LINKER <- "chromAlias"
+

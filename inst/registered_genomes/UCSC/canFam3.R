@@ -43,3 +43,5 @@ NCBI_LINKER <- list(
                        chrM="MT")
 )
 
+ENSEMBL_LINKER <- "chromAlias"
+

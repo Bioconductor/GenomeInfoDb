@@ -56,3 +56,6 @@ NCBI_LINKER <- list(
     drop_unmapped=TRUE
 )
 
+### Sequences not in the original GRCh38 are not mapped to Ensembl!
+ENSEMBL_LINKER <- "ucscToEnsembl"
+

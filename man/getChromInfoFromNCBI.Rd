@@ -85,7 +85,7 @@ registered_NCBI_genomes()
 }
 
 \value{
-  \code{getChromInfoFromNCBI}: A 9-column data frame with columns:
+  For \code{getChromInfoFromNCBI}: A 9-column data frame with columns:
   \enumerate{
     \item \code{SequenceName}: character.
     \item \code{SequenceRole}: factor.
@@ -100,7 +100,7 @@ registered_NCBI_genomes()
     \item \code{circular}: logical.
   }
 
-  \code{registered_NCBI_genomes}: A data frame summarizing all the NCBI
+  For \code{registered_NCBI_genomes}: A data frame summarizing all the NCBI
   genome assemblies currently \emph{registered} in the \pkg{GenomeInfoDb}
   package.
 }

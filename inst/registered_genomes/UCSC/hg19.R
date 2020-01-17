@@ -60,3 +60,5 @@ NCBI_LINKER <- list(
     unmapped_seqs=list(`assembled-molecule`="chrM")
 )
 
+ENSEMBL_LINKER <- "ucscToEnsembl"
+
