@@ -38,9 +38,12 @@ Additionally, it can also define any (or both) of the following variables:
     - unmapped_seqs: named list of character vectors.
     - drop_unmapped: TRUE or FALSE.
 
+  o ENSEMBL_LINKER:      Single non-empty string (can only be "ucscToEnsembl"
+                         or "chromAlias" at the moment).
+
 All the above variables are recognized by getChromInfoFromUCSC(). They
-must be defined at the top-level of the script and their names must be in
-UPPER CASE.
+must be defined at the top-level of the script and their names must be
+in UPPER CASE.
 
 The script can define its own top-level variables and functions but by
 convention their name should be in lower case and start with a dot.

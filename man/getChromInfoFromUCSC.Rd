@@ -134,21 +134,19 @@ registered_UCSC_genomes()
     \item \code{\link{getChromInfoFromNCBI}} for getting chromosome
           information of an NCBI genome assembly.
 
-    \item \code{\link{fetchExtendedChromInfoFromUCSC}} for fetching extended
-          chromosome information for a UCSC genome assembly.
-
     \item \link{Seqinfo} objects.
   }
 }
 
 \examples{
 ## Internet access required!
+
 getChromInfoFromUCSC("hg19")
 getChromInfoFromUCSC("hg19", assembled.molecules.only=TRUE)
 getChromInfoFromUCSC("panTro6", assembled.molecules.only=TRUE)
 
 ## Map the hg38 sequences to their corresponding sequences in
-## the GRCh38 assembly:
+## the GRCh38.p12 assembly:
 getChromInfoFromUCSC("hg38", add.NCBI.cols=TRUE)[c(1, 5)]
 
 ## Map the hg19 sequences to the Ensembl sequence names:

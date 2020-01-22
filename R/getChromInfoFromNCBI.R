@@ -195,7 +195,9 @@ lookup_NCBI_accession2assembly <- function(accession)
                              "alt-scaffold",
                              "unlocalized-scaffold",
                              "unplaced-scaffold",
-                             "pseudo-scaffold")
+                             "pseudo-scaffold",
+                             "fix-patch",
+                             "novel-patch")
     sequence_role <- factor(ans[ , "SequenceRole"], levels=SequenceRole_levels)
     stopifnot(identical(is.na(sequence_role), is.na(ans[ , "SequenceRole"])))
     ans[ , "SequenceRole"] <- sequence_role

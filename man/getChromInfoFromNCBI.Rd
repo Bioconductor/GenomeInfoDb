@@ -114,15 +114,13 @@ registered_NCBI_genomes()
     \item \code{\link{getChromInfoFromUCSC}} for getting chromosome
           information for a UCSC genome assembly.
 
-    \item \code{\link{fetchExtendedChromInfoFromUCSC}} for fetching extended
-          chromosome information of a UCSC genome assembly.
-
     \item \link{Seqinfo} objects.
   }
 }
 
 \examples{
 ## Internet access required!
+
 getChromInfoFromNCBI("GRCh37")
 getChromInfoFromNCBI("GRCh37", assembled.molecules.only=TRUE)
 
@@ -131,6 +129,24 @@ getChromInfoFromNCBI("TAIR10.1", assembly.units="non-nuclear")
 
 ## List of NCBI genome assemblies currently registered in the package:
 registered_NCBI_genomes()
+
+## The GRCh38.p12 assembly only adds "patch sequences" to the GRCh38
+## assembly:
+GRCh38 <- getChromInfoFromNCBI("GRCh38")
+table(GRCh38$SequenceRole)
+GRCh38.p12 <- getChromInfoFromNCBI("GRCh38.p12")
+table(GRCh38.p12$SequenceRole)  # 140 patch sequences (70 fix + 70 novel)
+
+## Sanity checks:
+idx <- match(GRCh38$SequenceName, GRCh38.p12$SequenceName)
+stopifnot(!anyNA(idx))
+tmp1 <- GRCh38.p12[idx, ]
+rownames(tmp1) <- NULL
+tmp2 <- GRCh38.p12[-idx, ]
+stopifnot(
+  identical(tmp1[ , -(4:6)], GRCh38[ , -(4:6)]),
+  identical(tmp2, GRCh38.p12[GRCh38.p12$AssemblyUnit == "PATCHES", ])
+)
 }
 
 \keyword{manip}

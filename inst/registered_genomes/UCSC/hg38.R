@@ -24,12 +24,32 @@ library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
     stopifnot(!anyNA(m31))
     m33 <- match(m3[ , 3L], c("alt", "random", "fix"))
     stopifnot(!anyNA(m33))
-    oo3 <- order(m33, m31, m3[ , 2L])
+    GenBankAccn_prefixes <- c("GL",  # alt-scaffold or unlocalized-scaffold
+                              "JH",  # alt-scaffold
+                              "KB",  # alt-scaffold
+                              "KI",  # alt-scaffold or unlocalized-scaffold
+                              "KN",  # fix-patch or novel-patch
+                              "KQ",  # fix-patch or novel-patch
+                              "KV",  # fix-patch or novel-patch
+                              "KZ")  # fix-patch or novel-patch
+    m32 <- match(substr(m3[ , 2L], 1L, 2L), GenBankAccn_prefixes)
+    stopifnot(!anyNA(m32))
+    is_alt_scaffold <- m33 == 1L & m32 <= 4L
+    is_unlocalized_scaffold <- m33 == 2L & m32 <= 4L
+    is_fix_patch <- m33 == 3L & m32 >= 5L
+    is_novel_patch <- m33 == 1L & m32 >= 5L
+    sequence_role <- integer(length(idx3))
+    sequence_role[is_alt_scaffold] <- 1L
+    sequence_role[is_unlocalized_scaffold] <- 2L
+    sequence_role[is_fix_patch] <- 3L
+    sequence_role[is_novel_patch] <- 4L
+    stopifnot(all(sequence_role != 0L))
+    oo3 <- order(sequence_role, m31, m3[ , 2L])
     idx3 <- idx3[oo3]
-    nfix <- sum(m33 == 3L)
-    idx3_fix <- tail(idx3, n=nfix)
-    if (nfix != 0L)
-        idx3 <- head(idx3, n=-nfix)
+    npatch <- sum(is_fix_patch) + sum(is_novel_patch)
+    idx3_patch <- tail(idx3, n=npatch)
+    if (npatch != 0L)
+        idx3 <- head(idx3, n=-npatch)
 
     idx2 <- which(npart == 2L)
     m2 <- matrix(unlist(tmp[idx2]), ncol=2L, byrow=TRUE)
@@ -37,7 +57,7 @@ library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
     oo2 <- order(m2[ , 2L])
     idx2 <- idx2[oo2]
 
-    c(idx1, idx3, idx2, idx3_fix)
+    c(idx1, idx3, idx2, idx3_patch)
 }
 
 GET_CHROM_SIZES <- function(goldenPath.url=getOption("UCSC.goldenPath.url"))
@@ -48,12 +68,16 @@ GET_CHROM_SIZES <- function(goldenPath.url=getOption("UCSC.goldenPath.url"))
     S4Vectors:::extract_data_frame_rows(chrom_sizes, oo)
 }
 
+#NCBI_LINKER <- list(
+#    assembly_accession="GCF_000001405.26",  # GRCh38
+#    ## The chromInfo table at UCSC contains sequences that belong to
+#    ## GRCh38.p12 but not to GRCh38. Because we want to map hg38 to
+#    ## GRCh38 and not to GRCh38.p12, we drop these sequences.
+#    drop_unmapped=TRUE
+#)
+
 NCBI_LINKER <- list(
-    assembly_accession="GCF_000001405.26",
-    ## The chromInfo table at UCSC contains sequences that belong to
-    ## GRCh38.p12 but not to GRCh38. Because we want to map hg38 to
-    ## GRCh38 and not to GRCh38.p12, we drop these sequences.
-    drop_unmapped=TRUE
+    assembly_accession="GCF_000001405.38"  # GRCh38.p12
 )
 
 ### Sequences not in the original GRCh38 are not mapped to Ensembl!
