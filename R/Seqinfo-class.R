@@ -241,7 +241,7 @@ Seqinfo <- function(seqnames=NULL, seqlengths=NA, isCircular=NA, genome=NA)
      && identical(seqlengths, NA)
      && identical(isCircular, NA)
      && isSingleString(genome)) {
-        return(as(fetchSequenceInfo(genome), "Seqinfo"))
+        return(as(get_sequence_info_from_NCBI_or_UCSC(genome), "Seqinfo"))
     }
     seqnames <- .normargSeqlevels(seqnames)
     seqlengths <- .normargSeqlengths(seqlengths, seqnames)

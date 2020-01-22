@@ -135,10 +135,18 @@ registered_UCSC_genomes()
           information of an NCBI genome assembly.
 
     \item \link{Seqinfo} objects.
+
+    \item The \code{\link[BSgenome]{getBSgenome}} convenience utility in
+          the \pkg{BSgenome} package for getting a \link[BSgenome]{BSgenome}
+          object from an installed BSgenome data package.
   }
 }
 
 \examples{
+## ---------------------------------------------------------------------
+## A. BASIC EXAMPLES
+## ---------------------------------------------------------------------
+
 ## Internet access required!
 
 getChromInfoFromUCSC("hg19")
@@ -154,6 +162,30 @@ getChromInfoFromUCSC("hg19", add.ensembl.col=TRUE)
 
 ## List of UCSC genome assemblies currently registered in the package:
 registered_UCSC_genomes()
+
+## ---------------------------------------------------------------------
+## B. USING getChromInfoFromUCSC() TO SET UCSC SEQUENCE NAMES ON THE
+##    GRCh38 GENOME
+## ---------------------------------------------------------------------
+
+## Load the BSgenome.Hsapiens.NCBI.GRCh38 package:
+library(BSgenome)
+genome <- getBSgenome("GRCh38")  # this loads the
+                                 # BSgenome.Hsapiens.NCBI.GRCh38 package
+genome
+
+## Get the chromosome info for the hg38 genome assembly:
+hg38_chrom_info <- getChromInfoFromUCSC("hg38", add.NCBI.cols=TRUE)
+ncbi2ucsc <- setNames(hg38_chrom_info$chrom, hg38_chrom_info$SequenceName)
+
+## Set the UCSC sequence names on 'genome':
+seqlevels(genome) <- ncbi2ucsc[seqlevels(genome)]
+genome
+
+## Sanity check: check that the sequence lengths in 'genome' are the same
+## as in 'hg38_chrom_info':
+m <- match(seqlevels(genome), hg38_chrom_info$chrom)
+stopifnot(identical(unname(seqlengths(genome)), hg38_chrom_info$size[m]))
 }
 
 \keyword{manip}

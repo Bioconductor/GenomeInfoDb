@@ -7,6 +7,9 @@
 }
 
 \description{
+  IMPORTANT NOTE: \code{fetchExtendedChromInfoFromUCSC} has been superseded
+  by \code{getChromInfoFromUCSC} and is now deprecated!
+
   Fetch the chromosomes info for some UCSC genomes.
   Only supports hg38, hg19, hg18, panTro4, panTro3, panTro2, bosTau8, bosTau7,
   bosTau6, canFam3, canFam2, canFam1, musFur1, mm10, mm9, mm8, susScr3,
@@ -146,6 +149,7 @@ fetchExtendedChromInfoFromUCSC(genome,
 }
 
 \examples{
+\dontrun{
 ## All the examples below require internet access!
 
 ## ---------------------------------------------------------------------
@@ -199,6 +203,7 @@ hg38_seqlevels <- setNames(hg38_chrominfo$UCSC_seqlevel,
 ## Set the hg38 seqlevels on 'genome':
 seqlevels(genome) <- hg38_seqlevels[seqlevels(genome)]
 head(seqlevels(genome), n=30)
+}
 }
 
 \keyword{manip}

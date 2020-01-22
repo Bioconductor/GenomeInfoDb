@@ -27,9 +27,9 @@ Collate: utils.R
 	UCSC-utils.R
 	getChromInfoFromNCBI.R
 	getChromInfoFromUCSC.R
+	get_sequence_info_from_NCBI_or_UCSC.R
 	loadTaxonomyDb.R
 	fetchExtendedChromInfoFromUCSC.R
-	fetchSequenceInfo.R
 	seqinfo.R
 	seqlevelsStyle.R
 	seqlevels-wrappers.R

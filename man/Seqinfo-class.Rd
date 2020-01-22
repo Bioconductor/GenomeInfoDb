@@ -214,29 +214,41 @@
   \itemize{
     \item \code{\link{seqinfo}}
 
-    \item The \code{\link{fetchExtendedChromInfoFromUCSC}} utility
-          function that is used behind the scene to make a Seqinfo
-          object for a supported genome (see examples below).
+    \item The \code{\link{getChromInfoFromNCBI}} and
+          \code{\link{getChromInfoFromUCSC}} utility functions
+          that are used behind the scene to generate a Seqinfo
+          object for a given genome assembly (see examples below).
   }
 }
 
 \examples{
 ## ---------------------------------------------------------------------
-## A. MAKING A Seqinfo OBJECT FOR A SUPPORTED GENOME
+## A. MAKING A Seqinfo OBJECT FOR A GIVEN GENOME ASSEMBLY
 ## ---------------------------------------------------------------------
 
 if (interactive()) {
-  ## This uses fetchExtendedChromInfoFromUCSC() behind the scene and
-  ## thus requires internet access. See ?fetchExtendedChromInfoFromUCSC
-  ## for the list of UCSC genomes that are currently supported.
+  ## This uses getChromInfoFromNCBI() or getChromInfoFromUCSC() behind
+  ## the scene and thus requires internet access.
+
+  ## NCBI genomes (see ?registered_NCBI_genomes for the list of NCBI
+  ## genome assemblies that are currently supported):
+  Seqinfo(genome="GRCh38")
+  Seqinfo(genome="GRCh38.p12")
+  Seqinfo(genome="Amel_HAv3.1")
+  Seqinfo(genome="WBcel235")
+  Seqinfo(genome="TAIR10.1")
+
+  ## UCSC genomes (see ?registered_UCSC_genomes for the list of UCSC
+  ## genome assemblies that are currently supported):
   Seqinfo(genome="hg38")
-  Seqinfo(genome="bosTau8")
-  Seqinfo(genome="canFam3")
-  Seqinfo(genome="musFur1")
   Seqinfo(genome="mm10")
   Seqinfo(genome="rn6")
-  Seqinfo(genome="galGal4")
+  Seqinfo(genome="bosTau9")
+  Seqinfo(genome="canFam3")
+  Seqinfo(genome="musFur1")
+  Seqinfo(genome="galGal6")
   Seqinfo(genome="dm6")
+  Seqinfo(genome="ce11")
   Seqinfo(genome="sacCer3")
 }
 

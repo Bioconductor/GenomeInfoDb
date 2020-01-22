@@ -702,6 +702,8 @@ fetchExtendedChromInfoFromUCSC <- function(genome,
         goldenPath_url="http://hgdownload.cse.ucsc.edu/goldenPath",
         quiet=FALSE)
 {
+    .Deprecated("getChromInfoFromUCSC")
+
     if (!isSingleString(genome))
         stop("'genome' must be a single string")
     if (!isTRUEorFALSE(quiet))
