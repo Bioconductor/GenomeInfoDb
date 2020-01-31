@@ -1,15 +1,12 @@
 \name{Seqinfo-class}
 \docType{class}
 
-% Classes:
+% Class:
 \alias{class:Seqinfo}
 \alias{Seqinfo-class}
 \alias{Seqinfo}
 
-% Constructors:
-\alias{Seqinfo}
-
-% Methods:
+% Accessors:
 \alias{length,Seqinfo-method}
 \alias{seqnames,Seqinfo-method}
 \alias{seqnames<-,Seqinfo-method}
@@ -23,20 +20,28 @@
 \alias{isCircular<-,Seqinfo-method}
 \alias{genome,Seqinfo-method}
 \alias{genome<-,Seqinfo-method}
+
+% Subsetting:
 \alias{[,Seqinfo-method}
+
+% Coercion:
+\alias{as.data.frame.Seqinfo}
 \alias{as.data.frame,Seqinfo-method}
 \alias{coerce,data.frame,Seqinfo-method}
 \alias{coerce,DataFrame,Seqinfo-method}
+
+% Display:
 \alias{summary.Seqinfo}
 \alias{summary,Seqinfo-method}
 \alias{show,Seqinfo-method}
+
+% Combine:
 \alias{merge,Seqinfo,missing-method}
 \alias{merge,missing,Seqinfo-method}
 \alias{merge,Seqinfo,NULL-method}
 \alias{merge,NULL,Seqinfo-method}
 \alias{merge,Seqinfo,Seqinfo-method}
 \alias{intersect,Seqinfo,Seqinfo-method}
-
 \alias{checkCompatibleSeqinfo}
 
 \title{Seqinfo objects}

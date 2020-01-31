@@ -731,7 +731,8 @@ getChromInfoFromUCSC <- function(genome,
     add.NCBI.cols=FALSE,
     add.ensembl.col=FALSE,
     goldenPath.url=getOption("UCSC.goldenPath.url"),
-    recache=FALSE)
+    recache=FALSE,
+    as.Seqinfo=FALSE)
 {
     if (!isSingleString(genome))
         stop(wmsg("'genome' must be a single string"))
@@ -750,6 +751,8 @@ getChromInfoFromUCSC <- function(genome,
         stop(wmsg("'goldenPath.url' must be a single string"))
     if (!isTRUEorFALSE(recache))
         stop(wmsg("'recache' must be TRUE or FALSE"))
+    if (!isTRUEorFALSE(as.Seqinfo))
+        stop(wmsg("'as.Seqinfo' must be TRUE or FALSE"))
 
     script_name <- paste0(genome, ".R")
     script_path <- system.file("registered_genomes", "UCSC", script_name,
@@ -773,6 +776,11 @@ getChromInfoFromUCSC <- function(genome,
                     goldenPath.url=goldenPath.url,
                     recache=recache)
     }
-    ans
+    if (!as.Seqinfo)
+        return(ans)
+    Seqinfo(seqnames=ans[ , "chrom"],
+            seqlengths=ans[ , "size"],
+            isCircular=ans[ , "circular"],
+            genome=genome)
 }
 

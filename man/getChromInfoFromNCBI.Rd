@@ -10,7 +10,7 @@
 \description{
   \code{getChromInfoFromNCBI} returns chromosome information like
   sequence names, sizes and circularity flags for a given NCBI genome
-  assembly e.g. GRCh38, ARS-UCD1.2, R64, etc...
+  assembly e.g. for GRCh38, ARS-UCD1.2, R64, etc...
 
   Note that \code{getChromInfoFromNCBI} behaves slightly differently
   depending on whether a genome assembly is \emph{registered} or not in
@@ -24,7 +24,8 @@
 getChromInfoFromNCBI(genome,
                      assembled.molecules.only=FALSE,
                      assembly.units=NULL,
-                     recache=FALSE)
+                     recache=FALSE,
+                     as.Seqinfo=FALSE)
 
 registered_NCBI_genomes()
 }
@@ -66,6 +67,13 @@ registered_NCBI_genomes()
     recaching) of the chromosome information for the specified genome
     assembly.
   }
+  \item{as.Seqinfo}{
+    \code{TRUE} or \code{FALSE} (the default). If \code{TRUE} then a
+    \link{Seqinfo} object is returned instead of a data frame. Note that
+    only the \code{SequenceName}, \code{SequenceLength}, and \code{circular}
+    columns of the data frame are used to make the \link{Seqinfo} object.
+    All the other columns are ignored (and lost).
+  }
 }
 
 \details{
@@ -85,7 +93,8 @@ registered_NCBI_genomes()
 }
 
 \value{
-  For \code{getChromInfoFromNCBI}: A 9-column data frame with columns:
+  For \code{getChromInfoFromNCBI}: By default, a 9-column data frame
+  with columns:
   \enumerate{
     \item \code{SequenceName}: character.
     \item \code{SequenceRole}: factor.
@@ -122,9 +131,13 @@ registered_NCBI_genomes()
 ## Internet access required!
 
 getChromInfoFromNCBI("GRCh37")
+
+getChromInfoFromNCBI("GRCh37", as.Seqinfo=TRUE)
+
 getChromInfoFromNCBI("GRCh37", assembled.molecules.only=TRUE)
 
 getChromInfoFromNCBI("TAIR10.1")
+
 getChromInfoFromNCBI("TAIR10.1", assembly.units="non-nuclear")
 
 ## List of NCBI genome assemblies currently registered in the package:

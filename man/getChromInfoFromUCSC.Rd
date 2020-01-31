@@ -10,7 +10,7 @@
 \description{
   \code{getChromInfoFromUCSC} returns chromosome information like
   sequence names, sizes and circularity flags for a given UCSC genome
-  assembly e.g. hg19, panTro6, sacCer3, etc...
+  assembly e.g. for hg19, panTro6, sacCer3, etc...
 
   Note that \code{getChromInfoFromUCSC} behaves slightly differently
   depending on whether a genome assembly is \emph{registered} or not in
@@ -26,7 +26,8 @@ getChromInfoFromUCSC(genome,
                      add.NCBI.cols=FALSE,
                      add.ensembl.col=FALSE,
                      goldenPath.url=getOption("UCSC.goldenPath.url"),
-                     recache=FALSE)
+                     recache=FALSE,
+                     as.Seqinfo=FALSE)
 
 registered_UCSC_genomes()
 }
@@ -73,6 +74,13 @@ registered_UCSC_genomes()
     Setting \code{recache} to \code{TRUE} forces a new download (and
     recaching) of the chromosome sizes for the specified genome assembly.
   }
+  \item{as.Seqinfo}{
+    \code{TRUE} or \code{FALSE} (the default). If \code{TRUE} then a
+    \link{Seqinfo} object is returned instead of a data frame. Note that
+    only the \code{chrom}, \code{size}, and \code{circular} columns of
+    the data frame are used to make the \link{Seqinfo} object. All the
+    other columns are ignored (and lost).
+  }
 }
 
 \details{
@@ -98,7 +106,8 @@ registered_UCSC_genomes()
 }
 
 \value{
-  For \code{getChromInfoFromUCSC}: A 4-column data frame with columns:
+  For \code{getChromInfoFromUCSC}: By default, a 4-column data frame
+  with columns:
   \enumerate{
     \item \code{chrom}: character.
     \item \code{size}: integer.
@@ -150,7 +159,11 @@ registered_UCSC_genomes()
 ## Internet access required!
 
 getChromInfoFromUCSC("hg19")
+
+getChromInfoFromUCSC("hg19", as.Seqinfo=TRUE)
+
 getChromInfoFromUCSC("hg19", assembled.molecules.only=TRUE)
+
 getChromInfoFromUCSC("panTro6", assembled.molecules.only=TRUE)
 
 ## Map the hg38 sequences to their corresponding sequences in

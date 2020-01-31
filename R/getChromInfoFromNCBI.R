@@ -266,7 +266,8 @@ lookup_NCBI_accession2assembly <- function(accession)
 getChromInfoFromNCBI <- function(genome,
     assembled.molecules.only=FALSE,
     assembly.units=NULL,
-    recache=FALSE)
+    recache=FALSE,
+    as.Seqinfo=FALSE)
 {
     if (!isSingleString(genome))
         stop(wmsg("'genome' must be a single string"))
@@ -283,6 +284,8 @@ getChromInfoFromNCBI <- function(genome,
     }
     if (!isTRUEorFALSE(recache))
         stop(wmsg("'recache' must be TRUE or FALSE"))
+    if (!isTRUEorFALSE(as.Seqinfo))
+        stop(wmsg("'as.Seqinfo' must be TRUE or FALSE"))
 
     ## First see if the user supplied the assembly accession of a registered
     ## genome assembly instead of its name.
@@ -314,10 +317,16 @@ getChromInfoFromNCBI <- function(genome,
             circ_seqs <- NULL
         }
     }
-    .get_NCBI_chrom_info_from_accession(accession,
-            circ_seqs=circ_seqs,
-            assembled.molecules.only=assembled.molecules.only,
-            assembly.units=assembly.units,
-            recache=recache)
+    ans <- .get_NCBI_chrom_info_from_accession(accession,
+                circ_seqs=circ_seqs,
+                assembled.molecules.only=assembled.molecules.only,
+                assembly.units=assembly.units,
+                recache=recache)
+    if (!as.Seqinfo)
+        return(ans)
+    Seqinfo(seqnames=ans[ , "SequenceName"],
+            seqlengths=ans[ , "SequenceLength"],
+            isCircular=ans[ , "circular"],
+            genome=genome)
 }
 

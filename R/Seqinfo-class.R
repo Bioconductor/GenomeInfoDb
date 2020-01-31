@@ -132,13 +132,30 @@ setValidity2("Seqinfo", .valid.Seqinfo)
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Constructor
 ###
-### The .normarg*() helper functions below do only partial checking of the
-### arguments. The full validation is performed by new() thru the validity
-### method.
+### The .normarg_*() helper functions below do only partial checking of the
+### arguments. The full validation is performed by the validity method when
+### new() is called.
 ###
 
+.make_Seqinfo_from_genome_string <- function(genome)
+{
+    if (!isSingleString(genome) || genome == "")
+        stop("'genome' must be a single non-empty string")
+    NCBI_genomes <- registered_NCBI_genomes()
+    if (genome %in% NCBI_genomes[ , "genome"] ||
+        genome %in% NCBI_genomes[ , "assembly_accession"])
+        return(getChromInfoFromNCBI(genome, as.Seqinfo=TRUE))
+    UCSC_genomes <- registered_UCSC_genomes()
+    if (genome %in% UCSC_genomes[ , "genome"])
+        return(getChromInfoFromNCBI(genome, as.Seqinfo=TRUE))
+    stop(wmsg("\"", genome, "\" is not a registered NCBI or UCSC genome ",
+              "(use registered_NCBI_genomes() or registered_UCSC_genomes() ",
+              "to list the NCBI or UCSC genome assemblies currently ",
+              "registered in the GenomeInfoDb package)"))
+}
+
 ### Make sure this always returns an *unnamed* character vector.
-.normargSeqlevels <- function(seqlevels)
+.normarg_seqlevels <- function(seqlevels)
 {
     if (is.null(seqlevels))
         return(character(0))
@@ -150,7 +167,7 @@ setValidity2("Seqinfo", .valid.Seqinfo)
 }
 
 ### Make sure this always returns an *unnamed* integer vector.
-.normargSeqlengths <- function(seqlengths, seqnames)
+.normarg_seqlengths <- function(seqlengths, seqnames)
 {
     if (identical(seqlengths, NA))
         return(rep.int(NA_integer_, length(seqnames)))
@@ -181,7 +198,7 @@ setValidity2("Seqinfo", .valid.Seqinfo)
 }
 
 ### Make sure this always returns an *unnamed* logical vector.
-.normargIsCircular <- function(isCircular, seqnames)
+.normarg_isCircular <- function(isCircular, seqnames)
 {
     if (identical(isCircular, NA))
         return(rep.int(NA, length(seqnames)))
@@ -201,7 +218,7 @@ setValidity2("Seqinfo", .valid.Seqinfo)
 
 ### Make sure this always returns an *unnamed* character vector parallel to
 ### 'seqnames'.
-.normargGenome <- function(genome, seqnames)
+.normarg_genome <- function(genome, seqnames)
 {
     if (!(is.vector(genome) || is.factor(genome)))
         stop(wmsg("supplied 'genome' must be a vector or factor"))
@@ -240,71 +257,17 @@ Seqinfo <- function(seqnames=NULL, seqlengths=NA, isCircular=NA, genome=NA)
     if (is.null(seqnames)
      && identical(seqlengths, NA)
      && identical(isCircular, NA)
-     && isSingleString(genome)) {
-        return(as(get_sequence_info_from_NCBI_or_UCSC(genome), "Seqinfo"))
-    }
-    seqnames <- .normargSeqlevels(seqnames)
-    seqlengths <- .normargSeqlengths(seqlengths, seqnames)
-    is_circular <- .normargIsCircular(isCircular, seqnames)
-    genome <- .normargGenome(genome, seqnames)
+     && isSingleString(genome))
+        return(.make_Seqinfo_from_genome_string(genome))
+
+    seqnames <- .normarg_seqlevels(seqnames)
+    seqlengths <- .normarg_seqlengths(seqlengths, seqnames)
+    is_circular <- .normarg_isCircular(isCircular, seqnames)
+    genome <- .normarg_genome(genome, seqnames)
     new("Seqinfo", seqnames=seqnames,
                    seqlengths=seqlengths,
                    is_circular=is_circular,
                    genome=genome)
-}
-
-.makeSeqinfoFromDataFrame <- function(df)
-{
-    if (!is.data.frame(df) && !is(df, "DataFrame")) 
-        stop("'df' must be a data.frame or DataFrame object")
-    df_colnames <- colnames(df)
-
-    ## Extract seqnames.
-    if ("seqnames" %in% df_colnames) {
-        ans_seqnames <- df[ , "seqnames"]
-    } else if ("seqlevels" %in% df_colnames) {
-        ans_seqnames <- df[ , "seqlevels"]
-    } else {
-        ans_seqnames <- rownames(df)
-        seqnames_as_ints <- suppressWarnings(as.integer(ans_seqnames))
-        if (!any(is.na(seqnames_as_ints))
-          && all(seqnames_as_ints == ans_seqnames))
-            stop("no sequence names found in input")
-    }
-    if (!is.character(ans_seqnames))
-        ans_seqnames <- as.character(ans_seqnames)
-
-    ## Extract seqlengths.
-    if ("seqlengths" %in% df_colnames) {
-        ans_seqlengths <- df[ , "seqlengths"]
-    } else {
-        ans_seqlengths <- rep.int(NA_integer_, nrow(df))
-    }
-    if (!is.integer(ans_seqlengths))
-        ans_seqlengths <-  as.integer(ans_seqlengths)
-
-    ## Extract isCircular.
-    if ("isCircular" %in% df_colnames) {
-        ans_isCircular <- df[ , "isCircular"]
-    } else if ("is_circular" %in% df_colnames) {
-        ans_isCircular <- df[ , "is_circular"]
-    } else {
-        ans_isCircular <- rep.int(NA, nrow(df))
-    }
-    if (!is.logical(ans_isCircular))
-        ans_isCircular <-  as.logical(ans_isCircular)
-
-    ## Extract genome.
-    if ("genome" %in% df_colnames) {
-        ans_genome <- df[ , "genome"]
-    } else {
-        ans_genome <- rep.int(NA_character_, nrow(df))
-    }
-    if (!is.character(ans_genome))
-        ans_genome <-  as.character(ans_genome)
-
-    Seqinfo(seqnames=ans_seqnames, seqlengths=ans_seqlengths,
-            isCircular=ans_isCircular, genome=ans_genome)
 }
 
 
@@ -363,7 +326,7 @@ setMethod("[", "Seqinfo",
 setReplaceMethod("seqnames", "Seqinfo",
     function(x, value)
     {
-        value <- .normargSeqlevels(value)
+        value <- .normarg_seqlevels(value)
         if (length(value) != length(x))
             stop("length of supplied 'seqnames' vector must equal ",
                  "the number of sequences")
@@ -406,7 +369,7 @@ setReplaceMethod("seqlevels", "Seqinfo",
 setReplaceMethod("seqlengths", "Seqinfo",
     function(x, value)
     {
-        x@seqlengths <- .normargSeqlengths(value, seqnames(x))
+        x@seqlengths <- .normarg_seqlengths(value, seqnames(x))
         x
     }
 )
@@ -414,7 +377,7 @@ setReplaceMethod("seqlengths", "Seqinfo",
 setReplaceMethod("isCircular", "Seqinfo",
     function(x, value)
     {
-        x@is_circular <- .normargIsCircular(value, seqnames(x))
+        x@is_circular <- .normarg_isCircular(value, seqnames(x))
         x
     }
 )
@@ -422,7 +385,7 @@ setReplaceMethod("isCircular", "Seqinfo",
 setReplaceMethod("genome", "Seqinfo",
     function(x, value)
     {
-        x@genome <- .normargGenome(value, seqnames(x))
+        x@genome <- .normarg_genome(value, seqnames(x))
         x
     }
 )
@@ -432,30 +395,83 @@ setReplaceMethod("genome", "Seqinfo",
 ### Coercion
 ###
 
-setMethod("as.data.frame", "Seqinfo",
-    function(x, row.names=NULL, optional=FALSE, ...)
-    {
-        if (!is.null(row.names))
-            warning("supplied 'row.names' value was ignored")
-        if (!identical(optional, FALSE))
-            warning("supplied 'optional' value was ignored")
-        if (length(list(...)) != 0L)
-            warning("extra arguments were ignored")
-        data.frame(seqlengths=unname(seqlengths(x)),
-                   isCircular=unname(isCircular(x)),
-                   genome=unname(genome(x)),
-                   row.names=seqnames(x),
-                   check.names=FALSE,
-                   stringsAsFactors=FALSE)
-    }
-)
+### S3/S4 combo for as.data.frame.Vector
+as.data.frame.Seqinfo <- function(x, row.names=NULL, optional=FALSE, ...)
+{
+    if (!is.null(row.names))
+        warning("supplied 'row.names' value was ignored")
+    if (!identical(optional, FALSE))
+        warning("supplied 'optional' value was ignored")
+    if (length(list(...)) != 0L)
+        warning("extra arguments were ignored")
+    data.frame(seqlengths=unname(seqlengths(x)),
+               isCircular=unname(isCircular(x)),
+               genome=unname(genome(x)),
+               row.names=seqnames(x),
+               check.names=FALSE,
+               stringsAsFactors=FALSE)
+}
+setMethod("as.data.frame", "Seqinfo", as.data.frame.Seqinfo)
 
-setAs("data.frame", "Seqinfo", function(from) .makeSeqinfoFromDataFrame(from))
-setAs("DataFrame", "Seqinfo", function(from) .makeSeqinfoFromDataFrame(from))
+.from_DataFrame_to_Seqinfo <- function(from)
+{
+    if (!is.data.frame(from) && !is(from, "DataFrame"))
+        stop("'from' must be a data.frame or DataFrame object")
+    from_colnames <- colnames(from)
+
+    ## Extract seqnames.
+    if ("seqnames" %in% from_colnames) {
+        ans_seqnames <- from[ , "seqnames"]
+    } else if ("seqlevels" %in% from_colnames) {
+        ans_seqnames <- from[ , "seqlevels"]
+    } else {
+        ans_seqnames <- rownames(from)
+        seqnames_as_ints <- suppressWarnings(as.integer(ans_seqnames))
+        if (!any(is.na(seqnames_as_ints))
+          && all(seqnames_as_ints == ans_seqnames))
+            stop("no sequence names found in input")
+    }
+    if (!is.character(ans_seqnames))
+        ans_seqnames <- as.character(ans_seqnames)
+
+    ## Extract seqlengths.
+    if ("seqlengths" %in% from_colnames) {
+        ans_seqlengths <- from[ , "seqlengths"]
+    } else {
+        ans_seqlengths <- rep.int(NA_integer_, nrow(from))
+    }
+    if (!is.integer(ans_seqlengths))
+        ans_seqlengths <-  as.integer(ans_seqlengths)
+
+    ## Extract isCircular.
+    if ("isCircular" %in% from_colnames) {
+        ans_isCircular <- from[ , "isCircular"]
+    } else if ("is_circular" %in% from_colnames) {
+        ans_isCircular <- from[ , "is_circular"]
+    } else {
+        ans_isCircular <- rep.int(NA, nrow(from))
+    }
+    if (!is.logical(ans_isCircular))
+        ans_isCircular <-  as.logical(ans_isCircular)
+
+    ## Extract genome.
+    if ("genome" %in% from_colnames) {
+        ans_genome <- from[ , "genome"]
+    } else {
+        ans_genome <- rep.int(NA_character_, nrow(from))
+    }
+    if (!is.character(ans_genome))
+        ans_genome <-  as.character(ans_genome)
+
+    Seqinfo(seqnames=ans_seqnames, seqlengths=ans_seqlengths,
+            isCircular=ans_isCircular, genome=ans_genome)
+}
+setAs("data.frame", "Seqinfo", .from_DataFrame_to_Seqinfo)
+setAs("DataFrame", "Seqinfo", .from_DataFrame_to_Seqinfo)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Displaying
+### Display
 ###
 
 ### S3/S4 combo for summary.Seqinfo
