@@ -1,7 +1,6 @@
 GENOME <- "panTro4"
 ORGANISM <- "Pan troglodytes"
 ASSEMBLED_MOLECULES <- paste0("chr", c(1, "2A", "2B", 3:22, "X", "Y", "M"))
-
 CIRC_SEQS <- "chrM"
 
 library(IRanges)       # for CharacterList()

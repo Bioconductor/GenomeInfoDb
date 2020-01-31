@@ -1,7 +1,6 @@
 GENOME <- "hg17"
 ORGANISM <- "Homo sapiens"
 ASSEMBLED_MOLECULES <- paste0("chr", c(1:22, "X", "Y", "M"))
-
 CIRC_SEQS <- "chrM"
 
 library(IRanges)       # for CharacterList()
