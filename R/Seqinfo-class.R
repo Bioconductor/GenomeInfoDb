@@ -147,7 +147,7 @@ setValidity2("Seqinfo", .valid.Seqinfo)
         return(getChromInfoFromNCBI(genome, as.Seqinfo=TRUE))
     UCSC_genomes <- registered_UCSC_genomes()
     if (genome %in% UCSC_genomes[ , "genome"])
-        return(getChromInfoFromNCBI(genome, as.Seqinfo=TRUE))
+        return(getChromInfoFromUCSC(genome, as.Seqinfo=TRUE))
     stop(wmsg("\"", genome, "\" is not a registered NCBI or UCSC genome ",
               "(use registered_NCBI_genomes() or registered_UCSC_genomes() ",
               "to list the NCBI or UCSC genome assemblies currently ",
