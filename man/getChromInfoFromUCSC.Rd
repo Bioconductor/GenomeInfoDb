@@ -170,6 +170,11 @@ getChromInfoFromUCSC("panTro6", assembled.molecules.only=TRUE)
 ## the GRCh38.p12 assembly:
 getChromInfoFromUCSC("hg38", add.NCBI.cols=TRUE)[c(1, 5)]
 
+## Note that some NCBI-based UCSC assemblies contain sequences that
+## are not mapped. For example this is the case for chrM in hg19:
+hg19 <- getChromInfoFromUCSC("hg19", add.NCBI.col=TRUE)
+hg19[is.na(hg19$SequenceName), ]
+
 ## Map the hg19 sequences to the Ensembl sequence names:
 getChromInfoFromUCSC("hg19", add.ensembl.col=TRUE)
 
