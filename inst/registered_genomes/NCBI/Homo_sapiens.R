@@ -2,6 +2,11 @@ ORGANISM <- "Homo sapiens"
 
 ### List of assemblies by date.
 ASSEMBLIES <- list(
+    list(genome="NCBI34",
+         assembly_accession="GCF_000001405.10",  # hg16
+         date="2004/02/04",
+         circ_seqs=character(0)),
+
     list(genome="NCBI36",
          assembly_accession="GCF_000001405.12",  # hg18
          date="2006/03/03",

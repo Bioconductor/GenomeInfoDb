@@ -11,7 +11,7 @@ Author: Sonali Arora, Martin Morgan, Marc Carlson, H. Pagès
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
 biocViews: Genetics, DataRepresentation, Annotation, GenomeAnnotation
 Depends: R (>= 3.1), methods, BiocGenerics (>= 0.13.8),
-	S4Vectors (>= 0.17.25), IRanges (>= 2.13.12)
+	S4Vectors (>= 0.25.12), IRanges (>= 2.13.12)
 Imports: stats, stats4, utils, RCurl, GenomeInfoDbData
 Suggests: GenomicRanges, Rsamtools, GenomicAlignments, BSgenome,
 	GenomicFeatures,
