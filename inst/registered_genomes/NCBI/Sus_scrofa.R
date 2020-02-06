@@ -4,21 +4,21 @@ ORGANISM <- "Sus scrofa"
 ASSEMBLIES <- list(
     ## breed: Duroc
     list(genome="Sscrofa9.2",
-         assembly_accession="GCF_000003025.3",  # susScr2
-         infraspecific_name=c(breed="Duroc"),
          date="2010/02/23",
+         extra_info=c(breed="Duroc"),
+         assembly_accession="GCF_000003025.3",  # susScr2
          circ_seqs=character(0)),
 
     list(genome="Sscrofa10.2",
-         assembly_accession="GCA_000003025.4",  # susScr3
-         infraspecific_name=c(breed="Duroc"),
          date="2011/09/07",
+         extra_info=c(breed="Duroc"),
+         assembly_accession="GCA_000003025.4",  # susScr3
          circ_seqs="MT"),
 
     list(genome="Sscrofa11.1",
-         assembly_accession="GCF_000003025.6",  # susScr11
-         infraspecific_name=c(breed="Duroc"),
          date="2017/02/07",
+         extra_info=c(breed="Duroc"),
+         assembly_accession="GCF_000003025.6",  # susScr11
          circ_seqs="MT")
 )
 

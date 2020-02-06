@@ -48,7 +48,7 @@
     stop_if(is.null(ASSEMBLIES), "'ASSEMBLIES' must be defined")
     stop_if(!is.list(ASSEMBLIES), "'ASSEMBLIES' must be a list of lists")
 
-    required_fields <- c("genome", "assembly_accession", "date", "circ_seqs")
+    required_fields <- c("genome", "date", "assembly_accession", "circ_seqs")
     for (i in seq_along(ASSEMBLIES)) {
         assembly <- ASSEMBLIES[[i]]
 
@@ -72,6 +72,12 @@
                 "\"genome\" field in 'ASSEMBLIES[[", i, "]]' must ",
                 "be a single non-empty string")
 
+        ## Check "date" field (required).
+        date <- assembly$date
+        stop_if(!isSingleString(date) || date == "",
+                "\"date\" field in 'ASSEMBLIES[[", i, "]]' must ",
+                "be a single non-empty string")
+
         ## Check "accession" field (required).
         accession <- assembly$assembly_accession
         stop_if(!isSingleString(accession) || accession == "",
@@ -79,12 +85,6 @@
                 "be a single non-empty string")
         stop_if(!is.null(.NCBI_accession2assembly[[accession]]),
                 "assembly accession ", accession, " used more than once")
-
-        ## Check "date" field (required).
-        date <- assembly$date
-        stop_if(!isSingleString(date) || date == "",
-                "\"date\" field in 'ASSEMBLIES[[", i, "]]' must ",
-                "be a single non-empty string")
 
         ## Check "circ_seqs" field (required).
         circ_seqs <- assembly$circ_seqs
@@ -98,19 +98,28 @@
                 "not contain NAs, empty strings, or duplicates")
 
         ## Check optional fields.
-        infraspecific_name <- assembly$infraspecific_name
-        if (!is.null(infraspecific_name)) {
-            stop_if(!isSingleString(infraspecific_name) ||
-                    infraspecific_name == "" ||
-                    !isSingleString(names(infraspecific_name)),
-              "\"infraspecific_name\" field in 'ASSEMBLIES[[", i, "]]' must ",
-              "be a single non-empty named string")
+        extra_info <- assembly$extra_info
+        if (!is.null(extra_info)) {
+            stop_if(!is.character(extra_info),
+                "\"extra_info\" field in 'ASSEMBLIES[[", i, "]]' must ",
+                "be a named character vector")
+            stop_if(anyNA(extra_info) || !all(nzchar(extra_info)),
+                "\"extra_info\" field in 'ASSEMBLIES[[", i, "]]' must ",
+                "not contain NAs or empty strings")
+            tags <- names(extra_info)
+            stop_if(!is.character(tags),
+                "\"extra_info\" field in 'ASSEMBLIES[[", i, "]]' must ",
+                "be a named character vector")
+            stop_if(anyNA(tags) || anyDuplicated(tags),
+                "the names on \"extra_info\" field 'ASSEMBLIES[[", i, "]]' ",
+                "must not contain NAs or duplicates")
         }
 
         genome <- tolower(genome)
         .NCBI_genome2accession[[genome]] <-
             c(.NCBI_genome2accession[[genome]], accession)
         assembly$organism <- ORGANISM
+        assembly$rank_within_organism <- i
         .NCBI_accession2assembly[[accession]] <- assembly
     }
 }
@@ -124,35 +133,44 @@
         .load_registered_NCBI_genome(file_path)
 }
 
+.make_extra_info_col <- function(col0, ifmissing="", sep=":", collapse="|")
+{
+    stopifnot(is.list(col0), is.character(ifmissing), length(ifmissing) == 1L)
+    col <- rep.int(ifmissing, length(col0))
+    idx1 <- which(lengths(col0) != 0L)
+    if (length(idx1) != 0L) {
+        col1 <- col0[idx1]
+        unlisted_col1 <- unlist(col1)
+        stopifnot(is.character(unlisted_col1))
+        tags <- names(unlisted_col1)
+        stopifnot(is.character(tags),
+                  !anyNA(tags),
+                  all(nzchar(tags)))
+        col1 <- relist(paste(tags, unlisted_col1, sep=sep), col1)
+        col[idx1] <- unstrsplit(col1, sep=collapse)
+    }
+    col
+}
+
 registered_NCBI_genomes <- function()
 {
     if (length(.NCBI_accession2assembly) == 0L)
         .load_registered_NCBI_genomes()
     assemblies <- unname(as.list(.NCBI_accession2assembly, all.names=TRUE))
 
-    colnames <- c("organism", "genome", "assembly_accession",
-                  "infraspecific_name", "date", "circ_seqs")
+    colnames <- c("organism", "rank_within_organism", "genome", "date",
+                  "extra_info", "assembly_accession", "circ_seqs")
     make_col <- function(colname) {
         col0 <- lapply(assemblies, `[[`, colname)
+        if (colname == "extra_info")
+            return(factor(.make_extra_info_col(col0)))
         if (colname == "circ_seqs")
             return(CharacterList(col0))
-        if (colname == "infraspecific_name") {
-            stopifnot(all(lengths(col0) <= 1L))
-            col <- rep.int(NA_character_, length(col0))
-            idx1 <- which(lengths(col0) == 1L)
-            if (length(idx1) != 0L) {
-                col1 <- unlist(col0)
-                stopifnot(is.character(col1))
-                col1_names <- names(col1)
-                stopifnot(is.character(col1_names),
-                          !anyNA(col1_names),
-                          all(nzchar(col1_names)))
-                col[idx1] <- paste(col1_names, col1, sep=":")
-            }
-            return(factor(col))
-        }
         stopifnot(all(lengths(col0) == 1L))
-        col <- as.character(unlist(col0, use.names=FALSE))
+        col <- unlist(col0, use.names=FALSE)
+        if (colname == "rank_within_organism")
+            return(as.integer(col))
+        col <- as.character(col)
         if (colname == "organism")
             col <- factor(col)  # order of levels will dictate order
                                 # of rows in final DataFrame
@@ -161,8 +179,8 @@ registered_NCBI_genomes <- function()
 
     listData <- lapply(setNames(colnames, colnames), make_col)
     ans <- S4Vectors:::new_DataFrame(listData, nrows=length(assemblies))
-    oo <- order(ans$organism, ans$infraspecific_name, ans$date)
-    as.data.frame(ans[oo, , drop=FALSE])
+    oo <- order(ans$organism, ans$rank_within_organism)
+    as.data.frame(drop_cols(ans, "rank_within_organism")[oo, , drop=FALSE])
 }
 
 lookup_NCBI_genome2accession <- function(genome)

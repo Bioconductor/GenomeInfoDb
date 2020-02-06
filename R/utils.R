@@ -1,7 +1,32 @@
 ### =========================================================================
 ### Miscellaneous low-level utils
 ### -------------------------------------------------------------------------
+###
+### Nothing in this file is exported.
+###
 
+
+drop_cols <- function(df, colnames)
+{
+    stopifnot(is.character(colnames), length(colnames) != 0L)
+    drop_idx <- match(colnames, colnames(df))
+    stopifnot(!anyNA(drop_idx))
+    df[-drop_idx]
+}
+
+### Uses RCurl to access and list the content of an FTP dir.
+list_ftp_dir <- function(url, subdirs.only=FALSE)
+{
+    doc <- getURL(url)
+    listing <- strsplit(doc, "\n", fixed=TRUE)[[1L]]
+    if (subdirs.only)
+        listing <- listing[substr(listing, 1L, 1L) == "d"]
+    ## Keep field no. 8 only
+    pattern <- paste(c("^", rep.int("[^[:space:]]+[[:space:]]+", 8L)),
+                     collapse="")
+    listing <- sub(pattern, "", listing)
+    sub("[[:space:]].*$", "", listing)
+}
 
 ### Global character vector to hold default names for circular sequences.
 ### This is exported!
@@ -89,17 +114,5 @@ mergeNamedAtomicVectors <- function(x, y, what=c("key", "values"))
     idx <- is.na(ans) & !is.na(ans2)
     ans[idx] <- ans2[idx]
     ans
-}
-
-### Uses RCurl to access and list the content of an FTP dir.
-list_ftp_dir <- function(url)
-{
-    doc <- getURL(url)  # from RCurl package
-    listing <- strsplit(doc, "\n", fixed=TRUE)[[1L]]
-    ## Keep field no. 8 only
-    pattern <- paste(c("^", rep.int("[^[:space:]]+[[:space:]]+", 8L)),
-                     collapse="")
-    listing <- sub(pattern, "", listing)
-    sub("[[:space:]].*$", "", listing)
 }
 

@@ -6,21 +6,21 @@ ORGANISM <- "Canis lupus familiaris"
 ASSEMBLIES <- list(
     ## breed: boxer
     list(genome="CanFam2.0",
-         assembly_accession="GCF_000002285.1",
-         infraspecific_name=c(breed="boxer"),
          date="2005/07/12",
+         extra_info=c(breed="boxer"),
+         assembly_accession="GCF_000002285.1",
          circ_seqs=character(0)),
 
     list(genome="CanFam2.0",
-         assembly_accession="GCF_000002285.2",  # canFam2
-         infraspecific_name=c(breed="boxer"),
          date="2005/07/12",
+         extra_info=c(breed="boxer"),
+         assembly_accession="GCF_000002285.2",  # canFam2
          circ_seqs="MT"),
 
     list(genome="CanFam3.1",
-         assembly_accession="GCF_000002285.3",  # canFam3
-         infraspecific_name=c(breed="boxer"),
          date="2011/11/02",
+         extra_info=c(breed="boxer"),
+         assembly_accession="GCF_000002285.3",  # canFam3
          circ_seqs="MT")
 )
 
