@@ -13,18 +13,19 @@ biocViews: Genetics, DataRepresentation, Annotation, GenomeAnnotation
 Depends: R (>= 3.1), methods, BiocGenerics (>= 0.13.8),
 	S4Vectors (>= 0.25.12), IRanges (>= 2.13.12)
 Imports: stats, stats4, utils, RCurl, GenomeInfoDbData
-Suggests: GenomicRanges, Rsamtools, GenomicAlignments, BSgenome,
-	GenomicFeatures,
+Suggests: GenomicRanges, Rsamtools, GenomicAlignments, GenomicFeatures,
+	TxDb.Dmelanogaster.UCSC.dm3.ensGene,
+	BSgenome,
 	BSgenome.Scerevisiae.UCSC.sacCer2,
 	BSgenome.Celegans.UCSC.ce2,
 	BSgenome.Hsapiens.NCBI.GRCh38,
-	TxDb.Dmelanogaster.UCSC.dm3.ensGene,
 	RUnit, BiocStyle, knitr
 License: Artistic-2.0
 Collate: utils.R
 	rankSeqlevels.R
 	NCBI-utils.R
 	UCSC-utils.R
+	Ensembl-utils.R
 	getChromInfoFromNCBI.R
 	getChromInfoFromUCSC.R
 	loadTaxonomyDb.R

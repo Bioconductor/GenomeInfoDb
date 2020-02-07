@@ -268,7 +268,7 @@ lookup_NCBI_accession2assembly <- function(accession)
         bad_idx <- which(!(lower_case_units %in% valid_assembly_units))
         if (length(bad_idx) != 0L) {
             in1string <- paste0(assembly.units[bad_idx], collapse=", ")
-            stop(wmsg("invalid Assembly Units: ", in1string))
+            stop(wmsg("invalid Assembly Unit(s): ", in1string))
         }
         keep_idx <- which(tolower(ans_assembly_units) %in% lower_case_units)
         ans <- S4Vectors:::extract_data_frame_rows(ans, keep_idx)

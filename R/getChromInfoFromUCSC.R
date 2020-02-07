@@ -278,7 +278,6 @@
 {
     col2class <- c(ucsc="character", ensembl="character")
     fetch_table_from_UCSC(genome, "ucscToEnsembl",
-                          colnames=names(col2class),
                           col2class=col2class,
                           goldenPath.url=goldenPath.url)
 }
@@ -291,7 +290,6 @@
 {
     col2class <- c(ensembl="character", ucsc="character", source="factor")
     chromAlias <- fetch_table_from_UCSC(genome, "chromAlias",
-                                        colnames=names(col2class),
                                         col2class=col2class,
                                         goldenPath.url=goldenPath.url)
     ## Filters and reformats.

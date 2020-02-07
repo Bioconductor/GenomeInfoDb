@@ -6,13 +6,78 @@
 ###
 
 
-drop_cols <- function(df, colnames)
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### JOIN two data.frames
+###
+### In typical base R fashion, merge.data.frame() does all kinds of weird
+### things with the column names and is very inefficient. Plus, independently
+### of how 'sort' is set, the order of the rows in the result does not make
+### sense. The order of the columns doesn't either.
+###
+### join_dfs() below does NOT mess around with the column names, preserves
+### the order of the rows of the left data.frame, does not shuffle the
+### columns around (left and right columns stay on the left and right,
+### respectively, and in their original order), and is about 3x-4x faster
+### than merge.data.frame()!
+###
+
+.drop_cols <- function(df, colnames)
 {
     stopifnot(is.character(colnames), length(colnames) != 0L)
     drop_idx <- match(colnames, colnames(df))
     stopifnot(!anyNA(drop_idx))
     df[-drop_idx]
 }
+
+.do_join <- function(Ldf, Rdf, L2R)
+{
+    #stopifnot(is.integer(L2R),
+    #          length(L2R) == nrow(Ldf),
+    #          all(L2R >= 1L, na.rm=TRUE),
+    #          all(L2R <= nrow(Rdf), na.rm=TRUE))
+    cbind(Ldf, S4Vectors:::extract_data_frame_rows(Rdf, L2R))
+}
+
+### Performs an SQL INNER JOIN by default. Also by default the right column
+### of the join ('Rcolname') is not included in the result.
+### IMPORTANT NOTE: It will mimic the behavior of an SQL JOIN (INNER or LEFT)
+### **only** if the right column contains unique values! (UNIQUE constraint
+### in SQL). If not, then values in the left column ('Lcolname') will only
+### get mapped to their first match in the right column ('Rcolname').
+### Comparison with merge.data.frame():
+### - INNER JOIN (join_dfs is about 3x faster):
+###     join_dfs(df1, df2, Lcolname, Rcolname)
+###     merge(df1, df2, by.x=Lcolname, by.y=Rcolname, sort=FALSE)
+### - LEFT JOIN (join_dfs is about 4x faster):
+###     join_dfs(df1, df2, Lcolname, Rcolname, left.join=TRUE)
+###     merge(df1, df2, by.x=Lcolname, by.y=Rcolname, sort=FALSE, all.x=TRUE)
+join_dfs <- function(Ldf, Rdf, Lcolname, Rcolname,
+                     left.join=FALSE, keep.Rcol=FALSE)
+{
+    stopifnot(is.data.frame(Ldf),
+              is.data.frame(Rdf),
+              isSingleString(Lcolname),
+              isSingleString(Rcolname))
+    ## Values in the left column only get mapped to their first match in
+    ## the right column.
+    L2R <- match(Ldf[ , Lcolname], Rdf[ , Rcolname])
+    if (!left.join) {
+        ## Drop rows in 'Ldf' that are not mapped.
+        drop_idx <- which(is.na(L2R))
+        if (length(drop_idx) != 0L) {
+            Ldf <- S4Vectors:::extract_data_frame_rows(Ldf, -drop_idx)
+            L2R <- L2R[-drop_idx]
+        }
+    }
+    if (!keep.Rcol)
+        Rdf <- .drop_cols(Rdf, Rcolname)
+    .do_join(Ldf, Rdf, L2R)
+}
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Other stuff
+###
 
 ### Uses RCurl to access and list the content of an FTP dir.
 list_ftp_dir <- function(url, subdirs.only=FALSE)
@@ -26,6 +91,34 @@ list_ftp_dir <- function(url, subdirs.only=FALSE)
                      collapse="")
     listing <- sub(pattern, "", listing)
     sub("[[:space:]].*$", "", listing)
+}
+
+### Provides a simpler interface to read.table().
+.simple_read_table <- function(file,
+                               header=FALSE, colnames=NULL, col2class=NULL,
+                               nrows=-1L, skip=0L,
+                               sep="\t", quote="", comment.char="")
+{
+    if (is.null(col2class))
+        col2class <- NA
+    ## Prepare args to pass to read.table().
+    args <- list(file, header=header,
+                 sep=sep, quote=quote, na.strings=c("NA", "na"),
+                 colClasses=col2class, nrows=nrows, skip=skip,
+                 comment.char=comment.char, stringsAsFactors=FALSE)
+    if (!is.null(colnames))
+        args$col.names <- colnames
+    do.call(read.table, args)
+}
+
+### Same interface as .simple_read_table() above.
+fetch_table_from_url <- function(url, ...)
+{
+    destfile <- tempfile()
+    download.file(url, destfile, quiet=TRUE)
+    ans <- .simple_read_table(destfile, ...)
+    unlink(destfile)
+    ans
 }
 
 ### Global character vector to hold default names for circular sequences.
