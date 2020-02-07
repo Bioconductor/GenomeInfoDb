@@ -6,6 +6,16 @@
 ###
 
 
+### 'x' must be a matrix-like or data-frame-like object.
+drop_cols <- function(x, colnames)
+{
+    stopifnot(is.character(colnames), length(colnames) != 0L)
+    drop_idx <- match(colnames, colnames(x))
+    stopifnot(!anyNA(drop_idx))
+    x[ , -drop_idx, drop=FALSE]
+}
+
+
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### JOIN two data.frames
 ###
@@ -20,14 +30,6 @@
 ### respectively, and in their original order), and is about 3x-4x faster
 ### than merge.data.frame()!
 ###
-
-.drop_cols <- function(df, colnames)
-{
-    stopifnot(is.character(colnames), length(colnames) != 0L)
-    drop_idx <- match(colnames, colnames(df))
-    stopifnot(!anyNA(drop_idx))
-    df[-drop_idx]
-}
 
 .do_join <- function(Ldf, Rdf, L2R)
 {
@@ -70,7 +72,7 @@ join_dfs <- function(Ldf, Rdf, Lcolname, Rcolname,
         }
     }
     if (!keep.Rcol)
-        Rdf <- .drop_cols(Rdf, Rcolname)
+        Rdf <- drop_cols(Rdf, Rcolname)
     .do_join(Ldf, Rdf, L2R)
 }
 
