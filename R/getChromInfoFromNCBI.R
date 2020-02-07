@@ -206,9 +206,16 @@ lookup_NCBI_accession2assembly <- function(accession)
 
 .format_assembly_report <- function(assembly_report, circ_seqs=NULL)
 {
-    drop_columns <- c("AssignedMolecule", "AssignedMoleculeLocationOrType")
-    ans <- assembly_report[ , !(colnames(assembly_report) %in% drop_columns)]
-    ans[ , "SequenceName"] <- as.character(ans[ , "SequenceName"])
+    ans <- drop_cols(assembly_report, "AssignedMoleculeLocationOrType")
+
+    ## Column "SequenceName".
+    sequence_name <- as.character(ans[ , "SequenceName"])
+    stopifnot(!anyNA(sequence_name),
+              all(nzchar(sequence_name)),
+              !anyDuplicated(sequence_name))
+    ans[ , "SequenceName"] <- sequence_name
+
+    ## Column "SequenceRole".
     SequenceRole_levels <- c("assembled-molecule",
                              "alt-scaffold",
                              "unlocalized-scaffold",
@@ -219,23 +226,40 @@ lookup_NCBI_accession2assembly <- function(accession)
     sequence_role <- factor(ans[ , "SequenceRole"], levels=SequenceRole_levels)
     stopifnot(identical(is.na(sequence_role), is.na(ans[ , "SequenceRole"])))
     ans[ , "SequenceRole"] <- sequence_role
+
+    ## Re-order the rows based on SequenceRole.
     oo <- order(as.integer(sequence_role))
     ans <- S4Vectors:::extract_data_frame_rows(ans, oo)
+
+    ## Column "AssignedMolecule".
+    idx <- which(ans[ , "SequenceRole"] %in% "assembled-molecule")
+    assembled_molecules <- ans[idx , "SequenceName"]
+    ans[ , "AssignedMolecule"] <- factor(ans[ , "AssignedMolecule"],
+                                         levels=assembled_molecules)
+
+    ## Column "Relationship".
     Relationship_levels <- c("=", "<>")
     ans[ , "Relationship"] <- factor(ans[ , "Relationship"],
                                      levels=Relationship_levels)
+
+    ## Column "AssemblyUnit".
     ans[ , "AssemblyUnit"] <- factor(ans[ , "AssemblyUnit"])
+
+    ## Column "UCSCStyleName".
     UCSCStyleName <- ans[ , "UCSCStyleName"]
     if (!is.character(UCSCStyleName))
         UCSCStyleName <- as.character(UCSCStyleName)
     na_idx <- which(UCSCStyleName %in% "na")
     UCSCStyleName[na_idx] <- NA_character_
     ans[ , "UCSCStyleName"] <- UCSCStyleName
+
+    ## Column "circular".
     circular <- make_circ_flags_from_circ_seqs(ans[ , "SequenceName"],
                                                circ_seqs=circ_seqs)
     stopifnot(all(ans[which(circular), "SequenceRole"] %in%
                   "assembled-molecule"))
     ans$circular <- circular
+
     ans
 }
 
@@ -276,11 +300,11 @@ lookup_NCBI_accession2assembly <- function(accession)
     ans
 }
 
-### Return an 8-column data.frame with columns "SequenceName" (character),
-### "SequenceRole" (factor),  "GenBankAccn" (character), "Relationship"
-### (factor), "RefSeqAccn" (character), "AssemblyUnit" (factor),
-### "SequenceLength" (integer), "UCSCStyleName" (character),
-### and "circular" (logical).
+### Return a 10-column data.frame with columns "SequenceName" (character),
+### "SequenceRole" (factor),  "AssignedMolecule" (factor), "GenBankAccn"
+### (character), "Relationship" (factor), "RefSeqAccn" (character),
+### "AssemblyUnit" (factor), "SequenceLength" (integer), "UCSCStyleName"
+### (character), and "circular" (logical).
 getChromInfoFromNCBI <- function(genome,
     assembled.molecules.only=FALSE,
     assembly.units=NULL,

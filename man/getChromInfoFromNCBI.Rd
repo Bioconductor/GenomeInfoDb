@@ -93,10 +93,11 @@ registered_NCBI_genomes()
 }
 
 \value{
-  For \code{getChromInfoFromNCBI}: By default, a 9-column data frame
+  For \code{getChromInfoFromNCBI}: By default, a 10-column data frame
   with columns:
   \enumerate{
     \item \code{SequenceName}: character.
+    \item \code{AssignedMolecule}: factor.
     \item \code{SequenceRole}: factor.
     \item \code{GenBankAccn}: character.
     \item \code{Relationship}: factor.

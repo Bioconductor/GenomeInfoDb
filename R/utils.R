@@ -29,7 +29,6 @@ drop_cols <- function(x, colnames)
 ### columns around (left and right columns stay on the left and right,
 ### respectively, and in their original order), and is about 3x-4x faster
 ### than merge.data.frame()!
-###
 
 .do_join <- function(Ldf, Rdf, L2R)
 {
@@ -74,6 +73,32 @@ join_dfs <- function(Ldf, Rdf, Lcolname, Rcolname,
     if (!keep.Rcol)
         Rdf <- drop_cols(Rdf, Rcolname)
     .do_join(Ldf, Rdf, L2R)
+}
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### solid_match()
+###
+### Like base::match() but raises an error if some elements in 'x' can be
+### matched to more than one element in 'table' (one-to-many mapping).
+### IMPORTANT NOTE: The fast implementation below assumes that 'x' contains
+### no duplicates. This means that we cannot use it in join_dfs() above!
+
+solid_match <- function(x, table)
+{
+    ## Unlike base::match(), where 'x' can be a NULL or a list, we only
+    ## support atomic vectors.
+    stopifnot(is.vector(x), is.atomic(x), !anyDuplicated(x))
+    revm <- match(table, x)  # reverse match
+    dup_idx <- which(duplicated(revm, incomparables=NA_integer_))
+    if (length(dup_idx) != 0L) {
+        in1string <- paste0(unique(table[dup_idx]), collapse=", ")
+        stop(wmsg("table has more than 1 entry for: ", in1string))
+    }
+    ans <- rep.int(NA_integer_, length(x))
+    ok <- !is.na(revm)
+    ans[revm[ok]] <- which(ok)
+    ans
 }
 
 
