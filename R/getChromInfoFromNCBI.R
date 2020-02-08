@@ -253,7 +253,7 @@ lookup_NCBI_accession2assembly <- function(accession)
     UCSCStyleName[na_idx] <- NA_character_
     ans[ , "UCSCStyleName"] <- UCSCStyleName
 
-    ## Column "circular".
+    ## Add column "circular".
     circular <- make_circ_flags_from_circ_seqs(ans[ , "SequenceName"],
                                                circ_seqs=circ_seqs)
     stopifnot(all(ans[which(circular), "SequenceRole"] %in%

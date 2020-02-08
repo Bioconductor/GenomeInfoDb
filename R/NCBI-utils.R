@@ -213,6 +213,8 @@ build_and_save_assembly_accessions_table <- function(dir=".", quiet=FALSE)
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### fetch_assembly_report()
 ###
+### This is the workhorse behind getChromInfoFromNCBI().
+###
 
 ### 'assembly_accession' can be:
 ###   (a) a GenBank assembly accession (e.g. "GCA_000001405.15");

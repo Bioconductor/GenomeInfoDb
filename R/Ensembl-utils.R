@@ -67,12 +67,6 @@
     "external_db_id"          # ==> external_db.external_db_id
 )
 
-### 'dna' table.
-.ENSEMBLDB_DNA_COLUMNS <- c(
-    "seq_region_id",          # primary key ==> seq_region.seq_region_id
-    "sequence"
-)
-
 ### External References
 
 ### 'external_db' table.
@@ -96,7 +90,6 @@
     coord_system=.ENSEMBLDB_COORD_SYSTEM_COLUMNS,
     seq_region_attrib=.ENSEMBLDB_SEQ_REGION_ATTRIB_COLUMNS,
     seq_region_synonym=.ENSEMBLDB_SEQ_REGION_SYNONYM_COLUMNS,
-    dna=.ENSEMBLDB_DNA_COLUMNS,
     external_db=.ENSEMBLDB_EXTERNAL_DB_COLUMNS
 )
 
@@ -231,8 +224,32 @@ get_url_to_Ensembl_ftp_mysql_core <- function(
     paste0(url, core_dir, "/")
 }
 
-attrib_type_codes_to_ids_from_Ensembl_ftp <- function(core_url, codes)
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### fetch_default_coord_systems_from_Ensembl_ftp()
+###
+
+fetch_default_coord_systems_from_Ensembl_ftp <- function(core_url)
 {
+    coord_system <- fetch_table_from_Ensembl_ftp(core_url, "coord_system")
+    ## Drop rows that do not have the default_version attrib.
+    keep_idx <- grep("default_version", coord_system[ , "attrib"], fixed=TRUE)
+    S4Vectors:::extract_data_frame_rows(coord_system, keep_idx)
+}
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### fetch_seq_regions_from_Ensembl_ftp()
+###
+### This is the workhorse behind getChromInfoFromEnsembl().
+###
+
+.attrib_type_codes_to_ids_from_Ensembl_ftp <- function(core_url, codes)
+{
+    if (!is.character(codes))
+        stop(wmsg("'codes' must be a character vector"))
+    if (anyDuplicated(codes))
+        stop(wmsg("'codes' cannot contain duplicates"))
     ## Get the first 99 rows of 'attrib_type' table.
     ## The reason we don't read in the entire table is because some rows at
     ## the bottom of the table (rows with attrib_type_id >= 416, these rows
@@ -246,53 +263,118 @@ attrib_type_codes_to_ids_from_Ensembl_ftp <- function(core_url, codes)
     ## to get what we need.
     attrib_type <- fetch_table_from_Ensembl_ftp(core_url, "attrib_type",
                                                 nrows=99L)
-
-    ## Even though we expect that column "attrib_type.code" will always
-    ## have unique values, we want to be informed if this is not the case.
-    attrib_type.code <- attrib_type[ , "code"]
-    if (anyDuplicated(attrib_type.code))
-        warning(wmsg("column \"attrib_type.code\" contains duplicates"))
-
-    if (!is.character(codes))
-        stop(wmsg("'codes' must be a character vector"))
-    m <- match(codes, attrib_type.code)
+    m <- solid_match(codes, attrib_type[ , "code"],
+                     x_what="supplied code",
+                     table_what="\"attrib_type.code\" value")
     bad_idx <- which(is.na(m))
     if (length(bad_idx) != 0L) {
         in1string <- paste0(codes[bad_idx], collapse=", ")
-        stop(wmsg("invalid \"attrib_type.code\" value(s): ", in1string))
+        stop(wmsg("table \"attrib_type\" has no entry for: ", in1string))
     }
-    attrib_type[m, "attrib_type_id"]
+    setNames(attrib_type[m, "attrib_type_id"], codes)
 }
 
+.external_db_names_to_ids_from_Ensembl_ftp <- function(core_url, db_names)
+{
+    if (!is.character(db_names))
+        stop(wmsg("'db_names' must be a character vector"))
+    if (anyDuplicated(db_names))
+        stop(wmsg("'db_names' cannot contain duplicates"))
+    external_db <- fetch_table_from_Ensembl_ftp(core_url, "external_db")
+    m <- solid_match(db_names, external_db[ , "db_name"],
+                     x_what="supplied db_name",
+                     table_what="\"external_db.db_name\" value")
+    bad_idx <- which(is.na(m))
+    if (length(bad_idx) != 0L) {
+        in1string <- paste0(db_names[bad_idx], collapse=", ")
+        stop(wmsg("table \"external_db\" has no entry for: ", in1string))
+    }
+    setNames(external_db[m, "external_db_id"], db_names)
+}
 
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### fetch_seq_regions_from_Ensembl_ftp()
-###
+### Retrieve attribs "toplevel" and "non_ref" for the supplied sequence ids.
+### This is done via tables "seq_region_attrib" and "attrib_type".
+.fetch_attribs_from_Ensembl_ftp <- function(core_url, seq_region_ids,
+                                            toplevel=FALSE, non_ref=FALSE)
+{
+    all_attribs <- fetch_table_from_Ensembl_ftp(core_url, "seq_region_attrib")
+    attrib_type_id <- all_attribs[ , "attrib_type_id"]
+    codes <- c("toplevel", "non_ref")
+    code2id <- .attrib_type_codes_to_ids_from_Ensembl_ftp(core_url, codes)
+    if (toplevel) {
+        idx <- which(attrib_type_id == code2id[["toplevel"]])
+        ids <- all_attribs[idx, "seq_region_id"]
+        toplevel <- seq_region_ids %in% ids
+    } else {
+        toplevel <- NULL
+    }
+    if (non_ref) {
+        idx <- which(attrib_type_id == code2id[["non_ref"]])
+        ids <- all_attribs[idx, "seq_region_id"]
+        non_ref <- seq_region_ids %in% ids
+    } else {
+        non_ref <- NULL
+    }
+    list(toplevel=toplevel, non_ref=non_ref)
+}
+
+### Retrieve the INSDC/RefSeq synonyms for the supplied sequence ids.
+### This is done via tables "seq_region_synonym" and "external_db".
+.fetch_synonyms_from_Ensembl_ftp <- function(core_url, seq_region_ids,
+                                             INSDC=FALSE, RefSeq=FALSE)
+{
+    all_synonyms <- fetch_table_from_Ensembl_ftp(core_url, "seq_region_synonym")
+    external_db_id <- all_synonyms[ , "external_db_id"]
+    db_names <- c("INSDC", "RefSeq", "RefSeq_genomic",
+                  "RefSeq_dna", "RefSeq_dna_predicted")
+    name2id <- .external_db_names_to_ids_from_Ensembl_ftp(core_url, db_names)
+    if (INSDC) {
+        idx <- which(external_db_id %in% name2id[["INSDC"]])
+        synonyms <- S4Vectors:::extract_data_frame_rows(all_synonyms, idx)
+        ## Risky assumption: we expect at most one INSDC synonym per sequence!
+        m <- solid_match(seq_region_ids, synonyms[ , "seq_region_id"],
+                         x_what="seq_region_id", table_what="INSDC synonym")
+        INSDC <- synonyms[m, "synonym"]
+    } else {
+        INSDC <- NULL
+    }
+    if (RefSeq) {
+        idx <- which(external_db_id %in% setdiff(name2id, name2id[["INSDC"]]))
+        synonyms <- S4Vectors:::extract_data_frame_rows(all_synonyms, idx)
+        ## Risky assumption: we expect at most one RefSeq synonym per sequence!
+        m <- solid_match(seq_region_ids, synonyms[ , "seq_region_id"],
+                         x_what="seq_region_id", table_what="RefSeq synonym")
+        RefSeq <- synonyms[m, "synonym"]
+    } else {
+        RefSeq <- NULL
+    }
+    list(INSDC=INSDC, RefSeq=RefSeq)
+}
+
 ### Typical use:
 ###   core_url <- get_url_to_Ensembl_ftp_mysql_core("hsapiens_gene_ensembl")
 ###   coord_system_names <- c("chromosome", "scaffold", "lrg")
 ###   fetch_seq_regions_from_Ensembl_ftp(core_url, coord_system_names)
-
 fetch_seq_regions_from_Ensembl_ftp <- function(core_url,
                                                coord_system_names=NULL,
                                                add.toplevel.col=FALSE,
-                                               add.non_ref.col=FALSE)
+                                               add.non_ref.col=FALSE,
+                                               add.INSDC.col=FALSE,
+                                               add.RefSeq.col=FALSE)
 {
-    stopifnot(isTRUEorFALSE(add.toplevel.col), isTRUEorFALSE(add.non_ref.col))
+    stopifnot(isTRUEorFALSE(add.toplevel.col),
+              isTRUEorFALSE(add.non_ref.col),
+              isTRUEorFALSE(add.INSDC.col),
+              isTRUEorFALSE(add.RefSeq.col))
 
-    coord_system <- fetch_table_from_Ensembl_ftp(core_url, "coord_system",
-                                                 full.colnames=TRUE)
-
-    ## Drop rows that do not have the default_version attrib.
-    keep_idx <- grep("default_version",
-                     coord_system[ , "coord_system.attrib"],
-                     fixed=TRUE)
-    coord_system <- S4Vectors:::extract_data_frame_rows(coord_system, keep_idx)
+    coord_systems <- fetch_default_coord_systems_from_Ensembl_ftp(core_url)
+    Rtable <- "coord_system"
+    colnames(coord_systems) <- paste(Rtable, colnames(coord_systems), sep=".")
 
     ## Even though we expect that column "coord_system.name" will always
     ## have unique values within the remaining rows, we want to be informed
     ## if this is not the case.
-    coord_system.name <- coord_system[ , "coord_system.name"]
+    coord_system.name <- coord_systems[ , "coord_system.name"]
     if (anyDuplicated(coord_system.name))
         warning(wmsg("column \"coord_system.name\" contains duplicates ",
                      "within the rows that have the default_version attrib"))
@@ -304,85 +386,42 @@ fetch_seq_regions_from_Ensembl_ftp <- function(core_url,
             stop(wmsg("'coord_system_names' must be a character vector"))
         if (anyDuplicated(coord_system_names))
             stop(wmsg("'coord_system_names' cannot contain duplicates"))
-        keep_idx <- match(coord_system_names, coord_system.name)
-        bad_idx <- which(is.na(keep_idx))
-        if (length(bad_idx) != 0L) {
-            in1string <- paste0(coord_system_names[bad_idx], collapse=", ")
-            stop(wmsg("Invalid \"coord_system.name\" value(s): ", in1string),
-                 "\n  ",
-                 wmsg("Valid \"coord_system.name\" values are: ",
-                      paste0(coord_system.name, collapse=", ")))
-        }
-        coord_system <- S4Vectors:::extract_data_frame_rows(coord_system,
-                                                            keep_idx)
+        #keep_idx <- match(coord_system_names, coord_system.name)
+        #bad_idx <- which(is.na(keep_idx))
+        #if (length(bad_idx) != 0L) {
+        #    in1string <- paste0(coord_system_names[bad_idx], collapse=", ")
+        #    stop(wmsg("Invalid \"coord_system.name\" value(s): ", in1string),
+        #         "\n  ",
+        #         wmsg("Valid \"coord_system.name\" values are: ",
+        #              paste0(coord_system.name, collapse=", ")))
+        #}
+        keep_idx <- which(coord_system.name %in% coord_system_names)
+        coord_systems <- S4Vectors:::extract_data_frame_rows(coord_systems,
+                                                             keep_idx)
     }
 
     ## Fetch "seq_region" table and INNER JOIN with "coord_system" table.
-    seq_region <- fetch_table_from_Ensembl_ftp(core_url, "seq_region")
+    seq_regions <- fetch_table_from_Ensembl_ftp(core_url, "seq_region")
     Lcolname <- "coord_system_id"
-    Rcolname <- paste("coord_system", Lcolname, sep=".")
-    ans <- join_dfs(seq_region, coord_system, Lcolname, Rcolname)
+    Rcolname <- paste(Rtable, Lcolname, sep=".")
+    ans <- join_dfs(seq_regions, coord_systems, Lcolname, Rcolname)
 
     if (add.toplevel.col || add.non_ref.col) {
-        ## Get attrib_type_id for toplevel and non_ref sequences.
-        codes <- c("toplevel", "non_ref")
-        ids <- attrib_type_codes_to_ids_from_Ensembl_ftp(core_url, codes)
-        toplevel_attrib_type_id <- ids[[1L]]
-        non_ref_attrib_type_id <- ids[[2L]]
-
-        seq_region_attrib <- fetch_table_from_Ensembl_ftp(core_url,
-                                                          "seq_region_attrib")
-        attrib_type_id <- seq_region_attrib[ , "attrib_type_id"]
-        ans_ids <- ans[ , "seq_region_id"]
-
-        if (add.toplevel.col) {
-            idx <- which(attrib_type_id == toplevel_attrib_type_id)
-            ids <- seq_region_attrib[idx, "seq_region_id"]
-            ans$toplevel <- ans_ids %in% ids
-        }
-        if (add.non_ref.col) {
-            idx <- which(attrib_type_id == non_ref_attrib_type_id)
-            ids <- seq_region_attrib[idx, "seq_region_id"]
-            ans$non_ref <- ans_ids %in% ids
-        }
+        cols <- .fetch_attribs_from_Ensembl_ftp(core_url,
+                                                ans[ , "seq_region_id"],
+                                                toplevel=add.toplevel.col,
+                                                non_ref=add.non_ref.col)
+        ans <- cbind(ans, S4Vectors:::delete_NULLs(cols))
     }
+
+    if (add.INSDC.col || add.RefSeq.col) {
+        cols <- .fetch_synonyms_from_Ensembl_ftp(core_url,
+                                                ans[ , "seq_region_id"],
+                                                INSDC=add.INSDC.col,
+                                                RefSeq=add.RefSeq.col)
+        ans <- cbind(ans, S4Vectors:::delete_NULLs(cols))
+    }
+
     ans
 }
 
-if (FALSE) {
-
-library(GenomeInfoDb)
-get_url_to_Ensembl_ftp_mysql_core <-
-    GenomeInfoDb:::get_url_to_Ensembl_ftp_mysql_core
-fetch_seq_regions_from_Ensembl_ftp <-
-    GenomeInfoDb:::fetch_seq_regions_from_Ensembl_ftp
-
-dataset <- "hsapiens_gene_ensembl"
-core_url <- get_url_to_Ensembl_ftp_mysql_core(dataset)
-coord_system_names <- c("chromosome", "scaffold", "lrg")
-#coord_system_names <- c("chromosome", "scaffold")
-seq_regions <- fetch_seq_regions_from_Ensembl_ftp(core_url,
-                                                  coord_system_names,
-                                                  add.toplevel.col=TRUE,
-                                                  add.non_ref.col=TRUE)
-seq_regions[487:501, c(2,4,6:7, 10:11)]
-
-hsa_seqlevels <- readRDS("hsapiens_gene_ensembl_txdb_seqlevels.rds")
-
-#                 1 id: 131550
-# CHR_HSCHR1_1_CTG3 id: 131561  <- non_ref
-#     HSCHR1_1_CTG3 id: 131562
-
-m <- match(paste0("CHR_", seq_regions$name), seq_regions$name)
-drop_idx <- m[!is.na(m)]
-if (length(drop_idx) != 0L)
-    seq_regions <- seq_regions[-drop_idx, ]
-
-bb <- getChromInfoFromNCBI("GRCh38.p13")
-m <- match(seq_regions$length, bb$SequenceLength)
-table(is.na(m))
-wide <- cbind(seq_regions, bb[m, ])
-oo <- order(match(wide$SequenceName, bb$SequenceName))
-wide <- wide[oo, ]
-
-}

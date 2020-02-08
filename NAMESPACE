@@ -32,6 +32,9 @@ export(
     registered_UCSC_genomes,
     getChromInfoFromUCSC,
 
+    ## Ensembl-utils.R:
+    getChromInfoFromEnsembl,
+
     ## fetchExtendedChromInfoFromUCSC.R:
     fetchExtendedChromInfoFromUCSC,
 

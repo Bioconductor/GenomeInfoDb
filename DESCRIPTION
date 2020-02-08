@@ -28,6 +28,7 @@ Collate: utils.R
 	Ensembl-utils.R
 	getChromInfoFromNCBI.R
 	getChromInfoFromUCSC.R
+	getChromInfoFromEnsembl.R
 	loadTaxonomyDb.R
 	fetchExtendedChromInfoFromUCSC.R
 	seqinfo.R
