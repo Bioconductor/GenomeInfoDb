@@ -158,7 +158,7 @@ tmp1 <- GRCh38.p12[idx, ]
 rownames(tmp1) <- NULL
 tmp2 <- GRCh38.p12[-idx, ]
 stopifnot(
-  identical(tmp1[ , -(4:6)], GRCh38[ , -(4:6)]),
+  identical(tmp1[ , -(5:7)], GRCh38[ , -(5:7)]),
   identical(tmp2, GRCh38.p12[GRCh38.p12$AssemblyUnit == "PATCHES", ])
 )
 }
