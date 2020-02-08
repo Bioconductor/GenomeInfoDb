@@ -77,27 +77,66 @@ join_dfs <- function(Ldf, Rdf, Lcolname, Rcolname,
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### solid_match()
+### solid_match() and solid_match2()
 ###
+
+.one_to_many_msg <- function(culprits, from_what, to_what)
+{
+    culprits_names <- names(culprits)
+    if (!is.null(culprits_names))
+        culprits <- culprits_names
+    in1string <- paste0(unique(culprits), collapse=", ")
+    c(from_what, "(s) matched to more than 1 ", to_what, ": ", in1string)
+}
+
 ### Like base::match() but raises an error if some elements in 'x' can be
 ### matched to more than one element in 'table' (one-to-many mapping).
-### IMPORTANT NOTE: The fast implementation below assumes that 'x' contains
-### no duplicates. This means that we cannot use it in join_dfs() above!
-
-solid_match <- function(x, table)
+### IMPORTANT NOTE: The fast implementation below doesn't work if 'x'
+### contains duplicates so we check this. This means that we cannot use
+### it in join_dfs() above!
+solid_match <- function(x, table,
+                        x_what="'x' element", table_what="'table' element")
 {
-    ## Unlike base::match(), where 'x' can be a NULL or a list, we only
-    ## support atomic vectors.
-    stopifnot(is.vector(x), is.atomic(x), !anyDuplicated(x))
+    ## We only support atomic vectors (this is unlike base::match()
+    ## where 'x' and 'table' each can be a NULL or a list).
+    stopifnot(is.vector(x), is.atomic(x), !anyDuplicated(x),
+              is.vector(table), is.atomic(table))
     revm <- match(table, x)  # reverse match
-    dup_idx <- which(duplicated(revm, incomparables=NA_integer_))
-    if (length(dup_idx) != 0L) {
-        in1string <- paste0(unique(table[dup_idx]), collapse=", ")
-        stop(wmsg("table has more than 1 entry for: ", in1string))
+    ambig_idx <- which(duplicated(revm, incomparables=NA_integer_))
+    if (length(ambig_idx) != 0L) {
+        uidx <- unique(revm[ambig_idx])
+        stop(wmsg(.one_to_many_msg(x[uidx], x_what, table_what)))
     }
     ans <- rep.int(NA_integer_, length(x))
     ok <- !is.na(revm)
     ans[revm[ok]] <- which(ok)
+    ans
+}
+
+### Like base::match() but raises an error if the direct or reverse mapping
+### is one-to-many.
+solid_match2 <- function(x, table,
+                         x_what="'x' element", table_what="'table' element")
+{
+    ## We only support atomic vectors (this is unlike base::match()
+    ## where 'x' and 'table' each can be a NULL or a list).
+    stopifnot(is.vector(x), is.atomic(x),
+              is.vector(table), is.atomic(table))
+    hits <- findMatches(x, table)
+    q_hits <- queryHits(hits)
+    s_hits <- subjectHits(hits)
+    q_ambig_idx <- which(duplicated(q_hits))
+    if (length(q_ambig_idx) != 0L) {
+        uidx <- unique(q_hits[q_ambig_idx])
+        stop(wmsg(.one_to_many_msg(x[uidx], x_what, table_what)))
+    }
+    s_ambig_idx <- which(duplicated(s_hits))
+    if (length(s_ambig_idx) != 0L) {
+        uidx <- unique(s_hits[s_ambig_idx])
+        stop(wmsg(.one_to_many_msg(table[uidx], table_what, x_what)))
+    }
+    ans <- rep.int(NA_integer_, length(x))
+    ans[q_hits] <- s_hits
     ans
 }
 

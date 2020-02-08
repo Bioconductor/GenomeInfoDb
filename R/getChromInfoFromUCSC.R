@@ -8,37 +8,14 @@
 ### .add_NCBI_columns()
 ###
 
-.safe_match <- function(query, NCBI_accns)
-{
-    hits <- findMatches(query, NCBI_accns)
-    q_hits <- queryHits(hits)
-    s_hits <- subjectHits(hits)
-    ambig_q_idx <- which(duplicated(q_hits))
-    if (length(ambig_q_idx) != 0L) {
-        ambig_idx <- unique(q_hits[ambig_q_idx])
-        in1string <- paste0(names(query)[ambig_idx], collapse=", ")
-        stop(wmsg("UCSC seqlevel(s) matching more than one accession ",
-                  "number: ", in1string))
-    }
-    ambig_s_idx <- which(duplicated(s_hits))
-    if (length(ambig_s_idx) != 0L) {
-        ambig_idx <- unique(s_hits[ambig_s_idx])
-        in1string <- paste0(NCBI_accns[ambig_idx], collapse=", ")
-        stop(wmsg("accession number(s) with more than one UCSC seqlevel ",
-                  "match: ", in1string))
-    }
-    ans <- rep.int(NA_integer_, length(query))
-    ans[q_hits] <- s_hits
-    ans
-}
-
 .match_UCSC_seqlevels_to_NCBI_accns <- function(UCSC_seqlevels, NCBI_accns,
                                                 accn_suffix="")
 {
     query <- chartr("-", ".", UCSC_seqlevels)
     query <- paste0(query, accn_suffix)
     names(query) <- UCSC_seqlevels
-    .safe_match(tolower(query), tolower(NCBI_accns))
+    solid_match2(tolower(query), tolower(NCBI_accns),
+                 x_what="UCSC seqlevel", table_what="accession number")
 }
 
 .match_trimmed_UCSC_random_seqlevels_to_NCBI_accns <-
@@ -47,7 +24,8 @@
     query <- sub("^[^_]*_", "", sub("_random$", "", UCSC_seqlevels))
     query <- chartr("v", ".", query)
     names(query) <- UCSC_seqlevels
-    .safe_match(tolower(query), tolower(NCBI_accns))
+    solid_match2(tolower(query), tolower(NCBI_accns),
+                 x_what="UCSC seqlevel", table_what="accession number")
 }
 
 .match_UCSC_seqlevels_part2_to_NCBI_accns <-
@@ -67,7 +45,9 @@
         query[unversioned_idx] <- paste0(query[unversioned_idx], ".1")
     query <- paste0(accn_prefix, query)
     names(query) <- UCSC_seqlevels[idx2]
-    ans[idx2] <- .safe_match(tolower(query), tolower(NCBI_accns))
+    ans[idx2] <- solid_match2(tolower(query), tolower(NCBI_accns),
+                              x_what="UCSC seqlevel",
+                              table_what="accession number")
     ans
 }
 
