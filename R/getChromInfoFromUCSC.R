@@ -5,7 +5,7 @@
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### .add_NCBI_columns()
+### .add_NCBI_cols_to_UCSC_chrom_info()
 ###
 
 .match_UCSC_seqlevels_to_NCBI_accns <- function(UCSC_seqlevels, NCBI_accns,
@@ -51,114 +51,134 @@
     ans
 }
 
-### 'NCBI_seqlevels', 'NCBI_gbkaccns', and 'NCBI_refseqaccns' must be
-### parallel vectors.
+### The workhorse behind .add_NCBI_cols_to_UCSC_chrom_info().
+### - All input vectors must be character vectors.
+### - All NCBI input vectors must have the same length.
+### - Vectors 'UCSC_seqlevels' and 'NCBI_seqlevels' must be "primary
+###   keys" i.e. must not contain NAs, empty strings, or duplicates.
+### No assumptions are made about the other input vectors.
+### Returns an integer vector parallel to 'UCSC_seqlevels'.
 .map_UCSC_seqlevels_to_NCBI_seqlevels <- function(UCSC_seqlevels,
                                                   NCBI_seqlevels,
-                                                  NCBI_ucsc_names,
-                                                  NCBI_gbkaccns,
-                                                  NCBI_refseqaccns,
+                                                  NCBI_UCSCStyleName,
+                                                  NCBI_GenBankAccn,
+                                                  NCBI_RefSeqAccn,
                                                   special_mappings=NULL)
 {
-    ans <- rep.int(NA_integer_, length(UCSC_seqlevels))
+    stopifnot(is.character(UCSC_seqlevels),
+              is_primary_key(UCSC_seqlevels),
+              is.character(NCBI_seqlevels),
+              is_primary_key(NCBI_seqlevels),
+              is.character(NCBI_UCSCStyleName),
+              is.character(NCBI_GenBankAccn),
+              is.character(NCBI_RefSeqAccn))
+
+    L2R <- rep.int(NA_integer_, length(UCSC_seqlevels))
+    unmapped_idx <- seq_along(L2R)
 
     ## 1. Handle special mappings.
     if (!is.null(special_mappings)) {
         m1 <- match(names(special_mappings), UCSC_seqlevels)
-        if (any(is.na(m1)))
-            stop(wmsg("'special_mappings' contains sequence names ",
-                      "not in 'UCSC_seqlevels'"))
+        if (anyNA(m1))
+            stop(wmsg("'names(special_mappings)' contains sequence ",
+                      "names not found in the UCSC genome assembly"))
         m2 <- match(special_mappings, NCBI_seqlevels)
-        if (any(is.na(m2)))
-            stop(wmsg("'special_mappings' has values not in 'NCBI_seqlevels'"))
-        ans[m1] <- m2
+        if (anyNA(m2))
+            stop(wmsg("'special_mappings' contains sequence ",
+                      "names not found in the NCBI assembly"))
+        L2R[m1] <- m2
+
+        unmapped_idx <- which(is.na(L2R))
+        if (length(unmapped_idx) == 0L)
+            return(L2R)
     }
-    unmapped_idx <- which(is.na(ans))
-    if (length(unmapped_idx) == 0L)
-        return(ans)
 
-    ## 2. We assign based on NCBI_ucsc_names.
-    m <- match(UCSC_seqlevels[unmapped_idx], NCBI_ucsc_names)
-    ok_idx <- which(!is.na(m))
-    ans[unmapped_idx[ok_idx]] <- m[ok_idx]
-    unmapped_idx <- which(is.na(ans))
-    if (length(unmapped_idx) == 0L)
-        return(ans)
+    ## 2. Match 'UCSC_seqlevels' to 'NCBI_UCSCStyleName'.
+    m <- match(UCSC_seqlevels[unmapped_idx], NCBI_UCSCStyleName)
+    L2R[unmapped_idx] <- m
 
-    ## 3. We assign based on exact matching (case insensitive) of the
-    ##    seqlevels.
+    unmapped_idx <- which(is.na(L2R))
+    if (length(unmapped_idx) == 0L)
+        return(L2R)
+
+    ## 3. We assign based on exact matching (case insensitive) of
+    ##    the seqlevels.
     ucsc_seqlevels <- tolower(UCSC_seqlevels)
     ncbi_seqlevels <- tolower(NCBI_seqlevels)
     m <- match(ucsc_seqlevels[unmapped_idx], ncbi_seqlevels)
-    ok_idx <- which(!is.na(m))
-    ans[unmapped_idx[ok_idx]] <- m[ok_idx]
-    unmapped_idx <- which(is.na(ans))
-    if (length(unmapped_idx) == 0L)
-        return(ans)
+    L2R[unmapped_idx] <- m
 
-    ## 4. We assign based on exact matching (case insensitive) of the
-    ##    seqlevels after removal of the "chr" prefix.
+    unmapped_idx <- which(is.na(L2R))
+    if (length(unmapped_idx) == 0L)
+        return(L2R)
+
+    ## 4. We assign based on exact matching (case insensitive) of
+    ##    the seqlevels after removal of the "chr" prefix.
     nochr_ucsc_seqlevels <- sub("^chr", "", ucsc_seqlevels[unmapped_idx])
     nochr_ncbi_seqlevels <- sub("^chr", "", ncbi_seqlevels)
     m <- match(nochr_ucsc_seqlevels, nochr_ncbi_seqlevels)
-    ok_idx <- which(!is.na(m))
-    ans[unmapped_idx[ok_idx]] <- m[ok_idx]
-    unmapped_idx <- which(is.na(ans))
+    L2R[unmapped_idx] <- m
+
+    unmapped_idx <- which(is.na(L2R))
     if (length(unmapped_idx) == 0L)
-        return(ans)
+        return(L2R)
 
     ## 5. We assign based on GenBank accession number found in UCSC seqlevels.
     m <- .match_UCSC_seqlevels_to_NCBI_accns(UCSC_seqlevels[unmapped_idx],
-                                             NCBI_gbkaccns)
-    ok_idx <- which(!is.na(m))
-    ans[unmapped_idx[ok_idx]] <- m[ok_idx]
-    unmapped_idx <- which(is.na(ans))
+                                             NCBI_GenBankAccn)
+    L2R[unmapped_idx] <- m
+
+    unmapped_idx <- which(is.na(L2R))
     if (length(unmapped_idx) == 0L)
-        return(ans)
+        return(L2R)
 
     ## 6. We assign based on GenBank accession number found in UCSC seqlevels
     ##    after adding .1 suffix to it.
     m <- .match_UCSC_seqlevels_to_NCBI_accns(UCSC_seqlevels[unmapped_idx],
-                                             NCBI_gbkaccns, accn_suffix=".1")
-    ok_idx <- which(!is.na(m))
-    ans[unmapped_idx[ok_idx]] <- m[ok_idx]
-    unmapped_idx <- which(is.na(ans))
+                                             NCBI_GenBankAccn,
+                                             accn_suffix=".1")
+    L2R[unmapped_idx] <- m
+
+    unmapped_idx <- which(is.na(L2R))
     if (length(unmapped_idx) == 0L)
-        return(ans)
+        return(L2R)
 
     ## 7. We assign based on RefSeq accession number found in UCSC seqlevels
     ##    after trimming the first part (e.g. "chr1_") and "_random" suffix
     ##    from the seqlevels.
     m <- .match_trimmed_UCSC_random_seqlevels_to_NCBI_accns(
                                                  UCSC_seqlevels[unmapped_idx],
-                                                 NCBI_refseqaccns)
-    ok_idx <- which(!is.na(m))
-    ans[unmapped_idx[ok_idx]] <- m[ok_idx]
-    unmapped_idx <- which(is.na(ans))
+                                                 NCBI_RefSeqAccn)
+    L2R[unmapped_idx] <- m
+
+    unmapped_idx <- which(is.na(L2R))
     if (length(unmapped_idx) == 0L)
-        return(ans)
+        return(L2R)
 
     ## 8. We assign based on GenBank accession number found in part 2 of
     ##    UCSC seqlevels.
     m <- .match_UCSC_seqlevels_part2_to_NCBI_accns(
                                         UCSC_seqlevels[unmapped_idx],
-                                        NCBI_gbkaccns)
-    ok_idx <- which(!is.na(m))
-    ans[unmapped_idx[ok_idx]] <- m[ok_idx]
-    unmapped_idx <- which(is.na(ans))
+                                        NCBI_GenBankAccn)
+    L2R[unmapped_idx] <- m
+
+    unmapped_idx <- which(is.na(L2R))
     if (length(unmapped_idx) == 0L)
-        return(ans)
+        return(L2R)
 
     ## 9. We assign based on GenBank accession number found in part 2 of
     ##    UCSC seqlevels after adding AAD prefix to it.
-    ans[unmapped_idx] <- .match_UCSC_seqlevels_part2_to_NCBI_accns(
-                                    UCSC_seqlevels[unmapped_idx],
-                                    NCBI_gbkaccns,
-                                    accn_prefix="AAD")
-    ans
+    m <- .match_UCSC_seqlevels_part2_to_NCBI_accns(
+                                        UCSC_seqlevels[unmapped_idx],
+                                        NCBI_GenBankAccn,
+                                        accn_prefix="AAD")
+    L2R[unmapped_idx] <- m
+
+    L2R
 }
 
-.add_NCBI_columns <- function(UCSC_chrom_info, assembly_accession,
+.add_NCBI_cols_to_UCSC_chrom_info <- function(
+    UCSC_chrom_info, assembly_accession,
     AssemblyUnits=NULL, special_mappings=NULL, unmapped_seqs=NULL,
     drop_unmapped=FALSE)
 {
@@ -169,31 +189,34 @@
                                       lengths(unmapped_seqs))
         unmapped_seqs <- unlist(unmapped_seqs, use.names=FALSE)
         unmapped_idx <- match(unmapped_seqs, UCSC_seqlevels)
-        stopifnot(!any(is.na(unmapped_idx)))
+        stopifnot(!anyNA(unmapped_idx))
     }
 
     NCBI_chrom_info <- getChromInfoFromNCBI(assembly_accession,
                                             assembly.units=AssemblyUnits)
 
-    NCBI_ucsc_names <- NCBI_chrom_info[ , "UCSCStyleName"]
-    NCBI_seqlevels <- NCBI_chrom_info[ , "SequenceName"]
-    NCBI_gbkaccns <- NCBI_chrom_info[ , "GenBankAccn"]
-    NCBI_refseqaccns <- NCBI_chrom_info[ , "RefSeqAccn"]
-    oo <- .map_UCSC_seqlevels_to_NCBI_seqlevels(UCSC_seqlevels, NCBI_seqlevels,
-                                      NCBI_ucsc_names,
-                                      NCBI_gbkaccns, NCBI_refseqaccns,
-                                      special_mappings=special_mappings)
-    oo_is_NA <- is.na(oo)
-    mapped_idx <- which(!oo_is_NA)
+    NCBI_seqlevels     <- NCBI_chrom_info[ , "SequenceName"]
+    NCBI_UCSCStyleName <- NCBI_chrom_info[ , "UCSCStyleName"]
+    NCBI_GenBankAccn   <- NCBI_chrom_info[ , "GenBankAccn"]
+    NCBI_RefSeqAccn    <- NCBI_chrom_info[ , "RefSeqAccn"]
+    L2R <- .map_UCSC_seqlevels_to_NCBI_seqlevels(
+                                       UCSC_seqlevels,
+                                       NCBI_seqlevels,
+                                       NCBI_UCSCStyleName,
+                                       NCBI_GenBankAccn,
+                                       NCBI_RefSeqAccn,
+                                       special_mappings=special_mappings)
+    L2R_is_NA <- is.na(L2R)
+    mapped_idx <- which(!L2R_is_NA)
 
     if (length(unmapped_seqs) != 0L)
-        stopifnot(all(oo_is_NA[unmapped_idx]))
+        stopifnot(all(L2R_is_NA[unmapped_idx]))
 
     if (isTRUE(drop_unmapped)) {
         UCSC_chrom_info <-
             S4Vectors:::extract_data_frame_rows(UCSC_chrom_info, mapped_idx)
-        oo <- oo[mapped_idx]
-        mapped_idx <- seq_along(oo)
+        L2R <- L2R[mapped_idx]
+        mapped_idx <- seq_along(L2R)
         ## Before we drop the unmapped UCSC seqlevels, we want to make sure
         ## that all the NCBI seqlevels are reverse mapped. For example, in
         ## the case of hg38, the chromInfo table at UCSC contains sequences
@@ -201,7 +224,7 @@
         ## sure that after we drop these "foreign sequences", we are left
         ## with a one-to-one mapping between UCSC seqlevels and the 455 NCBI
         ## seqlevels that are in the assembly report for GRCh38.
-        idx <- setdiff(seq_along(NCBI_seqlevels), oo)
+        idx <- setdiff(seq_along(NCBI_seqlevels), L2R)
         if (length(idx) != 0L) {
             in1string <- paste0(NCBI_seqlevels[idx], collapse=", ")
             stop(wmsg("no UCSC seqlevel could be mapped to the following ",
@@ -209,7 +232,7 @@
         }
     } else {
         unexpectedly_unmapped_idx <-
-            which(oo_is_NA & !(UCSC_seqlevels %in% unmapped_seqs))
+            which(L2R_is_NA & !(UCSC_seqlevels %in% unmapped_seqs))
         if (length(unexpectedly_unmapped_idx) != 0L) {
             in1string <- paste0(UCSC_seqlevels[unexpectedly_unmapped_idx],
                                 collapse=", ")
@@ -218,7 +241,7 @@
         }
     }
 
-    NCBI_chrom_info <- S4Vectors:::extract_data_frame_rows(NCBI_chrom_info, oo)
+    NCBI_chrom_info <- S4Vectors:::extract_data_frame_rows(NCBI_chrom_info, L2R)
 
     ## NCBI columns "circular", "SequenceLength", and "UCSCStyleName"
     ## are expected to be redundant with UCSC columns "circular", "size",
@@ -236,10 +259,8 @@
     stopifnot(identical(UCSC_chrom_info[compare_idx, "chrom"],
                         NCBI_chrom_info[compare_idx, "UCSCStyleName"]))
 
-    keep_NCBI_colnames <- c("SequenceName", "SequenceRole",
-                            "GenBankAccn", "Relationship", "RefSeqAccn",
-                            "AssemblyUnit")
-    ans <- cbind(UCSC_chrom_info, NCBI_chrom_info[ , keep_NCBI_colnames])
+    drop_colnames <- c("SequenceLength", "UCSCStyleName", "circular")
+    ans <- cbind(UCSC_chrom_info, drop_cols(NCBI_chrom_info, drop_colnames))
 
     if (length(unmapped_seqs) != 0L)
         ans[unmapped_idx, "SequenceRole"] <- unmapped_seqs_role
@@ -364,8 +385,8 @@
             ucsc2ensembl <- .try_to_fetch_ucsc2ensembl_from_chromAlias(genome,
                                       goldenPath.url=goldenPath.url)
             if (is.null(ucsc2ensembl)) {
-                warning(wmsg("No Ensembl sequence names could be found ",
-                             "for UCSC genome ", genome))
+                warning(wmsg("No Ensembl sequence names could be ",
+                             "found for UCSC genome ", genome))
                 return(rep.int(NA_character_, length(UCSC_chroms)))
             }
         }
@@ -434,9 +455,7 @@
             "'ASSEMBLED_MOLECULES' must be defined")
     stop_if(!is.character(ASSEMBLED_MOLECULES),
             "'ASSEMBLED_MOLECULES' must be a character vector")
-    stop_if(anyNA(ASSEMBLED_MOLECULES) ||
-            !all(nzchar(ASSEMBLED_MOLECULES)) ||
-            anyDuplicated(ASSEMBLED_MOLECULES),
+    stop_if(!is_primary_key(ASSEMBLED_MOLECULES),
             "'ASSEMBLED_MOLECULES' must ",
             "not contain NAs, empty strings, or duplicates")
 
@@ -463,9 +482,7 @@
         linker_fields <- names(NCBI_LINKER)
         stop_if(!is.character(linker_fields),
                 "when defined, 'NCBI_LINKER' must be a named list")
-        stop_if(anyNA(linker_fields) ||
-                !all(nzchar(linker_fields)) ||
-                anyDuplicated(linker_fields),
+        stop_if(!is_primary_key(linker_fields),
                 "the names on 'NCBI_LINKER' must ",
                 "not contain NAs, empty strings, or duplicates")
         stop_if(!("assembly_accession" %in% linker_fields),
@@ -670,9 +687,7 @@ registered_UCSC_genomes <- function()
                                 c(chrom="character", size="integer")),
                       identical(head(ans[ , "chrom"], n=nb_assembled),
                                 ASSEMBLED_MOLECULES),
-                      !anyNA(ans[ , "chrom"]),
-                      all(nzchar(ans[ , "chrom"])),
-                      !anyDuplicated(ans[ , "chrom"]))
+                      is_primary_key(ans[ , "chrom"]))
         }
 
         ## Add columns "assembled" and "circular".
@@ -688,7 +703,8 @@ registered_UCSC_genomes <- function()
     ## Add NCBI cols.
     NCBI_linker <- .get_NCBI_linker(add.NCBI.cols, vars$NCBI_LINKER, GENOME)
     if (!is.null(NCBI_linker))
-        ans <- do.call(.add_NCBI_columns, c(list(ans), NCBI_linker))
+        ans <- do.call(.add_NCBI_cols_to_UCSC_chrom_info,
+                       c(list(ans), NCBI_linker))
 
     ## Add Ensembl col.
     Ensemb_linker <- .get_Ensembl_linker(add.ensembl.col, vars$ENSEMBL_LINKER,

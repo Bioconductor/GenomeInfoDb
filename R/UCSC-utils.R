@@ -23,16 +23,14 @@ fetch_chrom_sizes_from_UCSC <- function(genome,
                                  goldenPath.url=goldenPath.url)
     ## Should never happen!
     ans_chroms <- ans[ , "chrom"]
-    if (anyNA(ans_chroms) ||
-        !all(nzchar(ans_chroms)) ||
-        anyDuplicated(ans_chroms))
-        stop(wmsg("invalid data in 'chromInfo' table for UCSC genome ",
-                  genome, ": 'chrom' column contains NAs, empty strings, ",
+    if (!is_primary_key(ans_chroms))
+        stop(wmsg("invalid data in \"chromInfo\" table for UCSC genome ",
+                  genome, ": \"chrom\" column contains NAs, empty strings, ",
                   "or duplicates"))
     ans_sizes <- ans[ , "size"]
     if (anyNA(ans_sizes) || any(ans_sizes < 0L))
-        stop(wmsg("invalid data in 'chromInfo' table for UCSC genome ",
-                  genome, ": 'size' column contains NAs or negative values"))
+        stop(wmsg("invalid data in \"chromInfo\" table for UCSC genome ",
+                  genome, ": \"size\" column contains NAs or negative values"))
     ans
 }
 

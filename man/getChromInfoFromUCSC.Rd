@@ -114,11 +114,12 @@ registered_UCSC_genomes()
     \item \code{assembled}: logical.
     \item \code{circular}: logical.
   }
-  If \code{add.NCBI.cols} is \code{TRUE}, then the 6 following
+  If \code{add.NCBI.cols} is \code{TRUE}, then the 7 following
   columns are added to the result:
   \itemize{
     \item \code{SequenceName}: character.
     \item \code{SequenceRole}: factor.
+    \item \code{AssignedMolecule}: factor.
     \item \code{GenBankAccn}: character.
     \item \code{Relationship}: factor.
     \item \code{RefSeqAccn}: character.

@@ -411,7 +411,8 @@ fetch_seq_regions_from_Ensembl_ftp <- function(core_url,
                                                 ans[ , "seq_region_id"],
                                                 toplevel=add.toplevel.col,
                                                 non_ref=add.non_ref.col)
-        ans <- cbind(ans, S4Vectors:::delete_NULLs(cols))
+        ans <- cbind(ans, S4Vectors:::delete_NULLs(cols),
+                     stringsAsFactors=FALSE)
     }
 
     if (add.INSDC.col || add.RefSeq.col) {
@@ -419,7 +420,8 @@ fetch_seq_regions_from_Ensembl_ftp <- function(core_url,
                                                 ans[ , "seq_region_id"],
                                                 INSDC=add.INSDC.col,
                                                 RefSeq=add.RefSeq.col)
-        ans <- cbind(ans, S4Vectors:::delete_NULLs(cols))
+        ans <- cbind(ans, S4Vectors:::delete_NULLs(cols),
+                     stringsAsFactors=FALSE)
     }
 
     ans

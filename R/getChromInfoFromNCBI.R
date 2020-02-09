@@ -57,9 +57,7 @@
         assembly_fields <- names(assembly)
         stop_if(!is.character(assembly_fields),
                 "'ASSEMBLIES[[", i, "]]' must be a named list")
-        stop_if(anyNA(assembly_fields) ||
-                !all(nzchar(assembly_fields)) ||
-                anyDuplicated(assembly_fields),
+        stop_if(!is_primary_key(assembly_fields),
                 "the names on 'ASSEMBLIES[[", i, "]]' must ",
                 "not contain NAs, empty strings, or duplicates")
         stop_if(!all(required_fields %in% names(assembly)),
@@ -91,9 +89,7 @@
         stop_if(!is.character(circ_seqs),
                 "\"circ_seqs\" field in 'ASSEMBLIES[[", i, "]]' must ",
                 "be a character vector")
-        stop_if(anyNA(circ_seqs) ||
-                !all(nzchar(circ_seqs)) ||
-                anyDuplicated(circ_seqs),
+        stop_if(!is_primary_key(circ_seqs),
                 "\"circ_seqs\" field in 'ASSEMBLIES[[", i, "]]' must ",
                 "not contain NAs, empty strings, or duplicates")
 
@@ -204,15 +200,13 @@ lookup_NCBI_accession2assembly <- function(accession)
 ### getChromInfoFromNCBI()
 ###
 
-.format_assembly_report <- function(assembly_report, circ_seqs=NULL)
+.format_NCBI_chrom_info <- function(assembly_report, circ_seqs=NULL)
 {
     ans <- drop_cols(assembly_report, "AssignedMoleculeLocationOrType")
 
     ## Column "SequenceName".
     sequence_name <- as.character(ans[ , "SequenceName"])
-    stopifnot(!anyNA(sequence_name),
-              all(nzchar(sequence_name)),
-              !anyDuplicated(sequence_name))
+    stopifnot(is_primary_key(sequence_name))
     ans[ , "SequenceName"] <- sequence_name
 
     ## Column "SequenceRole".
@@ -273,7 +267,7 @@ lookup_NCBI_accession2assembly <- function(accession)
     ans <- .NCBI_cached_chrom_info[[accession]]
     if (is.null(ans) || recache) {
         assembly_report <- fetch_assembly_report(accession)
-        ans <- .format_assembly_report(assembly_report, circ_seqs=circ_seqs)
+        ans <- .format_NCBI_chrom_info(assembly_report, circ_seqs=circ_seqs)
         .NCBI_cached_chrom_info[[accession]] <- ans
     }
     if (assembled.molecules.only) {
@@ -318,11 +312,7 @@ getChromInfoFromNCBI <- function(genome,
     if (!is.null(assembly.units)) {
         if (!is.character(assembly.units))
             stop(wmsg("'assembly.units' must be NULL or a character vector"))
-        if (anyNA(assembly.units) ||
-            !all(nzchar(assembly.units)) ||
-            anyDuplicated(assembly.units))
-            stop(wmsg("'assembly.units' cannot contain NAs, empty strings, ",
-                      "or duplicates"))
+        stop_if_not_primary_key(assembly.units, "'assembly.units'")
     }
     if (!isTRUEorFALSE(recache))
         stop(wmsg("'recache' must be TRUE or FALSE"))
