@@ -8,6 +8,36 @@
 ### .add_NCBI_cols_to_Ensembl_chrom_info()
 ###
 
+.match_Ensembl_synonmys_to_NCBI_col <- function(Ensembl_seqlevels,
+                                                Ensembl_synonyms,
+                                                NCBI_accns,
+                                                what)
+{
+    stopifnot(is(Ensembl_synonyms, "CompressedCharacterList"))
+    Ensembl_unlisted_synonyms <- unlist(Ensembl_synonyms, use.names=FALSE)
+
+    ## solid_match() will fail with a not-so-useful error message
+    ## if 'Ensembl_unlisted_synonyms' contains duplicates. We check
+    ## this early so we can display a slightly better error message.
+    if (anyDuplicated(Ensembl_unlisted_synonyms))
+        stop(wmsg("'unlist(Ensembl_synonyms)' contains duplicates"))
+
+    m <- solid_match(unname(Ensembl_unlisted_synonyms), NCBI_accns,
+                     x_what="Ensembl synonym",
+                     table_what=what)
+
+    m <- relist(m, Ensembl_synonyms)
+    m <- m[!is.na(m)]
+    m_lens <- lengths(m)
+    ambig_idx <- which(m_lens > 1L)
+    if (length(ambig_idx) != 0L) {
+        in1string <- paste0(Ensembl_seqlevels[ambig_idx], collapse = ", ")
+        stop(wmsg("Ensembl seqlevel(s) matched to more ",
+                  "than 1 ", what, ": ", in1string))
+    }
+    as.integer(m)
+}
+
 .mk_progress_str <- function(L2R, NCBI_seqlevels)
 {
     N <- length(NCBI_seqlevels)
@@ -21,16 +51,17 @@
 }
 
 ### The workhorse behind .add_NCBI_cols_to_Ensembl_chrom_info().
-### - All input vectors must be character vectors.
-### - All Ensembl input vectors must have the same length.
+### - All input vectors (except 'Ensembl_synonyms') must be character vectors.
+### - 'Ensembl_synonyms' must be a list-like object parallel to
+###   'Ensembl_seqlevels' where each list element is a character vector
+###   containing all the synonyms for the corresponding Ensembl seqlevel.
 ### - All NCBI input vectors must have the same length.
 ### - Vectors 'Ensembl_seqlevels' and 'NCBI_seqlevels' must be "primary
 ###   keys" i.e. must not contain NAs, empty strings, or duplicates.
-### No assumptions are made about the other input vectors.
+###   (No such assumption is made about the other input vectors.)
 ### Returns an integer vector parallel to 'Ensembl_seqlevels'.
 .map_Ensembl_seqlevels_to_NCBI_seqlevels <- function(Ensembl_seqlevels,
-                                                     Ensembl_INSDC,
-                                                     Ensembl_RefSeq,
+                                                     Ensembl_synonyms,
                                                      NCBI_seqlevels,
                                                      NCBI_GenBankAccn,
                                                      NCBI_RefSeqAccn,
@@ -39,12 +70,14 @@
 {
     stopifnot(is.character(Ensembl_seqlevels),
               is_primary_key(Ensembl_seqlevels),
-              is.character(Ensembl_INSDC),
-              is.character(Ensembl_RefSeq),
+              is(Ensembl_synonyms, "list_OR_List"),
               is.character(NCBI_seqlevels),
               is_primary_key(NCBI_seqlevels),
               is.character(NCBI_GenBankAccn),
               is.character(NCBI_RefSeqAccn))
+    if (!is(Ensembl_synonyms, "CompressedCharacterList"))
+        Ensembl_synonyms <- as(Ensembl_synonyms, "CompressedCharacterList")
+    stopifnot(length(Ensembl_synonyms) == length(Ensembl_seqlevels))
 
     prefix <- "Mapping Ensembl to NCBI: "
     L2R <- rep.int(NA_integer_, length(Ensembl_seqlevels))
@@ -71,21 +104,12 @@
             return(L2R)
     }
 
-    ## From now on matching will be case insensitive.
-    lower_with_names <- function(x) setNames(tolower(x), x)
-    ens_seqlevels <- lower_with_names(Ensembl_seqlevels)
-    ens_insdc <- lower_with_names(Ensembl_INSDC)
-    ens_refseq <- lower_with_names(Ensembl_RefSeq)
-    ncbi_seqlevels <- lower_with_names(NCBI_seqlevels)
-    ncbi_genbankaccn <- lower_with_names(NCBI_GenBankAccn)
-    ncbi_refseqaccn <- lower_with_names(NCBI_RefSeqAccn)
-
     ## 2. Assign based on exact matching (case insensitive) of
     ##    the seqlevels.
     if (verbose)
-        message(prefix, "Ensembl seqlevels -> NCBI seqlevels ... ",
+        message(prefix, "Ensembl_seqlevels -> NCBI_seqlevels ... ",
                 appendLF=FALSE)
-    m <- solid_match2(ens_seqlevels, ncbi_seqlevels,
+    m <- solid_match2(Ensembl_seqlevels, NCBI_seqlevels,
                       x_what="Ensembl seqlevel",
                       table_what="NCBI seqlevel")
     L2R[unmapped_idx] <- m[unmapped_idx]
@@ -98,9 +122,9 @@
 
     ## 3. Match 'Ensembl_seqlevels' to 'NCBI_GenBankAccn'.
     if (verbose)
-        message(prefix, "Ensembl seqlevels -> NCBI GenBankAccn ... ",
+        message(prefix, "Ensembl_seqlevels -> NCBI_GenBankAccn ... ",
                 appendLF=FALSE)
-    m <- solid_match2(ens_seqlevels, ncbi_genbankaccn,
+    m <- solid_match2(Ensembl_seqlevels, NCBI_GenBankAccn,
                       x_what="Ensembl seqlevel",
                       table_what="NCBI GenBankAccn value")
     L2R[unmapped_idx] <- m[unmapped_idx]
@@ -111,13 +135,13 @@
     if (length(unmapped_idx) == 0L)
         return(L2R)
 
-    ## 4. Match 'Ensembl_INSDC' to 'NCBI_GenBankAccn'.
+    ## 4. Match 'Ensembl_seqlevels' to 'NCBI_RefSeqAccn'.
     if (verbose)
-        message(prefix, "Ensembl_INSDC -> NCBI GenBankAccn ... ",
+        message(prefix, "Ensembl_seqlevels -> NCBI_RefSeqAccn ... ",
                 appendLF=FALSE)
-    m <- solid_match2(ens_insdc, ncbi_genbankaccn,
-                      x_what="INSDC synonym",
-                      table_what="NCBI GenBankAccn value")
+    m <- solid_match2(Ensembl_seqlevels, NCBI_RefSeqAccn,
+                      x_what="Ensembl seqlevel",
+                      table_what="NCBI RefSeqAccn value")
     L2R[unmapped_idx] <- m[unmapped_idx]
     if (verbose)
         message("OK (", .mk_progress_str(L2R, NCBI_seqlevels), ")")
@@ -126,13 +150,46 @@
     if (length(unmapped_idx) == 0L)
         return(L2R)
 
-    ## 5. Match 'Ensembl_RefSeq' to 'NCBI_RefSeqAccn'.
+    ## 5. Match 'Ensembl_synonyms' to 'NCBI_seqlevels'.
     if (verbose)
-        message(prefix, "Ensembl_RefSeq -> NCBI RefSeqAccn ... ",
+        message(prefix, "Ensembl_synonyms -> NCBI_seqlevels ... ",
                 appendLF=FALSE)
-    m <- solid_match2(ens_refseq, ncbi_refseqaccn,
-                      x_what="RefSeq synonym",
-                      table_what="NCBI RefSeqAccn value")
+    m <- .match_Ensembl_synonmys_to_NCBI_col(Ensembl_seqlevels,
+                                             Ensembl_synonyms,
+                                             NCBI_seqlevels,
+                                             what="NCBI seqlevel")
+    L2R[unmapped_idx] <- m[unmapped_idx]
+    if (verbose)
+        message("OK (", .mk_progress_str(L2R, NCBI_seqlevels), ")")
+
+    unmapped_idx <- which(is.na(L2R))
+    if (length(unmapped_idx) == 0L)
+        return(L2R)
+
+    ## 6. Match 'Ensembl_synonyms' to 'NCBI_GenBankAccn'.
+    if (verbose)
+        message(prefix, "Ensembl_synonyms -> NCBI_GenBankAccn ... ",
+                appendLF=FALSE)
+    m <- .match_Ensembl_synonmys_to_NCBI_col(Ensembl_seqlevels,
+                                             Ensembl_synonyms,
+                                             NCBI_GenBankAccn,
+                                             what="NCBI GenBankAccn value")
+    L2R[unmapped_idx] <- m[unmapped_idx]
+    if (verbose)
+        message("OK (", .mk_progress_str(L2R, NCBI_seqlevels), ")")
+
+    unmapped_idx <- which(is.na(L2R))
+    if (length(unmapped_idx) == 0L)
+        return(L2R)
+
+    ## 7. Match 'Ensembl_synonyms' to 'NCBI_RefSeqAccn'.
+    if (verbose)
+        message(prefix, "Ensembl_synonyms -> NCBI_RefSeqAccn ... ",
+                appendLF=FALSE)
+    m <- .match_Ensembl_synonmys_to_NCBI_col(Ensembl_seqlevels,
+                                             Ensembl_synonyms,
+                                             NCBI_RefSeqAccn,
+                                             what="NCBI RefSeqAccn value")
     L2R[unmapped_idx] <- m[unmapped_idx]
     if (verbose)
         message("OK (", .mk_progress_str(L2R, NCBI_seqlevels), ")")
@@ -147,15 +204,13 @@
     NCBI_chrom_info <- getChromInfoFromNCBI(assembly_accession)
 
     Ensembl_seqlevels <- Ensembl_chrom_info[ , "name"]
-    Ensembl_INSDC     <- Ensembl_chrom_info[ , "INSDC"]
-    Ensembl_RefSeq    <- Ensembl_chrom_info[ , "RefSeq"]
+    Ensembl_synonyms  <- Ensembl_chrom_info[ , "synonyms"]
     NCBI_seqlevels    <- NCBI_chrom_info[ , "SequenceName"]
     NCBI_GenBankAccn  <- NCBI_chrom_info[ , "GenBankAccn"]
     NCBI_RefSeqAccn   <- NCBI_chrom_info[ , "RefSeqAccn"]
     L2R <- .map_Ensembl_seqlevels_to_NCBI_seqlevels(
                                           Ensembl_seqlevels,
-                                          Ensembl_INSDC,
-                                          Ensembl_RefSeq,
+                                          Ensembl_synonyms,
                                           NCBI_seqlevels,
                                           NCBI_GenBankAccn,
                                           NCBI_RefSeqAccn,
@@ -176,17 +231,17 @@
 ### getChromInfoFromEnsembl()
 ###
 
-.normarg_coord.system.names <- function(coord.system.names)
+.normarg_coord.systems <- function(coord.systems)
 {
-    if (is.null(coord.system.names))
+    if (is.null(coord.systems))
         return(NULL)
-    if (!is.character(coord.system.names))
-        stop(wmsg("'coord.system.names' must be a character vector or NULL"))
-    stop_if_not_primary_key(coord.system.names, "'coord.system.names'")
-    ## Sorting pushes normalization of the 'coord.system.names' vector even
+    if (!is.character(coord.systems))
+        stop(wmsg("'coord.systems' must be a character vector or NULL"))
+    stop_if_not_primary_key(coord.systems, "'coord.systems'")
+    ## Sorting pushes normalization of the 'coord.systems' vector even
     ## further. This is important because we will encode the normalized vector
     ## in the caching key.
-    sort(coord.system.names)
+    sort(coord.systems)
 }
 
 .format_Ensembl_chrom_info <- function(seq_regions, circ_seqs=NULL)
@@ -195,6 +250,7 @@
                       "coord_system.species_id", "coord_system.version",
                       "coord_system.rank", "coord_system.attrib")
     ans <- drop_cols(seq_regions, drop_columns)
+    ans <- rename_cols(ans, "coord_system.name", "coord_system")
 
     circular <- make_circ_flags_from_circ_seqs(ans[ , "name"],
                                                circ_seqs=circ_seqs)
@@ -205,30 +261,28 @@
 
 .ENSEMBL_cached_chrom_info <- new.env(parent=emptyenv())
 
-.make_caching_key <- function(core_url, coord.system.names)
-    paste(c(core_url, coord.system.names), collapse=":")
+.make_caching_key <- function(core_url, coord.systems)
+    paste(c(core_url, coord.systems), collapse=":")
 
 .get_chrom_info_for_unregistered_Ensembl_dataset <- function(core_url,
     assembled.molecules.only=FALSE,
-    coord.system.names=c("chromosome", "scaffold"),
+    coord.systems=c("chromosome", "scaffold"),
     include.no_ref.sequences=FALSE,
     recache=FALSE)
 {
-    coord.system.names <- .normarg_coord.system.names(coord.system.names)
-    caching_key <- .make_caching_key(core_url, coord.system.names)
+    coord.systems <- .normarg_coord.systems(coord.systems)
+    caching_key <- .make_caching_key(core_url, coord.systems)
     ans <- .ENSEMBL_cached_chrom_info[[caching_key]]
     if (is.null(ans) || recache) {
         seq_regions <- fetch_seq_regions_from_Ensembl_ftp(core_url,
-                                         coord_system_names=coord.system.names,
+                                         coord_system_names=coord.systems,
                                          add.toplevel.col=TRUE,
-                                         add.non_ref.col=TRUE,
-                                         add.INSDC.col=TRUE,
-                                         add.RefSeq.col=TRUE)
+                                         add.non_ref.col=TRUE)
         ans <- .format_Ensembl_chrom_info(seq_regions)
         .ENSEMBL_cached_chrom_info[[caching_key]] <- ans
     }
     if (assembled.molecules.only) {
-        keep_idx <- which(ans[ , "coord_system.name"] %in% "chromosome")
+        keep_idx <- which(ans[ , "coord_system"] %in% "chromosome")
         ans <- S4Vectors:::extract_data_frame_rows(ans, keep_idx)
     }
     if (!include.no_ref.sequences) {
@@ -241,7 +295,7 @@
 getChromInfoFromEnsembl <- function(dataset,
     release=NA, use.grch37=FALSE, kingdom=NA,
     assembled.molecules.only=FALSE,
-    coord.system.names=c("chromosome", "scaffold"),
+    coord.systems=c("chromosome", "scaffold"),
     include.no_ref.sequences=FALSE,
     recache=FALSE,
     as.Seqinfo=FALSE)
@@ -264,7 +318,7 @@ getChromInfoFromEnsembl <- function(dataset,
 
     ans <- .get_chrom_info_for_unregistered_Ensembl_dataset(core_url,
                 assembled.molecules.only=assembled.molecules.only,
-                coord.system.names=coord.system.names,
+                coord.systems=coord.systems,
                 include.no_ref.sequences=include.no_ref.sequences,
                 recache=recache)
 

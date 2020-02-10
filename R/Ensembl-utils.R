@@ -111,7 +111,7 @@
 .ENSEMBLGRCh37.PUB_FTP_URL <- "ftp://ftp.ensembl.org/pub/grch37/"
 .ENSEMBLGENOMES.PUB_FTP_URL <- "ftp://ftp.ensemblgenomes.org/pub/"
 
-fetch_table_from_Ensembl_ftp <- function(base_url, table, full.colnames=FALSE,
+fetch_table_from_Ensembl_ftp <- function(core_url, table, full.colnames=FALSE,
                                          nrows=-1L)
 {
     columns <- .ENSEMBLDB_COLUMNS[[table]]
@@ -121,7 +121,7 @@ fetch_table_from_Ensembl_ftp <- function(base_url, table, full.colnames=FALSE,
     } else if (full.colnames) {
         columns <- paste(table, columns, sep=".")
     }
-    url <- paste0(base_url, table, ".txt.gz")
+    url <- paste0(core_url, table, ".txt.gz")
     ans <- fetch_table_from_url(url, colnames=columns, nrows=nrows)
     if (full.colnames && is.null(columns))
         colnames(ans) <- paste(table, colnames(ans), sep=".")
@@ -244,6 +244,31 @@ fetch_default_coord_systems_from_Ensembl_ftp <- function(core_url)
 ### This is the workhorse behind getChromInfoFromEnsembl().
 ###
 
+### Retrieves all synonyms for the supplied sequence ids.
+### This is done via tables "seq_region_synonym" and "external_db".
+### Return a list parallel to 'seq_region_ids' where each list element is a
+### named character vector containing all the synonyms for the corresponding
+### sequence id. The names on the character vector indicate the origin of
+### the synonym i.e. the external db where it's used (e.g. "INSDC",
+### "RefSeq_genomic", "UCSC", "ensembl_internal_synonym", etc..)
+.fetch_synonyms_from_Ensembl_ftp <- function(core_url, seq_region_ids)
+{
+    stopifnot(is_primary_key(seq_region_ids))
+
+    all_synonyms <- fetch_table_from_Ensembl_ftp(core_url, "seq_region_synonym")
+    keep_idx <- which(all_synonyms[ , "seq_region_id"] %in% seq_region_ids)
+    synonyms <- S4Vectors:::extract_data_frame_rows(all_synonyms, keep_idx)
+
+    external_dbs <- fetch_table_from_Ensembl_ftp(core_url, "external_db")
+    synonyms <- join_dfs(synonyms, external_dbs,
+                         "external_db_id", "external_db_id",
+                         keep.Rcol=TRUE)  # we'll drop it below
+
+    f <- factor(synonyms[ , "seq_region_id"], levels=seq_region_ids)
+    unlisted_ans <- setNames(synonyms[ , "synonym"], synonyms[ , "db_name"])
+    split(unlisted_ans, f)
+}
+
 .attrib_type_codes_to_ids_from_Ensembl_ftp <- function(core_url, codes)
 {
     if (!is.character(codes))
@@ -292,7 +317,7 @@ fetch_default_coord_systems_from_Ensembl_ftp <- function(core_url)
     setNames(external_db[m, "external_db_id"], db_names)
 }
 
-### Retrieve attribs "toplevel" and "non_ref" for the supplied sequence ids.
+### Retrieves attribs "toplevel" and "non_ref" for the supplied sequence ids.
 ### This is done via tables "seq_region_attrib" and "attrib_type".
 .fetch_attribs_from_Ensembl_ftp <- function(core_url, seq_region_ids,
                                             toplevel=FALSE, non_ref=FALSE)
@@ -302,53 +327,20 @@ fetch_default_coord_systems_from_Ensembl_ftp <- function(core_url)
     codes <- c("toplevel", "non_ref")
     code2id <- .attrib_type_codes_to_ids_from_Ensembl_ftp(core_url, codes)
     if (toplevel) {
-        idx <- which(attrib_type_id == code2id[["toplevel"]])
-        ids <- all_attribs[idx, "seq_region_id"]
+        keep_idx <- which(attrib_type_id == code2id[["toplevel"]])
+        ids <- all_attribs[keep_idx, "seq_region_id"]
         toplevel <- seq_region_ids %in% ids
     } else {
         toplevel <- NULL
     }
     if (non_ref) {
-        idx <- which(attrib_type_id == code2id[["non_ref"]])
-        ids <- all_attribs[idx, "seq_region_id"]
+        keep_idx <- which(attrib_type_id == code2id[["non_ref"]])
+        ids <- all_attribs[keep_idx, "seq_region_id"]
         non_ref <- seq_region_ids %in% ids
     } else {
         non_ref <- NULL
     }
     list(toplevel=toplevel, non_ref=non_ref)
-}
-
-### Retrieve the INSDC/RefSeq synonyms for the supplied sequence ids.
-### This is done via tables "seq_region_synonym" and "external_db".
-.fetch_synonyms_from_Ensembl_ftp <- function(core_url, seq_region_ids,
-                                             INSDC=FALSE, RefSeq=FALSE)
-{
-    all_synonyms <- fetch_table_from_Ensembl_ftp(core_url, "seq_region_synonym")
-    external_db_id <- all_synonyms[ , "external_db_id"]
-    db_names <- c("INSDC", "RefSeq", "RefSeq_genomic",
-                  "RefSeq_dna", "RefSeq_dna_predicted")
-    name2id <- .external_db_names_to_ids_from_Ensembl_ftp(core_url, db_names)
-    if (INSDC) {
-        idx <- which(external_db_id %in% name2id[["INSDC"]])
-        synonyms <- S4Vectors:::extract_data_frame_rows(all_synonyms, idx)
-        ## Risky assumption: we expect at most one INSDC synonym per sequence!
-        m <- solid_match(seq_region_ids, synonyms[ , "seq_region_id"],
-                         x_what="seq_region_id", table_what="INSDC synonym")
-        INSDC <- synonyms[m, "synonym"]
-    } else {
-        INSDC <- NULL
-    }
-    if (RefSeq) {
-        idx <- which(external_db_id %in% setdiff(name2id, name2id[["INSDC"]]))
-        synonyms <- S4Vectors:::extract_data_frame_rows(all_synonyms, idx)
-        ## Risky assumption: we expect at most one RefSeq synonym per sequence!
-        m <- solid_match(seq_region_ids, synonyms[ , "seq_region_id"],
-                         x_what="seq_region_id", table_what="RefSeq synonym")
-        RefSeq <- synonyms[m, "synonym"]
-    } else {
-        RefSeq <- NULL
-    }
-    list(INSDC=INSDC, RefSeq=RefSeq)
 }
 
 ### Typical use:
@@ -358,14 +350,10 @@ fetch_default_coord_systems_from_Ensembl_ftp <- function(core_url)
 fetch_seq_regions_from_Ensembl_ftp <- function(core_url,
                                                coord_system_names=NULL,
                                                add.toplevel.col=FALSE,
-                                               add.non_ref.col=FALSE,
-                                               add.INSDC.col=FALSE,
-                                               add.RefSeq.col=FALSE)
+                                               add.non_ref.col=FALSE)
 {
     stopifnot(isTRUEorFALSE(add.toplevel.col),
-              isTRUEorFALSE(add.non_ref.col),
-              isTRUEorFALSE(add.INSDC.col),
-              isTRUEorFALSE(add.RefSeq.col))
+              isTRUEorFALSE(add.non_ref.col))
 
     coord_systems <- fetch_default_coord_systems_from_Ensembl_ftp(core_url)
     Rtable <- "coord_system"
@@ -384,17 +372,7 @@ fetch_seq_regions_from_Ensembl_ftp <- function(core_url,
         ## in 'coord_system_names'.
         if (!is.character(coord_system_names))
             stop(wmsg("'coord_system_names' must be a character vector"))
-        if (anyDuplicated(coord_system_names))
-            stop(wmsg("'coord_system_names' cannot contain duplicates"))
-        #keep_idx <- match(coord_system_names, coord_system.name)
-        #bad_idx <- which(is.na(keep_idx))
-        #if (length(bad_idx) != 0L) {
-        #    in1string <- paste0(coord_system_names[bad_idx], collapse=", ")
-        #    stop(wmsg("Invalid \"coord_system.name\" value(s): ", in1string),
-        #         "\n  ",
-        #         wmsg("Valid \"coord_system.name\" values are: ",
-        #              paste0(coord_system.name, collapse=", ")))
-        #}
+        stop_if_not_primary_key(coord_system_names, "'coord_system_names'")
         keep_idx <- which(coord_system.name %in% coord_system_names)
         coord_systems <- S4Vectors:::extract_data_frame_rows(coord_systems,
                                                              keep_idx)
@@ -405,21 +383,15 @@ fetch_seq_regions_from_Ensembl_ftp <- function(core_url,
     Lcolname <- "coord_system_id"
     Rcolname <- paste(Rtable, Lcolname, sep=".")
     ans <- join_dfs(seq_regions, coord_systems, Lcolname, Rcolname)
+    seq_region_ids <- ans[ , "seq_region_id"]
+
+    ans$synonyms <- .fetch_synonyms_from_Ensembl_ftp(core_url, seq_region_ids)
 
     if (add.toplevel.col || add.non_ref.col) {
         cols <- .fetch_attribs_from_Ensembl_ftp(core_url,
-                                                ans[ , "seq_region_id"],
+                                                seq_region_ids,
                                                 toplevel=add.toplevel.col,
                                                 non_ref=add.non_ref.col)
-        ans <- cbind(ans, S4Vectors:::delete_NULLs(cols),
-                     stringsAsFactors=FALSE)
-    }
-
-    if (add.INSDC.col || add.RefSeq.col) {
-        cols <- .fetch_synonyms_from_Ensembl_ftp(core_url,
-                                                ans[ , "seq_region_id"],
-                                                INSDC=add.INSDC.col,
-                                                RefSeq=add.RefSeq.col)
         ans <- cbind(ans, S4Vectors:::delete_NULLs(cols),
                      stringsAsFactors=FALSE)
     }

@@ -56,7 +56,7 @@
 ### - All NCBI input vectors must have the same length.
 ### - Vectors 'UCSC_seqlevels' and 'NCBI_seqlevels' must be "primary
 ###   keys" i.e. must not contain NAs, empty strings, or duplicates.
-### No assumptions are made about the other input vectors.
+###   (No such assumption is made about the other input vectors.)
 ### Returns an integer vector parallel to 'UCSC_seqlevels'.
 .map_UCSC_seqlevels_to_NCBI_seqlevels <- function(UCSC_seqlevels,
                                                   NCBI_seqlevels,

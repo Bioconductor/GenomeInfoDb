@@ -6,15 +6,6 @@
 ###
 
 
-### 'x' must be a matrix-like or data-frame-like object.
-drop_cols <- function(x, colnames)
-{
-    stopifnot(is.character(colnames), length(colnames) != 0L)
-    drop_idx <- match(colnames, colnames(x))
-    stopifnot(!anyNA(drop_idx))
-    x[ , -drop_idx, drop=FALSE]
-}
-
 is_primary_key <- function(x)
 {
     !anyNA(x) && all(nzchar(x)) && !anyDuplicated(x)
@@ -25,6 +16,31 @@ stop_if_not_primary_key <- function(x, x_what="'x'")
     if (!is_primary_key(x))
         stop(wmsg(x_what, " must not contain NAs, ",
                   "empty strings, or duplicates"))
+}
+
+### 'x' must be a matrix-like or data-frame-like object.
+drop_cols <- function(x, columns=character(0))
+{
+    stopifnot(is.character(columns))
+    if (length(columns) == 0L)
+        return(x)
+    drop_idx <- match(columns, colnames(x))
+    stopifnot(!anyNA(drop_idx))
+    x[ , -drop_idx, drop=FALSE]
+}
+
+### 'x' must be a matrix-like or data-frame-like object.
+rename_cols <- function(x, old=character(0), new=character(0))
+{
+    stopifnot(is.character(old),
+              is.character(new),
+              length(old) == length(new))
+    if (length(old) == 0L)
+        return(x)
+    rename_idx <- match(old, colnames(x))
+    stopifnot(!anyNA(rename_idx))
+    colnames(x)[rename_idx] <- new
+    x
 }
 
 
