@@ -103,14 +103,25 @@
 ### the sequences in the reference genome associated with a particular dataset
 ### and Ensembl release (e.g. for dataset "hsapiens_gene_ensembl" and Ensembl
 ### release "64").
+###
 ### Note that querying the Ensembl MySQL server (via RMariaDB) would probably
 ### be a better way to access this stuff.
+### Update (Feb 10, 2020): Some preliminary testing indicates that using
+### RMariaDB to fetch full tables is actually significantly slower.
+### For example, to fetch table "seq_region" from db "homo_sapiens_core_99_38"
+### (the table has 268443 rows and 4 columns):
+###   o The utils::download.file() + utils::read.table() method takes about
+###     7 sec to download and parse the MySQL dump located at:
+###         ftp://ftp.ensembl.org/pub/current_mysql/homo_sapiens_core_99_38/
+###   o The RMariaDB method takes about 22 sec to retrieve the table from the
+###     MySQL server at ensembldb.ensembl.org.
 ###
 
 .ENSEMBL.PUB_FTP_URL <- "ftp://ftp.ensembl.org/pub/"
 .ENSEMBLGRCh37.PUB_FTP_URL <- "ftp://ftp.ensembl.org/pub/grch37/"
 .ENSEMBLGENOMES.PUB_FTP_URL <- "ftp://ftp.ensemblgenomes.org/pub/"
 
+### Uses the utils::download.file() + utils::read.table() method.
 fetch_table_from_Ensembl_ftp <- function(core_url, table, full.colnames=FALSE,
                                          nrows=-1L)
 {
@@ -371,7 +382,8 @@ fetch_seq_regions_from_Ensembl_ftp <- function(core_url,
         ## Drop rows for which column "coord_system.name" is not
         ## in 'coord_system_names'.
         if (!is.character(coord_system_names))
-            stop(wmsg("'coord_system_names' must be a character vector"))
+            stop(wmsg("'coord_system_names' must be ",
+                      "a character vector or NULL"))
         stop_if_not_primary_key(coord_system_names, "'coord_system_names'")
         keep_idx <- which(coord_system.name %in% coord_system_names)
         coord_systems <- S4Vectors:::extract_data_frame_rows(coord_systems,

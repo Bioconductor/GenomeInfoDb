@@ -4,17 +4,17 @@
 \alias{registered_NCBI_genomes}
 
 \title{
-  Get chromosome information of an NCBI genome assembly
+  Get chromosome information for an NCBI genome assembly
 }
 
 \description{
   \code{getChromInfoFromNCBI} returns chromosome information like
-  sequence names, sizes and circularity flags for a given NCBI genome
+  sequence names, lengths and circularity flags for a given NCBI genome
   assembly e.g. for GRCh38, ARS-UCD1.2, R64, etc...
 
   Note that \code{getChromInfoFromNCBI} behaves slightly differently
-  depending on whether a genome assembly is \emph{registered} or not in
-  the \pkg{GenomeInfoDb} package. See below for the details.
+  depending on whether a genome assembly is \emph{registered} in the
+  \pkg{GenomeInfoDb} package or not. See below for the details.
 
   Use \code{registered_NCBI_genomes} to list all the NCBI genome
   assemblies currently registered in the \pkg{GenomeInfoDb} package.
@@ -123,6 +123,9 @@ registered_NCBI_genomes()
   \itemize{
     \item \code{\link{getChromInfoFromUCSC}} for getting chromosome
           information for a UCSC genome assembly.
+
+    \item \code{\link{getChromInfoFromEnsembl}} for getting chromosome
+          information for an Ensembl dataset.
 
     \item \link{Seqinfo} objects.
   }

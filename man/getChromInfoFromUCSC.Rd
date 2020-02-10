@@ -4,17 +4,17 @@
 \alias{registered_UCSC_genomes}
 
 \title{
-  Get chromosome information of a UCSC genome assembly
+  Get chromosome information for a UCSC genome assembly
 }
 
 \description{
   \code{getChromInfoFromUCSC} returns chromosome information like
-  sequence names, sizes and circularity flags for a given UCSC genome
+  sequence names, lengths and circularity flags for a given UCSC genome
   assembly e.g. for hg19, panTro6, sacCer3, etc...
 
   Note that \code{getChromInfoFromUCSC} behaves slightly differently
-  depending on whether a genome assembly is \emph{registered} or not in
-  the \pkg{GenomeInfoDb} package. See below for the details.
+  depending on whether a genome assembly is \emph{registered} in the
+  \pkg{GenomeInfoDb} package or not. See below for the details.
 
   Use \code{registered_UCSC_genomes} to list all the UCSC genome
   assemblies currently registered in the \pkg{GenomeInfoDb} package.
@@ -142,7 +142,10 @@ registered_UCSC_genomes()
 \seealso{
   \itemize{
     \item \code{\link{getChromInfoFromNCBI}} for getting chromosome
-          information of an NCBI genome assembly.
+          information for an NCBI genome assembly.
+
+    \item \code{\link{getChromInfoFromEnsembl}} for getting chromosome
+          information for an Ensembl dataset.
 
     \item \link{Seqinfo} objects.
 

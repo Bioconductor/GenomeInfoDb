@@ -46,7 +46,7 @@
     ## assumption here so let's stay on the safe side.
     revmap_count <- sum(tabulate(L2R, nbins=length(NCBI_seqlevels)) != 0L)
     percent <- 100 * revmap_count / N
-    sprintf("Total NCBI seqlevels mapped: %d/%d -- %.1f%%",
+    sprintf("Total NCBI seqlevels mapped: %d/%d -- %.2f%%",
             revmap_count, N, percent)
 }
 
@@ -252,6 +252,10 @@
     ans <- drop_cols(seq_regions, drop_columns)
     ans <- rename_cols(ans, "coord_system.name", "coord_system")
 
+    ## Column "coord_system".
+    ans[ , "coord_system"] <- factor(ans[ , "coord_system"])
+
+    ## Add column "circular".
     circular <- make_circ_flags_from_circ_seqs(ans[ , "name"],
                                                circ_seqs=circ_seqs)
     ans$circular <- circular
@@ -266,8 +270,10 @@
 
 .get_chrom_info_for_unregistered_Ensembl_dataset <- function(core_url,
     assembled.molecules.only=FALSE,
-    coord.systems=c("chromosome", "scaffold"),
-    include.no_ref.sequences=FALSE,
+    coord.systems=NULL,
+    include.non_ref.sequences=FALSE,
+    include.contigs=FALSE,
+    include.clones=FALSE,
     recache=FALSE)
 {
     coord.systems <- .normarg_coord.systems(coord.systems)
@@ -282,11 +288,21 @@
         .ENSEMBL_cached_chrom_info[[caching_key]] <- ans
     }
     if (assembled.molecules.only) {
+        ## FIXME: This is broken on some datasets e.g. btaurus_gene_ensembl
+        ## where coord_system is not set to "chromosome" for chromosomes.
         keep_idx <- which(ans[ , "coord_system"] %in% "chromosome")
         ans <- S4Vectors:::extract_data_frame_rows(ans, keep_idx)
     }
-    if (!include.no_ref.sequences) {
+    if (!include.non_ref.sequences) {
         keep_idx <- which(!ans[ , "non_ref"])
+        ans <- S4Vectors:::extract_data_frame_rows(ans, keep_idx)
+    }
+    if (!include.contigs) {
+        keep_idx <- which(!(ans[ , "coord_system"] %in% "contig"))
+        ans <- S4Vectors:::extract_data_frame_rows(ans, keep_idx)
+    }
+    if (!include.clones) {
+        keep_idx <- which(!(ans[ , "coord_system"] %in% "clone"))
         ans <- S4Vectors:::extract_data_frame_rows(ans, keep_idx)
     }
     ans
@@ -295,8 +311,10 @@
 getChromInfoFromEnsembl <- function(dataset,
     release=NA, use.grch37=FALSE, kingdom=NA,
     assembled.molecules.only=FALSE,
-    coord.systems=c("chromosome", "scaffold"),
-    include.no_ref.sequences=FALSE,
+    coord.systems=NULL,
+    include.non_ref.sequences=FALSE,
+    include.contigs=FALSE,
+    include.clones=FALSE,
     recache=FALSE,
     as.Seqinfo=FALSE)
 {
@@ -309,8 +327,12 @@ getChromInfoFromEnsembl <- function(dataset,
                                                   kingdom=kingdom)
     if (!isTRUEorFALSE(assembled.molecules.only))
         stop(wmsg("'assembled.molecules.only' must be TRUE or FALSE"))
-    if (!isTRUEorFALSE(include.no_ref.sequences))
-        stop(wmsg("'include.no_ref.sequences' must be TRUE or FALSE"))
+    if (!isTRUEorFALSE(include.non_ref.sequences))
+        stop(wmsg("'include.non_ref.sequences' must be TRUE or FALSE"))
+    if (!isTRUEorFALSE(include.contigs))
+        stop(wmsg("'include.contigs' must be TRUE or FALSE"))
+    if (!isTRUEorFALSE(include.clones))
+        stop(wmsg("'include.clones' must be TRUE or FALSE"))
     if (!isTRUEorFALSE(recache))
         stop(wmsg("'recache' must be TRUE or FALSE"))
     if (!isTRUEorFALSE(as.Seqinfo))
@@ -319,14 +341,15 @@ getChromInfoFromEnsembl <- function(dataset,
     ans <- .get_chrom_info_for_unregistered_Ensembl_dataset(core_url,
                 assembled.molecules.only=assembled.molecules.only,
                 coord.systems=coord.systems,
-                include.no_ref.sequences=include.no_ref.sequences,
+                include.non_ref.sequences=include.non_ref.sequences,
+                include.contigs=include.contigs,
+                include.clones=include.clones,
                 recache=recache)
 
     if (!as.Seqinfo)
         return(ans)
     Seqinfo(seqnames=ans[ , "name"],
             seqlengths=ans[ , "length"],
-            isCircular=ans[ , "circular"],
-            genome=genome)
+            isCircular=ans[ , "circular"])
 }
 

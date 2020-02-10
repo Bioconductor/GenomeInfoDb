@@ -311,7 +311,7 @@ getChromInfoFromNCBI <- function(genome,
         stop(wmsg("'assembled.molecules.only' must be TRUE or FALSE"))
     if (!is.null(assembly.units)) {
         if (!is.character(assembly.units))
-            stop(wmsg("'assembly.units' must be NULL or a character vector"))
+            stop(wmsg("'assembly.units' must be a character vector or NULL"))
         stop_if_not_primary_key(assembly.units, "'assembly.units'")
     }
     if (!isTRUEorFALSE(recache))
