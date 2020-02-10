@@ -137,28 +137,28 @@ solid_match2 <- function(x, table,
 }
 
 ### Performs an SQL INNER JOIN by default. Also by default the right column
-### of the join ('Rcolname') is not included in the result.
+### of the join ('Rcolumn') is not included in the result.
 ### IMPORTANT NOTE: It will mimic the behavior of an SQL JOIN (INNER or LEFT)
 ### **only** if the right column contains unique values! (UNIQUE constraint
-### in SQL). If not, then values in the left column ('Lcolname') will only
-### get mapped to their first match in the right column ('Rcolname').
+### in SQL). If not, then values in the left column ('Lcolumn') will only
+### get mapped to their first match in the right column ('Rcolumn').
 ### Comparison with merge.data.frame():
 ### - INNER JOIN (join_dfs is about 3x faster):
-###     join_dfs(df1, df2, Lcolname, Rcolname)
-###     merge(df1, df2, by.x=Lcolname, by.y=Rcolname, sort=FALSE)
+###     join_dfs(df1, df2, Lcolumn, Rcolumn)
+###     merge(df1, df2, by.x=Lcolumn, by.y=Rcolumn, sort=FALSE)
 ### - LEFT JOIN (join_dfs is about 4x faster):
-###     join_dfs(df1, df2, Lcolname, Rcolname, left.join=TRUE)
-###     merge(df1, df2, by.x=Lcolname, by.y=Rcolname, sort=FALSE, all.x=TRUE)
-join_dfs <- function(Ldf, Rdf, Lcolname, Rcolname,
+###     join_dfs(df1, df2, Lcolumn, Rcolumn, left.join=TRUE)
+###     merge(df1, df2, by.x=Lcolumn, by.y=Rcolumn, sort=FALSE, all.x=TRUE)
+join_dfs <- function(Ldf, Rdf, Lcolumn, Rcolumn,
                      left.join=FALSE, keep.Rcol=FALSE)
 {
     stopifnot(is.data.frame(Ldf),
               is.data.frame(Rdf),
-              isSingleString(Lcolname),
-              isSingleString(Rcolname))
+              isSingleString(Lcolumn),
+              isSingleString(Rcolumn))
     ## Values in the left column only get mapped to their first match in
     ## the right column.
-    L2R <- match(Ldf[ , Lcolname], Rdf[ , Rcolname])
+    L2R <- match(Ldf[ , Lcolumn], Rdf[ , Rcolumn])
     if (!left.join) {
         ## Drop rows in 'Ldf' that are not mapped.
         drop_idx <- which(is.na(L2R))
@@ -168,7 +168,7 @@ join_dfs <- function(Ldf, Rdf, Lcolname, Rcolname,
         }
     }
     if (!keep.Rcol)
-        Rdf <- drop_cols(Rdf, Rcolname)
+        Rdf <- drop_cols(Rdf, Rcolumn)
     .do_join(Ldf, Rdf, L2R)
 }
 

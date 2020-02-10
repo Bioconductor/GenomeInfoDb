@@ -231,28 +231,15 @@
 ### getChromInfoFromEnsembl()
 ###
 
-.normarg_coord.systems <- function(coord.systems)
-{
-    if (is.null(coord.systems))
-        return(NULL)
-    if (!is.character(coord.systems))
-        stop(wmsg("'coord.systems' must be a character vector or NULL"))
-    stop_if_not_primary_key(coord.systems, "'coord.systems'")
-    ## Sorting pushes normalization of the 'coord.systems' vector even
-    ## further. This is important because we will encode the normalized vector
-    ## in the caching key.
-    sort(coord.systems)
-}
-
 .format_Ensembl_chrom_info <- function(seq_regions, circ_seqs=NULL)
 {
     drop_columns <- c("seq_region_id", "coord_system_id",
                       "coord_system.species_id", "coord_system.version",
                       "coord_system.rank", "coord_system.attrib")
     ans <- drop_cols(seq_regions, drop_columns)
-    ans <- rename_cols(ans, "coord_system.name", "coord_system")
 
     ## Column "coord_system".
+    ans <- rename_cols(ans, "coord_system.name", "coord_system")
     ans[ , "coord_system"] <- factor(ans[ , "coord_system"])
 
     ## Add column "circular".
@@ -265,27 +252,20 @@
 
 .ENSEMBL_cached_chrom_info <- new.env(parent=emptyenv())
 
-.make_caching_key <- function(core_url, coord.systems)
-    paste(c(core_url, coord.systems), collapse=":")
-
 .get_chrom_info_for_unregistered_Ensembl_dataset <- function(core_url,
     assembled.molecules.only=FALSE,
-    coord.systems=NULL,
     include.non_ref.sequences=FALSE,
     include.contigs=FALSE,
     include.clones=FALSE,
     recache=FALSE)
 {
-    coord.systems <- .normarg_coord.systems(coord.systems)
-    caching_key <- .make_caching_key(core_url, coord.systems)
-    ans <- .ENSEMBL_cached_chrom_info[[caching_key]]
+    ans <- .ENSEMBL_cached_chrom_info[[core_url]]
     if (is.null(ans) || recache) {
         seq_regions <- fetch_seq_regions_from_Ensembl_ftp(core_url,
-                                         coord_system_names=coord.systems,
                                          add.toplevel.col=TRUE,
                                          add.non_ref.col=TRUE)
         ans <- .format_Ensembl_chrom_info(seq_regions)
-        .ENSEMBL_cached_chrom_info[[caching_key]] <- ans
+        .ENSEMBL_cached_chrom_info[[core_url]] <- ans
     }
     if (assembled.molecules.only) {
         ## FIXME: This is broken on some datasets e.g. btaurus_gene_ensembl
@@ -311,7 +291,6 @@
 getChromInfoFromEnsembl <- function(dataset,
     release=NA, use.grch37=FALSE, kingdom=NA,
     assembled.molecules.only=FALSE,
-    coord.systems=NULL,
     include.non_ref.sequences=FALSE,
     include.contigs=FALSE,
     include.clones=FALSE,
@@ -340,7 +319,6 @@ getChromInfoFromEnsembl <- function(dataset,
 
     ans <- .get_chrom_info_for_unregistered_Ensembl_dataset(core_url,
                 assembled.molecules.only=assembled.molecules.only,
-                coord.systems=coord.systems,
                 include.non_ref.sequences=include.non_ref.sequences,
                 include.contigs=include.contigs,
                 include.clones=include.clones,

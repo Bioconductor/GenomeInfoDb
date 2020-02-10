@@ -18,7 +18,6 @@
 getChromInfoFromEnsembl(dataset,
                         release=NA, use.grch37=FALSE, kingdom=NA,
                         assembled.molecules.only=FALSE,
-                        coord.systems=NULL,
                         include.non_ref.sequences=FALSE,
                         include.contigs=FALSE,
                         include.clones=FALSE,
@@ -49,9 +48,6 @@ getChromInfoFromEnsembl(dataset,
   }
   \item{assembled.molecules.only}{
     NOT IMPLEMENTED YET!
-  }
-  \item{coord.systems}{
-    TODO: DOCUMENT THIS!
   }
   \item{include.non_ref.sequences}{
     TODO: DOCUMENT THIS!
@@ -249,7 +245,6 @@ table(human_chrom_info$SequenceRole, human_chrom_info$toplevel)
 ## https://uswest.ensembl.org/Mus_musculus/Info/Index
 ## Based on GRCm38.p6 (GCA_000001635.8)
 
-## Valid coord.systems: contig, chromosome, scaffold, clone, lrg
 ## Return 258 rows
 mouse_chrom_info <- getChromInfoFromEnsembl("mmusculus_gene_ensembl")
 

@@ -2,7 +2,12 @@
 ### Some low-level utilities to fetch data from Ensembl
 ### -------------------------------------------------------------------------
 ###
-### Unless stated otherwise, nothing in this file is exported.
+### Nothing in this file is exported.
+###
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Ensembl db schema (only for the tables we care about)
 ###
 ### List of Ensembl public MySQL servers / ports
 ###   https://www.ensembl.org/info/data/mysql.html
@@ -10,12 +15,6 @@
 ###   https://www.ensembl.org/info/docs/api/core/core_schema.html
 ### Full schema:
 ###   ftp://ftp.ensembl.org/pub/ensembl/sql/table.sql
-###
-
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Ensembl db schema (only for the tables we care about)
-###
 
 ### Fundamental Tables
 
@@ -117,10 +116,6 @@
 ###     MySQL server at ensembldb.ensembl.org.
 ###
 
-.ENSEMBL.PUB_FTP_URL <- "ftp://ftp.ensembl.org/pub/"
-.ENSEMBLGRCh37.PUB_FTP_URL <- "ftp://ftp.ensembl.org/pub/grch37/"
-.ENSEMBLGENOMES.PUB_FTP_URL <- "ftp://ftp.ensemblgenomes.org/pub/"
-
 ### Uses the utils::download.file() + utils::read.table() method.
 fetch_table_from_Ensembl_ftp <- function(core_url, table, full.colnames=FALSE,
                                          nrows=-1L)
@@ -139,121 +134,23 @@ fetch_table_from_Ensembl_ftp <- function(core_url, table, full.colnames=FALSE,
     ans
 }
 
-### 'kingdom' must be NA or one of the EnsemblGenomes marts i.e. "bacteria",
-### "fungi", "metazoa", "plants", or "protists".
-get_url_to_Ensembl_ftp_mysql <- function(
-    release=NA,
-    use.grch37=FALSE, kingdom=NA)
-{
-    if (is.na(kingdom)) {
-        if (is.na(release)) {
-            if (use.grch37) {
-                pub_subdir <- "current/mysql"
-            } else {
-                pub_subdir <- "current_mysql"
-            }
-        } else {
-            pub_subdir <- paste0("release-", release, "/mysql")
-        }
-        if (use.grch37)
-            pub_ftp_url <- .ENSEMBLGRCh37.PUB_FTP_URL
-        else
-            pub_ftp_url <- .ENSEMBL.PUB_FTP_URL
-    } else {
-        pub_ftp_url <- paste0(.ENSEMBLGENOMES.PUB_FTP_URL, kingdom, "/")
-        if (is.na(release)) {
-            pub_subdir <- "current"
-        } else {
-            pub_subdir <- paste0("release-", release)
-        }
-        pub_subdir <- paste0(pub_subdir, "/mysql")
-    }
-    paste0(pub_ftp_url, pub_subdir, "/")
-}
-
-get_url_to_Ensembl_ftp_gtf <- function(release=NA)
-{
-    if (is.na(release))
-        pub_subdir <- "current_gtf"
-    else
-        pub_subdir <- paste0("release-", release, "/gtf")
-    paste0(.ENSEMBL.PUB_FTP_URL, pub_subdir, "/")
-}
-
-### 'kingdom' must be NA or one of the EnsemblGenomes marts i.e. "bacteria",
-### "fungi", "metazoa", "plants", or "protists".
-list_Ensembl_ftp_mysql_core_dirs <- function(
-    release=NA,
-    use.grch37=FALSE, kingdom=NA, url=NA)
-{
-    if (is.na(url))
-        url <- get_url_to_Ensembl_ftp_mysql(release, use.grch37, kingdom)
-    core_dirs <- list_ftp_dir(url, subdirs.only=TRUE)
-    pattern <- "_core_"
-    if (!is.na(release))
-        pattern <- paste0(pattern, release, "_")
-    core_dirs[grep(pattern, core_dirs, fixed=TRUE)]
-}
-
-get_Ensembl_ftp_mysql_core_dir <- function(
-    dataset, release=NA,
-    use.grch37=FALSE, kingdom=NA, url=NA)
-{
-    if (is.na(url))
-        url <- get_url_to_Ensembl_ftp_mysql(release, use.grch37, kingdom)
-    core_dirs <- list_Ensembl_ftp_mysql_core_dirs(release=release,
-                                                  use.grch37=use.grch37,
-                                                  kingdom=kingdom,
-                                                  url=url)
-    trimmed_core_dirs <- sub("_core_.*$", "", core_dirs)
-    shortnames <- sub("^(.)[^_]*_", "\\1", trimmed_core_dirs)
-    if (dataset == "mfuro_gene_ensembl") {
-        shortname0 <- "mputorius_furo"
-    } else {
-        shortname0 <- strsplit(dataset, "_", fixed=TRUE)[[1L]][1L]
-    }
-    core_dir <- core_dirs[shortnames == shortname0]
-    if (length(core_dir) != 1L)
-        stop("found 0 or more than 1 subdir for \"", dataset,
-             "\" dataset at ", url)
-    core_dir
-}
-
-### 'kingdom' must be NA or one of the EnsemblGenomes marts i.e. "bacteria",
-### "fungi", "metazoa", "plants", or "protists".
-### Return URL of Ensemble Core DB (FTP access).
-get_url_to_Ensembl_ftp_mysql_core <- function(
-    dataset, release=NA,
-    use.grch37=FALSE, kingdom=NA, url=NA)
-{
-    if (is.na(url))
-        url <- get_url_to_Ensembl_ftp_mysql(release, use.grch37, kingdom)
-    core_dir <- get_Ensembl_ftp_mysql_core_dir(dataset, release=release,
-                                               use.grch37=use.grch37,
-                                               kingdom=kingdom,
-                                               url=url)
-    paste0(url, core_dir, "/")
-}
-
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### fetch_default_coord_systems_from_Ensembl_ftp()
-###
-
 fetch_default_coord_systems_from_Ensembl_ftp <- function(core_url)
 {
     coord_system <- fetch_table_from_Ensembl_ftp(core_url, "coord_system")
+
     ## Drop rows that do not have the default_version attrib.
     keep_idx <- grep("default_version", coord_system[ , "attrib"], fixed=TRUE)
-    S4Vectors:::extract_data_frame_rows(coord_system, keep_idx)
+    ans <- S4Vectors:::extract_data_frame_rows(coord_system, keep_idx)
+
+    ## Even though we expect that column "name" will always have unique
+    ## values within the remaining rows, we want to be informed if this
+    ## is not the case.
+    coord_system.name <- ans[ , "name"]
+    if (anyDuplicated(coord_system.name))
+        warning(wmsg("column \"coord_system.name\" contains duplicates ",
+                     "within the rows that have the default_version attrib"))
+    ans
 }
-
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### fetch_seq_regions_from_Ensembl_ftp()
-###
-### This is the workhorse behind getChromInfoFromEnsembl().
-###
 
 ### Retrieves all synonyms for the supplied sequence ids.
 ### This is done via tables "seq_region_synonym" and "external_db".
@@ -354,12 +251,11 @@ fetch_default_coord_systems_from_Ensembl_ftp <- function(core_url)
     list(toplevel=toplevel, non_ref=non_ref)
 }
 
+### This is the workhorse behind getChromInfoFromEnsembl().
 ### Typical use:
 ###   core_url <- get_url_to_Ensembl_ftp_mysql_core("hsapiens_gene_ensembl")
-###   coord_system_names <- c("chromosome", "scaffold", "lrg")
-###   fetch_seq_regions_from_Ensembl_ftp(core_url, coord_system_names)
+###   fetch_seq_regions_from_Ensembl_ftp(core_url)
 fetch_seq_regions_from_Ensembl_ftp <- function(core_url,
-                                               coord_system_names=NULL,
                                                add.toplevel.col=FALSE,
                                                add.non_ref.col=FALSE)
 {
@@ -367,34 +263,16 @@ fetch_seq_regions_from_Ensembl_ftp <- function(core_url,
               isTRUEorFALSE(add.non_ref.col))
 
     coord_systems <- fetch_default_coord_systems_from_Ensembl_ftp(core_url)
+
+    ## Fetch table "seq_region".
+    seq_regions <- fetch_table_from_Ensembl_ftp(core_url, "seq_region")
+
+    ## INNER JOIN table "seq_region" with table "coord_system".
     Rtable <- "coord_system"
     colnames(coord_systems) <- paste(Rtable, colnames(coord_systems), sep=".")
-
-    ## Even though we expect that column "coord_system.name" will always
-    ## have unique values within the remaining rows, we want to be informed
-    ## if this is not the case.
-    coord_system.name <- coord_systems[ , "coord_system.name"]
-    if (anyDuplicated(coord_system.name))
-        warning(wmsg("column \"coord_system.name\" contains duplicates ",
-                     "within the rows that have the default_version attrib"))
-
-    if (!is.null(coord_system_names)) {
-        ## Drop rows for which column "coord_system.name" is not
-        ## in 'coord_system_names'.
-        if (!is.character(coord_system_names))
-            stop(wmsg("'coord_system_names' must be ",
-                      "a character vector or NULL"))
-        stop_if_not_primary_key(coord_system_names, "'coord_system_names'")
-        keep_idx <- which(coord_system.name %in% coord_system_names)
-        coord_systems <- S4Vectors:::extract_data_frame_rows(coord_systems,
-                                                             keep_idx)
-    }
-
-    ## Fetch "seq_region" table and INNER JOIN with "coord_system" table.
-    seq_regions <- fetch_table_from_Ensembl_ftp(core_url, "seq_region")
-    Lcolname <- "coord_system_id"
-    Rcolname <- paste(Rtable, Lcolname, sep=".")
-    ans <- join_dfs(seq_regions, coord_systems, Lcolname, Rcolname)
+    Lcolumn <- "coord_system_id"
+    Rcolumn <- paste(Rtable, Lcolumn, sep=".")
+    ans <- join_dfs(seq_regions, coord_systems, Lcolumn, Rcolumn)
     seq_region_ids <- ans[ , "seq_region_id"]
 
     ans$synonyms <- .fetch_synonyms_from_Ensembl_ftp(core_url, seq_region_ids)
@@ -409,5 +287,105 @@ fetch_seq_regions_from_Ensembl_ftp <- function(core_url,
     }
 
     ans
+}
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Obtain URLs to specific folders on the Ensembl FTP server
+###
+
+.ENSEMBL.PUB_FTP_URL <- "ftp://ftp.ensembl.org/pub/"
+.ENSEMBLGRCh37.PUB_FTP_URL <- "ftp://ftp.ensembl.org/pub/grch37/"
+.ENSEMBLGENOMES.PUB_FTP_URL <- "ftp://ftp.ensemblgenomes.org/pub/"
+
+### 'kingdom' must be NA or one of the EnsemblGenomes marts i.e. "bacteria",
+### "fungi", "metazoa", "plants", or "protists".
+get_url_to_Ensembl_ftp_mysql <- function(
+    release=NA,
+    use.grch37=FALSE, kingdom=NA)
+{
+    if (is.na(kingdom)) {
+        if (is.na(release)) {
+            if (use.grch37) {
+                pub_subdir <- "current/mysql"
+            } else {
+                pub_subdir <- "current_mysql"
+            }
+        } else {
+            pub_subdir <- paste0("release-", release, "/mysql")
+        }
+        if (use.grch37)
+            pub_ftp_url <- .ENSEMBLGRCh37.PUB_FTP_URL
+        else
+            pub_ftp_url <- .ENSEMBL.PUB_FTP_URL
+    } else {
+        pub_ftp_url <- paste0(.ENSEMBLGENOMES.PUB_FTP_URL, kingdom, "/")
+        if (is.na(release)) {
+            pub_subdir <- "current"
+        } else {
+            pub_subdir <- paste0("release-", release)
+        }
+        pub_subdir <- paste0(pub_subdir, "/mysql")
+    }
+    paste0(pub_ftp_url, pub_subdir, "/")
+}
+
+get_url_to_Ensembl_ftp_gtf <- function(release=NA)
+{
+    if (is.na(release))
+        pub_subdir <- "current_gtf"
+    else
+        pub_subdir <- paste0("release-", release, "/gtf")
+    paste0(.ENSEMBL.PUB_FTP_URL, pub_subdir, "/")
+}
+
+.ENSEMBL_cached_core_dirs <- new.env(parent=emptyenv())
+
+.list_Ensembl_ftp_mysql_core_dirs <- function(url, release=NA)
+{
+    stopifnot(isSingleString(url))
+    pattern <- "_core_"
+
+    core_dirs <- .ENSEMBL_cached_core_dirs[[url]]
+    if (is.null(core_dirs)) {
+        subdirs <- list_ftp_dir(url, subdirs.only=TRUE)
+        core_dirs <- subdirs[grep(pattern, subdirs, fixed=TRUE)]
+        .ENSEMBL_cached_core_dirs[[url]] <- core_dirs
+    }
+
+    if (!is.na(release))
+        pattern <- paste0(pattern, release, "_")
+    core_dirs[grep(pattern, core_dirs, fixed=TRUE)]
+}
+
+.get_Ensembl_ftp_mysql_core_dir <- function(url, dataset, release=NA)
+{
+    stopifnot(isSingleString(dataset))
+    core_dirs <- .list_Ensembl_ftp_mysql_core_dirs(url, release=release)
+    trimmed_core_dirs <- sub("_core_.*$", "", core_dirs)
+    shortnames <- sub("^(.)[^_]*_", "\\1", trimmed_core_dirs)
+    if (dataset == "mfuro_gene_ensembl") {
+        shortname0 <- "mputorius_furo"
+    } else {
+        shortname0 <- strsplit(dataset, "_", fixed=TRUE)[[1L]][1L]
+    }
+    core_dir <- core_dirs[shortnames == shortname0]
+    if (length(core_dir) != 1L)
+        stop("found 0 or more than 1 subdir for \"", dataset,
+             "\" dataset at ", url)
+    core_dir
+}
+
+### 'kingdom' must be NA or one of the EnsemblGenomes marts i.e. "bacteria",
+### "fungi", "metazoa", "plants", or "protists".
+### Return URL of Ensemble Core DB (FTP access).
+get_url_to_Ensembl_ftp_mysql_core <- function(
+    dataset, release=NA,
+    use.grch37=FALSE, kingdom=NA, url=NA)
+{
+    if (is.na(url))
+        url <- get_url_to_Ensembl_ftp_mysql(release, use.grch37, kingdom)
+    core_dir <- .get_Ensembl_ftp_mysql_core_dir(url, dataset, release=release)
+    paste0(url, core_dir, "/")
 }
 
