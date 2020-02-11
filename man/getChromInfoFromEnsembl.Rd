@@ -16,7 +16,7 @@
 
 \usage{
 getChromInfoFromEnsembl(dataset,
-                        release=NA, use.grch37=FALSE, kingdom=NA,
+                        release=NA, division=NA, use.grch37=FALSE,
                         assembled.molecules.only=FALSE,
                         include.non_ref.sequences=FALSE,
                         include.contigs=FALSE,
@@ -34,17 +34,15 @@ getChromInfoFromEnsembl(dataset,
     The Ensembl release to query e.g. 89. If set to \code{NA} (the
     default), the current release is used.
   }
+  \item{division}{
+    \code{NA} (the default) or one of the EnsemblGenomes marts i.e.
+    \code{"bacteria"}, \code{"fungi"}, \code{"metazoa"}, \code{"plants"},
+    or \code{"protists"}.
+  }
   \item{use.grch37}{
     NOT TESTED YET!
 
     \code{TRUE} or \code{FALSE} (the default).
-  }
-  \item{kingdom}{
-    NOT TESTED YET!
-
-    \code{NA} (the default) or one of the EnsemblGenomes marts i.e.
-    \code{"bacteria"}, \code{"fungi"}, \code{"metazoa"}, \code{"plants"},
-    or \code{"protists"}.
   }
   \item{assembled.molecules.only}{
     NOT IMPLEMENTED YET!
@@ -128,6 +126,8 @@ getChromInfoFromEnsembl("scerevisiae_gene_ensembl")
 
 getChromInfoFromEnsembl("scerevisiae_gene_ensembl", as.Seqinfo=TRUE)
 
+getChromInfoFromEnsembl("athaliana_gene_ensembl", division="plants")
+
 ## ---------------------------------------------------------------------
 ## Temporary stuff that needs to go away...
 ## ---------------------------------------------------------------------
@@ -164,7 +164,7 @@ map_to_NCBI <- function(Ensembl_chrom_info, NCBI_chrom_info,
 
 ## ------------------------------------------------------------------------
 ## Yeast
-## https://uswest.ensembl.org/Saccharomyces_cerevisiae/Info/Index
+## https://uswest.ensembl.org/Saccharomyces_cerevisiae/
 ## Based on R64-1-1 (GCA_000146045.2, called R64 at NCBI)
 
 ## Return 17 rows
@@ -183,7 +183,7 @@ yeast_chrom_info <- .do_join(yeast_chrom_info, R64, L2R)
 
 ## ------------------------------------------------------------------------
 ## Worm
-## https://uswest.ensembl.org/Caenorhabditis_elegans/Info/Index
+## https://uswest.ensembl.org/Caenorhabditis_elegans/
 ## Based on WBcel235 (GCA_000002985.3)
 
 ## Return 7 rows
@@ -199,7 +199,7 @@ table(worm_chrom_info$SequenceRole, worm_chrom_info$toplevel)
 
 ## ------------------------------------------------------------------------
 ## Human
-## https://uswest.ensembl.org/Homo_sapiens/Info/Index
+## https://uswest.ensembl.org/Homo_sapiens/
 ## Based on GRCh38.p13 (GCA_000001405.28)
 
 ## Return 944 rows
@@ -242,7 +242,7 @@ table(human_chrom_info$SequenceRole, human_chrom_info$toplevel)
 
 ## ------------------------------------------------------------------------
 ## Mouse
-## https://uswest.ensembl.org/Mus_musculus/Info/Index
+## https://uswest.ensembl.org/Mus_musculus/
 ## Based on GRCm38.p6 (GCA_000001635.8)
 
 ## Return 258 rows
@@ -283,7 +283,7 @@ mouse_chrom_info[mouse_chrom_info$SequenceName %in% "MT", c(1:5, 8, 11, 13)]
 
 ## ------------------------------------------------------------------------
 ## Rat
-## https://uswest.ensembl.org/Rattus_norvegicus/Info/Index
+## https://uswest.ensembl.org/Rattus_norvegicus/
 ## Based on Rnor_6.0 (GCA_000001895.4)
 
 # Return 1418 rows
@@ -319,7 +319,7 @@ table(rat_chrom_info$SequenceRole, rat_chrom_info$toplevel)
 
 ## ------------------------------------------------------------------------
 ## Cow
-## https://uswest.ensembl.org/Bos_taurus/Info/Index
+## https://uswest.ensembl.org/Bos_taurus/
 ## Based on ARS-UCD1.2 (GCA_002263795.2)
 
 ## Return 2211 rows

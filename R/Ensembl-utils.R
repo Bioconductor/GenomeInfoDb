@@ -7,14 +7,243 @@
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Ensembl db schema (only for the tables we care about)
+### Obtain URLs to specific locations on the Ensembl FTP server
+###
+
+.ENSEMBL_FTP_PUB_URL <- "ftp://ftp.ensembl.org/pub/"
+.ENSEMBL_FTP_PUB_GRCH37_URL <- "ftp://ftp.ensembl.org/pub/grch37/"
+.ENSEMBLGENOMES_FTP_PUB_URL <- "ftp://ftp.ensemblgenomes.org/pub/"
+.ENSEMBL_FTP_RELEASE_PREFIX <- "release-"
+
+### 'division' must be NA or one of the Ensembl Genomes divisions i.e.
+### "bacteria", "fungi", "metazoa", "plants", or "protists".
+.get_Ensembl_FTP_top_url <- function(division=NA, use.grch37=FALSE)
+{
+    if (!is_single_value(division))
+        stop(wmsg("'division' must be a single value"))
+    if (!isTRUEorFALSE(use.grch37))
+        stop(wmsg("'use.grch37' must be TRUE or FALSE"))
+    if (!is.na(division)) {
+        if (!is.character(division) || division == "")
+            stop(wmsg("'division' must be a single non-empty string or NA"))
+        if (!isFALSE(use.grch37))
+            warning(wmsg("'use.grch37' is ignored when 'division' is supplied"))
+        top_url <- paste0(.ENSEMBLGENOMES_FTP_PUB_URL, division, "/")
+    } else if (use.grch37) {
+        top_url <- .ENSEMBL_FTP_PUB_GRCH37_URL
+    } else {
+        top_url <- .ENSEMBL_FTP_PUB_URL
+    }
+    top_url
+}
+
+### The keys are FTP URLs to Ensembl division top-level directories e.g.
+###   "ftp://ftp.ensembl.org/pub/"
+###   "ftp://ftp.ensembl.org/pub/grch37/"
+###   "ftp://ftp.ensemblgenomes.org/pub/plants/"
+### etc...
+.Ensembl_FTP_cached_releases <- new.env(parent=emptyenv())
+
+list_Ensembl_FTP_releases <- function(division=NA, use.grch37=FALSE,
+                                      as.subdirs=FALSE)
+{
+    if (!isTRUEorFALSE(as.subdirs))
+        stop(wmsg("'as.subdirs' must be TRUE or FALSE"))
+    top_url <- .get_Ensembl_FTP_top_url(division=division,
+                                        use.grch37=use.grch37)
+    releases <- .Ensembl_FTP_cached_releases[[top_url]]
+    if (is.null(releases)) {
+        top_files <- list_ftp_dir(top_url)
+        nc <- nchar(.ENSEMBL_FTP_RELEASE_PREFIX)
+        prefixes <- substr(top_files, 1L, nc)
+        releases <- top_files[prefixes == .ENSEMBL_FTP_RELEASE_PREFIX]
+        releases <- substr(releases, nc + 1L, nchar(releases))
+        releases <- sort(as.integer(releases))
+        .Ensembl_FTP_cached_releases[[top_url]] <- releases
+    }
+    if (as.subdirs)
+        releases <- paste0(.ENSEMBL_FTP_RELEASE_PREFIX, releases)
+    releases
+}
+
+get_Ensembl_FTP_species_url <- function(release=NA, division=NA)
+{
+    if (!is_single_value(release))
+        stop(wmsg("'release' must be a single value"))
+    top_url <- .get_Ensembl_FTP_top_url(division=division)
+    if (is.na(division)) {
+        ## Available in Ensembl release 96 (March 2019) and above.
+        species_file <- "species_EnsemblVertebrates.txt"
+    } else {
+        ## Available in Ensembl Genomes release 17 (Feb 2013) and above.
+        ## However the current format (see fetch_species_from_Ensembl_FTP()
+        ## below) is used only since release 22 (March 2014).
+        species_file <- switch(division,
+            bacteria="species_EnsemblBacteria.txt",
+            fungi="species_EnsemblFungi.txt",
+            metazoa="species_EnsemblMetazoa.txt",
+            plants="species_EnsemblPlants.txt",
+            protists="species_EnsemblProtists.txt",
+            stop(wmsg("invalid division: ", division))
+        )
+    }
+    if (!is.na(release)) {
+        subdir <- paste0(.ENSEMBL_FTP_RELEASE_PREFIX, release)
+    } else if (is.na(division)) {
+        ## Get latest release.
+        subdir <- tail(list_Ensembl_FTP_releases(as.subdirs=TRUE), n=1L)
+    } else {
+        subdir <- "current"
+    }
+    paste0(top_url, subdir, "/", species_file)
+}
+
+### 'division' must be NA or one of the Ensembl Genomes divisions i.e.
+### "bacteria", "fungi", "metazoa", "plants", or "protists".
+get_Ensembl_FTP_mysql_url <- function(release=NA, division=NA,
+                                      use.grch37=FALSE)
+{
+    if (!is_single_value(release))
+        stop(wmsg("'release' must be a single value"))
+    top_url <- .get_Ensembl_FTP_top_url(division=division,
+                                        use.grch37=use.grch37)
+    if (!is.na(release)) {
+        mysql_subdir <- paste0(.ENSEMBL_FTP_RELEASE_PREFIX, release, "/mysql")
+    } else if (is.na(division) && !use.grch37) {
+        mysql_subdir <- "current_mysql"
+    } else {
+        mysql_subdir <- "current/mysql"
+    }
+    paste0(top_url, mysql_subdir, "/")
+}
+
+### 'division' must be NA or one of the Ensembl Genomes divisions i.e.
+### "bacteria", "fungi", "metazoa", "plants", or "protists".
+get_Ensembl_FTP_gtf_url <- function(release=NA, division=NA,
+                                    use.grch37=FALSE)
+{
+    if (!is_single_value(release))
+        stop(wmsg("'release' must be a single value"))
+    top_url <- .get_Ensembl_FTP_top_url(division=division,
+                                        use.grch37=use.grch37)
+    if (!is.na(release)) {
+        gtf_subdir <- paste0(.ENSEMBL_FTP_RELEASE_PREFIX, release, "/gtf")
+    } else if (is.na(division) && !use.grch37) {
+        gtf_subdir <- "current_gtf"
+    } else {
+        gtf_subdir <- "current/gtf"
+    }
+    paste0(top_url, gtf_subdir, "/")
+}
+
+### The keys are FTP URLs to "mysql" directories e.g.
+###   "ftp://ftp.ensembl.org/pub/current_mysql/"
+###   "ftp://ftp.ensembl.org/pub/release-98/mysql/"
+###   "ftp://ftp.ensemblgenomes.org/pub/bacteria/current/mysql/"
+###   "ftp://ftp.ensemblgenomes.org/pub/plants/release-45/mysql/"
+### etc...
+.Ensembl_FTP_cached_core_dbs <- new.env(parent=emptyenv())
+
+.list_Ensembl_FTP_core_dbs <- function(mysql_url, release=NA)
+{
+    stopifnot(isSingleString(mysql_url))
+
+    pattern <- "_core_"
+    core_dbs <- .Ensembl_FTP_cached_core_dbs[[mysql_url]]
+    if (is.null(core_dbs)) {
+        subdirs <- list_ftp_dir(mysql_url, subdirs.only=TRUE)
+        core_dbs <- subdirs[grep(pattern, subdirs, fixed=TRUE)]
+        .Ensembl_FTP_cached_core_dbs[[mysql_url]] <- core_dbs
+    }
+
+    if (!is.na(release))
+        pattern <- paste0(pattern, release, "_")
+    core_dbs[grep(pattern, core_dbs, fixed=TRUE)]
+}
+
+.get_Ensembl_FTP_core_db <- function(mysql_url, dataset, release=NA)
+{
+    stopifnot(isSingleString(dataset))
+    core_dbs <- .list_Ensembl_FTP_core_dbs(mysql_url, release=release)
+    trimmed_core_dbs <- sub("_core_.*$", "", core_dbs)
+    shortnames <- sub("^(.)[^_]*_", "\\1", trimmed_core_dbs)
+    if (dataset == "mfuro_gene_ensembl") {
+        shortname0 <- "mputorius_furo"
+    } else {
+        shortname0 <- strsplit(dataset, "_", fixed=TRUE)[[1L]][1L]
+    }
+    core_db <- core_dbs[shortnames == shortname0]
+    if (length(core_db) != 1L)
+        stop(wmsg("found 0 or more than 1 subdir for \"", dataset,
+                  "\" dataset at ", mysql_url))
+    core_db
+}
+
+### 'division' must be NA or one of the Ensembl Genomes divisions i.e.
+### "bacteria", "fungi", "metazoa", "plants", or "protists".
+### Return URL to Ensemble Core DB (FTP access).
+get_Ensembl_FTP_core_db_url <- function(dataset, release=NA, division=NA,
+                                        use.grch37=FALSE)
+{
+    mysql_url <- get_Ensembl_FTP_mysql_url(release=release, division=division,
+                                           use.grch37=use.grch37)
+    core_db <- .get_Ensembl_FTP_core_db(mysql_url, dataset, release=release)
+    paste0(mysql_url, core_db, "/")
+}
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### fetch_species_from_Ensembl_FTP()
+###
+
+.Ensembl_FTP_cached_species <- new.env(parent=emptyenv())
+
+### Works with Ensembl releases >= 96 and Ensembl Genomes releases >= 22.
+fetch_species_from_Ensembl_FTP <- function(release=NA, division=NA)
+{
+    url <- get_Ensembl_FTP_species_url(release=release, division=division)
+    species <- .Ensembl_FTP_cached_species[[url]]
+    if (is.null(species)) {
+        ## This is the format used in Ensembl releases >= 96 and Ensembl
+        ## Genomes releases >= 22.
+        expected_colnames <- c(
+            "name", "species", "division", "taxonomy_id",
+            "assembly", "assembly_accession", "genebuild", "variation",
+            "pan_compara", "peptide_compara", "genome_alignments",
+            "other_alignments", "core_db", "species_id"
+        )
+        species <- fetch_table_from_url(url, header=TRUE)
+
+        ## Note that Ensembl species files are broken: the header line
+        ## specifies 14 fields separated by 13 tabs BUT each line of data
+        ## contains 14 tabs! The last tab is an additional tab placed
+        ## at the end of the line i.e. after the 14th value in the line.
+        ## For read.table() this means that there are actually 15 values
+        ## and that the last value is missing! As a consequence the colnames
+        ## on the returned data frame are completely messed up!
+        expected_messed_up_colnames <- c("row.names", expected_colnames)
+        expected_messed_up_colnames[2L] <- "X.name"
+        if (!identical(colnames(species), expected_messed_up_colnames))
+            stop(wmsg(url, " does not contain the expected fields"))
+        colnames(species) <- c(expected_colnames, "V15")
+
+        ## The last column should be filled with NAs. Drop it.
+        stopifnot(all(is.na(species[[length(species)]])))
+        species <- species[-length(species)]
+
+        .Ensembl_FTP_cached_species[[url]] <- species
+    }
+    species
+}
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Ensembl Core schema (only for the tables we care about)
 ###
 ### List of Ensembl public MySQL servers / ports
 ###   https://www.ensembl.org/info/data/mysql.html
 ### Ensembl Core Schema:
 ###   https://www.ensembl.org/info/docs/api/core/core_schema.html
-### Full schema:
-###   ftp://ftp.ensembl.org/pub/ensembl/sql/table.sql
 
 ### Fundamental Tables
 
@@ -94,17 +323,17 @@
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Fetch data from the Ensembl FTP server (via RCurl)
+### Fetch core db data from the Ensembl FTP server (via RCurl)
 ###
 ### The utililities in this section use RCurl or just utils::download.file()
-### for getting stuff directly from the Ensembl FTP server. They can access
-### stuff that is not available thru biomaRt like for example the lengths of
-### the sequences in the reference genome associated with a particular dataset
-### and Ensembl release (e.g. for dataset "hsapiens_gene_ensembl" and Ensembl
-### release "64").
+### for getting core db stuff directly from the Ensembl FTP server. They can
+### access stuff that is not available thru biomaRt like for example the
+### lengths of the sequences in the reference genome associated with a
+### particular dataset and Ensembl release (e.g. for dataset
+### "hsapiens_gene_ensembl" in release "64").
 ###
-### Note that querying the Ensembl MySQL server (via RMariaDB) would probably
-### be a better way to access this stuff.
+### Note that querying the Ensembl MySQL server (via RMariaDB) would
+### probably be a better way to do this.
 ### Update (Feb 10, 2020): Some preliminary testing indicates that using
 ### RMariaDB to fetch full tables is actually significantly slower.
 ### For example, to fetch table "seq_region" from db "homo_sapiens_core_99_38"
@@ -117,8 +346,8 @@
 ###
 
 ### Uses the utils::download.file() + utils::read.table() method.
-fetch_table_from_Ensembl_ftp <- function(core_url, table, full.colnames=FALSE,
-                                         nrows=-1L)
+fetch_table_from_Ensembl_FTP <- function(core_db_url, table,
+                                         full.colnames=FALSE, nrows=-1L)
 {
     columns <- .ENSEMBLDB_COLUMNS[[table]]
     if (is.null(columns)) {
@@ -127,16 +356,16 @@ fetch_table_from_Ensembl_ftp <- function(core_url, table, full.colnames=FALSE,
     } else if (full.colnames) {
         columns <- paste(table, columns, sep=".")
     }
-    url <- paste0(core_url, table, ".txt.gz")
+    url <- paste0(core_db_url, table, ".txt.gz")
     ans <- fetch_table_from_url(url, colnames=columns, nrows=nrows)
     if (full.colnames && is.null(columns))
         colnames(ans) <- paste(table, colnames(ans), sep=".")
     ans
 }
 
-fetch_default_coord_systems_from_Ensembl_ftp <- function(core_url)
+fetch_default_coord_systems_from_Ensembl_FTP <- function(core_db_url)
 {
-    coord_system <- fetch_table_from_Ensembl_ftp(core_url, "coord_system")
+    coord_system <- fetch_table_from_Ensembl_FTP(core_db_url, "coord_system")
 
     ## Drop rows that do not have the default_version attrib.
     keep_idx <- grep("default_version", coord_system[ , "attrib"], fixed=TRUE)
@@ -159,15 +388,16 @@ fetch_default_coord_systems_from_Ensembl_ftp <- function(core_url)
 ### sequence id. The names on the character vector indicate the origin of
 ### the synonym i.e. the external db where it's used (e.g. "INSDC",
 ### "RefSeq_genomic", "UCSC", "ensembl_internal_synonym", etc..)
-.fetch_synonyms_from_Ensembl_ftp <- function(core_url, seq_region_ids)
+.fetch_synonyms_from_Ensembl_FTP <- function(core_db_url, seq_region_ids)
 {
     stopifnot(is_primary_key(seq_region_ids))
 
-    all_synonyms <- fetch_table_from_Ensembl_ftp(core_url, "seq_region_synonym")
+    all_synonyms <- fetch_table_from_Ensembl_FTP(core_db_url,
+                                                 "seq_region_synonym")
     keep_idx <- which(all_synonyms[ , "seq_region_id"] %in% seq_region_ids)
     synonyms <- S4Vectors:::extract_data_frame_rows(all_synonyms, keep_idx)
 
-    external_dbs <- fetch_table_from_Ensembl_ftp(core_url, "external_db")
+    external_dbs <- fetch_table_from_Ensembl_FTP(core_db_url, "external_db")
     synonyms <- join_dfs(synonyms, external_dbs,
                          "external_db_id", "external_db_id",
                          keep.Rcol=TRUE)  # we'll drop it below
@@ -177,7 +407,7 @@ fetch_default_coord_systems_from_Ensembl_ftp <- function(core_url)
     split(unlisted_ans, f)
 }
 
-.attrib_type_codes_to_ids_from_Ensembl_ftp <- function(core_url, codes)
+.attrib_type_codes_to_ids_from_Ensembl_FTP <- function(core_db_url, codes)
 {
     if (!is.character(codes))
         stop(wmsg("'codes' must be a character vector"))
@@ -194,7 +424,7 @@ fetch_default_coord_systems_from_Ensembl_ftp <- function(core_url)
     ## of 6 and the lines in the file seem to always be ordered by
     ## attrib_type_id), reading in the first 99 rows should be way enough
     ## to get what we need.
-    attrib_type <- fetch_table_from_Ensembl_ftp(core_url, "attrib_type",
+    attrib_type <- fetch_table_from_Ensembl_FTP(core_db_url, "attrib_type",
                                                 nrows=99L)
     m <- solid_match(codes, attrib_type[ , "code"],
                      x_what="supplied code",
@@ -207,13 +437,13 @@ fetch_default_coord_systems_from_Ensembl_ftp <- function(core_url)
     setNames(attrib_type[m, "attrib_type_id"], codes)
 }
 
-.external_db_names_to_ids_from_Ensembl_ftp <- function(core_url, db_names)
+.external_db_names_to_ids_from_Ensembl_FTP <- function(core_db_url, db_names)
 {
     if (!is.character(db_names))
         stop(wmsg("'db_names' must be a character vector"))
     if (anyDuplicated(db_names))
         stop(wmsg("'db_names' cannot contain duplicates"))
-    external_db <- fetch_table_from_Ensembl_ftp(core_url, "external_db")
+    external_db <- fetch_table_from_Ensembl_FTP(core_db_url, "external_db")
     m <- solid_match(db_names, external_db[ , "db_name"],
                      x_what="supplied db_name",
                      table_what="\"external_db.db_name\" value")
@@ -227,13 +457,14 @@ fetch_default_coord_systems_from_Ensembl_ftp <- function(core_url)
 
 ### Retrieves attribs "toplevel" and "non_ref" for the supplied sequence ids.
 ### This is done via tables "seq_region_attrib" and "attrib_type".
-.fetch_attribs_from_Ensembl_ftp <- function(core_url, seq_region_ids,
+.fetch_attribs_from_Ensembl_FTP <- function(core_db_url, seq_region_ids,
                                             toplevel=FALSE, non_ref=FALSE)
 {
-    all_attribs <- fetch_table_from_Ensembl_ftp(core_url, "seq_region_attrib")
+    all_attribs <- fetch_table_from_Ensembl_FTP(core_db_url,
+                                                "seq_region_attrib")
     attrib_type_id <- all_attribs[ , "attrib_type_id"]
     codes <- c("toplevel", "non_ref")
-    code2id <- .attrib_type_codes_to_ids_from_Ensembl_ftp(core_url, codes)
+    code2id <- .attrib_type_codes_to_ids_from_Ensembl_FTP(core_db_url, codes)
     if (toplevel) {
         keep_idx <- which(attrib_type_id == code2id[["toplevel"]])
         ids <- all_attribs[keep_idx, "seq_region_id"]
@@ -253,19 +484,19 @@ fetch_default_coord_systems_from_Ensembl_ftp <- function(core_url)
 
 ### This is the workhorse behind getChromInfoFromEnsembl().
 ### Typical use:
-###   core_url <- get_url_to_Ensembl_ftp_mysql_core("hsapiens_gene_ensembl")
-###   fetch_seq_regions_from_Ensembl_ftp(core_url)
-fetch_seq_regions_from_Ensembl_ftp <- function(core_url,
+###   core_db_url <- get_Ensembl_FTP_core_db_url("hsapiens_gene_ensembl")
+###   fetch_seq_regions_from_Ensembl_FTP(core_db_url)
+fetch_seq_regions_from_Ensembl_FTP <- function(core_db_url,
                                                add.toplevel.col=FALSE,
                                                add.non_ref.col=FALSE)
 {
     stopifnot(isTRUEorFALSE(add.toplevel.col),
               isTRUEorFALSE(add.non_ref.col))
 
-    coord_systems <- fetch_default_coord_systems_from_Ensembl_ftp(core_url)
+    coord_systems <- fetch_default_coord_systems_from_Ensembl_FTP(core_db_url)
 
     ## Fetch table "seq_region".
-    seq_regions <- fetch_table_from_Ensembl_ftp(core_url, "seq_region")
+    seq_regions <- fetch_table_from_Ensembl_FTP(core_db_url, "seq_region")
 
     ## INNER JOIN table "seq_region" with table "coord_system".
     Rtable <- "coord_system"
@@ -275,10 +506,11 @@ fetch_seq_regions_from_Ensembl_ftp <- function(core_url,
     ans <- join_dfs(seq_regions, coord_systems, Lcolumn, Rcolumn)
     seq_region_ids <- ans[ , "seq_region_id"]
 
-    ans$synonyms <- .fetch_synonyms_from_Ensembl_ftp(core_url, seq_region_ids)
+    ans$synonyms <- .fetch_synonyms_from_Ensembl_FTP(core_db_url,
+                                                     seq_region_ids)
 
     if (add.toplevel.col || add.non_ref.col) {
-        cols <- .fetch_attribs_from_Ensembl_ftp(core_url,
+        cols <- .fetch_attribs_from_Ensembl_FTP(core_db_url,
                                                 seq_region_ids,
                                                 toplevel=add.toplevel.col,
                                                 non_ref=add.non_ref.col)
@@ -287,105 +519,5 @@ fetch_seq_regions_from_Ensembl_ftp <- function(core_url,
     }
 
     ans
-}
-
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Obtain URLs to specific folders on the Ensembl FTP server
-###
-
-.ENSEMBL.PUB_FTP_URL <- "ftp://ftp.ensembl.org/pub/"
-.ENSEMBLGRCh37.PUB_FTP_URL <- "ftp://ftp.ensembl.org/pub/grch37/"
-.ENSEMBLGENOMES.PUB_FTP_URL <- "ftp://ftp.ensemblgenomes.org/pub/"
-
-### 'kingdom' must be NA or one of the EnsemblGenomes marts i.e. "bacteria",
-### "fungi", "metazoa", "plants", or "protists".
-get_url_to_Ensembl_ftp_mysql <- function(
-    release=NA,
-    use.grch37=FALSE, kingdom=NA)
-{
-    if (is.na(kingdom)) {
-        if (is.na(release)) {
-            if (use.grch37) {
-                pub_subdir <- "current/mysql"
-            } else {
-                pub_subdir <- "current_mysql"
-            }
-        } else {
-            pub_subdir <- paste0("release-", release, "/mysql")
-        }
-        if (use.grch37)
-            pub_ftp_url <- .ENSEMBLGRCh37.PUB_FTP_URL
-        else
-            pub_ftp_url <- .ENSEMBL.PUB_FTP_URL
-    } else {
-        pub_ftp_url <- paste0(.ENSEMBLGENOMES.PUB_FTP_URL, kingdom, "/")
-        if (is.na(release)) {
-            pub_subdir <- "current"
-        } else {
-            pub_subdir <- paste0("release-", release)
-        }
-        pub_subdir <- paste0(pub_subdir, "/mysql")
-    }
-    paste0(pub_ftp_url, pub_subdir, "/")
-}
-
-get_url_to_Ensembl_ftp_gtf <- function(release=NA)
-{
-    if (is.na(release))
-        pub_subdir <- "current_gtf"
-    else
-        pub_subdir <- paste0("release-", release, "/gtf")
-    paste0(.ENSEMBL.PUB_FTP_URL, pub_subdir, "/")
-}
-
-.ENSEMBL_cached_core_dirs <- new.env(parent=emptyenv())
-
-.list_Ensembl_ftp_mysql_core_dirs <- function(url, release=NA)
-{
-    stopifnot(isSingleString(url))
-    pattern <- "_core_"
-
-    core_dirs <- .ENSEMBL_cached_core_dirs[[url]]
-    if (is.null(core_dirs)) {
-        subdirs <- list_ftp_dir(url, subdirs.only=TRUE)
-        core_dirs <- subdirs[grep(pattern, subdirs, fixed=TRUE)]
-        .ENSEMBL_cached_core_dirs[[url]] <- core_dirs
-    }
-
-    if (!is.na(release))
-        pattern <- paste0(pattern, release, "_")
-    core_dirs[grep(pattern, core_dirs, fixed=TRUE)]
-}
-
-.get_Ensembl_ftp_mysql_core_dir <- function(url, dataset, release=NA)
-{
-    stopifnot(isSingleString(dataset))
-    core_dirs <- .list_Ensembl_ftp_mysql_core_dirs(url, release=release)
-    trimmed_core_dirs <- sub("_core_.*$", "", core_dirs)
-    shortnames <- sub("^(.)[^_]*_", "\\1", trimmed_core_dirs)
-    if (dataset == "mfuro_gene_ensembl") {
-        shortname0 <- "mputorius_furo"
-    } else {
-        shortname0 <- strsplit(dataset, "_", fixed=TRUE)[[1L]][1L]
-    }
-    core_dir <- core_dirs[shortnames == shortname0]
-    if (length(core_dir) != 1L)
-        stop("found 0 or more than 1 subdir for \"", dataset,
-             "\" dataset at ", url)
-    core_dir
-}
-
-### 'kingdom' must be NA or one of the EnsemblGenomes marts i.e. "bacteria",
-### "fungi", "metazoa", "plants", or "protists".
-### Return URL of Ensemble Core DB (FTP access).
-get_url_to_Ensembl_ftp_mysql_core <- function(
-    dataset, release=NA,
-    use.grch37=FALSE, kingdom=NA, url=NA)
-{
-    if (is.na(url))
-        url <- get_url_to_Ensembl_ftp_mysql(release, use.grch37, kingdom)
-    core_dir <- .get_Ensembl_ftp_mysql_core_dir(url, dataset, release=release)
-    paste0(url, core_dir, "/")
 }
 

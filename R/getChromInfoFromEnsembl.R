@@ -252,20 +252,20 @@
 
 .ENSEMBL_cached_chrom_info <- new.env(parent=emptyenv())
 
-.get_chrom_info_for_unregistered_Ensembl_dataset <- function(core_url,
+.get_chrom_info_from_Ensembl_FTP <- function(core_db_url,
     assembled.molecules.only=FALSE,
     include.non_ref.sequences=FALSE,
     include.contigs=FALSE,
     include.clones=FALSE,
     recache=FALSE)
 {
-    ans <- .ENSEMBL_cached_chrom_info[[core_url]]
+    ans <- .ENSEMBL_cached_chrom_info[[core_db_url]]
     if (is.null(ans) || recache) {
-        seq_regions <- fetch_seq_regions_from_Ensembl_ftp(core_url,
+        seq_regions <- fetch_seq_regions_from_Ensembl_FTP(core_db_url,
                                          add.toplevel.col=TRUE,
                                          add.non_ref.col=TRUE)
         ans <- .format_Ensembl_chrom_info(seq_regions)
-        .ENSEMBL_cached_chrom_info[[core_url]] <- ans
+        .ENSEMBL_cached_chrom_info[[core_db_url]] <- ans
     }
     if (assembled.molecules.only) {
         ## FIXME: This is broken on some datasets e.g. btaurus_gene_ensembl
@@ -289,7 +289,7 @@
 }
 
 getChromInfoFromEnsembl <- function(dataset,
-    release=NA, use.grch37=FALSE, kingdom=NA,
+    release=NA, division=NA, use.grch37=FALSE,
     assembled.molecules.only=FALSE,
     include.non_ref.sequences=FALSE,
     include.contigs=FALSE,
@@ -297,13 +297,9 @@ getChromInfoFromEnsembl <- function(dataset,
     recache=FALSE,
     as.Seqinfo=FALSE)
 {
-    ## TODO: get_url_to_Ensembl_ftp_mysql_core() is not users proof (i.e.
-    ## it does not check user input). Either make it users proof or wrap it
-    ## into a users proof wrapper.
-    core_url <- get_url_to_Ensembl_ftp_mysql_core(dataset,
-                                                  release=release,
-                                                  use.grch37=use.grch37,
-                                                  kingdom=kingdom)
+    core_db_url <- get_Ensembl_FTP_core_db_url(dataset, release=release,
+                                               division=division,
+                                               use.grch37=use.grch37)
     if (!isTRUEorFALSE(assembled.molecules.only))
         stop(wmsg("'assembled.molecules.only' must be TRUE or FALSE"))
     if (!isTRUEorFALSE(include.non_ref.sequences))
@@ -317,7 +313,7 @@ getChromInfoFromEnsembl <- function(dataset,
     if (!isTRUEorFALSE(as.Seqinfo))
         stop(wmsg("'as.Seqinfo' must be TRUE or FALSE"))
 
-    ans <- .get_chrom_info_for_unregistered_Ensembl_dataset(core_url,
+    ans <- .get_chrom_info_from_Ensembl_FTP(core_db_url,
                 assembled.molecules.only=assembled.molecules.only,
                 include.non_ref.sequences=include.non_ref.sequences,
                 include.contigs=include.contigs,

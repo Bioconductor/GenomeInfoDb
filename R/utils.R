@@ -6,6 +6,11 @@
 ###
 
 
+is_single_value <- function(x)
+{
+    is.vector(x) && is.atomic(x) && length(x) == 1L
+}
+
 is_primary_key <- function(x)
 {
     !anyNA(x) && all(nzchar(x)) && !anyDuplicated(x)
@@ -200,10 +205,9 @@ list_ftp_dir <- function(url, subdirs.only=FALSE)
     if (is.null(col2class))
         col2class <- NA
     ## Prepare args to pass to read.table().
-    args <- list(file, header=header,
-                 sep=sep, quote=quote, na.strings=c("NA", "na"),
-                 colClasses=col2class, nrows=nrows, skip=skip,
-                 comment.char=comment.char, stringsAsFactors=FALSE)
+    args <- list(file, header=header, sep=sep, quote=quote, row.names=NULL,
+                 na.strings=c("NA", "na"), colClasses=col2class, nrows=nrows,
+                 skip=skip, comment.char=comment.char, stringsAsFactors=FALSE)
     if (!is.null(colnames))
         args$col.names <- colnames
     do.call(read.table, args)
@@ -213,7 +217,7 @@ list_ftp_dir <- function(url, subdirs.only=FALSE)
 fetch_table_from_url <- function(url, ...)
 {
     destfile <- tempfile()
-    download.file(url, destfile, quiet=TRUE)
+    suppressWarnings(download.file(url, destfile, quiet=TRUE))
     ans <- .simple_read_table(destfile, ...)
     unlink(destfile)
     ans
