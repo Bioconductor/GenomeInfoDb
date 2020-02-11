@@ -3,19 +3,17 @@
 \alias{getChromInfoFromEnsembl}
 
 \title{
-  Get chromosome information for an Ensembl dataset
+  Get chromosome information for an Ensembl species
 }
 
 \description{
-  WORK IN PROGRESS!
-
   \code{getChromInfoFromEnsembl} returns chromosome information like
-  sequence names, lengths and circularity flags for a given Ensembl dataset
-  e.g. hsapiens_gene_ensembl, scerevisiae_gene_ensembl, etc...
+  sequence names, lengths and circularity flags for a given Ensembl
+  species e.g. Human, Cow, Saccharomyces cerevisiae, etc...
 }
 
 \usage{
-getChromInfoFromEnsembl(dataset,
+getChromInfoFromEnsembl(species,
                         release=NA, division=NA, use.grch37=FALSE,
                         assembled.molecules.only=FALSE,
                         include.non_ref.sequences=FALSE,
@@ -26,9 +24,13 @@ getChromInfoFromEnsembl(dataset,
 }
 
 \arguments{
-  \item{dataset}{
-    A single string specifying the name of an Ensembl dataset (e.g.
-    \code{"hsapiens_gene_ensembl"}).
+  \item{species}{
+    A single string specifying the name of an Ensembl species e.g.
+    \code{"human"}, \code{"hsapiens"}, or \code{"Homo sapiens"}.
+    Case is ignored.
+
+    Alternatively the name of an assembly (e.g. \code{"GRCh38"})
+    or a taxonomy id (e.g. 9606) can be supplied.
   }
   \item{release}{
     The Ensembl release to query e.g. 89. If set to \code{NA} (the
@@ -53,14 +55,14 @@ getChromInfoFromEnsembl(dataset,
   \item{include.contigs}{
     Whether or not sequences for which \code{coord_system} is set to
     \code{"contig"} should be included. They are not included by
-    default. Note that dataset \code{hsapiens_gene_ensembl} contains
-    more than one hundred thousands \emph{contigs}.
+    default. Note that the dataset for Human contains more than one
+    hundred thousands \emph{contigs}!
   }
   \item{include.clones}{
     Whether or not sequences for which \code{coord_system} is set to
     \code{"clone"} should be included. They are not included by
-    default. Note that dataset \code{hsapiens_gene_ensembl} contains
-    more than one hundred thousands \emph{clones}.
+    default. Note that the dataset for Human contains more than one
+    hundred thousands \emph{clones}!
   }
   \item{recache}{
     \code{getChromInfoFromEnsembl} uses a cache mechanism so the
@@ -95,6 +97,8 @@ getChromInfoFromEnsembl(dataset,
     \item \code{non_ref}: logical.
     \item \code{circular}: logical.
   }
+  and with attribute \code{species_info} which provides details about
+  the species that was used to obtained the data.
 }
 
 \author{
@@ -118,15 +122,18 @@ getChromInfoFromEnsembl(dataset,
 
 ## Internet access required!
 
-getChromInfoFromEnsembl("celegans_gene_ensembl")
+celegans <- getChromInfoFromEnsembl("celegans")
+attr(celegans, "species_info")
 
-getChromInfoFromEnsembl("celegans_gene_ensembl", as.Seqinfo=TRUE)
+getChromInfoFromEnsembl("celegans", as.Seqinfo=TRUE)
 
-getChromInfoFromEnsembl("scerevisiae_gene_ensembl")
+scerevisiae <- getChromInfoFromEnsembl("scerevisiae")
+attr(scerevisiae, "species_info")
 
-getChromInfoFromEnsembl("scerevisiae_gene_ensembl", as.Seqinfo=TRUE)
+getChromInfoFromEnsembl("scerevisiae", as.Seqinfo=TRUE)
 
-getChromInfoFromEnsembl("athaliana_gene_ensembl", division="plants")
+athaliana <- getChromInfoFromEnsembl("athaliana", division="plants")
+attr(athaliana, "species_info")
 
 ## ---------------------------------------------------------------------
 ## Temporary stuff that needs to go away...
@@ -168,7 +175,7 @@ map_to_NCBI <- function(Ensembl_chrom_info, NCBI_chrom_info,
 ## Based on R64-1-1 (GCA_000146045.2, called R64 at NCBI)
 
 ## Return 17 rows
-yeast_chrom_info <- getChromInfoFromEnsembl("scerevisiae_gene_ensembl")
+yeast_chrom_info <- getChromInfoFromEnsembl("scerevisiae")
 
 ## Mapping to NCBI is one-to-one!
 R64 <- getChromInfoFromNCBI("R64")
@@ -187,7 +194,7 @@ yeast_chrom_info <- .do_join(yeast_chrom_info, R64, L2R)
 ## Based on WBcel235 (GCA_000002985.3)
 
 ## Return 7 rows
-worm_chrom_info <- getChromInfoFromEnsembl("celegans_gene_ensembl")
+worm_chrom_info <- getChromInfoFromEnsembl("celegans")
 
 ## Mapping to NCBI is one-to-one!
 WBcel235 <- getChromInfoFromNCBI("WBcel235")
@@ -203,7 +210,7 @@ table(worm_chrom_info$SequenceRole, worm_chrom_info$toplevel)
 ## Based on GRCh38.p13 (GCA_000001405.28)
 
 ## Return 944 rows
-human_chrom_info <- getChromInfoFromEnsembl("hsapiens_gene_ensembl")
+human_chrom_info <- getChromInfoFromEnsembl("hsapiens")
 #                 1 id: 131550  <- ref chromosome
 # CHR_HSCHR1_1_CTG3 id: 131561  <- non-ref chromosome
 #     HSCHR1_1_CTG3 id: 131562  <- scaffold (no scaffold is non_ref)
@@ -246,7 +253,7 @@ table(human_chrom_info$SequenceRole, human_chrom_info$toplevel)
 ## Based on GRCm38.p6 (GCA_000001635.8)
 
 ## Return 258 rows
-mouse_chrom_info <- getChromInfoFromEnsembl("mmusculus_gene_ensembl")
+mouse_chrom_info <- getChromInfoFromEnsembl("mmusculus")
 
 ## Map to NCBI
 ## Summary:
@@ -287,7 +294,7 @@ mouse_chrom_info[mouse_chrom_info$SequenceName %in% "MT", c(1:5, 8, 11, 13)]
 ## Based on Rnor_6.0 (GCA_000001895.4)
 
 # Return 1418 rows
-rat_chrom_info <- getChromInfoFromEnsembl("rnorvegicus_gene_ensembl")
+rat_chrom_info <- getChromInfoFromEnsembl("rnorvegicus")
 
 ## Map to NCBI
 ## Summary:
@@ -323,7 +330,7 @@ table(rat_chrom_info$SequenceRole, rat_chrom_info$toplevel)
 ## Based on ARS-UCD1.2 (GCA_002263795.2)
 
 ## Return 2211 rows
-cow_chrom_info <- getChromInfoFromEnsembl("btaurus_gene_ensembl")
+cow_chrom_info <- getChromInfoFromEnsembl("btaurus")
 
 ## Map to NCBI:
 ## Summary:

@@ -90,7 +90,7 @@
         m1 <- match(names(special_mappings), Ensembl_seqlevels)
         if (anyNA(m1))
             stop(wmsg("'names(special_mappings)' contains sequence ",
-                      "names not found in the Ensembl dataset"))
+                      "names not found in Ensembl core db"))
         m2 <- match(special_mappings, NCBI_seqlevels)
         if (anyNA(m2))
             stop(wmsg("'special_mappings' contains sequence ",
@@ -268,7 +268,7 @@
         .ENSEMBL_cached_chrom_info[[core_db_url]] <- ans
     }
     if (assembled.molecules.only) {
-        ## FIXME: This is broken on some datasets e.g. btaurus_gene_ensembl
+        ## FIXME: This is broken for some core dbs e.g. bos_taurus_core_99_12
         ## where coord_system is not set to "chromosome" for chromosomes.
         keep_idx <- which(ans[ , "coord_system"] %in% "chromosome")
         ans <- S4Vectors:::extract_data_frame_rows(ans, keep_idx)
@@ -288,7 +288,7 @@
     ans
 }
 
-getChromInfoFromEnsembl <- function(dataset,
+getChromInfoFromEnsembl <- function(species,
     release=NA, division=NA, use.grch37=FALSE,
     assembled.molecules.only=FALSE,
     include.non_ref.sequences=FALSE,
@@ -297,7 +297,7 @@ getChromInfoFromEnsembl <- function(dataset,
     recache=FALSE,
     as.Seqinfo=FALSE)
 {
-    core_db_url <- get_Ensembl_FTP_core_db_url(dataset, release=release,
+    core_db_url <- get_Ensembl_FTP_core_db_url(species, release=release,
                                                division=division,
                                                use.grch37=use.grch37)
     if (!isTRUEorFALSE(assembled.molecules.only))
@@ -320,10 +320,19 @@ getChromInfoFromEnsembl <- function(dataset,
                 include.clones=include.clones,
                 recache=recache)
 
-    if (!as.Seqinfo)
+    species_info <- attr(core_db_url, "species_info")
+    if (!as.Seqinfo) {
+        attr(ans, "species_info") <- species_info
         return(ans)
+    }
+    if (is.null(species_info)) {
+        ans_genome <- rep.int(NA_character_, nrow(ans))
+    } else {
+        ans_genome <- species_info$assembly
+    }
     Seqinfo(seqnames=ans[ , "name"],
             seqlengths=ans[ , "length"],
-            isCircular=ans[ , "circular"])
+            isCircular=ans[ , "circular"],
+            genome=ans_genome)
 }
 

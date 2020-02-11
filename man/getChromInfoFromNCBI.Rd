@@ -125,7 +125,7 @@ registered_NCBI_genomes()
           information for a UCSC genome assembly.
 
     \item \code{\link{getChromInfoFromEnsembl}} for getting chromosome
-          information for an Ensembl dataset.
+          information for an Ensembl species.
 
     \item \link{Seqinfo} objects.
   }

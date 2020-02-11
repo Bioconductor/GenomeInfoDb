@@ -7,7 +7,7 @@
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Obtain URLs to specific locations on the Ensembl FTP server
+### Obtain URL of a given core db on the Ensembl FTP servers
 ###
 
 .ENSEMBL_FTP_PUB_URL <- "ftp://ftp.ensembl.org/pub/"
@@ -26,8 +26,8 @@
     if (!is.na(division)) {
         if (!is.character(division) || division == "")
             stop(wmsg("'division' must be a single non-empty string or NA"))
-        if (!isFALSE(use.grch37))
-            warning(wmsg("'use.grch37' is ignored when 'division' is supplied"))
+        if (use.grch37)
+            stop(wmsg("'division' and 'use.grch37' cannot both be specified"))
         top_url <- paste0(.ENSEMBLGENOMES_FTP_PUB_URL, division, "/")
     } else if (use.grch37) {
         top_url <- .ENSEMBL_FTP_PUB_GRCH37_URL
@@ -66,7 +66,69 @@ list_Ensembl_FTP_releases <- function(division=NA, use.grch37=FALSE,
     releases
 }
 
-get_Ensembl_FTP_species_url <- function(release=NA, division=NA)
+.predict_core_db_in_Ensembl_FTP_grch37 <- function(species=NA, release=NA)
+{
+    ## User-supplied 'species' will be ignored.
+    warn <- TRUE
+    if (missing(species))
+        warn <- FALSE
+    if (warn && is_single_value(species)) {
+        if (is.na(species)) {
+            ok <- TRUE
+        } else if (is.character(species)) {
+            ok <- species == "" ||
+                  grepl("human", species, ignore.case=TRUE) ||
+                  grepl("homo", species, ignore.case=TRUE) ||
+                  grepl("sapiens", species, ignore.case=TRUE) ||
+                  grepl("GRCh37", species, ignore.case=TRUE)
+        } else {
+            ok <- FALSE
+        }
+        warn <- !ok
+    }
+    if (warn)
+        warning(wmsg("you've set 'use.grch37' to TRUE ",
+                     "so 'species' was ignored"))
+    if (is.na(release))
+        release <- tail(list_Ensembl_FTP_releases(), n=1L)  # latest
+    core_db <- paste0("homo_sapiens_core_", release, "_37")
+    attr(core_db, "species_info") <- list(
+        name="Human",
+        species="homo_sapiens",
+        division="EnsemblVertebrates",
+        taxonomy_id=9606L,
+        assembly="GRCh37",
+        assembly_accession="GCF_000001405.13",
+        core_db=core_db
+    )
+    core_db
+}
+
+### The species index file can be used with Ensembl releases >= 96 and
+### Ensembl Genomes releases >= 22.
+use_species_index_from_Ensembl_FTP <- function(release=NA, division=NA,
+                                               use.grch37=FALSE)
+{
+    if (!is_single_value(release))
+        stop(wmsg("'release' must be a single value"))
+    if (!is_single_value(division))
+        stop(wmsg("'division' must be a single value"))
+    if (!isTRUEorFALSE(use.grch37))
+        stop(wmsg("'use.grch37' must be TRUE or FALSE"))
+    if (use.grch37) {
+        if (is.na(division))
+            return(FALSE)
+        stop(wmsg("'division' and 'use.grch37' cannot both be specified"))
+    }
+    if (is.na(release))
+        return(TRUE)
+    release <- as.integer(release)
+    if (is.na(division))
+        return(release >= 96L)
+    release >= 22L
+}
+
+.get_Ensembl_FTP_species_index_url <- function(release=NA, division=NA)
 {
     if (!is_single_value(release))
         stop(wmsg("'release' must be a single value"))
@@ -76,8 +138,8 @@ get_Ensembl_FTP_species_url <- function(release=NA, division=NA)
         species_file <- "species_EnsemblVertebrates.txt"
     } else {
         ## Available in Ensembl Genomes release 17 (Feb 2013) and above.
-        ## However the current format (see fetch_species_from_Ensembl_FTP()
-        ## below) is used only since release 22 (March 2014).
+        ## However the current format is used only since release 22 (March
+        ## 2014). See .fetch_species_index_from_url() below.
         species_file <- switch(division,
             bacteria="species_EnsemblBacteria.txt",
             fungi="species_EnsemblFungi.txt",
@@ -96,6 +158,172 @@ get_Ensembl_FTP_species_url <- function(release=NA, division=NA)
         subdir <- "current"
     }
     paste0(top_url, subdir, "/", species_file)
+}
+
+.cached_species_index <- new.env(parent=emptyenv())
+
+.fetch_species_index_from_url <- function(url)
+{
+    species_index <- .cached_species_index[[url]]
+    if (is.null(species_index)) {
+        ## This is the format used in Ensembl releases >= 96 and Ensembl
+        ## Genomes releases >= 22.
+        expected_colnames <- c(
+            "name", "species", "division", "taxonomy_id",
+            "assembly", "assembly_accession", "genebuild", "variation",
+            "pan_compara", "peptide_compara", "genome_alignments",
+            "other_alignments", "core_db", "species_id"
+        )
+        species_index <- fetch_table_from_url(url, header=TRUE)
+
+        ## Note that Ensembl species index files are broken: the header line
+        ## specifies 14 fields separated by 13 tabs BUT each line of data
+        ## contains 14 tabs! The last tab is an additional tab placed
+        ## at the end of the line i.e. after the 14th value in the line.
+        ## For read.table() this means that there are actually 15 values
+        ## and that the last value is missing! As a consequence the colnames
+        ## on the returned data frame are completely messed up!
+        expected_messed_up_colnames <- c("row.names", expected_colnames)
+        expected_messed_up_colnames[2L] <- "X.name"
+        if (!identical(colnames(species_index), expected_messed_up_colnames))
+            stop(wmsg(url, " does not contain the expected fields"))
+        colnames(species_index) <- c(expected_colnames, "V15")
+
+        ## The last column should be filled with NAs. Drop it.
+        stopifnot(all(is.na(species_index[[length(species_index)]])))
+        species_index <- species_index[-length(species_index)]
+
+        .cached_species_index[[url]] <- species_index
+    }
+    species_index
+}
+
+fetch_species_index_from_Ensembl_FTP <- function(release=NA, division=NA)
+{
+    url <- .get_Ensembl_FTP_species_index_url(release=release,
+                                              division=division)
+    .fetch_species_index_from_url(url)
+}
+
+.stop_on_ambiguous_lookup <- function(species_index, idx, max_print,
+                                      species, column, url)
+{
+    show_matching_entries <- function(species_index, idx) {
+        cat("\n  Matching entries")
+        truncate <- length(idx) > max_print
+        if (truncate) {
+            cat(" (showing the first", max_print, "only)")
+            idx <- head(idx, n=max_print)
+        }
+        cat(":\n")
+        ## We drop columns that are totally uninteresting/meaningless in
+        ## the context of species lookup.
+        drop_columns <- c(
+            "variation", "pan_compara", "peptide_compara",
+            "genome_alignments", "other_alignments", "species_id"
+        )
+        m <- as.matrix(drop_cols(species_index[idx, ], drop_columns))
+        if (truncate) {
+            ellipsis <- "..."
+            m <- rbind(m, rep.int(ellipsis, ncol(m)))
+            rownames(m)[max_print + 1L] <- ellipsis
+        }
+        rownames(m) <- paste0("    ", rownames(m))
+        print(m, quote=FALSE, right=TRUE)
+    }
+    on.exit(show_matching_entries(species_index, idx))
+    stop("\n  ", wmsg("Found ", length(idx), " matches (case insensitive) ",
+              "for \"", species, "\" in \"", column, "\" column of ",
+              "Ensembl species index file:"),
+              "\n    ", url)
+}
+
+### Matches a 'species' supplied as the name of a BioMart dataset (e.g.
+### "hsapiens" or "hsapiens_gene_ensembl") to its corresponding core db.
+.lookup_abbrev_species_in_core_dbs <- function(species, core_dbs)
+{
+    trimmed_core_dbs <- sub("_core_.*$", "", core_dbs)
+    abbrev_core_dbs <- sub("^(.)[^_]*_", "\\1", trimmed_core_dbs)
+    if (species == "mfuro_gene_ensembl") {
+        abbrev_species <- "mputorius_furo"
+    } else {
+        abbrev_species <- strsplit(species, "_", fixed=TRUE)[[1L]][[1L]]
+    }
+    which(abbrev_core_dbs == abbrev_species)
+}
+
+.lookup_species <- function(species, species_index, url)
+{
+    .normalize_species <- function(species) chartr(" ", "_", tolower(species))
+
+    ## Exact match (case insensitive).
+    search_columns <- c("name", "species", "taxonomy_id",
+                        "assembly", "assembly_accession", "core_db")
+    for (column in search_columns) {
+        if (column %in% c("name", "taxonomy_id")) {
+            target <- species
+        } else {
+            target <- .normalize_species(species)
+        }
+        idx <- which(tolower(species_index[ , column]) %in% target)
+        if (length(idx) == 1L)
+            return(idx)
+        if (length(idx) > 1L)
+            .stop_on_ambiguous_lookup(species_index, idx, 4L,
+                                      species, column, url)
+    }
+
+    ## Matches a 'species' supplied as the name of a BioMart dataset (e.g.
+    ## "hsapiens_gene_ensembl" or "hsapiens") to the "core_db" column.
+    idx <- .lookup_abbrev_species_in_core_dbs(.normalize_species(species),
+                                              species_index[ , "core_db"])
+    if (length(idx) == 1L)
+        return(idx)
+    if (length(idx) > 1L)
+        .stop_on_ambiguous_lookup(species_index, idx, 4L,
+                                  species, "core_db", url)
+
+    ## Fuzzy match (grep()-based).
+    search_columns <- c("name", "species", "assembly", "core_db")
+    for (column in search_columns) {
+        if (column %in% "name") {
+            target <- species
+        } else {
+            target <- .normalize_species(species)
+        }
+        idx <- grep(target, species_index[ , column], ignore.case=TRUE)
+        if (length(idx) == 1L)
+            return(idx)
+        if (length(idx) > 1L)
+            .stop_on_ambiguous_lookup(species_index, idx, 4L,
+                                      species, column, url)
+    }
+
+    ## We tried hard and failed!
+    stop(wmsg("Couldn't find \"", species, "\" in ",
+              "Ensembl species index file:"),
+         "\n    ", url)
+}
+
+.find_core_db_in_Ensembl_FTP_species_index <- function(species,
+                                                       release=NA, division=NA)
+{
+    stopifnot(isSingleString(species))
+    url <- .get_Ensembl_FTP_species_index_url(release=release,
+                                              division=division)
+    species_index <- .fetch_species_index_from_url(url)
+    idx <- .lookup_species(species, species_index, url)
+    core_db <- species_index[idx, "core_db"]
+    attr(core_db, "species_info") <- list(
+        name=species_index[idx, "name"],
+        species=species_index[idx, "species"],
+        division=species_index[idx, "division"],
+        taxonomy_id=species_index[idx, "taxonomy_id"],
+        assembly=species_index[idx, "assembly"],
+        assembly_accession=species_index[idx, "assembly_accession"],
+        core_db=core_db
+    )
+    core_db
 }
 
 ### 'division' must be NA or one of the Ensembl Genomes divisions i.e.
@@ -161,79 +389,58 @@ get_Ensembl_FTP_gtf_url <- function(release=NA, division=NA,
     core_dbs[grep(pattern, core_dbs, fixed=TRUE)]
 }
 
-.get_Ensembl_FTP_core_db <- function(mysql_url, dataset, release=NA)
+.find_core_db_in_Ensembl_FTP_core_dbs <-
+    function(mysql_url, species, release=NA)
 {
-    stopifnot(isSingleString(dataset))
+    stopifnot(isSingleString(species))
     core_dbs <- .list_Ensembl_FTP_core_dbs(mysql_url, release=release)
-    trimmed_core_dbs <- sub("_core_.*$", "", core_dbs)
-    shortnames <- sub("^(.)[^_]*_", "\\1", trimmed_core_dbs)
-    if (dataset == "mfuro_gene_ensembl") {
-        shortname0 <- "mputorius_furo"
-    } else {
-        shortname0 <- strsplit(dataset, "_", fixed=TRUE)[[1L]][1L]
-    }
-    core_db <- core_dbs[shortnames == shortname0]
-    if (length(core_db) != 1L)
-        stop(wmsg("found 0 or more than 1 subdir for \"", dataset,
-                  "\" dataset at ", mysql_url))
-    core_db
+    species2 <- chartr(" ", "_", tolower(species))
+    idx <- .lookup_abbrev_species_in_core_dbs(species2, core_dbs)
+    if (length(idx) != 1L)
+        stop(wmsg("found 0 or more than 1 subdir for \"", species,
+                  "\" species at ", mysql_url))
+    core_dbs[[idx]]
 }
 
 ### 'division' must be NA or one of the Ensembl Genomes divisions i.e.
 ### "bacteria", "fungi", "metazoa", "plants", or "protists".
 ### Return URL to Ensemble Core DB (FTP access).
-get_Ensembl_FTP_core_db_url <- function(dataset, release=NA, division=NA,
+get_Ensembl_FTP_core_db_url <- function(species, release=NA, division=NA,
                                         use.grch37=FALSE)
 {
-    mysql_url <- get_Ensembl_FTP_mysql_url(release=release, division=division,
+    mysql_url <- get_Ensembl_FTP_mysql_url(release=release,
+                                           division=division,
                                            use.grch37=use.grch37)
-    core_db <- .get_Ensembl_FTP_core_db(mysql_url, dataset, release=release)
-    paste0(mysql_url, core_db, "/")
-}
-
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### fetch_species_from_Ensembl_FTP()
-###
-
-.Ensembl_FTP_cached_species <- new.env(parent=emptyenv())
-
-### Works with Ensembl releases >= 96 and Ensembl Genomes releases >= 22.
-fetch_species_from_Ensembl_FTP <- function(release=NA, division=NA)
-{
-    url <- get_Ensembl_FTP_species_url(release=release, division=division)
-    species <- .Ensembl_FTP_cached_species[[url]]
-    if (is.null(species)) {
-        ## This is the format used in Ensembl releases >= 96 and Ensembl
-        ## Genomes releases >= 22.
-        expected_colnames <- c(
-            "name", "species", "division", "taxonomy_id",
-            "assembly", "assembly_accession", "genebuild", "variation",
-            "pan_compara", "peptide_compara", "genome_alignments",
-            "other_alignments", "core_db", "species_id"
-        )
-        species <- fetch_table_from_url(url, header=TRUE)
-
-        ## Note that Ensembl species files are broken: the header line
-        ## specifies 14 fields separated by 13 tabs BUT each line of data
-        ## contains 14 tabs! The last tab is an additional tab placed
-        ## at the end of the line i.e. after the 14th value in the line.
-        ## For read.table() this means that there are actually 15 values
-        ## and that the last value is missing! As a consequence the colnames
-        ## on the returned data frame are completely messed up!
-        expected_messed_up_colnames <- c("row.names", expected_colnames)
-        expected_messed_up_colnames[2L] <- "X.name"
-        if (!identical(colnames(species), expected_messed_up_colnames))
-            stop(wmsg(url, " does not contain the expected fields"))
-        colnames(species) <- c(expected_colnames, "V15")
-
-        ## The last column should be filled with NAs. Drop it.
-        stopifnot(all(is.na(species[[length(species)]])))
-        species <- species[-length(species)]
-
-        .Ensembl_FTP_cached_species[[url]] <- species
+    if (use.grch37) {
+        core_db <- .predict_core_db_in_Ensembl_FTP_grch37(
+                                           species,
+                                           release=release)
+    } else {
+        if (!isSingleString(species) || species == "")
+            stop(wmsg("'species' must be a single non-empty string"))
+        use_species_index <- use_species_index_from_Ensembl_FTP(
+                                           release=release,
+                                           division=division,
+                                           use.grch37=use.grch37)
+        if (use_species_index) {
+            ## The new way!
+            core_db <- .find_core_db_in_Ensembl_FTP_species_index(
+                                           species,
+                                           release=release,
+                                           division=division)
+        } else {
+            ## The old way. Dumb, unreliable, and slow!
+            ## Only works if 'species' is supplied as the name of a BioMart
+            ## dataset e.g. "celegans_gene_ensembl" (or "celegans").
+            ## Ridiculously stiff and outdated!
+            core_db <- .find_core_db_in_Ensembl_FTP_core_dbs(
+                                           mysql_url,
+                                           species, release=release)
+        }
     }
-    species
+    core_db_url <- paste0(mysql_url, core_db, "/")
+    attr(core_db_url, "species_info") <- attr(core_db, "species_info")
+    core_db_url
 }
 
 
@@ -248,7 +455,7 @@ fetch_species_from_Ensembl_FTP <- function(release=NA, division=NA)
 ### Fundamental Tables
 
 ### 'attrib_type' table.
-### nrow = 331 (in dataset hsapiens_gene_ensembl, Ensembl 99)
+### (331 rows in homo_sapiens_core_99_38)
 .ENSEMBLDB_ATTRIB_TYPE_COLUMNS <- c(
     "attrib_type_id",         # primary key
     "code",
@@ -259,7 +466,7 @@ fetch_species_from_Ensembl_FTP <- function(release=NA, division=NA)
 ### Assembly Tables
 
 ### 'seq_region' table.
-### nrow = 268443 (in dataset hsapiens_gene_ensembl, Ensembl 99)
+### (268443 rows in homo_sapiens_core_99_38)
 .ENSEMBLDB_SEQ_REGION_COLUMNS <- c(
     "seq_region_id",          # primary key
     "name",
@@ -268,7 +475,7 @@ fetch_species_from_Ensembl_FTP <- function(release=NA, division=NA)
 )
 
 ### 'coord_system' table.
-### nrow = 9 (in dataset hsapiens_gene_ensembl, Ensembl 99)
+### (9 rows in homo_sapiens_core_99_38)
 .ENSEMBLDB_COORD_SYSTEM_COLUMNS <- c(
     "coord_system_id",        # primary key
     "species_id",
@@ -279,7 +486,7 @@ fetch_species_from_Ensembl_FTP <- function(release=NA, division=NA)
 )
 
 ### 'seq_region_attrib' table.
-### nrow = 5927 (in dataset hsapiens_gene_ensembl, Ensembl 99)
+### (5927 rows in homo_sapiens_core_99_38)
 .ENSEMBLDB_SEQ_REGION_ATTRIB_COLUMNS <- c(
     "seq_region_id",          # ==> seq_region.seq_region_id
     "attrib_type_id",         # ==> attrib_type.attrib_type_id
@@ -287,7 +494,7 @@ fetch_species_from_Ensembl_FTP <- function(release=NA, division=NA)
 )
 
 ### 'seq_region_synonym' table.
-### nrow = 2360 (in dataset hsapiens_gene_ensembl, Ensembl 99)
+### (2360 rows in homo_sapiens_core_99_38)
 .ENSEMBLDB_SEQ_REGION_SYNONYM_COLUMNS <- c(
     "seq_region_synonym_id",  # primary key
     "seq_region_id",          # ==> seq_region.seq_region_id
@@ -298,7 +505,7 @@ fetch_species_from_Ensembl_FTP <- function(release=NA, division=NA)
 ### External References
 
 ### 'external_db' table.
-### nrow = 446 (in dataset hsapiens_gene_ensembl, Ensembl 99)
+### (446 rows in homo_sapiens_core_99_38)
 .ENSEMBLDB_EXTERNAL_DB_COLUMNS <- c(
     "external_db_id",         # primary key
     "db_name",
@@ -484,7 +691,7 @@ fetch_default_coord_systems_from_Ensembl_FTP <- function(core_db_url)
 
 ### This is the workhorse behind getChromInfoFromEnsembl().
 ### Typical use:
-###   core_db_url <- get_Ensembl_FTP_core_db_url("hsapiens_gene_ensembl")
+###   core_db_url <- get_Ensembl_FTP_core_db_url("hsapiens")
 ###   fetch_seq_regions_from_Ensembl_FTP(core_db_url)
 fetch_seq_regions_from_Ensembl_FTP <- function(core_db_url,
                                                add.toplevel.col=FALSE,
