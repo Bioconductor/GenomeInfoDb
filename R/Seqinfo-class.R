@@ -141,17 +141,18 @@ setValidity2("Seqinfo", .valid.Seqinfo)
 {
     if (!isSingleString(genome) || genome == "")
         stop("'genome' must be a single non-empty string")
-    NCBI_genomes <- registered_NCBI_genomes()
-    if (genome %in% NCBI_genomes[ , "genome"] ||
-        genome %in% NCBI_genomes[ , "assembly_accession"])
+    NCBI_assemblies <- registered_NCBI_assemblies()
+    if (genome %in% NCBI_assemblies[ , "assembly"] ||
+        genome %in% NCBI_assemblies[ , "assembly_accession"])
         return(getChromInfoFromNCBI(genome, as.Seqinfo=TRUE))
     UCSC_genomes <- registered_UCSC_genomes()
     if (genome %in% UCSC_genomes[ , "genome"])
         return(getChromInfoFromUCSC(genome, as.Seqinfo=TRUE))
-    stop(wmsg("\"", genome, "\" is not a registered NCBI or UCSC genome ",
-              "(use registered_NCBI_genomes() or registered_UCSC_genomes() ",
-              "to list the NCBI or UCSC genome assemblies currently ",
-              "registered in the GenomeInfoDb package)"))
+    stop(wmsg("\"", genome, "\" is not a registered NCBI assembly ",
+              "or UCSC genome (use registered_NCBI_assemblies() or ",
+              "registered_UCSC_genomes() to list the NCBI or UCSC ",
+              "assemblies/genomes currently registered in the ",
+              "GenomeInfoDb package)"))
 }
 
 ### Make sure this always returns an *unnamed* character vector.

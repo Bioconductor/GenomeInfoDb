@@ -4,20 +4,20 @@
 \alias{registered_UCSC_genomes}
 
 \title{
-  Get chromosome information for a UCSC genome assembly
+  Get chromosome information for a UCSC genome
 }
 
 \description{
   \code{getChromInfoFromUCSC} returns chromosome information like
   sequence names, lengths and circularity flags for a given UCSC genome
-  assembly e.g. for hg19, panTro6, sacCer3, etc...
+  e.g. for hg19, panTro6, sacCer3, etc...
 
   Note that \code{getChromInfoFromUCSC} behaves slightly differently
-  depending on whether a genome assembly is \emph{registered} in the
+  depending on whether a genome is \emph{registered} in the
   \pkg{GenomeInfoDb} package or not. See below for the details.
 
-  Use \code{registered_UCSC_genomes} to list all the UCSC genome
-  assemblies currently registered in the \pkg{GenomeInfoDb} package.
+  Use \code{registered_UCSC_genomes} to list all the UCSC genomes
+  currently registered in the \pkg{GenomeInfoDb} package.
 }
 
 \usage{
@@ -34,12 +34,12 @@ registered_UCSC_genomes()
 
 \arguments{
   \item{genome}{
-    A single string specifying the name of a UCSC genome assembly
+    A single string specifying the name of a UCSC genome
     (e.g. \code{"panTro6"}).
   }
   \item{assembled.molecules.only}{
     If \code{FALSE} (the default) then chromosome information is returned
-    for all the sequences in the assembly, that is, for all the chromosomes,
+    for all the sequences in the genome, that is, for all the chromosomes,
     plasmids, and scaffolds.
 
     If \code{TRUE} then chromosome information is returned only for the
@@ -47,15 +47,15 @@ registered_UCSC_genomes()
     mitochondrial chromosome) and plasmids only. No scaffolds.
 
     Note that \code{assembled.molecules.only=TRUE} is supported only for
-    \emph{registered} genome assemblies. When used on an \emph{unregistered}
-    genome assembly, \code{assembled.molecules.only} is ignored with a warning.
+    \emph{registered} genomes. When used on an \emph{unregistered}
+    genome, \code{assembled.molecules.only} is ignored with a warning.
   }
   \item{add.NCBI.cols}{
     \code{TRUE} or \code{FALSE} (the default). If \code{TRUE} then
     additional columns containing data from NCBI are bound to the result.
     This can be useful to map UCSC sequence names to NCBI sequence names.
     Note that this is only supported for \emph{registered} UCSC genomes
-    based on an NCBI genome!
+    based on an NCBI assembly!
   }
   \item{add.ensembl.col}{
     \code{TRUE} or \code{FALSE} (the default). Whether or not the
@@ -68,11 +68,11 @@ registered_UCSC_genomes()
   }
   \item{recache}{
     \code{getChromInfoFromUCSC} uses a cache mechanism so the
-    chromosome sizes of a given genome assembly only get downloaded
+    chromosome sizes of a given genome only get downloaded
     once during the current R session (note that the caching is done
     in memory so cached information does NOT persist across sessions).
     Setting \code{recache} to \code{TRUE} forces a new download (and
-    recaching) of the chromosome sizes for the specified genome assembly.
+    recaching) of the chromosome sizes for the specified genome.
   }
   \item{as.Seqinfo}{
     \code{TRUE} or \code{FALSE} (the default). If \code{TRUE} then a
@@ -84,25 +84,25 @@ registered_UCSC_genomes()
 }
 
 \details{
-  \emph{registered} vs \emph{unregistered} UCSC genome assemblies:
+  \emph{registered} vs \emph{unregistered} UCSC genomes:
   \itemize{
     \item \code{assembled.molecules.only=TRUE} is supported only for
-          \emph{registered} genome assemblies. For \emph{unregistered}
-          genome assemblies, the argument is ignored with a warning.
+          \emph{registered} genomes. For \emph{unregistered}
+          genomes, the argument is ignored with a warning.
 
-    \item For \emph{registered} genome assemblies, the returned
+    \item For \emph{registered} genomes, the returned
           circularity flags are guaranteed to be accurate.
-          For \emph{unregistered} genome assemblies, a heuristic is
+          For \emph{unregistered} genomes, a heuristic is
           used to determine the circular sequences.
 
-    \item For \emph{registered} genome assemblies, special care is taken
+    \item For \emph{registered} genomes, special care is taken
           to make sure that the sequences are returned in a sensible order.
-          For \emph{unregistered} genome assemblies, a heuristic is used
+          For \emph{unregistered} genomes, a heuristic is used
           to return the sequence in a sensible order.
   }
 
   Please contact the maintainer of the \pkg{GenomeInfoDb} package to
-  request registration of additional genome assemblies.
+  request registration of additional genomes.
 }
 
 \value{
@@ -131,8 +131,7 @@ registered_UCSC_genomes()
   is added to the result.
 
   For \code{registered_UCSC_genomes}: A data frame summarizing all the UCSC
-  genome assemblies currently \emph{registered} in the \pkg{GenomeInfoDb}
-  package.
+  genomes currently \emph{registered} in the \pkg{GenomeInfoDb} package.
 }
 
 \author{
@@ -142,7 +141,7 @@ registered_UCSC_genomes()
 \seealso{
   \itemize{
     \item \code{\link{getChromInfoFromNCBI}} for getting chromosome
-          information for an NCBI genome assembly.
+          information for an NCBI assembly.
 
     \item \code{\link{getChromInfoFromEnsembl}} for getting chromosome
           information for an Ensembl species.

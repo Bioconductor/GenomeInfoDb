@@ -5,7 +5,7 @@
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Load and access db of registered NCBI genome assemblies
+### Load and access db of registered NCBI assemblies
 ###
 
 .NCBI_assembly2accession <- new.env(parent=emptyenv())
@@ -15,10 +15,10 @@
 {
     filename <- basename(file_path)
     if (substr(filename, nchar(filename)-1L, nchar(filename)) != ".R")
-        stop(wmsg("name of genome registration file '", filename, "' must ",
+        stop(wmsg("name of assembly registration file '", filename, "' must ",
                   "have extension .R"))
     if (grepl(" ", filename, fixed=TRUE))
-        stop(wmsg("name of genome registration file '", filename, "' must ",
+        stop(wmsg("name of assembly registration file '", filename, "' must ",
                   "not contain spaces"))
 
     ## Placeholders. Will actually get defined when we source the
@@ -30,7 +30,7 @@
 
     stop_if <- function(notok, ...) {
         if (notok)
-            stop("Error in NCBI genome registration file '", filename,
+            stop("Error in NCBI assembly registration file '", filename,
                  "':\n  ", wmsg(...))
     }
 
@@ -48,7 +48,7 @@
     stop_if(is.null(ASSEMBLIES), "'ASSEMBLIES' must be defined")
     stop_if(!is.list(ASSEMBLIES), "'ASSEMBLIES' must be a list of lists")
 
-    required_fields <- c("genome", "date", "assembly_accession", "circ_seqs")
+    required_fields <- c("assembly", "date", "assembly_accession", "circ_seqs")
     for (i in seq_along(ASSEMBLIES)) {
         assembly_info <- ASSEMBLIES[[i]]
         label <- sprintf("'ASSEMBLIES[[%d]]'", i)
@@ -63,10 +63,10 @@
                 label, " must have fields: ",
                 paste(paste0("\"", required_fields, "\""), collapse=", "))
 
-        ## Check "genome" field (required).
-        genome <- assembly_info$genome
-        stop_if(!isSingleString(genome) || genome == "",
-                "\"genome\" field in ", label, " must ",
+        ## Check "assembly" field (required).
+        assembly <- assembly_info$assembly
+        stop_if(!isSingleString(assembly) || assembly == "",
+                "\"assembly\" field in ", label, " must ",
                 "be a single non-empty string")
 
         ## Check "date" field (required).
@@ -121,9 +121,9 @@
                 "be a named character vector")
         }
 
-        genome <- tolower(genome)
-        .NCBI_assembly2accession[[genome]] <-
-            c(.NCBI_assembly2accession[[genome]], accession)
+        assembly <- tolower(assembly)
+        .NCBI_assembly2accession[[assembly]] <-
+            c(.NCBI_assembly2accession[[assembly]], accession)
         assembly_info$organism <- ORGANISM
         assembly_info$rank_within_organism <- i
         .NCBI_accession2assembly_info[[accession]] <- assembly_info
@@ -158,13 +158,13 @@
     col
 }
 
-registered_NCBI_genomes <- function()
+registered_NCBI_assemblies <- function()
 {
     if (length(.NCBI_accession2assembly_info) == 0L)
         .load_registered_NCBI_assemblies()
     assemblies <- unname(as.list(.NCBI_accession2assembly_info, all.names=TRUE))
 
-    colnames <- c("organism", "rank_within_organism", "genome", "date",
+    colnames <- c("organism", "rank_within_organism", "assembly", "date",
                   "extra_info", "assembly_accession", "circ_seqs")
     make_col <- function(colname) {
         col0 <- lapply(assemblies, `[[`, colname)
@@ -189,12 +189,12 @@ registered_NCBI_genomes <- function()
     as.data.frame(drop_cols(ans, "rank_within_organism")[oo, , drop=FALSE])
 }
 
-.lookup_NCBI_assembly2accession <- function(genome)
+.lookup_NCBI_assembly2accession <- function(assembly)
 {
-    stopifnot(isSingleString(genome))
+    stopifnot(isSingleString(assembly))
     if (length(.NCBI_assembly2accession) == 0L)
         .load_registered_NCBI_assemblies()
-    .NCBI_assembly2accession[[tolower(genome)]]
+    .NCBI_assembly2accession[[tolower(assembly)]]
 }
 
 find_NCBI_assembly_info_for_accession <- function(accession)
@@ -309,14 +309,14 @@ find_NCBI_assembly_info_for_accession <- function(accession)
 ### (character), "Relationship" (factor), "RefSeqAccn" (character),
 ### "AssemblyUnit" (factor), "SequenceLength" (integer), "UCSCStyleName"
 ### (character), and "circular" (logical).
-getChromInfoFromNCBI <- function(genome,
+getChromInfoFromNCBI <- function(assembly,
     assembled.molecules.only=FALSE,
     assembly.units=NULL,
     recache=FALSE,
     as.Seqinfo=FALSE)
 {
-    if (!isSingleString(genome))
-        stop(wmsg("'genome' must be a single string"))
+    if (!isSingleString(assembly))
+        stop(wmsg("'assembly' must be a single string"))
     if (!isTRUEorFALSE(assembled.molecules.only))
         stop(wmsg("'assembled.molecules.only' must be TRUE or FALSE"))
     if (!is.null(assembly.units)) {
@@ -329,22 +329,22 @@ getChromInfoFromNCBI <- function(genome,
     if (!isTRUEorFALSE(as.Seqinfo))
         stop(wmsg("'as.Seqinfo' must be TRUE or FALSE"))
 
-    ## First see if the user supplied the assembly accession of a registered
-    ## genome assembly instead of its name.
-    NCBI_assembly_info <- find_NCBI_assembly_info_for_accession(genome)
+    ## First see if the user supplied the accession of a registered assembly
+    ## instead of the name of the assembly.
+    NCBI_assembly_info <- find_NCBI_assembly_info_for_accession(assembly)
     if (!is.null(NCBI_assembly_info)) {
         ## Yes s/he did.
-        accession <- genome
+        accession <- assembly
         circ_seqs <- NCBI_assembly_info$circ_seqs
     } else {
         ## No s/he didn't.
-        ## Now see if s/he supplied the name of a registered genome assembly.
-        accession <- .lookup_NCBI_assembly2accession(genome)
+        ## Now see if s/he supplied the name of a registered assembly.
+        accession <- .lookup_NCBI_assembly2accession(assembly)
         if (!is.null(accession)) {
             ## Yes s/he did.
             if (length(accession) > 1L) {
                 in1string <- paste0(accession, collapse=", ")
-                warning(wmsg("Genome ", genome, " is mapped to more ",
+                warning(wmsg("Assembly ", assembly, " is mapped to more ",
                              "than one assembly (", in1string, "). ",
                              "The first one was selected."))
                 accession <- accession[[1L]]
@@ -354,9 +354,9 @@ getChromInfoFromNCBI <- function(genome,
             circ_seqs <- NCBI_assembly_info$circ_seqs
         } else {
             ## No s/he didn't.
-            ## So now we just assume that 'genome' is an assembly accession
+            ## So now we just assume that 'assembly' is an assembly accession
             ## (an unregistered one).
-            accession <- genome
+            accession <- assembly
             circ_seqs <- NULL
         }
     }
@@ -374,6 +374,6 @@ getChromInfoFromNCBI <- function(genome,
     Seqinfo(seqnames=ans[ , "SequenceName"],
             seqlengths=ans[ , "SequenceLength"],
             isCircular=ans[ , "circular"],
-            genome=NCBI_assembly_info$genome)
+            genome=NCBI_assembly_info$assembly)
 }
 

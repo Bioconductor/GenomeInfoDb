@@ -1,38 +1,38 @@
 \name{getChromInfoFromNCBI}
 
 \alias{getChromInfoFromNCBI}
-\alias{registered_NCBI_genomes}
+\alias{registered_NCBI_assemblies}
 
 \title{
-  Get chromosome information for an NCBI genome assembly
+  Get chromosome information for an NCBI assembly
 }
 
 \description{
-  \code{getChromInfoFromNCBI} returns chromosome information like
-  sequence names, lengths and circularity flags for a given NCBI genome
-  assembly e.g. for GRCh38, ARS-UCD1.2, R64, etc...
+  \code{getChromInfoFromNCBI} returns chromosome information
+  like sequence names, lengths and circularity flags for a given
+  NCBI assembly e.g. for GRCh38, ARS-UCD1.2, R64, etc...
 
   Note that \code{getChromInfoFromNCBI} behaves slightly differently
-  depending on whether a genome assembly is \emph{registered} in the
+  depending on whether the assembly is \emph{registered} in the
   \pkg{GenomeInfoDb} package or not. See below for the details.
 
-  Use \code{registered_NCBI_genomes} to list all the NCBI genome
-  assemblies currently registered in the \pkg{GenomeInfoDb} package.
+  Use \code{registered_NCBI_assemblies} to list all the NCBI assemblies
+  currently registered in the \pkg{GenomeInfoDb} package.
 }
 
 \usage{
-getChromInfoFromNCBI(genome,
+getChromInfoFromNCBI(assembly,
                      assembled.molecules.only=FALSE,
                      assembly.units=NULL,
                      recache=FALSE,
                      as.Seqinfo=FALSE)
 
-registered_NCBI_genomes()
+registered_NCBI_assemblies()
 }
 
 \arguments{
-  \item{genome}{
-    A single string specifying the name of an NCBI genome assembly (e.g.
+  \item{assembly}{
+    A single string specifying the name of an NCBI assembly (e.g.
     \code{"GRCh38"}).
     Alternatively, an assembly accession (GenBank or RefSeq) can be
     supplied (e.g. \code{"GCF_000001405.12"}).
@@ -60,12 +60,11 @@ registered_NCBI_genomes()
   }
   \item{recache}{
     \code{getChromInfoFromNCBI} uses a cache mechanism so the
-    chromosome information of a given genome assembly only gets downloaded
+    chromosome information of a given assembly only gets downloaded
     once during the current R session (note that the caching is done
     in memory so cached information does NOT persist across sessions).
     Setting \code{recache} to \code{TRUE} forces a new download (and
-    recaching) of the chromosome information for the specified genome
-    assembly.
+    recaching) of the chromosome information for the specified assembly.
   }
   \item{as.Seqinfo}{
     \code{TRUE} or \code{FALSE} (the default). If \code{TRUE} then a
@@ -77,19 +76,19 @@ registered_NCBI_genomes()
 }
 
 \details{
-  \emph{registered} vs \emph{unregistered} NCBI genome assemblies:
+  \emph{registered} vs \emph{unregistered} NCBI assemblies:
   \itemize{
-    \item All NCBI genome assemblies can be looked up by assembly accession
-          (GenBank or RefSeq) but only \emph{registered} genome assemblies
-          can also be looked up by genome assembly name.
+    \item All NCBI assemblies can be looked up by assembly accession
+          (GenBank or RefSeq) but only \emph{registered} assemblies
+          can also be looked up by assembly name.
 
-    \item For \emph{registered} genome assemblies, the returned
+    \item For \emph{registered} assemblies, the returned
           circularity flags are guaranteed to be accurate.
-          For \emph{unregistered} genome assemblies, a heuristic is
+          For \emph{unregistered} assemblies, a heuristic is
           used to determine the circular sequences.
   }
   Please contact the maintainer of the \pkg{GenomeInfoDb} package to
-  request registration of additional genome assemblies.
+  request registration of additional assemblies.
 }
 
 \value{
@@ -110,8 +109,8 @@ registered_NCBI_genomes()
     \item \code{circular}: logical.
   }
 
-  For \code{registered_NCBI_genomes}: A data frame summarizing all the NCBI
-  genome assemblies currently \emph{registered} in the \pkg{GenomeInfoDb}
+  For \code{registered_NCBI_assemblies}: A data frame summarizing all the
+  NCBI assemblies currently \emph{registered} in the \pkg{GenomeInfoDb}
   package.
 }
 
@@ -122,7 +121,7 @@ registered_NCBI_genomes()
 \seealso{
   \itemize{
     \item \code{\link{getChromInfoFromUCSC}} for getting chromosome
-          information for a UCSC genome assembly.
+          information for a UCSC genome.
 
     \item \code{\link{getChromInfoFromEnsembl}} for getting chromosome
           information for an Ensembl species.
@@ -144,8 +143,8 @@ getChromInfoFromNCBI("TAIR10.1")
 
 getChromInfoFromNCBI("TAIR10.1", assembly.units="non-nuclear")
 
-## List of NCBI genome assemblies currently registered in the package:
-registered_NCBI_genomes()
+## List of NCBI assemblies currently registered in the package:
+registered_NCBI_assemblies()
 
 ## The GRCh38.p12 assembly only adds "patch sequences" to the GRCh38
 ## assembly:

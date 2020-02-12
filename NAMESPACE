@@ -25,7 +25,7 @@ export(
     rankSeqlevels,
 
     ## NCBI-utils.R:
-    registered_NCBI_genomes,
+    registered_NCBI_assemblies,
     getChromInfoFromNCBI,
 
     ## UCSC-utils.R:

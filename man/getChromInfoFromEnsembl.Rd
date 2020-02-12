@@ -129,7 +129,7 @@ getChromInfoFromEnsembl(species,
   \itemize{
     \item \code{\link{getChromInfoFromNCBI}} and
           \code{\link{getChromInfoFromUCSC}} for getting chromosome
-          information for an NCBI or UCSC genome assembly.
+          information for an NCBI assembly or UCSC genome.
 
     \item \link{Seqinfo} objects.
   }

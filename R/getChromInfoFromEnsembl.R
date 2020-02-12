@@ -94,7 +94,7 @@
         m2 <- match(special_mappings, NCBI_seqlevels)
         if (anyNA(m2))
             stop(wmsg("'special_mappings' contains sequence ",
-                      "names not found in the NCBI genome assembly"))
+                      "names not found in the NCBI assembly"))
         L2R[m1] <- m2
         if (verbose)
             message("OK (", .mk_progress_str(L2R, NCBI_seqlevels), ")")
@@ -276,7 +276,7 @@
         return(NULL)
     }
 
-    ## Is this Ensembl species associated with a registered NCBI genome?
+    ## Is this Ensembl species associated with a registered NCBI assembly?
 
     NCBI_assembly_info <-
         find_NCBI_assembly_info_for_accession(assembly_accession)
@@ -289,28 +289,29 @@
     if (is.null(Ensembl_assembly))
         return(fallback_assembly_info)  # no
 
-    NCBI_genomes <- registered_NCBI_genomes()
-    idx <- which(NCBI_genomes[ , "genome"] %in% Ensembl_assembly)
+    NCBI_assemblies <- registered_NCBI_assemblies()
+    idx <- which(NCBI_assemblies[ , "assembly"] %in% Ensembl_assembly)
     if (length(idx) == 0L)
         return(fallback_assembly_info)  # no
 
     if (length(idx) == 1L) {        # yes!
-        accession <- NCBI_genomes[idx , "assembly_accession"]
+        accession <- NCBI_assemblies[idx , "assembly_accession"]
         NCBI_assembly_info <- find_NCBI_assembly_info_for_accession(accession)
         return(NCBI_assembly_info)
     }
     ## Yes, but ambiguously! We stick to the accession provided by Ensembl
     ## with a warning.
-    in1string <- paste(NCBI_genomes[idx , "assembly_accession"], collapse=", ")
+    in1string <- paste(NCBI_assemblies[idx , "assembly_accession"],
+                       collapse=", ")
     warning(wmsg(
         "Assembly accession found for species \"", species, "\" in ",
         "Ensembl release ", Ensembl_release, " is ", assembly_accession, ". ",
-        "This is not associated with **any** of the NCBI genomes ",
-        "registered in GenomeInfoDb (see registered_NCBI_genomes()). ",
+        "This is not associated with **any** of the NCBI assemblies ",
+        "registered in GenomeInfoDb (see registered_NCBI_assemblies()). ",
         "However, using the assembly name (", Ensembl_assembly, ") ",
         "provided by Ensembl in release ", Ensembl_release, ", ",
         "it can be associated with **more than one** registered ",
-        "NCBI genome (", in1string, "). Because this association is ",
+        "NCBI assembly (", in1string, "). Because this association is ",
         "ambiguous, we ignored it and associated \"", species, "\" ",
         "with the assembly accession provided by Ensembl."))
     fallback_assembly_info

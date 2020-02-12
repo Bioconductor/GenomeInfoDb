@@ -5,26 +5,26 @@ ORGANISM <- "Vitis vinifera"
 ### Lookup by genome name will pick-up the first in the list.
 ASSEMBLIES <- list(
     ## cultivar: Chardonnay
-    list(genome="AWRI_Vv-CHD_1.0",
+    list(assembly="AWRI_Vv-CHD_1.0",
          date="2019/01/10",
          extra_info=c(cultivar="Chardonnay"),
          assembly_accession="GCA_004011995.1",
          circ_seqs=character(0)),
 
     ## cultivar: PN40024
-    list(genome="8x_WGS",
+    list(assembly="8x_WGS",
          date="2007/09/19",
          extra_info=c(cultivar="PN40024"),
          assembly_accession="GCF_000003745.1",
          circ_seqs=character(0)),
 
-    list(genome="12X",
+    list(assembly="12X",
          date="2009/12/07",
          extra_info=c(cultivar="PN40024"),
          assembly_accession="GCF_000003745.2",
          circ_seqs=c("MT", "Pltd")),
 
-    list(genome="12X",
+    list(assembly="12X",
          date="2009/12/07",
          extra_info=c(cultivar="PN40024"),
          assembly_accession="GCF_000003745.3",

@@ -5,79 +5,79 @@ ORGANISM <- "Bos taurus"
 ### Lookup by genome name will pick-up the first in the list.
 ASSEMBLIES <- list(
     ## breed: Hereford
-    list(genome="UMD Bos_taurus 2.0",
+    list(assembly="UMD Bos_taurus 2.0",
          date="2009/04/30",
          extra_info=c(breed="Hereford"),
          assembly_accession="GCA_000003055.1",
          circ_seqs=character(0)),
 
-    list(genome="Bos_taurus_UMD_3.0",
+    list(assembly="Bos_taurus_UMD_3.0",
          date="2009/09/09",
          extra_info=c(breed="Hereford"),
          assembly_accession="GCA_000003055.2",
          circ_seqs=character(0)),
 
-    list(genome="Bos_taurus_UMD_3.1",
+    list(assembly="Bos_taurus_UMD_3.1",
          date="2009/12/01",
          extra_info=c(breed="Hereford"),
          assembly_accession="GCF_000003055.3",
          circ_seqs=character(0)),
 
-    list(genome="Bos_taurus_UMD_3.1",
+    list(assembly="Bos_taurus_UMD_3.1",
          date="2009/12/01",
          extra_info=c(breed="Hereford"),
          assembly_accession="GCF_000003055.4",  # bosTau6
          circ_seqs="MT"),
 
-    list(genome="Bos_taurus_UMD_3.1.1",
+    list(assembly="Bos_taurus_UMD_3.1.1",
          date="2009/12/01",
          extra_info=c(breed="Hereford"),
          assembly_accession="GCF_000003055.5",  # bosTau8
          circ_seqs="MT"),
 
-    list(genome="Btau_4.2",
+    list(assembly="Btau_4.2",
          date="2011/05/12",
          extra_info=c(breed="Hereford"),
          assembly_accession="GCF_000003205.3",
          circ_seqs=character(0)),
 
-    list(genome="Btau_4.2",
+    list(assembly="Btau_4.2",
          date="2011/05/12",
          extra_info=c(breed="Hereford"),
          assembly_accession="GCF_000003205.4",
          circ_seqs=character(0)),
 
-    list(genome="Btau_4.6",
+    list(assembly="Btau_4.6",
          date="2011/09/14",
          extra_info=c(breed="Hereford"),
          assembly_accession="GCA_000003205.3",
          circ_seqs=character(0)),
 
-    list(genome="Btau_4.6.1",
+    list(assembly="Btau_4.6.1",
          date="2011/11/02",
          extra_info=c(breed="Hereford"),
          assembly_accession="GCA_000003205.4",  # bosTau7
          circ_seqs=character(0)),
 
-    list(genome="Bos_taurus_UMD_3.1.1",
+    list(assembly="Bos_taurus_UMD_3.1.1",
          date="2014/11/25",
          extra_info=c(breed="Hereford"),
          assembly_accession="GCA_000003055.5",
          circ_seqs="MT"),
 
-    list(genome="Btau_5.0",
+    list(assembly="Btau_5.0",
          date="2015/09/30",
          extra_info=c(breed="Hereford"),
          assembly_accession="GCA_000003205.5",
          circ_seqs=character(0)),
 
-    list(genome="Btau_5.0.1",
+    list(assembly="Btau_5.0.1",
          date="2015/11/19",
          extra_info=c(breed="Hereford"),
          assembly_accession="GCA_000003205.6",
          circ_seqs=character(0)),
 
-    list(genome="ARS-UCD1.2",
+    list(assembly="ARS-UCD1.2",
          date="2018/04/11",
          extra_info=c(breed="Hereford"),
          ## GCA_002263795.2 is the same as GCF_002263795.1 but the former

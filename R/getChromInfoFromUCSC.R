@@ -81,11 +81,11 @@
         m1 <- match(names(special_mappings), UCSC_seqlevels)
         if (anyNA(m1))
             stop(wmsg("'names(special_mappings)' contains sequence ",
-                      "names not found in the UCSC genome assembly"))
+                      "names not found in the UCSC genome"))
         m2 <- match(special_mappings, NCBI_seqlevels)
         if (anyNA(m2))
             stop(wmsg("'special_mappings' contains sequence ",
-                      "names not found in the NCBI genome assembly"))
+                      "names not found in the NCBI assembly"))
         L2R[m1] <- m2
 
         unmapped_idx <- which(is.na(L2R))
@@ -494,9 +494,9 @@
         NCBI_assembly_info <- find_NCBI_assembly_info_for_accession(accession)
         stop_if(is.null(NCBI_assembly_info),
                 "\"assembly_accession\" field in 'NCBI_LINKER' must ",
-                "be associated with a registered NCBI genome")
+                "be associated with a registered NCBI assembly")
         stop_if(!identical(ORGANISM, NCBI_assembly_info$organism),
-                "the NCBI genome associated with the \"assembly_accession\" ",
+                "the NCBI assembly associated with the \"assembly_accession\" ",
                 "field in 'NCBI_LINKER' is registered for an organism ",
                 "(\"", NCBI_assembly_info$organism, "\") that differs ",
                 "from 'ORGANISM' (\"", ORGANISM, "\")")
@@ -525,18 +525,18 @@ registered_UCSC_genomes <- function()
     file_paths <- list.files(dir_path, pattern="\\.R$", full.names=TRUE)
     assemblies <- lapply(file_paths, .parse_script_for_registered_UCSC_genome)
 
-    colnames <- c("organism", "genome", "based_on_NCBI_genome",
+    colnames <- c("organism", "genome", "NCBI_assembly",
                   "assembly_accession", "with_Ensembl", "circ_seqs")
     make_col <- function(j) {
         colname <- colnames[[j]]
-        if (colname == "based_on_NCBI_genome") {
+        if (colname == "NCBI_assembly") {
             col <- vapply(assemblies,
                 function(assembly_info) {
                     linker <- assembly_info$NCBI_LINKER
                     if (is.null(linker))
                         return(NA_character_)
                     accession <- linker$assembly_accession
-                    find_NCBI_assembly_info_for_accession(accession)$genome
+                    find_NCBI_assembly_info_for_accession(accession)$assembly
                 }, character(1), USE.NAMES=FALSE)
             return(col)
         }
@@ -597,7 +597,7 @@ registered_UCSC_genomes <- function()
                            goldenPath.url=goldenPath.url)),
                    silent=TRUE)
         if (inherits(ans, "try-error"))
-            stop(wmsg("unknown UCSC genome assembly: ", genome))
+            stop(wmsg("unknown UCSC genome: ", genome))
         oo <- orderSeqlevels(ans[ , "chrom"])
         ans <- S4Vectors:::extract_data_frame_rows(ans, oo)
 
@@ -636,7 +636,7 @@ registered_UCSC_genomes <- function()
         warning(wmsg("'add.NCBI.cols' got ignored for registered ",
                      "UCSC genome ", GENOME, " (additional NCBI columns ",
                      "are only available for registered UCSC genomes ",
-                     "based on an NCBI genome)"))
+                     "based on an NCBI assembly)"))
     linker
 }
 
@@ -756,7 +756,7 @@ getChromInfoFromUCSC <- function(genome,
             warning(wmsg("'add.NCBI.cols' got ignored for unregistered ",
                          "UCSC genome ", genome, " (additional NCBI columns ",
                          "are only available for registered UCSC genomes ",
-                         "based on an NCBI genome)"))
+                         "based on an NCBI assembly)"))
         ans <- .get_chrom_info_for_unregistered_UCSC_genome(genome,
                     assembled.molecules.only=assembled.molecules.only,
                     add.ensembl.col=add.ensembl.col,

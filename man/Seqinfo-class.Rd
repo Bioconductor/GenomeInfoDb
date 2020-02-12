@@ -222,7 +222,7 @@
     \item The \code{\link{getChromInfoFromNCBI}} and
           \code{\link{getChromInfoFromUCSC}} utility functions
           that are used behind the scene to generate a Seqinfo
-          object for a given genome assembly (see examples below).
+          object for a given assembly/genome (see examples below).
   }
 }
 
@@ -235,8 +235,8 @@ if (interactive()) {
   ## This uses getChromInfoFromNCBI() or getChromInfoFromUCSC() behind
   ## the scene and thus requires internet access.
 
-  ## NCBI genomes (see ?registered_NCBI_genomes for the list of NCBI
-  ## genome assemblies that are currently supported):
+  ## NCBI assemblies (see ?registered_NCBI_assemblies for the list of
+  ## NCBI assemblies that are currently supported):
   Seqinfo(genome="GRCh38")
   Seqinfo(genome="GRCh38.p12")
   Seqinfo(genome="Amel_HAv3.1")
@@ -244,7 +244,7 @@ if (interactive()) {
   Seqinfo(genome="TAIR10.1")
 
   ## UCSC genomes (see ?registered_UCSC_genomes for the list of UCSC
-  ## genome assemblies that are currently supported):
+  ## genomes that are currently supported):
   Seqinfo(genome="hg38")
   Seqinfo(genome="mm10")
   Seqinfo(genome="rn6")
