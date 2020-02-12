@@ -142,7 +142,9 @@ getChromInfoFromEnsembl(species,
 
 ## Internet access required!
 
-## Worm:
+## === Worm ===
+## https://uswest.ensembl.org/Caenorhabditis_elegans
+
 celegans <- getChromInfoFromEnsembl("celegans")
 attr(celegans, "species_info")
 
@@ -150,7 +152,9 @@ getChromInfoFromEnsembl("celegans", as.Seqinfo=TRUE)
 
 celegans <- getChromInfoFromEnsembl("celegans", add.NCBI.cols=TRUE)
 
-## Yeast:
+## === Yeast ===
+## https://uswest.ensembl.org/Saccharomyces_cerevisiae
+
 scerevisiae <- getChromInfoFromEnsembl("scerevisiae")
 attr(scerevisiae, "species_info")
 
@@ -166,6 +170,14 @@ attr(athaliana, "species_info")
 ## ---------------------------------------------------------------------
 ## Temporary stuff that needs to go away...
 ## ---------------------------------------------------------------------
+
+## TODO: Check all species for which an NCBI assembly is registered!
+## Checked so far (with current Ensembl release i.e. 99):
+## - celegans       OK
+## - scerevisiae    OK
+## - athaliana      OK
+## - btaurus        OK
+
 \dontrun{
 ## WORK IN PROGRESS!!!
 library(GenomeInfoDb)
@@ -196,42 +208,6 @@ map_to_NCBI <- function(Ensembl_chrom_info, NCBI_chrom_info,
          special_mappings=special_mappings,
          verbose=TRUE)
 }
-
-## ------------------------------------------------------------------------
-## Yeast
-## https://uswest.ensembl.org/Saccharomyces_cerevisiae/
-## Based on R64-1-1 (GCA_000146045.2, called R64 at NCBI)
-
-## Return 17 rows
-yeast_chrom_info <- getChromInfoFromEnsembl("scerevisiae")
-
-## Mapping to NCBI is one-to-one!
-R64 <- getChromInfoFromNCBI("GCA_000146045.2")
-R64 <- getChromInfoFromNCBI("R64")
-## Same sequence names except that Mito is called MT at NCBI.
-## Mito (GenBank=AJ011856.1) and MT (GenBank=KP263414.1,
-## RefSeq=NC_001224.1) are exactly the same DNA sequence. Don't ask me why
-## we need 2 GenBank entries for that and why only the latter is associated
-## with a RefSeq accession!
-special_mappings <- c(Mito="MT")
-L2R <- map_to_NCBI(yeast_chrom_info, R64, special_mappings)
-yeast_chrom_info <- .do_join(yeast_chrom_info, R64, L2R)
-
-## ------------------------------------------------------------------------
-## Worm
-## https://uswest.ensembl.org/Caenorhabditis_elegans/
-## Based on WBcel235 (GCA_000002985.3)
-
-## Return 7 rows
-worm_chrom_info <- getChromInfoFromEnsembl("celegans")
-
-## Mapping to NCBI is one-to-one!
-WBcel235 <- getChromInfoFromNCBI("WBcel235")
-## Same sequence names except that MtDNA is called MT at NCBI (MtDNA and MT
-## are both associated with RefSeqAccn NC_001328.1).
-L2R <- map_to_NCBI(worm_chrom_info, WBcel235)
-worm_chrom_info <- .do_join(worm_chrom_info, WBcel235, L2R)
-table(worm_chrom_info$SequenceRole, worm_chrom_info$toplevel)
 
 ## ------------------------------------------------------------------------
 ## Human
@@ -352,25 +328,6 @@ table(rat_chrom_info$SequenceRole, rat_chrom_info$toplevel)
 #   pseudo-scaffold          0    0
 #   fix-patch                0    0
 #   novel-patch              0    0
-
-## ------------------------------------------------------------------------
-## Cow
-## https://uswest.ensembl.org/Bos_taurus/
-## Based on ARS-UCD1.2 (GCA_002263795.2)
-
-## Return 2211 rows
-cow_chrom_info <- getChromInfoFromEnsembl("btaurus")
-
-## Map to NCBI:
-## Summary:
-## - All 2211 Ensembl sequences are mapped.
-## - 2211/2212 NCBI sequences are reverse-mapped.
-## - M is the only NCBI sequence that is not reverse-mapped (ARS-UCD1.2
-##   has MT and M).
-NCBI_cow <- getChromInfoFromNCBI("GCA_002263795.2")
-L2R <- map_to_NCBI(cow_chrom_info, NCBI_cow)
-cow_chrom_info <- .do_join(cow_chrom_info, NCBI_cow, L2R)
-cow_chrom_info[ , c(1:5, 8, 11, 13)]
 }
 }
 

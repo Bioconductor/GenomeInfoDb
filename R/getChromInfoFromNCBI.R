@@ -51,35 +51,34 @@
     required_fields <- c("genome", "date", "assembly_accession", "circ_seqs")
     for (i in seq_along(ASSEMBLIES)) {
         assembly <- ASSEMBLIES[[i]]
+        label <- sprintf("'ASSEMBLIES[[%d]]'", i)
 
-        stop_if(!is.list(assembly),
-                "'ASSEMBLIES[[", i, "]]' must be a named list")
+        stop_if(!is.list(assembly), label, " must be a named list")
         assembly_fields <- names(assembly)
-        stop_if(!is.character(assembly_fields),
-                "'ASSEMBLIES[[", i, "]]' must be a named list")
+        stop_if(!is.character(assembly_fields), label, " must be a named list")
         stop_if(!is_primary_key(assembly_fields),
-                "the names on 'ASSEMBLIES[[", i, "]]' must ",
+                "the names on ", label, " must ",
                 "not contain NAs, empty strings, or duplicates")
         stop_if(!all(required_fields %in% names(assembly)),
-                "'ASSEMBLIES[[", i, "]]' must have fields: ",
+                label, " must have fields: ",
                 paste(paste0("\"", required_fields, "\""), collapse=", "))
 
         ## Check "genome" field (required).
         genome <- assembly$genome
         stop_if(!isSingleString(genome) || genome == "",
-                "\"genome\" field in 'ASSEMBLIES[[", i, "]]' must ",
+                "\"genome\" field in ", label, " must ",
                 "be a single non-empty string")
 
         ## Check "date" field (required).
         date <- assembly$date
         stop_if(!isSingleString(date) || date == "",
-                "\"date\" field in 'ASSEMBLIES[[", i, "]]' must ",
+                "\"date\" field in ", label, " must ",
                 "be a single non-empty string")
 
         ## Check "accession" field (required).
         accession <- assembly$assembly_accession
         stop_if(!isSingleString(accession) || accession == "",
-                "\"accession\" field in 'ASSEMBLIES[[", i, "]]' must ",
+                "\"accession\" field in ", label, " must ",
                 "be a single non-empty string")
         stop_if(!is.null(.NCBI_accession2assembly[[accession]]),
                 "assembly accession ", accession, " used more than once")
@@ -87,28 +86,39 @@
         ## Check "circ_seqs" field (required).
         circ_seqs <- assembly$circ_seqs
         stop_if(!is.character(circ_seqs),
-                "\"circ_seqs\" field in 'ASSEMBLIES[[", i, "]]' must ",
+                "\"circ_seqs\" field in ", label, " must ",
                 "be a character vector")
         stop_if(!is_primary_key(circ_seqs),
-                "\"circ_seqs\" field in 'ASSEMBLIES[[", i, "]]' must ",
+                "\"circ_seqs\" field in ", label, " must ",
                 "not contain NAs, empty strings, or duplicates")
 
         ## Check optional fields.
+
         extra_info <- assembly$extra_info
         if (!is.null(extra_info)) {
             stop_if(!is.character(extra_info),
-                "\"extra_info\" field in 'ASSEMBLIES[[", i, "]]' must ",
+                "\"extra_info\" field in ", label, " must ",
                 "be a named character vector")
             stop_if(anyNA(extra_info) || !all(nzchar(extra_info)),
-                "\"extra_info\" field in 'ASSEMBLIES[[", i, "]]' must ",
+                "\"extra_info\" field in ", label, " must ",
                 "not contain NAs or empty strings")
             tags <- names(extra_info)
             stop_if(!is.character(tags),
-                "\"extra_info\" field in 'ASSEMBLIES[[", i, "]]' must ",
+                "\"extra_info\" field in ", label, " must ",
                 "be a named character vector")
             stop_if(anyNA(tags) || anyDuplicated(tags),
-                "the names on \"extra_info\" field 'ASSEMBLIES[[", i, "]]' ",
-                "must not contain NAs or duplicates")
+                "the names on \"extra_info\" field ", label, " must ",
+                "not contain NAs or duplicates")
+        }
+
+        special_mappings <- assembly$NCBI2Ensembl_special_mappings
+        if (!is.null(special_mappings)) {
+            stop_if(!is.character(special_mappings),
+                "\"NCBI2Ensembl_special_mappings\" field in ", label, " must ",
+                "be a named character vector")
+            stop_if(is.null(names(special_mappings)),
+                "\"NCBI2Ensembl_special_mappings\" field in ", label, " must ",
+                "be a named character vector")
         }
 
         genome <- tolower(genome)

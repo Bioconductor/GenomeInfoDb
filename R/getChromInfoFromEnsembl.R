@@ -199,7 +199,7 @@
 
 .add_NCBI_cols_to_Ensembl_chrom_info <- function(
     Ensembl_chrom_info, assembly_accession,
-    special_mappings=NULL)
+    NCBI2Ensembl_special_mappings=NULL)
 {
     NCBI_chrom_info <- getChromInfoFromNCBI(assembly_accession)
 
@@ -208,6 +208,15 @@
     NCBI_seqlevels    <- NCBI_chrom_info[ , "SequenceName"]
     NCBI_GenBankAccn  <- NCBI_chrom_info[ , "GenBankAccn"]
     NCBI_RefSeqAccn   <- NCBI_chrom_info[ , "RefSeqAccn"]
+
+    ## Reverse the mappings.
+    if (is.null(NCBI2Ensembl_special_mappings)) {
+        special_mappings <- NULL
+    } else {
+        special_mappings <- names(NCBI2Ensembl_special_mappings)
+        names(special_mappings) <- NCBI2Ensembl_special_mappings
+    }
+
     L2R <- .map_Ensembl_seqlevels_to_NCBI_seqlevels(
                                           Ensembl_seqlevels,
                                           Ensembl_synonyms,
@@ -250,34 +259,60 @@
     ans
 }
 
-.get_NCBI_accession <- function(species_info)
+### Return NULL or a named list with at least component "assembly_accession"
+### and optionally component "NCBI2Ensembl_special_mappings" (plus possibly
+### other components that are will be ignored by the caller).
+.get_NCBI_assembly <- function(species_info)
 {
-    stopifnot(is.list(species_info), !is.null(names(species_info)))
+    check_species_info(species_info)
+    species <- species_info$species
+    Ensembl_release <- species_info$Ensembl_release
 
     assembly_accession <- species_info$assembly_accession
     if (is.null(assembly_accession)) {
-        warning(wmsg("'add.NCBI.cols' got ignored for Ensembl species ",
-                     "\"", species_info$species, "\" (don't know which ",
-                     "NCBI genome this species is associated with)"))
-        return(NA)
+        warning(wmsg("'add.NCBI.cols' got ignored for species \"",
+                     species, "\" (no assembly accession can be found ",
+                     "for it in Ensembl release ", Ensembl_release, ")"))
+        return(NULL)
     }
 
     ## Is this Ensembl species associated with a registered NCBI genome?
+
+    registered_assembly <- lookup_NCBI_accession2assembly(assembly_accession)
+    if (!is.null(registered_assembly))
+        return(registered_assembly)  # yes!
+
+    fallback_assembly <- list(assembly_accession=assembly_accession)
+
+    Ensembl_assembly <- species_info$assembly
+    if (is.null(Ensembl_assembly))
+        return(fallback_assembly)  # no
+
     NCBI_genomes <- registered_NCBI_genomes()
-    genomes <- NCBI_genomes[ , "genome"]
-    accessions <- NCBI_genomes[ , "assembly_accession"]
-    if (assembly_accession %in% accessions)
-        return(assembly_accession)  # yes
-    name <- species_info$name
-    if (is.null(name))
-        return(assembly_accession)  # no
-    idx <- which(genomes %in% name)
+    idx <- which(NCBI_genomes[ , "genome"] %in% Ensembl_assembly)
     if (length(idx) == 0L)
-        return(assembly_accession)  # no
-    if (length(idx) == 1L)
-        return(accessions[[idx]])   # yes
-    ## Yes, but ambiguously! We stick to the accession provided by Ensembl.
-    assembly_accession
+        return(fallback_assembly)  # no
+
+    if (length(idx) == 1L) {        # yes!
+        accession <- NCBI_genomes[idx , "assembly_accession"]
+        registered_assembly <- lookup_NCBI_accession2assembly(accession)
+        return(registered_assembly)
+    }
+    ## Yes, but ambiguously! We stick to the accession provided by Ensembl
+    ## with a warning.
+    in1string <- paste(NCBI_genomes[idx , "assembly_accession"], collapse=", ")
+    warning(wmsg(
+        "Assembly accession found for species \"", species, "\" in ",
+        "Ensembl release ", Ensembl_release, " is ", assembly_accession, ". ",
+        "This is not associated with **any** of the NCBI genomes ",
+        "registered in GenomeInfoDb (see registered_NCBI_genomes()). ",
+        "However, using the assembly name (", Ensembl_assembly, ") ",
+        "provided by Ensembl in release ", Ensembl_release, ", ",
+        "it can be associated with **more than one** registered ",
+        "NCBI genome (", in1string, "). Because this association is ",
+        "ambiguous, we ignored it and associated \"", species, "\" ",
+        "with the assembly accession provided by Ensembl."))
+    fallback_assembly
 }
 
 .ENSEMBL_cached_chrom_info <- new.env(parent=emptyenv())
@@ -301,9 +336,12 @@
 
     ## Add NCBI cols.
     if (!is.null(species_info)) {
-        NCBI_accession <- .get_NCBI_accession(species_info)
-        if (!is.na(NCBI_accession))
-            ans <- .add_NCBI_cols_to_Ensembl_chrom_info(ans, NCBI_accession)
+        NCBI_assembly <- .get_NCBI_assembly(species_info)
+        if (!is.null(NCBI_assembly)) {
+            ans <- .add_NCBI_cols_to_Ensembl_chrom_info(
+                                  ans, NCBI_assembly$assembly_accession,
+                                  NCBI_assembly$NCBI2Ensembl_special_mappings)
+        }
     }
 
     if (assembled.molecules.only) {
@@ -324,6 +362,9 @@
         keep_idx <- which(!(ans[ , "coord_system"] %in% "clone"))
         ans <- S4Vectors:::extract_data_frame_rows(ans, keep_idx)
     }
+
+    if (!(is.null(species_info) || is.null(NCBI_assembly)))
+        attr(ans, "NCBI_assembly") <- NCBI_assembly
     ans
 }
 
@@ -341,7 +382,7 @@ getChromInfoFromEnsembl <- function(species,
                                                division=division,
                                                use.grch37=use.grch37)
     species_info <- attr(core_db_url, "species_info")
-    stopifnot(is.list(species_info), !is.null(names(species_info)))
+    check_species_info(species_info)
 
     if (!isTRUEorFALSE(assembled.molecules.only))
         stop(wmsg("'assembled.molecules.only' must be TRUE or FALSE"))

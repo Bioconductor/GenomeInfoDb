@@ -24,7 +24,13 @@ ASSEMBLIES <- list(
          ## saccharomyces_cerevisiae in release 99. Strangely they
          ## call this assembly R64-1-1 (like UCSC).
          assembly_accession="GCA_000146045.2",  # sacCer3
-         circ_seqs="MT"),
+         circ_seqs="MT",
+         ## MT is called Mito at Ensembl. MT (GenBank=KP263414.1,
+         ## RefSeq=NC_001224.1) and Mito (GenBank=AJ011856.1) are
+         ## exactly the same DNA sequence (I checked that). Don't
+         ## ask me why we need 2 GenBank entries for the same sequence
+         ## or why only the latter is associated with a RefSeq accession!
+         NCBI2Ensembl_special_mappings=c(MT="Mito")),
 
     list(genome="ASM205763v1",
          date="2017/03/21",

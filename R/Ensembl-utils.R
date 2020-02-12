@@ -15,6 +15,14 @@
 .ENSEMBLGENOMES_FTP_PUB_URL <- "ftp://ftp.ensemblgenomes.org/pub/"
 .ENSEMBL_FTP_RELEASE_PREFIX <- "release-"
 
+check_species_info <- function(species_info)
+{
+    stopifnot(is.list(species_info))
+    fields <- names(species_info)
+    stopifnot(!is.null(fields), is_primary_key(fields),
+              all(c("species", "Ensembl_release") %in% fields))
+}
+
 ### 'division' must be NA or one of the Ensembl Genomes divisions i.e.
 ### "bacteria", "fungi", "metazoa", "plants", or "protists".
 .get_Ensembl_FTP_top_url <- function(division=NA, use.grch37=FALSE)
@@ -66,7 +74,8 @@ list_Ensembl_FTP_releases <- function(division=NA, use.grch37=FALSE,
     releases
 }
 
-### Returns a single string with the "species_info" attribute (named list) on it.
+### Returns a single string with the "species_info" attribute (named list)
+### on it.
 .predict_core_db_in_Ensembl_FTP_grch37 <- function(species=NA, release=NA)
 {
     ## User-supplied 'species' will be ignored.
@@ -310,7 +319,8 @@ fetch_species_index_from_Ensembl_FTP <- function(release=NA, division=NA)
          "\n    ", url)
 }
 
-### Returns a single string with the "species_info" attribute (named list) on it.
+### Returns a single string with the "species_info" attribute (named list)
+### on it.
 .find_core_db_in_Ensembl_FTP_species_index <- function(species,
                                                        release=NA, division=NA)
 {
@@ -401,7 +411,8 @@ get_Ensembl_FTP_gtf_url <- function(release=NA, division=NA,
     core_dbs[grep(pattern, core_dbs, fixed=TRUE)]
 }
 
-### Returns a single string with the "species_info" attribute (named list) on it.
+### Returns a single string with the "species_info" attribute (named list)
+### on it.
 .find_core_db_in_Ensembl_FTP_core_dbs <-
     function(mysql_url, species, release=NA)
 {
@@ -464,7 +475,7 @@ get_Ensembl_FTP_core_db_url <- function(species, release=NA, division=NA,
         }
     }
     species_info <- attr(core_db, "species_info")
-    stopifnot(is.list(species_info), !is.null(names(species_info)))
+    check_species_info(species_info)
     core_db_url <- paste0(mysql_url, core_db, "/")
     attr(core_db_url, "species_info") <- species_info
     core_db_url
