@@ -23,7 +23,7 @@
 \usage{
 getChromInfoFromUCSC(genome,
                      assembled.molecules.only=FALSE,
-                     add.NCBI.cols=FALSE,
+                     map.NCBI=FALSE,
                      add.ensembl.col=FALSE,
                      goldenPath.url=getOption("UCSC.goldenPath.url"),
                      recache=FALSE,
@@ -50,12 +50,29 @@ registered_UCSC_genomes()
     \emph{registered} genomes. When used on an \emph{unregistered}
     genome, \code{assembled.molecules.only} is ignored with a warning.
   }
-  \item{add.NCBI.cols}{
-    \code{TRUE} or \code{FALSE} (the default). If \code{TRUE} then
-    additional columns containing data from NCBI are bound to the result.
-    This can be useful to map UCSC sequence names to NCBI sequence names.
-    Note that this is only supported for \emph{registered} UCSC genomes
-    based on an NCBI assembly!
+  \item{map.NCBI}{
+    \code{TRUE} or \code{FALSE} (the default).
+
+    If \code{TRUE} then NCBI chromosome information is bound to
+    the result. This information is retrieved from NCBI by calling
+    \code{\link{getChromInfoFromNCBI}} on the NCBI assembly that
+    the UCSC genome is based on. Then the data frame returned
+    by \code{\link{getChromInfoFromNCBI}} ("NCBI chrom info") is
+    \emph{mapped} and bound to the data frame returned by
+    \code{getChromInfoFromUCSC} ("UCSC chrom info").
+    This "map and bind" operation is similar to a \code{JOIN} in SQL.
+
+    Note that not all rows in the "UCSC chrom info" data frame are
+    necessarily mapped to a row in the "NCBI chrom info" data frame.
+    For example chrM in hg19 has no corresponding sequence in the GRCh37
+    assembly (the mitochondrial chromosome was omitted from GRCh37).
+    For the unmapped rows the NCBI columns in the final data frame
+    are filled with NAs (\code{LEFT JOIN} in SQL).
+
+    The primary use case for using \code{map.NCBI=TRUE} is to map
+    UCSC sequence names to NCBI sequence names.
+    This is only supported for \emph{registered} UCSC genomes based
+    on an NCBI assembly!
   }
   \item{add.ensembl.col}{
     \code{TRUE} or \code{FALSE} (the default). Whether or not the
@@ -114,7 +131,7 @@ registered_UCSC_genomes()
     \item \code{assembled}: logical.
     \item \code{circular}: logical.
   }
-  If \code{add.NCBI.cols} is \code{TRUE}, then the 7 following
+  If \code{map.NCBI} is \code{TRUE}, then the 7 following
   columns are added to the result:
   \itemize{
     \item \code{SequenceName}: character.
@@ -171,11 +188,11 @@ getChromInfoFromUCSC("panTro6", assembled.molecules.only=TRUE)
 
 ## Map the hg38 sequences to their corresponding sequences in
 ## the GRCh38.p12 assembly:
-getChromInfoFromUCSC("hg38", add.NCBI.cols=TRUE)[c(1, 5)]
+getChromInfoFromUCSC("hg38", map.NCBI=TRUE)[c(1, 5)]
 
 ## Note that some NCBI-based UCSC assemblies contain sequences that
 ## are not mapped. For example this is the case for chrM in hg19:
-hg19 <- getChromInfoFromUCSC("hg19", add.NCBI.col=TRUE)
+hg19 <- getChromInfoFromUCSC("hg19", map.NCBI=TRUE)
 hg19[is.na(hg19$SequenceName), ]
 
 ## Map the hg19 sequences to the Ensembl sequence names:
@@ -195,8 +212,8 @@ genome <- getBSgenome("GRCh38")  # this loads the
                                  # BSgenome.Hsapiens.NCBI.GRCh38 package
 genome
 
-## Get the chromosome info for the hg38 genome assembly:
-hg38_chrom_info <- getChromInfoFromUCSC("hg38", add.NCBI.cols=TRUE)
+## Get the chromosome info for the hg38 genome:
+hg38_chrom_info <- getChromInfoFromUCSC("hg38", map.NCBI=TRUE)
 ncbi2ucsc <- setNames(hg38_chrom_info$chrom, hg38_chrom_info$SequenceName)
 
 ## Set the UCSC sequence names on 'genome':

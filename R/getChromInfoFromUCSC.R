@@ -632,14 +632,14 @@ registered_UCSC_genomes <- function()
     ans
 }
 
-.get_NCBI_linker <- function(add.NCBI.cols, linker, GENOME)
+.get_NCBI_linker <- function(map.NCBI, linker, GENOME)
 {
-    if (is.list(add.NCBI.cols))
-        return(add.NCBI.cols)
-    if (isFALSE(add.NCBI.cols))
+    if (is.list(map.NCBI))
+        return(map.NCBI)
+    if (isFALSE(map.NCBI))
         return(NULL)
     if (is.null(linker))
-        warning(wmsg("'add.NCBI.cols' got ignored for registered ",
+        warning(wmsg("'map.NCBI' got ignored for registered ",
                      "UCSC genome ", GENOME, " (additional NCBI columns ",
                      "are only available for registered UCSC genomes ",
                      "based on an NCBI assembly)"))
@@ -664,7 +664,7 @@ registered_UCSC_genomes <- function()
 
 .get_chrom_info_for_registered_UCSC_genome <- function(script_path,
     assembled.molecules.only=FALSE,
-    add.NCBI.cols=FALSE,
+    map.NCBI=FALSE,
     add.ensembl.col=FALSE,
     goldenPath.url=getOption("UCSC.goldenPath.url"),
     recache=FALSE)
@@ -707,7 +707,7 @@ registered_UCSC_genomes <- function()
     }
 
     ## Add NCBI cols.
-    NCBI_linker <- .get_NCBI_linker(add.NCBI.cols, vars$NCBI_LINKER, GENOME)
+    NCBI_linker <- .get_NCBI_linker(map.NCBI, vars$NCBI_LINKER, GENOME)
     if (!is.null(NCBI_linker))
         ans <- do.call(.add_NCBI_cols_to_UCSC_chrom_info,
                        c(list(ans), NCBI_linker))
@@ -728,7 +728,7 @@ registered_UCSC_genomes <- function()
 ### (integer), "assembled" (logical), and "circular" (logical).
 getChromInfoFromUCSC <- function(genome,
     assembled.molecules.only=FALSE,
-    add.NCBI.cols=FALSE,
+    map.NCBI=FALSE,
     add.ensembl.col=FALSE,
     goldenPath.url=getOption("UCSC.goldenPath.url"),
     recache=FALSE,
@@ -738,9 +738,9 @@ getChromInfoFromUCSC <- function(genome,
         stop(wmsg("'genome' must be a single string"))
     if (!isTRUEorFALSE(assembled.molecules.only))
         stop(wmsg("'assembled.molecules.only' must be TRUE or FALSE"))
-    if (!(isTRUEorFALSE(add.NCBI.cols) ||
-          is.list(add.NCBI.cols) && !is.null(names(add.NCBI.cols))))
-        stop(wmsg("'add.NCBI.cols' must be TRUE or FALSE ",
+    if (!(isTRUEorFALSE(map.NCBI) ||
+          is.list(map.NCBI) && !is.null(names(map.NCBI))))
+        stop(wmsg("'map.NCBI' must be TRUE or FALSE ",
                   "(experts can also supply an \"NCBI linker\" ",
                   "as a named list)"))
     if (!(isTRUEorFALSE(add.ensembl.col) ||
@@ -758,8 +758,8 @@ getChromInfoFromUCSC <- function(genome,
     script_path <- system.file("registered", "UCSC_genomes", script_name,
                                package="GenomeInfoDb")
     if (identical(script_path, "")) {
-        if (!isFALSE(add.NCBI.cols))
-            warning(wmsg("'add.NCBI.cols' got ignored for unregistered ",
+        if (!isFALSE(map.NCBI))
+            warning(wmsg("'map.NCBI' got ignored for unregistered ",
                          "UCSC genome ", genome, " (additional NCBI columns ",
                          "are only available for registered UCSC genomes ",
                          "based on an NCBI assembly)"))
@@ -771,7 +771,7 @@ getChromInfoFromUCSC <- function(genome,
     } else {
         ans <- .get_chrom_info_for_registered_UCSC_genome(script_path,
                     assembled.molecules.only=assembled.molecules.only,
-                    add.NCBI.cols=add.NCBI.cols,
+                    map.NCBI=map.NCBI,
                     add.ensembl.col=add.ensembl.col,
                     goldenPath.url=goldenPath.url,
                     recache=recache)

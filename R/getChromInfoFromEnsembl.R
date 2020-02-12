@@ -270,7 +270,7 @@
 
     assembly_accession <- species_info$assembly_accession
     if (is.null(assembly_accession)) {
-        warning(wmsg("'add.NCBI.cols' got ignored for species \"",
+        warning(wmsg("'map.NCBI' got ignored for species \"",
                      species, "\" (no assembly accession can be found ",
                      "for it in Ensembl release ", Ensembl_release, ")"))
         return(NULL)
@@ -377,7 +377,7 @@ getChromInfoFromEnsembl <- function(species,
     include.non_ref.sequences=FALSE,
     include.contigs=FALSE,
     include.clones=FALSE,
-    add.NCBI.cols=FALSE,
+    map.NCBI=FALSE,
     recache=FALSE,
     as.Seqinfo=FALSE)
 {
@@ -395,8 +395,8 @@ getChromInfoFromEnsembl <- function(species,
         stop(wmsg("'include.contigs' must be TRUE or FALSE"))
     if (!isTRUEorFALSE(include.clones))
         stop(wmsg("'include.clones' must be TRUE or FALSE"))
-    if (!isTRUEorFALSE(add.NCBI.cols))
-        stop(wmsg("'add.NCBI.cols' must be TRUE or FALSE"))
+    if (!isTRUEorFALSE(map.NCBI))
+        stop(wmsg("'map.NCBI' must be TRUE or FALSE"))
     if (!isTRUEorFALSE(recache))
         stop(wmsg("'recache' must be TRUE or FALSE"))
     if (!isTRUEorFALSE(as.Seqinfo))
@@ -407,7 +407,7 @@ getChromInfoFromEnsembl <- function(species,
                 include.non_ref.sequences=include.non_ref.sequences,
                 include.contigs=include.contigs,
                 include.clones=include.clones,
-                species_info=if (add.NCBI.cols) species_info else NULL,
+                species_info=if (map.NCBI) species_info else NULL,
                 recache=recache)
 
     if (!as.Seqinfo) {

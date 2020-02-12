@@ -19,7 +19,7 @@ getChromInfoFromEnsembl(species,
                         include.non_ref.sequences=FALSE,
                         include.contigs=FALSE,
                         include.clones=FALSE,
-                        add.NCBI.cols=FALSE,
+                        map.NCBI=FALSE,
                         recache=FALSE,
                         as.Seqinfo=FALSE)
 }
@@ -65,10 +65,25 @@ getChromInfoFromEnsembl(species,
     default. Note that the dataset for Human contains more than one
     hundred thousands \emph{clones}!
   }
-  \item{add.NCBI.cols}{
-    \code{TRUE} or \code{FALSE} (the default). If \code{TRUE} then
-    additional columns containing data from NCBI are bound to the result.
-    This can be useful to map Ensembl sequence names to NCBI sequence names.
+  \item{map.NCBI}{
+    \code{TRUE} or \code{FALSE} (the default).
+
+    If \code{TRUE} then NCBI chromosome information is bound to
+    the result. This information is retrieved from NCBI by calling
+    \code{\link{getChromInfoFromNCBI}} on the NCBI assembly that
+    the Ensembl species is based on. Then the data frame returned
+    by \code{\link{getChromInfoFromNCBI}} ("NCBI chrom info") is
+    \emph{mapped} and bound to the data frame returned by
+    \code{getChromInfoFromEnsembl} ("Ensembl chrom info").
+    This "map and bind" operation is similar to a \code{JOIN} in SQL.
+
+    Note that not all rows in the "Ensembl chrom info" data frame are
+    necessarily mapped to a row in the "NCBI chrom info" data frame.
+    For the unmapped rows the NCBI columns in the final data frame
+    are filled with NAs (\code{LEFT JOIN} in SQL).
+
+    The primary use case for using \code{map.NCBI=TRUE} is to map
+    Ensembl sequence names to NCBI sequence names.
   }
   \item{recache}{
     \code{getChromInfoFromEnsembl} uses a cache mechanism so the
@@ -106,7 +121,7 @@ getChromInfoFromEnsembl(species,
   and with attribute \code{species_info} which contains details about
   the species that was used to obtaine the data.
 
-  If \code{add.NCBI.cols} is \code{TRUE}, then the 7 following
+  If \code{map.NCBI} is \code{TRUE}, then the 7 following
   columns are added to the result:
   \itemize{
     \item \code{SequenceName}: character.
@@ -150,7 +165,7 @@ attr(celegans, "species_info")
 
 getChromInfoFromEnsembl("celegans", as.Seqinfo=TRUE)
 
-celegans <- getChromInfoFromEnsembl("celegans", add.NCBI.cols=TRUE)
+celegans <- getChromInfoFromEnsembl("celegans", map.NCBI=TRUE)
 
 ## === Yeast ===
 ## https://uswest.ensembl.org/Saccharomyces_cerevisiae
@@ -160,11 +175,11 @@ attr(scerevisiae, "species_info")
 
 getChromInfoFromEnsembl("scerevisiae", as.Seqinfo=TRUE)
 
-scerevisiae <- getChromInfoFromEnsembl("scerevisiae", add.NCBI.cols=TRUE)
+scerevisiae <- getChromInfoFromEnsembl("scerevisiae", map.NCBI=TRUE)
 
 ## Arabidopsis thaliana:
 athaliana <- getChromInfoFromEnsembl("athaliana", division="plants",
-                                     add.NCBI.cols=TRUE)
+                                     map.NCBI=TRUE)
 attr(athaliana, "species_info")
 
 ## ---------------------------------------------------------------------
