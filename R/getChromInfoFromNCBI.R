@@ -11,7 +11,7 @@
 .NCBI_assembly2accession <- new.env(parent=emptyenv())
 .NCBI_accession2assembly_info <- new.env(parent=emptyenv())
 
-.load_registered_NCBI_genome <- function(file_path)
+.load_registered_NCBI_assembly <- function(file_path)
 {
     filename <- basename(file_path)
     if (substr(filename, nchar(filename)-1L, nchar(filename)) != ".R")
@@ -130,13 +130,13 @@
     }
 }
 
-.load_registered_NCBI_genomes <- function()
+.load_registered_NCBI_assemblies <- function()
 {
-    dir_path <- system.file("registered_genomes", "NCBI",
+    dir_path <- system.file("registered", "NCBI_assemblies",
                              package="GenomeInfoDb")
     file_paths <- list.files(dir_path, pattern="\\.R$", full.names=TRUE)
     for (file_path in file_paths)
-        .load_registered_NCBI_genome(file_path)
+        .load_registered_NCBI_assembly(file_path)
 }
 
 .make_extra_info_col <- function(col0, ifmissing="", sep=":", collapse="|")
@@ -161,7 +161,7 @@
 registered_NCBI_genomes <- function()
 {
     if (length(.NCBI_accession2assembly_info) == 0L)
-        .load_registered_NCBI_genomes()
+        .load_registered_NCBI_assemblies()
     assemblies <- unname(as.list(.NCBI_accession2assembly_info, all.names=TRUE))
 
     colnames <- c("organism", "rank_within_organism", "genome", "date",
@@ -193,7 +193,7 @@ registered_NCBI_genomes <- function()
 {
     stopifnot(isSingleString(genome))
     if (length(.NCBI_assembly2accession) == 0L)
-        .load_registered_NCBI_genomes()
+        .load_registered_NCBI_assemblies()
     .NCBI_assembly2accession[[tolower(genome)]]
 }
 
@@ -201,7 +201,7 @@ find_NCBI_assembly_info_for_accession <- function(accession)
 {
     stopifnot(isSingleString(accession))
     if (length(.NCBI_accession2assembly_info) == 0L)
-        .load_registered_NCBI_genomes()
+        .load_registered_NCBI_assemblies()
     .NCBI_accession2assembly_info[[accession]]
 }
 

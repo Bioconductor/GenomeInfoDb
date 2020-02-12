@@ -426,7 +426,7 @@
                   "not contain spaces"))
 
     ## Placeholders. Will actually get defined when we source the script.
-    ## See README.TXT in inst/registered_genomes/UCSC/ for the list of
+    ## See README.TXT in inst/registered/UCSC_genomes/ for the list of
     ## variables.
     GENOME <- ORGANISM <- ASSEMBLED_MOLECULES <- CIRC_SEQS <- NULL
     GET_CHROM_SIZES <- NCBI_LINKER <- ENSEMBL_LINKER <- NULL
@@ -520,7 +520,7 @@
 
 registered_UCSC_genomes <- function()
 {
-    dir_path <- system.file("registered_genomes", "UCSC",
+    dir_path <- system.file("registered", "UCSC_genomes",
                              package="GenomeInfoDb")
     file_paths <- list.files(dir_path, pattern="\\.R$", full.names=TRUE)
     assemblies <- lapply(file_paths, .parse_script_for_registered_UCSC_genome)
@@ -749,7 +749,7 @@ getChromInfoFromUCSC <- function(genome,
         stop(wmsg("'as.Seqinfo' must be TRUE or FALSE"))
 
     script_name <- paste0(genome, ".R")
-    script_path <- system.file("registered_genomes", "UCSC", script_name,
+    script_path <- system.file("registered", "UCSC_genomes", script_name,
                                package="GenomeInfoDb")
     if (identical(script_path, "")) {
         if (!isFALSE(add.NCBI.cols))
