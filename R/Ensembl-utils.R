@@ -7,7 +7,7 @@
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Obtain URL of a given core db on the Ensembl FTP servers
+### Obtain URL to the core db of a given species on the Ensembl FTP servers
 ###
 
 .ENSEMBL_FTP_PUB_URL <- "ftp://ftp.ensembl.org/pub/"
@@ -66,6 +66,7 @@ list_Ensembl_FTP_releases <- function(division=NA, use.grch37=FALSE,
     releases
 }
 
+### Returns a single string with the "species_info" attribute (named list) on it.
 .predict_core_db_in_Ensembl_FTP_grch37 <- function(species=NA, release=NA)
 {
     ## User-supplied 'species' will be ignored.
@@ -89,13 +90,17 @@ list_Ensembl_FTP_releases <- function(division=NA, use.grch37=FALSE,
     if (warn)
         warning(wmsg("you've set 'use.grch37' to TRUE ",
                      "so 'species' was ignored"))
-    if (is.na(release))
+    if (is.na(release)) {
         release <- tail(list_Ensembl_FTP_releases(), n=1L)  # latest
+    } else {
+        release <- as.integer(release)
+    }
     core_db <- paste0("homo_sapiens_core_", release, "_37")
     attr(core_db, "species_info") <- list(
         name="Human",
         species="homo_sapiens",
         division="EnsemblVertebrates",
+        Ensembl_release=release,
         taxonomy_id=9606L,
         assembly="GRCh37",
         assembly_accession="GCF_000001405.13",
@@ -305,6 +310,7 @@ fetch_species_index_from_Ensembl_FTP <- function(release=NA, division=NA)
          "\n    ", url)
 }
 
+### Returns a single string with the "species_info" attribute (named list) on it.
 .find_core_db_in_Ensembl_FTP_species_index <- function(species,
                                                        release=NA, division=NA)
 {
@@ -314,10 +320,16 @@ fetch_species_index_from_Ensembl_FTP <- function(release=NA, division=NA)
     species_index <- .fetch_species_index_from_url(url)
     idx <- .lookup_species(species, species_index, url)
     core_db <- species_index[idx, "core_db"]
+    if (is.na(release)) {
+        release <- tail(list_Ensembl_FTP_releases(), n=1L)  # latest
+    } else {
+        release <- as.integer(release)
+    }
     attr(core_db, "species_info") <- list(
         name=species_index[idx, "name"],
         species=species_index[idx, "species"],
         division=species_index[idx, "division"],
+        Ensembl_release=release,
         taxonomy_id=species_index[idx, "taxonomy_id"],
         assembly=species_index[idx, "assembly"],
         assembly_accession=species_index[idx, "assembly_accession"],
@@ -389,6 +401,7 @@ get_Ensembl_FTP_gtf_url <- function(release=NA, division=NA,
     core_dbs[grep(pattern, core_dbs, fixed=TRUE)]
 }
 
+### Returns a single string with the "species_info" attribute (named list) on it.
 .find_core_db_in_Ensembl_FTP_core_dbs <-
     function(mysql_url, species, release=NA)
 {
@@ -399,12 +412,24 @@ get_Ensembl_FTP_gtf_url <- function(release=NA, division=NA,
     if (length(idx) != 1L)
         stop(wmsg("found 0 or more than 1 subdir for \"", species,
                   "\" species at ", mysql_url))
-    core_dbs[[idx]]
+    core_db <- core_dbs[[idx]]
+    if (is.na(release)) {
+        release <- tail(list_Ensembl_FTP_releases(), n=1L)  # latest
+    } else {
+        release <- as.integer(release)
+    }
+    attr(core_db, "species_info") <- list(
+        species=sub("_core_.*$", "", core_db),
+        Ensembl_release=release,
+        core_db=core_db
+    )
+    core_db
 }
 
 ### 'division' must be NA or one of the Ensembl Genomes divisions i.e.
 ### "bacteria", "fungi", "metazoa", "plants", or "protists".
-### Return URL to Ensemble Core DB (FTP access).
+### Return URL to Ensemble Core DB (FTP access) in a single string with
+### the "species_info" attribute (named list) on it.
 get_Ensembl_FTP_core_db_url <- function(species, release=NA, division=NA,
                                         use.grch37=FALSE)
 {
@@ -438,8 +463,10 @@ get_Ensembl_FTP_core_db_url <- function(species, release=NA, division=NA,
                                            species, release=release)
         }
     }
+    species_info <- attr(core_db, "species_info")
+    stopifnot(is.list(species_info), !is.null(names(species_info)))
     core_db_url <- paste0(mysql_url, core_db, "/")
-    attr(core_db_url, "species_info") <- attr(core_db, "species_info")
+    attr(core_db_url, "species_info") <- species_info
     core_db_url
 }
 

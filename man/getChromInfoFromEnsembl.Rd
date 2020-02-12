@@ -19,6 +19,7 @@ getChromInfoFromEnsembl(species,
                         include.non_ref.sequences=FALSE,
                         include.contigs=FALSE,
                         include.clones=FALSE,
+                        add.NCBI.cols=FALSE,
                         recache=FALSE,
                         as.Seqinfo=FALSE)
 }
@@ -64,6 +65,11 @@ getChromInfoFromEnsembl(species,
     default. Note that the dataset for Human contains more than one
     hundred thousands \emph{clones}!
   }
+  \item{add.NCBI.cols}{
+    \code{TRUE} or \code{FALSE} (the default). If \code{TRUE} then
+    additional columns containing data from NCBI are bound to the result.
+    This can be useful to map Ensembl sequence names to NCBI sequence names.
+  }
   \item{recache}{
     \code{getChromInfoFromEnsembl} uses a cache mechanism so the
     chromosome information of a given dataset only gets downloaded
@@ -97,8 +103,22 @@ getChromInfoFromEnsembl(species,
     \item \code{non_ref}: logical.
     \item \code{circular}: logical.
   }
-  and with attribute \code{species_info} which provides details about
-  the species that was used to obtained the data.
+  and with attribute \code{species_info} which contains details about
+  the species that was used to obtaine the data.
+
+  If \code{add.NCBI.cols} is \code{TRUE}, then the 7 following
+  columns are added to the result:
+  \itemize{
+    \item \code{SequenceName}: character.
+    \item \code{SequenceRole}: factor.
+    \item \code{AssignedMolecule}: factor.
+    \item \code{GenBankAccn}: character.
+    \item \code{Relationship}: factor.
+    \item \code{RefSeqAccn}: character.
+    \item \code{AssemblyUnit}: factor.
+  }
+  Note that these additional columns are obtained with
+  \code{\link{getChromInfoFromNCBI}} and their names are preserved.
 }
 
 \author{
@@ -122,17 +142,25 @@ getChromInfoFromEnsembl(species,
 
 ## Internet access required!
 
+## Worm:
 celegans <- getChromInfoFromEnsembl("celegans")
 attr(celegans, "species_info")
 
 getChromInfoFromEnsembl("celegans", as.Seqinfo=TRUE)
 
+celegans <- getChromInfoFromEnsembl("celegans", add.NCBI.cols=TRUE)
+
+## Yeast:
 scerevisiae <- getChromInfoFromEnsembl("scerevisiae")
 attr(scerevisiae, "species_info")
 
 getChromInfoFromEnsembl("scerevisiae", as.Seqinfo=TRUE)
 
-athaliana <- getChromInfoFromEnsembl("athaliana", division="plants")
+scerevisiae <- getChromInfoFromEnsembl("scerevisiae", add.NCBI.cols=TRUE)
+
+## Arabidopsis thaliana:
+athaliana <- getChromInfoFromEnsembl("athaliana", division="plants",
+                                     add.NCBI.cols=TRUE)
 attr(athaliana, "species_info")
 
 ## ---------------------------------------------------------------------
@@ -178,6 +206,7 @@ map_to_NCBI <- function(Ensembl_chrom_info, NCBI_chrom_info,
 yeast_chrom_info <- getChromInfoFromEnsembl("scerevisiae")
 
 ## Mapping to NCBI is one-to-one!
+R64 <- getChromInfoFromNCBI("GCA_000146045.2")
 R64 <- getChromInfoFromNCBI("R64")
 ## Same sequence names except that Mito is called MT at NCBI.
 ## Mito (GenBank=AJ011856.1) and MT (GenBank=KP263414.1,

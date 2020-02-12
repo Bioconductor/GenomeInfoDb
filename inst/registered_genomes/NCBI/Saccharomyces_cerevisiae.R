@@ -16,10 +16,14 @@ ASSEMBLIES <- list(
          circ_seqs=character(0)),
 
     ## strain: S288C
-    list(genome="R64",
+    list(genome="R64",      # called R64-1-1 in Ensembl
          date="2014/12/17",
          extra_info=c(strain="S288C"),
-         assembly_accession="GCF_000146045.2",  # sacCer3
+         ## GCA_000146045.2 and GCF_000146045.2 are equivalent but
+         ## we use the former because that's what Ensembl uses for
+         ## saccharomyces_cerevisiae in release 99. Strangely they
+         ## call this assembly R64-1-1 (like UCSC).
+         assembly_accession="GCA_000146045.2",  # sacCer3
          circ_seqs="MT"),
 
     list(genome="ASM205763v1",

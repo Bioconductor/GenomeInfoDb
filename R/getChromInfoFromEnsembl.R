@@ -250,6 +250,36 @@
     ans
 }
 
+.get_NCBI_accession <- function(species_info)
+{
+    stopifnot(is.list(species_info), !is.null(names(species_info)))
+
+    assembly_accession <- species_info$assembly_accession
+    if (is.null(assembly_accession)) {
+        warning(wmsg("'add.NCBI.cols' got ignored for Ensembl species ",
+                     "\"", species_info$species, "\" (don't know which ",
+                     "NCBI genome this species is associated with)"))
+        return(NA)
+    }
+
+    ## Is this Ensembl species associated with a registered NCBI genome?
+    NCBI_genomes <- registered_NCBI_genomes()
+    genomes <- NCBI_genomes[ , "genome"]
+    accessions <- NCBI_genomes[ , "assembly_accession"]
+    if (assembly_accession %in% accessions)
+        return(assembly_accession)  # yes
+    name <- species_info$name
+    if (is.null(name))
+        return(assembly_accession)  # no
+    idx <- which(genomes %in% name)
+    if (length(idx) == 0L)
+        return(assembly_accession)  # no
+    if (length(idx) == 1L)
+        return(accessions[[idx]])   # yes
+    ## Yes, but ambiguously! We stick to the accession provided by Ensembl.
+    assembly_accession
+}
+
 .ENSEMBL_cached_chrom_info <- new.env(parent=emptyenv())
 
 .get_chrom_info_from_Ensembl_FTP <- function(core_db_url,
@@ -257,6 +287,7 @@
     include.non_ref.sequences=FALSE,
     include.contigs=FALSE,
     include.clones=FALSE,
+    species_info=NULL,
     recache=FALSE)
 {
     ans <- .ENSEMBL_cached_chrom_info[[core_db_url]]
@@ -267,6 +298,14 @@
         ans <- .format_Ensembl_chrom_info(seq_regions)
         .ENSEMBL_cached_chrom_info[[core_db_url]] <- ans
     }
+
+    ## Add NCBI cols.
+    if (!is.null(species_info)) {
+        NCBI_accession <- .get_NCBI_accession(species_info)
+        if (!is.na(NCBI_accession))
+            ans <- .add_NCBI_cols_to_Ensembl_chrom_info(ans, NCBI_accession)
+    }
+
     if (assembled.molecules.only) {
         ## FIXME: This is broken for some core dbs e.g. bos_taurus_core_99_12
         ## where coord_system is not set to "chromosome" for chromosomes.
@@ -294,12 +333,16 @@ getChromInfoFromEnsembl <- function(species,
     include.non_ref.sequences=FALSE,
     include.contigs=FALSE,
     include.clones=FALSE,
+    add.NCBI.cols=FALSE,
     recache=FALSE,
     as.Seqinfo=FALSE)
 {
     core_db_url <- get_Ensembl_FTP_core_db_url(species, release=release,
                                                division=division,
                                                use.grch37=use.grch37)
+    species_info <- attr(core_db_url, "species_info")
+    stopifnot(is.list(species_info), !is.null(names(species_info)))
+
     if (!isTRUEorFALSE(assembled.molecules.only))
         stop(wmsg("'assembled.molecules.only' must be TRUE or FALSE"))
     if (!isTRUEorFALSE(include.non_ref.sequences))
@@ -308,6 +351,8 @@ getChromInfoFromEnsembl <- function(species,
         stop(wmsg("'include.contigs' must be TRUE or FALSE"))
     if (!isTRUEorFALSE(include.clones))
         stop(wmsg("'include.clones' must be TRUE or FALSE"))
+    if (!isTRUEorFALSE(add.NCBI.cols))
+        stop(wmsg("'add.NCBI.cols' must be TRUE or FALSE"))
     if (!isTRUEorFALSE(recache))
         stop(wmsg("'recache' must be TRUE or FALSE"))
     if (!isTRUEorFALSE(as.Seqinfo))
@@ -318,18 +363,17 @@ getChromInfoFromEnsembl <- function(species,
                 include.non_ref.sequences=include.non_ref.sequences,
                 include.contigs=include.contigs,
                 include.clones=include.clones,
+                species_info=if (add.NCBI.cols) species_info else NULL,
                 recache=recache)
 
-    species_info <- attr(core_db_url, "species_info")
     if (!as.Seqinfo) {
         attr(ans, "species_info") <- species_info
         return(ans)
     }
-    if (is.null(species_info)) {
-        ans_genome <- rep.int(NA_character_, nrow(ans))
-    } else {
-        ans_genome <- species_info$assembly
-    }
+    ans_genome <- NA_character_
+    assembly <- species_info$assembly
+    if (!is.null(assembly))
+        ans_genome <- assembly
     Seqinfo(seqnames=ans[ , "name"],
             seqlengths=ans[ , "length"],
             isCircular=ans[ , "circular"],
