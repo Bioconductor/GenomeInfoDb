@@ -121,19 +121,20 @@ getChromInfoFromEnsembl(species,
   and with attribute \code{species_info} which contains details about
   the species that was used to obtaine the data.
 
-  If \code{map.NCBI} is \code{TRUE}, then the 7 following
-  columns are added to the result:
+  If \code{map.NCBI} is \code{TRUE}, then 7 "NCBI columns" are added
+  to the result:
   \itemize{
-    \item \code{SequenceName}: character.
-    \item \code{SequenceRole}: factor.
-    \item \code{AssignedMolecule}: factor.
-    \item \code{GenBankAccn}: character.
-    \item \code{Relationship}: factor.
-    \item \code{RefSeqAccn}: character.
-    \item \code{AssemblyUnit}: factor.
+    \item \code{NCBI.SequenceName}: character.
+    \item \code{NCBI.SequenceRole}: factor.
+    \item \code{NCBI.AssignedMolecule}: factor.
+    \item \code{NCBI.GenBankAccn}: character.
+    \item \code{NCBI.Relationship}: factor.
+    \item \code{NCBI.RefSeqAccn}: character.
+    \item \code{NCBI.AssemblyUnit}: factor.
   }
-  Note that these additional columns are obtained with
-  \code{\link{getChromInfoFromNCBI}} and their names are preserved.
+  Note that the names of the "NCBI columns" are those returned
+  by \code{\link{getChromInfoFromNCBI}} but with the \code{NCBI.}
+  prefix added to them.
 }
 
 \author{

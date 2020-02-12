@@ -231,8 +231,10 @@
     stopifnot(identical(Ensembl_chrom_info[compare_idx, "length"],
                         NCBI_chrom_info[compare_idx, "SequenceLength"]))
 
-    drop_colnames <- c("SequenceLength", "UCSCStyleName", "circular")
-    cbind(Ensembl_chrom_info, drop_cols(NCBI_chrom_info, drop_colnames))
+    drop_columns <- c("SequenceLength", "UCSCStyleName", "circular")
+    NCBI_chrom_info <- drop_cols(NCBI_chrom_info, drop_columns)
+    colnames(NCBI_chrom_info) <- paste0("NCBI.", colnames(NCBI_chrom_info))
+    cbind(Ensembl_chrom_info, NCBI_chrom_info)
 }
 
 

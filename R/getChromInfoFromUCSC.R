@@ -265,13 +265,15 @@
     stopifnot(identical(UCSC_chrom_info[compare_idx, "chrom"],
                         NCBI_chrom_info[compare_idx, "UCSCStyleName"]))
 
-    drop_colnames <- c("SequenceLength", "UCSCStyleName", "circular")
-    ans <- cbind(UCSC_chrom_info, drop_cols(NCBI_chrom_info, drop_colnames))
+    drop_columns <- c("SequenceLength", "UCSCStyleName", "circular")
+    NCBI_chrom_info <- drop_cols(NCBI_chrom_info, drop_columns)
+    colnames(NCBI_chrom_info) <- paste0("NCBI.", colnames(NCBI_chrom_info))
+    ans <- cbind(UCSC_chrom_info, NCBI_chrom_info)
 
     if (length(unmapped_seqs) != 0L)
-        ans[unmapped_idx, "SequenceRole"] <- unmapped_seqs_role
+        ans[unmapped_idx, "NCBI.SequenceRole"] <- unmapped_seqs_role
 
-    stopifnot(!is.unsorted(ans[ , "SequenceRole"]))
+    stopifnot(!is.unsorted(ans[ , "NCBI.SequenceRole"]))
     ans
 }
 

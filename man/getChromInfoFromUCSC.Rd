@@ -131,19 +131,21 @@ registered_UCSC_genomes()
     \item \code{assembled}: logical.
     \item \code{circular}: logical.
   }
-  If \code{map.NCBI} is \code{TRUE}, then the 7 following
-  columns are added to the result:
+  If \code{map.NCBI} is \code{TRUE}, then 7 "NCBI columns" are added
+  to the result:
   \itemize{
-    \item \code{SequenceName}: character.
-    \item \code{SequenceRole}: factor.
-    \item \code{AssignedMolecule}: factor.
-    \item \code{GenBankAccn}: character.
-    \item \code{Relationship}: factor.
-    \item \code{RefSeqAccn}: character.
-    \item \code{AssemblyUnit}: factor.
+    \item \code{NCBI.SequenceName}: character.
+    \item \code{NCBI.SequenceRole}: factor.
+    \item \code{NCBI.AssignedMolecule}: factor.
+    \item \code{NCBI.GenBankAccn}: character.
+    \item \code{NCBI.Relationship}: factor.
+    \item \code{NCBI.RefSeqAccn}: character.
+    \item \code{NCBI.AssemblyUnit}: factor.
   }
-  Note that these additional columns are obtained with
-  \code{\link{getChromInfoFromNCBI}} and their names are preserved.
+  Note that the names of the "NCBI columns" are those returned
+  by \code{\link{getChromInfoFromNCBI}} but with the \code{NCBI.}
+  prefix added to them.
+
   If \code{add.ensembl.col} is \code{TRUE}, the column \code{ensembl}
   is added to the result.
 
@@ -193,7 +195,7 @@ getChromInfoFromUCSC("hg38", map.NCBI=TRUE)[c(1, 5)]
 ## Note that some NCBI-based UCSC assemblies contain sequences that
 ## are not mapped. For example this is the case for chrM in hg19:
 hg19 <- getChromInfoFromUCSC("hg19", map.NCBI=TRUE)
-hg19[is.na(hg19$SequenceName), ]
+hg19[is.na(hg19$NCBI.SequenceName), ]
 
 ## Map the hg19 sequences to the Ensembl sequence names:
 getChromInfoFromUCSC("hg19", add.ensembl.col=TRUE)
@@ -214,7 +216,8 @@ genome
 
 ## Get the chromosome info for the hg38 genome:
 hg38_chrom_info <- getChromInfoFromUCSC("hg38", map.NCBI=TRUE)
-ncbi2ucsc <- setNames(hg38_chrom_info$chrom, hg38_chrom_info$SequenceName)
+ncbi2ucsc <- setNames(hg38_chrom_info$chrom,
+                      hg38_chrom_info$NCBI.SequenceName)
 
 ## Set the UCSC sequence names on 'genome':
 seqlevels(genome) <- ncbi2ucsc[seqlevels(genome)]
