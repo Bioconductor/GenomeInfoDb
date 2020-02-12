@@ -5,11 +5,11 @@
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Load and access db of registered NCBI genomes
+### Load and access db of registered NCBI genome assemblies
 ###
 
-.NCBI_genome2accession <- new.env(parent=emptyenv())
-.NCBI_accession2assembly <- new.env(parent=emptyenv())
+.NCBI_assembly2accession <- new.env(parent=emptyenv())
+.NCBI_accession2assembly_info <- new.env(parent=emptyenv())
 
 .load_registered_NCBI_genome <- function(file_path)
 {
@@ -50,41 +50,41 @@
 
     required_fields <- c("genome", "date", "assembly_accession", "circ_seqs")
     for (i in seq_along(ASSEMBLIES)) {
-        assembly <- ASSEMBLIES[[i]]
+        assembly_info <- ASSEMBLIES[[i]]
         label <- sprintf("'ASSEMBLIES[[%d]]'", i)
 
-        stop_if(!is.list(assembly), label, " must be a named list")
-        assembly_fields <- names(assembly)
+        stop_if(!is.list(assembly_info), label, " must be a named list")
+        assembly_fields <- names(assembly_info)
         stop_if(!is.character(assembly_fields), label, " must be a named list")
         stop_if(!is_primary_key(assembly_fields),
                 "the names on ", label, " must ",
                 "not contain NAs, empty strings, or duplicates")
-        stop_if(!all(required_fields %in% names(assembly)),
+        stop_if(!all(required_fields %in% names(assembly_info)),
                 label, " must have fields: ",
                 paste(paste0("\"", required_fields, "\""), collapse=", "))
 
         ## Check "genome" field (required).
-        genome <- assembly$genome
+        genome <- assembly_info$genome
         stop_if(!isSingleString(genome) || genome == "",
                 "\"genome\" field in ", label, " must ",
                 "be a single non-empty string")
 
         ## Check "date" field (required).
-        date <- assembly$date
+        date <- assembly_info$date
         stop_if(!isSingleString(date) || date == "",
                 "\"date\" field in ", label, " must ",
                 "be a single non-empty string")
 
         ## Check "accession" field (required).
-        accession <- assembly$assembly_accession
+        accession <- assembly_info$assembly_accession
         stop_if(!isSingleString(accession) || accession == "",
                 "\"accession\" field in ", label, " must ",
                 "be a single non-empty string")
-        stop_if(!is.null(.NCBI_accession2assembly[[accession]]),
+        stop_if(!is.null(.NCBI_accession2assembly_info[[accession]]),
                 "assembly accession ", accession, " used more than once")
 
         ## Check "circ_seqs" field (required).
-        circ_seqs <- assembly$circ_seqs
+        circ_seqs <- assembly_info$circ_seqs
         stop_if(!is.character(circ_seqs),
                 "\"circ_seqs\" field in ", label, " must ",
                 "be a character vector")
@@ -94,7 +94,7 @@
 
         ## Check optional fields.
 
-        extra_info <- assembly$extra_info
+        extra_info <- assembly_info$extra_info
         if (!is.null(extra_info)) {
             stop_if(!is.character(extra_info),
                 "\"extra_info\" field in ", label, " must ",
@@ -111,7 +111,7 @@
                 "not contain NAs or duplicates")
         }
 
-        special_mappings <- assembly$NCBI2Ensembl_special_mappings
+        special_mappings <- assembly_info$NCBI2Ensembl_special_mappings
         if (!is.null(special_mappings)) {
             stop_if(!is.character(special_mappings),
                 "\"NCBI2Ensembl_special_mappings\" field in ", label, " must ",
@@ -122,11 +122,11 @@
         }
 
         genome <- tolower(genome)
-        .NCBI_genome2accession[[genome]] <-
-            c(.NCBI_genome2accession[[genome]], accession)
-        assembly$organism <- ORGANISM
-        assembly$rank_within_organism <- i
-        .NCBI_accession2assembly[[accession]] <- assembly
+        .NCBI_assembly2accession[[genome]] <-
+            c(.NCBI_assembly2accession[[genome]], accession)
+        assembly_info$organism <- ORGANISM
+        assembly_info$rank_within_organism <- i
+        .NCBI_accession2assembly_info[[accession]] <- assembly_info
     }
 }
 
@@ -160,9 +160,9 @@
 
 registered_NCBI_genomes <- function()
 {
-    if (length(.NCBI_accession2assembly) == 0L)
+    if (length(.NCBI_accession2assembly_info) == 0L)
         .load_registered_NCBI_genomes()
-    assemblies <- unname(as.list(.NCBI_accession2assembly, all.names=TRUE))
+    assemblies <- unname(as.list(.NCBI_accession2assembly_info, all.names=TRUE))
 
     colnames <- c("organism", "rank_within_organism", "genome", "date",
                   "extra_info", "assembly_accession", "circ_seqs")
@@ -189,20 +189,20 @@ registered_NCBI_genomes <- function()
     as.data.frame(drop_cols(ans, "rank_within_organism")[oo, , drop=FALSE])
 }
 
-lookup_NCBI_genome2accession <- function(genome)
+.lookup_NCBI_assembly2accession <- function(genome)
 {
     stopifnot(isSingleString(genome))
-    if (length(.NCBI_genome2accession) == 0L)
+    if (length(.NCBI_assembly2accession) == 0L)
         .load_registered_NCBI_genomes()
-    .NCBI_genome2accession[[tolower(genome)]]
+    .NCBI_assembly2accession[[tolower(genome)]]
 }
 
-lookup_NCBI_accession2assembly <- function(accession)
+find_NCBI_assembly_info_for_accession <- function(accession)
 {
     stopifnot(isSingleString(accession))
-    if (length(.NCBI_accession2assembly) == 0L)
+    if (length(.NCBI_accession2assembly_info) == 0L)
         .load_registered_NCBI_genomes()
-    .NCBI_accession2assembly[[accession]]
+    .NCBI_accession2assembly_info[[accession]]
 }
 
 
@@ -331,15 +331,15 @@ getChromInfoFromNCBI <- function(genome,
 
     ## First see if the user supplied the assembly accession of a registered
     ## genome assembly instead of its name.
-    assembly <- lookup_NCBI_accession2assembly(genome)
-    if (!is.null(assembly)) {
+    NCBI_assembly_info <- find_NCBI_assembly_info_for_accession(genome)
+    if (!is.null(NCBI_assembly_info)) {
         ## Yes s/he did.
         accession <- genome
-        circ_seqs <- assembly$circ_seqs
+        circ_seqs <- NCBI_assembly_info$circ_seqs
     } else {
         ## No s/he didn't.
         ## Now see if s/he supplied the name of a registered genome assembly.
-        accession <- lookup_NCBI_genome2accession(genome)
+        accession <- .lookup_NCBI_assembly2accession(genome)
         if (!is.null(accession)) {
             ## Yes s/he did.
             if (length(accession) > 1L) {
@@ -349,8 +349,9 @@ getChromInfoFromNCBI <- function(genome,
                              "The first one was selected."))
                 accession <- accession[[1L]]
             }
-            assembly <- lookup_NCBI_accession2assembly(accession)
-            circ_seqs <- assembly$circ_seqs
+            NCBI_assembly_info <-
+                find_NCBI_assembly_info_for_accession(accession)
+            circ_seqs <- NCBI_assembly_info$circ_seqs
         } else {
             ## No s/he didn't.
             ## So now we just assume that 'genome' is an assembly accession
@@ -359,16 +360,20 @@ getChromInfoFromNCBI <- function(genome,
             circ_seqs <- NULL
         }
     }
+
     ans <- .get_NCBI_chrom_info_from_accession(accession,
                 circ_seqs=circ_seqs,
                 assembled.molecules.only=assembled.molecules.only,
                 assembly.units=assembly.units,
                 recache=recache)
-    if (!as.Seqinfo)
+
+    if (!as.Seqinfo) {
+        attr(ans, "NCBI_assembly_info") <- NCBI_assembly_info
         return(ans)
+    }
     Seqinfo(seqnames=ans[ , "SequenceName"],
             seqlengths=ans[ , "SequenceLength"],
             isCircular=ans[ , "circular"],
-            genome=genome)
+            genome=NCBI_assembly_info$genome)
 }
 

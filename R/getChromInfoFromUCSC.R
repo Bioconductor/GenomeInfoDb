@@ -85,7 +85,7 @@
         m2 <- match(special_mappings, NCBI_seqlevels)
         if (anyNA(m2))
             stop(wmsg("'special_mappings' contains sequence ",
-                      "names not found in the NCBI assembly"))
+                      "names not found in the NCBI genome assembly"))
         L2R[m1] <- m2
 
         unmapped_idx <- which(is.na(L2R))
@@ -491,14 +491,14 @@
         stop_if(!isSingleString(accession) || accession == "",
                 "\"assembly_accession\" field in 'NCBI_LINKER' must ",
                 "be a single non-empty string")
-        NCBI_assembly <- lookup_NCBI_accession2assembly(accession)
-        stop_if(is.null(NCBI_assembly),
+        NCBI_assembly_info <- find_NCBI_assembly_info_for_accession(accession)
+        stop_if(is.null(NCBI_assembly_info),
                 "\"assembly_accession\" field in 'NCBI_LINKER' must ",
                 "be associated with a registered NCBI genome")
-        stop_if(!identical(ORGANISM, NCBI_assembly$organism),
+        stop_if(!identical(ORGANISM, NCBI_assembly_info$organism),
                 "the NCBI genome associated with the \"assembly_accession\" ",
                 "field in 'NCBI_LINKER' is registered for an organism ",
-                "(\"", NCBI_assembly$organism, "\") that differs ",
+                "(\"", NCBI_assembly_info$organism, "\") that differs ",
                 "from 'ORGANISM' (\"", ORGANISM, "\")")
     }
 
@@ -531,19 +531,19 @@ registered_UCSC_genomes <- function()
         colname <- colnames[[j]]
         if (colname == "based_on_NCBI_genome") {
             col <- vapply(assemblies,
-                function(assembly) {
-                    linker <- assembly$NCBI_LINKER
+                function(assembly_info) {
+                    linker <- assembly_info$NCBI_LINKER
                     if (is.null(linker))
                         return(NA_character_)
                     accession <- linker$assembly_accession
-                    lookup_NCBI_accession2assembly(accession)$genome
+                    find_NCBI_assembly_info_for_accession(accession)$genome
                 }, character(1), USE.NAMES=FALSE)
             return(col)
         }
         if (colname == "assembly_accession") {
             col <- vapply(assemblies,
-                function(assembly) {
-                    linker <- assembly$NCBI_LINKER
+                function(assembly_info) {
+                    linker <- assembly_info$NCBI_LINKER
                     if (is.null(linker))
                         return(NA_character_)
                     linker$assembly_accession
@@ -552,8 +552,8 @@ registered_UCSC_genomes <- function()
         }
         if (colname == "with_Ensembl") {
             col <- vapply(assemblies,
-                function(assembly) {
-                    linker <- assembly$ENSEMBL_LINKER
+                function(assembly_info) {
+                    linker <- assembly_info$ENSEMBL_LINKER
                     !is.null(linker)
                 }, logical(1), USE.NAMES=FALSE)
             return(col)
