@@ -371,9 +371,14 @@ getChromInfoFromNCBI <- function(assembly,
         attr(ans, "NCBI_assembly_info") <- NCBI_assembly_info
         return(ans)
     }
+    if (is.null(NCBI_assembly_info)) {
+        ans_genome <- assembly
+    } else {
+        ans_genome <- NCBI_assembly_info$assembly
+    }
     Seqinfo(seqnames=ans[ , "SequenceName"],
             seqlengths=ans[ , "SequenceLength"],
             isCircular=ans[ , "circular"],
-            genome=NCBI_assembly_info$assembly)
+            genome=ans_genome)
 }
 
