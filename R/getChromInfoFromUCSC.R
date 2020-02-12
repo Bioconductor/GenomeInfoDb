@@ -9,20 +9,14 @@
 ###
 
 .match_UCSC_seqlevels_to_NCBI_accns <- function(UCSC_seqlevels, NCBI_accns,
-                                                accn_suffix="")
+                                                trim=FALSE, accn_suffix="")
 {
-    query <- chartr("-", ".", UCSC_seqlevels)
+    if (trim) {
+        UCSC_seqlevels <- sub("_random$", "", UCSC_seqlevels)
+        UCSC_seqlevels <- sub("^[^_]*_", "", UCSC_seqlevels)
+    }
+    query <- chartr("v-", "..", UCSC_seqlevels)
     query <- paste0(query, accn_suffix)
-    names(query) <- UCSC_seqlevels
-    solid_match2(tolower(query), tolower(NCBI_accns),
-                 x_what="UCSC seqlevel", table_what="accession number")
-}
-
-.match_trimmed_UCSC_random_seqlevels_to_NCBI_accns <-
-    function(UCSC_seqlevels, NCBI_accns)
-{
-    query <- sub("^[^_]*_", "", sub("_random$", "", UCSC_seqlevels))
-    query <- chartr("v", ".", query)
     names(query) <- UCSC_seqlevels
     solid_match2(tolower(query), tolower(NCBI_accns),
                  x_what="UCSC seqlevel", table_what="accession number")
@@ -93,7 +87,8 @@
             return(L2R)
     }
 
-    ## 2. Match 'UCSC_seqlevels' to 'NCBI_UCSCStyleName'.
+    ## 2. We assign based on exact match between 'UCSC_seqlevels'
+    ##    and 'NCBI_UCSCStyleName'.
     m <- match(UCSC_seqlevels[unmapped_idx], NCBI_UCSCStyleName)
     L2R[unmapped_idx] <- m
 
@@ -101,8 +96,8 @@
     if (length(unmapped_idx) == 0L)
         return(L2R)
 
-    ## 3. We assign based on exact matching (case insensitive) of
-    ##    the seqlevels.
+    ## 3. We assign based on exact match (case insensitive) between UCSC
+    ##    and NCBI seqlevels.
     ucsc_seqlevels <- tolower(UCSC_seqlevels)
     ncbi_seqlevels <- tolower(NCBI_seqlevels)
     m <- match(ucsc_seqlevels[unmapped_idx], ncbi_seqlevels)
@@ -112,8 +107,8 @@
     if (length(unmapped_idx) == 0L)
         return(L2R)
 
-    ## 4. We assign based on exact matching (case insensitive) of
-    ##    the seqlevels after removal of the "chr" prefix.
+    ## 4. We assign based on exact match (case insensitive) between UCSC
+    ##    and NCBI seqlevels after removal of the "chr" prefix on both sides.
     nochr_ucsc_seqlevels <- sub("^chr", "", ucsc_seqlevels[unmapped_idx])
     nochr_ncbi_seqlevels <- sub("^chr", "", ncbi_seqlevels)
     m <- match(nochr_ucsc_seqlevels, nochr_ncbi_seqlevels)
@@ -123,7 +118,18 @@
     if (length(unmapped_idx) == 0L)
         return(L2R)
 
-    ## 5. We assign based on GenBank accession number found in UCSC seqlevels.
+    ## 5. We assign based on match between UCSC seqlevels and RefSeq
+    ##    accession numbers.
+    m <- .match_UCSC_seqlevels_to_NCBI_accns(UCSC_seqlevels[unmapped_idx],
+                                             NCBI_RefSeqAccn)
+    L2R[unmapped_idx] <- m
+
+    unmapped_idx <- which(is.na(L2R))
+    if (length(unmapped_idx) == 0L)
+        return(L2R)
+
+    ## 6. We assign based on match between UCSC seqlevels and GenBank
+    ##    accession numbers.
     m <- .match_UCSC_seqlevels_to_NCBI_accns(UCSC_seqlevels[unmapped_idx],
                                              NCBI_GenBankAccn)
     L2R[unmapped_idx] <- m
@@ -132,8 +138,8 @@
     if (length(unmapped_idx) == 0L)
         return(L2R)
 
-    ## 6. We assign based on GenBank accession number found in UCSC seqlevels
-    ##    after adding .1 suffix to it.
+    ## 7. We assign based on match between UCSC seqlevels and GenBank
+    ##    accession numbers after adding ".1" suffix to UCSC seqlevels.
     m <- .match_UCSC_seqlevels_to_NCBI_accns(UCSC_seqlevels[unmapped_idx],
                                              NCBI_GenBankAccn,
                                              accn_suffix=".1")
@@ -143,19 +149,19 @@
     if (length(unmapped_idx) == 0L)
         return(L2R)
 
-    ## 7. We assign based on RefSeq accession number found in UCSC seqlevels
-    ##    after trimming the first part (e.g. "chr1_") and "_random" suffix
-    ##    from the seqlevels.
-    m <- .match_trimmed_UCSC_random_seqlevels_to_NCBI_accns(
-                                                 UCSC_seqlevels[unmapped_idx],
-                                                 NCBI_RefSeqAccn)
+    ## 8. We assign based on match between UCSC seqlevels and RefSeq
+    ##    accession numbers after trimming the first part (e.g. "chr1_")
+    ##    and "_random" suffix from the seqlevels.
+    m <- .match_UCSC_seqlevels_to_NCBI_accns(UCSC_seqlevels[unmapped_idx],
+                                             NCBI_RefSeqAccn,
+                                             trim=TRUE)
     L2R[unmapped_idx] <- m
 
     unmapped_idx <- which(is.na(L2R))
     if (length(unmapped_idx) == 0L)
         return(L2R)
 
-    ## 8. We assign based on GenBank accession number found in part 2 of
+    ## 9. We assign based on GenBank accession number found in part 2 of
     ##    UCSC seqlevels.
     m <- .match_UCSC_seqlevels_part2_to_NCBI_accns(
                                         UCSC_seqlevels[unmapped_idx],
@@ -166,7 +172,7 @@
     if (length(unmapped_idx) == 0L)
         return(L2R)
 
-    ## 9. We assign based on GenBank accession number found in part 2 of
+    ## 10. We assign based on GenBank accession number found in part 2 of
     ##    UCSC seqlevels after adding AAD prefix to it.
     m <- .match_UCSC_seqlevels_part2_to_NCBI_accns(
                                         UCSC_seqlevels[unmapped_idx],
