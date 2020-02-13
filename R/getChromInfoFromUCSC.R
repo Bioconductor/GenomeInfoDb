@@ -723,6 +723,13 @@ registered_UCSC_genomes <- function()
 
     if (assembled.molecules.only)
         ans <- S4Vectors:::extract_data_frame_rows(ans, assembled_idx)
+
+    if (!is.null(NCBI_linker)) {
+        assembly_accession <- NCBI_linker$assembly_accession
+        NCBI_assembly_info <-
+            find_NCBI_assembly_info_for_accession(assembly_accession)
+        attr(ans, "NCBI_assembly_info") <- NCBI_assembly_info
+    }
     ans
 }
 
@@ -759,6 +766,7 @@ getChromInfoFromUCSC <- function(genome,
     script_name <- paste0(genome, ".R")
     script_path <- system.file("registered", "UCSC_genomes", script_name,
                                package="GenomeInfoDb")
+
     if (identical(script_path, "")) {
         if (!isFALSE(map.NCBI))
             warning(wmsg("'map.NCBI' got ignored for unregistered ",
@@ -778,6 +786,7 @@ getChromInfoFromUCSC <- function(genome,
                     goldenPath.url=goldenPath.url,
                     recache=recache)
     }
+
     if (!as.Seqinfo)
         return(ans)
     Seqinfo(seqnames=ans[ , "chrom"],
