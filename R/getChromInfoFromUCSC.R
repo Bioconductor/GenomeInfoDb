@@ -9,21 +9,22 @@
 ###
 
 .match_UCSC_seqlevels_to_NCBI_accns <- function(UCSC_seqlevels, NCBI_accns,
-                                                trim=FALSE, accn_suffix="")
+                                                trim.seqlevels=FALSE,
+                                                accn.suffix="")
 {
-    if (trim) {
-        UCSC_seqlevels <- sub("_random$", "", UCSC_seqlevels)
+    if (trim.seqlevels) {
+        UCSC_seqlevels <- sub("_(alt|random|fix)$", "", UCSC_seqlevels)
         UCSC_seqlevels <- sub("^[^_]*_", "", UCSC_seqlevels)
     }
-    query <- chartr("v-", "..", UCSC_seqlevels)
-    query <- paste0(query, accn_suffix)
-    names(query) <- UCSC_seqlevels
-    solid_match2(tolower(query), tolower(NCBI_accns),
+    x <- chartr("v-", "..", UCSC_seqlevels)
+    x <- paste0(x, accn.suffix)
+    names(x) <- UCSC_seqlevels
+    solid_match2(tolower(x), tolower(NCBI_accns),
                  x_what="UCSC seqlevel", table_what="accession number")
 }
 
 .match_UCSC_seqlevels_part2_to_NCBI_accns <-
-    function(UCSC_seqlevels, NCBI_accns, accn_prefix="")
+    function(UCSC_seqlevels, NCBI_accns, part2.auto.version="", accn.prefix="")
 {
     ans <- rep.int(NA_integer_, length(UCSC_seqlevels))
     seqlevel_parts <- strsplit(UCSC_seqlevels, "_")
@@ -32,14 +33,14 @@
     if (length(idx2) == 0L)
         return(ans)
     offsets <- c(0L, cumsum(nparts[idx2[-length(idx2)]]))
-    query <- unlist(seqlevel_parts[idx2], use.names=FALSE)[offsets + 2L]
-    query <- chartr("v", ".", query)
-    unversioned_idx <- grep(".", query, fixed=TRUE, invert=TRUE)
+    x <- unlist(seqlevel_parts[idx2], use.names=FALSE)[offsets + 2L]
+    x <- chartr("v", ".", x)
+    unversioned_idx <- grep(".", x, fixed=TRUE, invert=TRUE)
     if (length(unversioned_idx) != 0L)
-        query[unversioned_idx] <- paste0(query[unversioned_idx], ".1")
-    query <- paste0(accn_prefix, query)
-    names(query) <- UCSC_seqlevels[idx2]
-    ans[idx2] <- solid_match2(tolower(query), tolower(NCBI_accns),
+        x[unversioned_idx] <- paste0(x[unversioned_idx], part2.auto.version)
+    x <- paste0(accn.prefix, x)
+    names(x) <- UCSC_seqlevels[idx2]
+    ans[idx2] <- solid_match2(tolower(x), tolower(NCBI_accns),
                               x_what="UCSC seqlevel",
                               table_what="accession number")
     ans
@@ -85,6 +86,8 @@
         unmapped_idx <- which(is.na(L2R))
         if (length(unmapped_idx) == 0L)
             return(L2R)
+
+        NCBI_UCSCStyleName[m2] <- NA_character_
     }
 
     ## 2. We assign based on exact match between 'UCSC_seqlevels'
@@ -142,7 +145,7 @@
     ##    accession numbers after adding ".1" suffix to UCSC seqlevels.
     m <- .match_UCSC_seqlevels_to_NCBI_accns(UCSC_seqlevels[unmapped_idx],
                                              NCBI_GenBankAccn,
-                                             accn_suffix=".1")
+                                             accn.suffix=".1")
     L2R[unmapped_idx] <- m
 
     unmapped_idx <- which(is.na(L2R))
@@ -154,30 +157,46 @@
     ##    and "_random" suffix from the seqlevels.
     m <- .match_UCSC_seqlevels_to_NCBI_accns(UCSC_seqlevels[unmapped_idx],
                                              NCBI_RefSeqAccn,
-                                             trim=TRUE)
+                                             trim.seqlevels=TRUE)
     L2R[unmapped_idx] <- m
 
     unmapped_idx <- which(is.na(L2R))
     if (length(unmapped_idx) == 0L)
         return(L2R)
 
-    ## 9. We assign based on GenBank accession number found in part 2 of
-    ##    UCSC seqlevels.
+    ## 9. We assign based on GenBank accession number inferred from part 2 of
+    ##    UCSC seqlevels (after adding automatic suffix ".1" to the inferred
+    ##    GenBank accession number if it's not versioned).
     m <- .match_UCSC_seqlevels_part2_to_NCBI_accns(
                                         UCSC_seqlevels[unmapped_idx],
-                                        NCBI_GenBankAccn)
+                                        NCBI_GenBankAccn,
+                                        part2.auto.version=".1")
     L2R[unmapped_idx] <- m
 
     unmapped_idx <- which(is.na(L2R))
     if (length(unmapped_idx) == 0L)
         return(L2R)
 
-    ## 10. We assign based on GenBank accession number found in part 2 of
+    ## 10. We assign based on GenBank accession number inferred from part 2 of
+    ##    UCSC seqlevels (after dropping the version from the GenBank accession
+    ##    numbers provided by NCBI).
+    NCBI_GenBankAccn0 <- sub("\\.[^.]*$", "", NCBI_GenBankAccn)
+    m <- .match_UCSC_seqlevels_part2_to_NCBI_accns(
+                                        UCSC_seqlevels[unmapped_idx],
+                                        NCBI_GenBankAccn0)
+    L2R[unmapped_idx] <- m
+
+    unmapped_idx <- which(is.na(L2R))
+    if (length(unmapped_idx) == 0L)
+        return(L2R)
+
+    ## 11. We assign based on GenBank accession number inferred from part 2 of
     ##    UCSC seqlevels after adding AAD prefix to it.
     m <- .match_UCSC_seqlevels_part2_to_NCBI_accns(
                                         UCSC_seqlevels[unmapped_idx],
                                         NCBI_GenBankAccn,
-                                        accn_prefix="AAD")
+                                        part2.auto.version=".1",
+                                        accn.prefix="AAD")
     L2R[unmapped_idx] <- m
 
     L2R
@@ -261,9 +280,15 @@
     stopifnot(identical(UCSC_chrom_info[compare_idx, "size"],
                         NCBI_chrom_info[compare_idx, "SequenceLength"]))
 
-    compare_idx <- which(!is.na(NCBI_chrom_info[ , "UCSCStyleName"]))
-    stopifnot(identical(UCSC_chrom_info[compare_idx, "chrom"],
-                        NCBI_chrom_info[compare_idx, "UCSCStyleName"]))
+    ## According to the UCSC-style-name column of the assembly report for
+    ## GRCh37.p13 (accession GCF_000001405.25), MT in GRCh37.p13 is mapped
+    ## to chrM in hg19, which is wrong! So we skip this sanity check for
+    ## GCF_000001405.25.
+    if (assembly_accession != "GCF_000001405.25") {
+        compare_idx <- which(!is.na(NCBI_chrom_info[ , "UCSCStyleName"]))
+        stopifnot(identical(UCSC_chrom_info[compare_idx, "chrom"],
+                            NCBI_chrom_info[compare_idx, "UCSCStyleName"]))
+    }
 
     drop_columns <- c("SequenceLength", "UCSCStyleName", "circular")
     NCBI_chrom_info <- drop_cols(NCBI_chrom_info, drop_columns)

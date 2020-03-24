@@ -24,8 +24,13 @@ ASSEMBLIES <- list(
 
     list(assembly="GRCh37",
          date="2009/02/27",
-         assembly_accession="GCF_000001405.13",  # hg19
+         assembly_accession="GCF_000001405.13",
          circ_seqs=character(0)),
+
+    list(assembly="GRCh37.p13",
+         date="2013/06/28",
+         assembly_accession="GCF_000001405.25",  # hg19
+         circ_seqs="MT"),
 
     list(assembly="GRCh38",
          date="2013/12/17",
