@@ -235,7 +235,7 @@
 
 \examples{
 ## ---------------------------------------------------------------------
-## A. MAKING A Seqinfo OBJECT FOR A GIVEN GENOME ASSEMBLY
+## A. MAKING A Seqinfo OBJECT FOR A GIVEN NCBI ASSEMBLY OR UCSC GENOME
 ## ---------------------------------------------------------------------
 
 ## One special form of calling the 'Seqinfo()' constructor is to specify
