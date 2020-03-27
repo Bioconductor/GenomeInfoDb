@@ -66,7 +66,14 @@
   \describe{
     \item{}{
       \code{Seqinfo(seqnames, seqlengths=NA, isCircular=NA, genome=NA)}:
-      Creates a Seqinfo object.
+      Create a Seqinfo object and populate it with the supplied data.
+
+      One special form of calling the \code{Seqinfo()} constructor is
+      to specify only the \code{genome} argument and set it to the name
+      of an NCBI assembly (e.g. \code{Seqinfo(genome="GRCh38.p12")})
+      or UCSC genome (e.g. \code{Seqinfo(genome="hg38")}), in which
+      case the sequence information is fetched from NCBI or UCSC.
+      See Examples section below for some examples.
     }
   }
 }
@@ -231,11 +238,14 @@
 ## A. MAKING A Seqinfo OBJECT FOR A GIVEN GENOME ASSEMBLY
 ## ---------------------------------------------------------------------
 
-if (interactive()) {
-  ## This uses getChromInfoFromNCBI() or getChromInfoFromUCSC() behind
-  ## the scene and thus requires internet access.
+## One special form of calling the 'Seqinfo()' constructor is to specify
+## only the 'genome' argument and set it to the name of an NCBI assembly
+## or UCSC genome, in which case the sequence information is fetched
+## from NCBI or UCSC ('getChromInfoFromNCBI()' or 'getChromInfoFromUCSC()'
+## are used behind the scene for this so internet access is required).
 
-  ## NCBI assemblies (see ?registered_NCBI_assemblies for the list of
+if (interactive()) {
+  ## NCBI assemblies (see '?registered_NCBI_assemblies' for the list of
   ## NCBI assemblies that are currently supported):
   Seqinfo(genome="GRCh38")
   Seqinfo(genome="GRCh38.p12")
@@ -243,7 +253,7 @@ if (interactive()) {
   Seqinfo(genome="WBcel235")
   Seqinfo(genome="TAIR10.1")
 
-  ## UCSC genomes (see ?registered_UCSC_genomes for the list of UCSC
+  ## UCSC genomes (see '?registered_UCSC_genomes' for the list of UCSC
   ## genomes that are currently supported):
   Seqinfo(genome="hg38")
   Seqinfo(genome="mm10")
