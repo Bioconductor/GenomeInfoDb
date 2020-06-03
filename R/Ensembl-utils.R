@@ -160,7 +160,10 @@ use_species_index_from_Ensembl_FTP <- function(release=NA, division=NA,
             metazoa="species_EnsemblMetazoa.txt",
             plants="species_EnsemblPlants.txt",
             protists="species_EnsemblProtists.txt",
-            stop(wmsg("invalid division: ", division))
+            stop("Invalid division: ", division, "\n  ",
+                 wmsg("Must be one of NA (stands for the main Ensembl ",
+                      "division), \"bacteria\", \"fungi\", \"metazoa\", ",
+                      "\"plants\", or \"protists\"."))
         )
     }
     if (!is.na(release)) {
