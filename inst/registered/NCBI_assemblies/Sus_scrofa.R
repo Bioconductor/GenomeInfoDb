@@ -18,6 +18,7 @@ ASSEMBLIES <- list(
     list(assembly="Sscrofa11.1",
          date="2017/02/07",
          extra_info=c(breed="Duroc"),
+         ## This is what Ensembl uses for sus_scrofa in release 99.
          assembly_accession="GCA_000003025.6",  # susScr11
          circ_seqs="MT")
 )

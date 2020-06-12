@@ -263,7 +263,7 @@
 
 ### Return NULL or a named list with at least component "assembly_accession"
 ### and optionally component "NCBI2Ensembl_special_mappings" (plus possibly
-### other components that are will be ignored by the caller).
+### other components that will be ignored by the caller).
 .find_NCBI_assembly_info_for_Ensembl_species_info <- function(species_info)
 {
     check_species_info(species_info)
@@ -338,17 +338,24 @@
         .ENSEMBL_cached_chrom_info[[core_db_url]] <- ans
     }
 
-    ## Add NCBI cols.
-    if (!is.null(species_info)) {
-        NCBI_assembly_info <-
-            .find_NCBI_assembly_info_for_Ensembl_species_info(species_info)
-        if (!is.null(NCBI_assembly_info)) {
-            ans <- .add_NCBI_cols_to_Ensembl_chrom_info(
-                             ans, NCBI_assembly_info$assembly_accession,
-                             NCBI_assembly_info$NCBI2Ensembl_special_mappings)
+    if (include.contigs) {
+        if (!is.null(species_info))
+            stop(wmsg("'map.NCBI' is not supported when 'include.contigs' ",
+                      "is set to TRUE"))
+    } else {
+        keep_idx <- which(!(ans[ , "coord_system"] %in% "contig"))
+        ans <- S4Vectors:::extract_data_frame_rows(ans, keep_idx)
+        ## Add NCBI cols.
+        if (!is.null(species_info)) {
+            NCBI_assembly_info <-
+                .find_NCBI_assembly_info_for_Ensembl_species_info(species_info)
+            if (!is.null(NCBI_assembly_info)) {
+                ans <- .add_NCBI_cols_to_Ensembl_chrom_info(
+                            ans, NCBI_assembly_info$assembly_accession,
+                            NCBI_assembly_info$NCBI2Ensembl_special_mappings)
+            }
         }
     }
-
     if (assembled.molecules.only) {
         ## FIXME: This is broken for some core dbs e.g. bos_taurus_core_99_12
         ## where coord_system is not set to "chromosome" for chromosomes.
@@ -357,10 +364,6 @@
     }
     if (!include.non_ref.sequences) {
         keep_idx <- which(!ans[ , "non_ref"])
-        ans <- S4Vectors:::extract_data_frame_rows(ans, keep_idx)
-    }
-    if (!include.contigs) {
-        keep_idx <- which(!(ans[ , "coord_system"] %in% "contig"))
         ans <- S4Vectors:::extract_data_frame_rows(ans, keep_idx)
     }
     if (!include.clones) {

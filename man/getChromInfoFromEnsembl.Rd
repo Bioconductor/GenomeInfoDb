@@ -193,6 +193,7 @@ attr(athaliana, "species_info")
 ## - scerevisiae    OK
 ## - athaliana      OK
 ## - btaurus        OK
+## - sscrofa        OK
 
 \dontrun{
 ## WORK IN PROGRESS!!!
