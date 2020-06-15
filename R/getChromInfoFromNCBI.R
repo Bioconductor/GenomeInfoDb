@@ -241,10 +241,19 @@ find_NCBI_assembly_info_for_accession <- function(accession)
     ans[ , "AssignedMolecule"] <- factor(ans[ , "AssignedMolecule"],
                                          levels=assembled_molecules)
 
+    ## Column "GenBankAccn".
+    GenBankAccn <- ans[ , "GenBankAccn"]
+    if (!is.character(GenBankAccn))
+        ans[ , "GenBankAccn"] <- as.character(GenBankAccn)
+
     ## Column "Relationship".
     Relationship_levels <- c("=", "<>")
     ans[ , "Relationship"] <- factor(ans[ , "Relationship"],
                                      levels=Relationship_levels)
+    ## Column "RefSeqAccn".
+    RefSeqAccn <- ans[ , "RefSeqAccn"]
+    if (!is.character(RefSeqAccn))
+        ans[ , "RefSeqAccn"] <- as.character(RefSeqAccn)
 
     ## Column "AssemblyUnit".
     ans[ , "AssemblyUnit"] <- factor(ans[ , "AssemblyUnit"])

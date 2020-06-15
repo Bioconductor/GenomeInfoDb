@@ -2,7 +2,7 @@
 ### Some low-level utilities to fetch data from the UCSC Genome Browser
 ### -------------------------------------------------------------------------
 ###
-### Unless stated otherwise, nothing in this file is exported.
+### Nothing in this file is exported.
 ###
 
 

@@ -24,15 +24,15 @@ export(
     orderSeqlevels,
     rankSeqlevels,
 
-    ## NCBI-utils.R:
+    ## getChromInfoFromNCBI.R:
     registered_NCBI_assemblies,
     getChromInfoFromNCBI,
 
-    ## UCSC-utils.R:
+    ## getChromInfoFromUCSC.R:
     registered_UCSC_genomes,
     getChromInfoFromUCSC,
 
-    ## Ensembl-utils.R:
+    ## getChromInfoFromEnsembl.R:
     getChromInfoFromEnsembl,
 
     ## fetchExtendedChromInfoFromUCSC.R:
@@ -42,6 +42,9 @@ export(
     mapGenomeBuilds,
     genomeBuilds,
     listOrganisms,
+
+    ## Seqinfo-class.R:
+    Seqinfo, checkCompatibleSeqinfo,
 
     ## seqlevelsStyle.R:
     genomeStyles,
@@ -53,9 +56,6 @@ export(
     ## seqlevels-wrappers.R:
     keepSeqlevels, dropSeqlevels, renameSeqlevels, restoreSeqlevels,
     standardChromosomes, keepStandardChromosomes,
-
-    ## Seqinfo-class.R:
-    Seqinfo, checkCompatibleSeqinfo,
 
     ## GenomeDescription-classR:
     GenomeDescription

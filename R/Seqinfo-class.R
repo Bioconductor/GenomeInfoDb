@@ -137,7 +137,7 @@ setValidity2("Seqinfo", .valid.Seqinfo)
 ### new() is called.
 ###
 
-.make_Seqinfo_from_genome_string <- function(genome)
+.make_Seqinfo_from_genome <- function(genome)
 {
     if (!isSingleString(genome) || genome == "")
         stop("'genome' must be a single non-empty string")
@@ -259,7 +259,7 @@ Seqinfo <- function(seqnames=NULL, seqlengths=NA, isCircular=NA, genome=NA)
      && identical(seqlengths, NA)
      && identical(isCircular, NA)
      && isSingleString(genome))
-        return(.make_Seqinfo_from_genome_string(genome))
+        return(.make_Seqinfo_from_genome(genome))
 
     seqnames <- .normarg_seqlevels(seqnames)
     seqlengths <- .normarg_seqlengths(seqlengths, seqnames)
