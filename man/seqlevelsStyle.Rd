@@ -2,9 +2,11 @@
 
 \alias{seqlevelsStyle}
 \alias{seqlevelsStyle<-}
-\alias{seqlevelsStyle,character-method}
 \alias{seqlevelsStyle,ANY-method}
 \alias{seqlevelsStyle<-,ANY-method}
+\alias{seqlevelsStyle,Seqinfo-method}
+\alias{seqlevelsStyle<-,Seqinfo-method}
+\alias{seqlevelsStyle,character-method}
 \alias{seqlevelsStyle<-,character-method}
 
 \alias{genomeStyles}

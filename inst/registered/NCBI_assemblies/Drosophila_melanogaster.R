@@ -2,6 +2,7 @@ ORGANISM <- "Drosophila melanogaster"
 
 ### List of assemblies by date.
 ASSEMBLIES <- list(
+    ## Length of sequence Un is set to NA in assembly report!
     list(assembly="Release 5",
          date="2007/10/22",
          assembly_accession="GCF_000001215.2",  # dm3

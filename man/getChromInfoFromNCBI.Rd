@@ -103,8 +103,9 @@ registered_NCBI_assemblies()
     \item \code{RefSeqAccn}: character.
     \item \code{AssemblyUnit}: factor.
     \item \code{SequenceLength}: integer. Note that this column **can**
-          contain NAs! For example this is the case for assembly Amel_HAv3.1
-          where the length of sequence MT is missing.
+          contain NAs! For example this is the case in assembly Amel_HAv3.1
+          where the length of sequence MT is missing or in assembly
+          Release 5 where the length of sequence Un is missing.
     \item \code{UCSCStyleName}: character.
     \item \code{circular}: logical.
   }
