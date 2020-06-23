@@ -118,9 +118,12 @@ seqlevelsInGroup(seqnames, group, species, style)
   For \code{seqlevelsStyle}: A single string containing the style of the
   seqlevels in \code{x}, or a character vector containing the styles of the
   seqlevels in \code{x} if the current style cannot be determined
-  unambiguously. Note that this information is not stored in \code{x} but
-  inferred by looking up a seqlevels style database stored inside the
-  \pkg{GenomeInfoDb} package.
+  unambiguously. Note that this information is not stored in \code{x}
+  but inferred from its seqlevels using a heuristic helped by a seqlevels
+  style database stored in the \pkg{GenomeInfoDb} package.
+  If the underlying genome is known (i.e. if \code{unique(genome(x))} is
+  not \code{NA}), the name of the genome or assembly (e.g. \code{ce11} or
+  \code{WBcel235}) is also used by the heuristic.
  
   For \code{extractSeqlevels} , \code{extractSeqlevelsByGroup} and 
   \code{seqlevelsInGroup}: A character vector of seqlevels 
@@ -144,13 +147,13 @@ seqlevelsInGroup(seqnames, group, species, style)
 ## seqlevelsStyle() getter and setter
 ## ---------------------------------------------------------------------
 
-## character vectors:
+## On a character vector:
 x <- paste0("chr", 1:5)
 seqlevelsStyle(x)
 seqlevelsStyle(x) <- "NCBI"
 x
 
-## GRanges:
+## On a GRanges object:
 library(GenomicRanges)
 gr <- GRanges(rep(c("chr2", "chr3", "chrM"), 2), IRanges(1:6, 10))
 
@@ -165,6 +168,25 @@ gr
 seqlevelsStyle(gr)
 seqlevelsStyle(gr) <- "UCSC"
 gr
+
+## In general the seqlevelsStyle() setter doesn't know how to rename
+## scaffolds. However, if the genome is specified, it's very likely
+## that seqlevelsStyle() will be able to take advantage of that:
+gr <- GRanges(rep(c("2", "Y", "Hs6_111610_36"), 2), IRanges(1:6, 10))
+genome(gr) <- "NCBI36"
+seqlevelsStyle(gr) <- "UCSC"
+gr
+
+## On a Seqinfo object:
+si <- Seqinfo(genome="WBcel235")
+si
+seqlevelsStyle(si) <- "UCSC"
+si
+
+si <- Seqinfo(genome="macFas5")
+si
+seqlevelsStyle(si) <- "NCBI"
+si
 
 ## ---------------------------------------------------------------------
 ## Related low-level utilities

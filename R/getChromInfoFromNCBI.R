@@ -250,6 +250,7 @@ find_NCBI_assembly_info_for_accession <- function(accession)
     Relationship_levels <- c("=", "<>")
     ans[ , "Relationship"] <- factor(ans[ , "Relationship"],
                                      levels=Relationship_levels)
+
     ## Column "RefSeqAccn".
     RefSeqAccn <- ans[ , "RefSeqAccn"]
     if (!is.character(RefSeqAccn))

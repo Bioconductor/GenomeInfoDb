@@ -1,5 +1,4 @@
-test_basic <- 
-    function()
+test_basic <- function()
 {
     filename <- system.file(package="GenomeInfoDb",  "extdata",
                             "dataFiles", "Homo_sapiens.txt")
@@ -18,16 +17,14 @@ test_basic <-
     checkEquals(c(FALSE,TRUE),unique(data[,3]))
 }
 
-test_genomeStyles <- 
-    function()
+test_genomeStyles <- function()
 {
     checkIdentical("data.frame", class(genomeStyles("Homo sapiens")))
     checkIdentical(c(25L, 7L), dim(genomeStyles("Homo sapiens")))
     checkException(genomeStyles("SAD"))
 }
 
-test_orderSeqlevels <- 
-    function()
+test_orderSeqlevels <- function()
 {
     checkIdentical(integer(), orderSeqlevels())
     checkException(orderSeqlevels(c(1,2,3,4,5)))
@@ -36,8 +33,7 @@ test_orderSeqlevels <-
     checkEquals(c(1L, 3L, 4L, 2L, 5L), orderSeqlevels(seqnames) )
 }    
 
-test_extractSeqlevels <- 
-    function()
+test_extractSeqlevels <- function()
 {
     got <- extractSeqlevels("Homo sapiens", "UCSC" )
     checkEquals(25,length(got))
@@ -47,8 +43,7 @@ test_extractSeqlevels <-
     checkException(extractSeqlevels("Drosophila melanogaster"))
 }
 
-test_extractSeqlevelsByGroup <- 
-    function()
+test_extractSeqlevelsByGroup <- function()
 {
     got <- extractSeqlevelsByGroup("Drosophila melanogaster","Ensembl","auto")
     checkEquals(5,length(got))
@@ -59,8 +54,7 @@ test_extractSeqlevelsByGroup <-
     checkException(extractSeqlevelsByGroup("Homo sapiens","auto","NCBI"))
 }
 
-test_seqlevelsInGroup <-
-    function()
+test_seqlevelsInGroup <- function()
 {
     newch <- paste0("chr",c(1:22,"X","Y","M","1_gl000192_random","4_ctg9_hap1"))
     got1 <- seqlevelsInGroup(newch, group="sex")
