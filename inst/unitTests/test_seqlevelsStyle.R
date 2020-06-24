@@ -67,8 +67,6 @@ test_seqlevelsStyle_character <- function()
 
 test_seqlevelsStyle_Seqinfo <- function()
 {
-    genome_as_factor <- GenomeInfoDb:::.get_genome_as_factor
-
     test_UCSC_NCBI_switch <- function(UCSC_genome, NCBI_assembly,
                                       nmapped, UCSC_nunmapped, NCBI_nunmapped)
     {
@@ -162,6 +160,8 @@ test_seqlevelsStyle_Seqinfo <- function()
         list("mm9",      "MGSCv37",                      22L,   13L,    283L),
         list("mm10",     "GRCm38",                       66L,    0L,     99L),
         list("musFur1",  "MusPutFur1.0",               7741L,    0L,     42L),
+        list("panPan1",  "panpan1",                   10867L,    0L,      0L),
+        list("panPan2",  "panpan1.1",                 10274L,    0L,      0L),
         list("panTro2",  "Pan_troglodytes-2.1",          26L,   26L,  29214L),
         list("panTro3",  "Pan_troglodytes-2.1.3",     24131L,    1L,      0L),
         list("panTro4",  "Pan_troglodytes-2.1.4",     24129L,    0L,      0L),
