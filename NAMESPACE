@@ -134,7 +134,7 @@ export(
 
     ## GenomeDescription-class.R:
     commonName, provider, providerVersion,
-    releaseDate, releaseName, bsgenomeName
+    releaseDate, bsgenomeName
 )
 
 ### Exactly the same list as above.
@@ -149,6 +149,6 @@ exportMethods(
     genome, "genome<-",
     seqlevelsStyle, "seqlevelsStyle<-",
     commonName, provider, providerVersion,
-    releaseDate, releaseName, bsgenomeName
+    releaseDate, bsgenomeName
 )
 

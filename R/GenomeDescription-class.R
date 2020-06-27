@@ -16,10 +16,6 @@ setClass("GenomeDescription",
         ## release_date: "Mar. 2006", "Feb. 2006", "Oct. 2003", etc...
         release_date="character",
 
-        ## release_name: "NCBI Build 36.1", "NCBI Build 36",
-        ## "SGD 1 Oct 2003 sequence", etc...
-        release_name="character",
-
         ## names, lengths, and circularity flags of the genome sequences
         seqinfo="Seqinfo"
     )
@@ -51,9 +47,6 @@ setMethod("providerVersion", "GenomeDescription",
 
 setGeneric("releaseDate", function(x) standardGeneric("releaseDate"))
 setMethod("releaseDate", "GenomeDescription", function(x) x@release_date)
-
-setGeneric("releaseName", function(x) standardGeneric("releaseName"))
-setMethod("releaseName", "GenomeDescription", function(x) x@release_name)
 
 setGeneric("bsgenomeName", function(x) standardGeneric("bsgenomeName"))
 setMethod("bsgenomeName", "GenomeDescription",
@@ -113,17 +106,14 @@ setValidity("GenomeDescription",
 ### 'common_name' argument but the former was kept for backward compatibility
 ### (essentially with existing SNPlocs and XtraSNPlocs packages).
 ### TODO: At some point the 'species' argument needs to be deprecated.
-GenomeDescription <- function(organism, common_name,
-                              provider, release_date, release_name,
-                              seqinfo,
-                              species=NA_character_)
+GenomeDescription <- function(organism, common_name, provider, release_date,
+                              seqinfo, species=NA_character_)
 {
     if (identical(organism, "NA")) organism <- NA_character_
     if (missing(common_name))
         common_name <- species
     if (identical(common_name, "NA")) common_name <- NA_character_
     if (identical(release_date, "NA")) release_date <- NA_character_
-    if (identical(release_name, "NA")) release_name <- NA_character_
 
     ## Check 'seqinfo'.
     if (!is(seqinfo, "Seqinfo"))
@@ -137,7 +127,6 @@ GenomeDescription <- function(organism, common_name,
         common_name=common_name,
         provider=provider,
         release_date=release_date,
-        release_name=release_name,
         seqinfo=seqinfo)
 }
 
@@ -178,7 +167,6 @@ showGenomeDescription <- function(x, margin="", print.seqlengths=FALSE)
     cat(margin, "genome: ", genome(x)[[1L]], "\n", sep="")
     cat(margin, "provider: ", provider(x), "\n", sep="")
     cat(margin, "release date: ", releaseDate(x), "\n", sep="")
-    #cat(margin, "release name: ", releaseName(x), "\n", sep="")
     if (print.seqlengths) {
         cat(margin, "---\n", sep="")
         cat(margin, "seqlengths:\n", sep="")
