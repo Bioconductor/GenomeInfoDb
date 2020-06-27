@@ -70,12 +70,6 @@
       \code{"FlyBase"}, etc...
     }
     \item{}{
-      \code{providerVersion(x)}:
-      Return the provider-side version of this genome.
-      For example UCSC uses versions \code{"hg18"}, \code{"hg17"}, etc...
-      for the different Builds of the Human genome.
-    }
-    \item{}{
       \code{releaseDate(x)}:
       Return the release date of this genome e.g. \code{"Mar. 2006"}.
     }
@@ -135,12 +129,13 @@ class(Celegans)
 is(Celegans, "GenomeDescription")
 provider(Celegans)
 seqinfo(Celegans)
-gendesc <- as(Celegans, "GenomeDescription")
-class(gendesc)
-gendesc
-provider(gendesc)
-seqinfo(gendesc)
-bsgenomeName(gendesc)
+
+genome_desc <- as(Celegans, "GenomeDescription")
+class(genome_desc)
+genome_desc
+provider(genome_desc)
+seqinfo(genome_desc)
+bsgenomeName(genome_desc)
 }
 
 \keyword{methods}

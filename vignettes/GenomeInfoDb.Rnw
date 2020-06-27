@@ -11,7 +11,7 @@ BiocStyle::latex()
 
 \title{An Introduction to \Biocpkg{GenomeInfoDb}}
 \author{Martin Morgan, Herv\'e Pag\`es, Marc Carlson, Sonali Arora}
-\date{Modified: 17 January, 2014. Compiled: \today}
+\date{Modified: 26 June, 2020. Compiled: \today}
 
 \begin{document}
 
@@ -211,28 +211,7 @@ keepStandardChromosomes(plantgr, species="Arabidopsis thaliana",
                                  pruning.mode="coarse")
 @
 
-\section{Classes inside GenomeInfoDb package}
-
-\subsection{Genome-Description class}
-
-We also provide a Genome Description class which can be used in the following
-way:
-
-<<genome-description-class, message=FALSE>>=
-library(BSgenome.Celegans.UCSC.ce2)
-class(Celegans)
-is(Celegans, "GenomeDescription")
-provider(Celegans)
-seqinfo(Celegans)
-gendesc <- as(Celegans, "GenomeDescription")
-class(gendesc)
-gendesc
-provider(gendesc)
-seqinfo(gendesc)
-bsgenomeName(gendesc)
-@
-
-\subsection{Seqinfo class}
+\section{Seqinfo objects}
 
 <<Seqinfo-egs>>=
 ## Note that all the arguments (except 'genome') must have the

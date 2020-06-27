@@ -13,9 +13,6 @@ setClass("GenomeDescription",
         ## provider: "UCSC", "BDGP", etc...
         provider="character",
 
-        ## provider_version: "hg18", "mm8", "sacCer1", etc...
-        provider_version="character",
-
         ## release_date: "Mar. 2006", "Feb. 2006", "Oct. 2003", etc...
         release_date="character",
 
@@ -44,7 +41,13 @@ setGeneric("provider", function(x) standardGeneric("provider"))
 setMethod("provider", "GenomeDescription", function(x) x@provider)
 
 setGeneric("providerVersion", function(x) standardGeneric("providerVersion"))
-setMethod("providerVersion", "GenomeDescription", function(x) x@provider_version)
+setMethod("providerVersion", "GenomeDescription",
+    function(x)
+    {
+        .Deprecated()
+        genome(x)[[1L]]
+    }
+)
 
 setGeneric("releaseDate", function(x) standardGeneric("releaseDate"))
 setMethod("releaseDate", "GenomeDescription", function(x) x@release_date)
@@ -60,7 +63,7 @@ setMethod("bsgenomeName", "GenomeDescription",
         tmp <- strsplit(organism(x), " ", fixed=TRUE)[[1L]]
         part2 <- paste(substr(tmp[1L], start=1L, stop=1L), tmp[2L], sep="")
         part3 <- provider(x)
-        part4 <- providerVersion(x)
+        part4 <- genome(x)[[1L]]
         paste(part1, part2, part3, part4, sep=".")
     }
 )
@@ -70,7 +73,7 @@ setMethod("seqinfo", "GenomeDescription", function(x) x@seqinfo)
 setMethod("seqnames", "GenomeDescription",
     function(x)
     {
-        ans <- seqnames(seqinfo(x))
+        ans <- seqnames(x)
         if (length(ans) == 0L)
             ans <- NULL
         ans
@@ -110,8 +113,7 @@ setValidity("GenomeDescription",
 ### (essentially with existing SNPlocs and XtraSNPlocs packages).
 ### TODO: At some point the 'species' argument needs to be deprecated.
 GenomeDescription <- function(organism, common_name,
-                              provider, provider_version,
-                              release_date, release_name,
+                              provider, release_date, release_name,
                               seqinfo,
                               species=NA_character_)
 {
@@ -121,11 +123,18 @@ GenomeDescription <- function(organism, common_name,
     if (identical(common_name, "NA")) common_name <- NA_character_
     if (identical(release_date, "NA")) release_date <- NA_character_
     if (identical(release_name, "NA")) release_name <- NA_character_
+
+    ## Check 'seqinfo'.
+    if (!is(seqinfo, "Seqinfo"))
+        stop(wmsg("'seqinfo' must be a Seqinfo object"))
+    ugenome <- unique(genome(seqinfo))
+    if (length(ugenome) != 1L || is.na(ugenome))
+        stop(wmsg("'genome(seqinfo)' must contain a unique string"))
+
     new("GenomeDescription",
         organism=organism,
         common_name=common_name,
         provider=provider,
-        provider_version=provider_version,
         release_date=release_date,
         release_name=release_name,
         seqinfo=seqinfo)
@@ -165,8 +174,8 @@ compactPrintNamedAtomicVector <- function(x, margin="")
 showGenomeDescription <- function(x, margin="", print.seqlengths=FALSE)
 {
     cat(margin, "organism: ", organism(x), " (",  commonName(x), ")\n", sep="")
+    cat(margin, "genome: ", genome(x)[[1L]], "\n", sep="")
     cat(margin, "provider: ", provider(x), "\n", sep="")
-    cat(margin, "provider version: ", providerVersion(x), "\n", sep="")
     cat(margin, "release date: ", releaseDate(x), "\n", sep="")
     cat(margin, "release name: ", releaseName(x), "\n", sep="")
     if (print.seqlengths) {
