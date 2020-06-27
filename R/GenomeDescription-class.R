@@ -73,7 +73,8 @@ setMethod("seqinfo", "GenomeDescription", function(x) x@seqinfo)
 setMethod("seqnames", "GenomeDescription",
     function(x)
     {
-        ans <- seqnames(x)
+        ## Do NOT use 'seqnames(x)' here or you'll get infinite recursion!
+        ans <- seqnames(seqinfo(x))
         if (length(ans) == 0L)
             ans <- NULL
         ans
