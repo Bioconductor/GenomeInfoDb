@@ -178,7 +178,7 @@ showGenomeDescription <- function(x, margin="", print.seqlengths=FALSE)
     cat(margin, "genome: ", genome(x)[[1L]], "\n", sep="")
     cat(margin, "provider: ", provider(x), "\n", sep="")
     cat(margin, "release date: ", releaseDate(x), "\n", sep="")
-    cat(margin, "release name: ", releaseName(x), "\n", sep="")
+    #cat(margin, "release name: ", releaseName(x), "\n", sep="")
     if (print.seqlengths) {
         cat(margin, "---\n", sep="")
         cat(margin, "seqlengths:\n", sep="")
