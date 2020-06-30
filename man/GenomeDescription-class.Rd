@@ -19,6 +19,8 @@
 \alias{providerVersion,GenomeDescription-method}
 \alias{releaseDate}
 \alias{releaseDate,GenomeDescription-method}
+\alias{releaseName}
+\alias{releaseName,GenomeDescription-method}
 \alias{bsgenomeName}
 \alias{bsgenomeName,GenomeDescription-method}
 \alias{seqinfo,GenomeDescription-method}
@@ -68,8 +70,22 @@
       \code{"FlyBase"}, etc...
     }
     \item{}{
+      \code{providerVersion(x)}:
+      Return the provider-side version of this genome.
+      For example UCSC uses versions \code{"hg18"}, \code{"hg17"}, etc...
+      for the different Builds of the Human genome.
+    }
+    \item{}{
       \code{releaseDate(x)}:
       Return the release date of this genome e.g. \code{"Mar. 2006"}.
+    }
+    \item{}{
+      \code{releaseName(x)}:
+      Return the release name of this genome, which is generally made of the
+      name of the organization who assembled it plus its Build version.
+      For example, UCSC uses \code{"hg18"} for the version of the
+      Human genome corresponding to the Build 36.1 from NCBI hence
+      the release name for this genome is \code{"NCBI Build 36.1"}.
     }
     \item{}{
       \code{bsgenomeName(x)}:
