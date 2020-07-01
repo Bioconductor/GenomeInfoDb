@@ -3,22 +3,39 @@
 ### -------------------------------------------------------------------------
 
 
+normarg_new2old <- function(new2old, new_N, old_N,
+                            new_what="the supplied 'seqinfo'",
+                            old_what="the current 'seqinfo'")
+{
+    if (!is.numeric(new2old))
+        stop(wmsg("'new2old' must be NULL or an integer vector"))
+    if (length(new2old) != new_N)
+        stop(wmsg("when not NULL, 'new2old' must ",
+                  "have the length of ", new_what))
+    if (!is.integer(new2old))
+        new2old <- as.integer(new2old)
+    min_new2old <- suppressWarnings(min(new2old, na.rm=TRUE))
+    if (min_new2old != Inf) {
+        if (min_new2old < 1L)
+            stop(wmsg("when not NULL, 'new2old' must ",
+                      "contain positive values or NAs"))
+        if (max(new2old, na.rm=TRUE) > old_N)
+            stop(wmsg("'new2old' cannot contain values ",
+                      "greater than the length of ", old_what))
+    }
+    if (any(duplicated(new2old) & !is.na(new2old)))
+        stop(wmsg("non-NA values in 'new2old' must be unique"))
+    new2old
+}
+
 ### Validate and reverse the 'new2old' mapping.
-.reverseNew2old <- function(new2old, new_N, old_N)
+.reverse_new2old <- function(new2old, new_N, old_N,
+                             new_what="the supplied 'seqinfo'",
+                             old_what="the current 'seqinfo'")
 {
     if (is.null(new2old))
         return(NULL)
-    if (!is.integer(new2old) || length(new2old) != new_N)
-        stop("when 'new2old' is not NULL, it must be an integer ",
-             "vector of the\n  same length as the supplied 'seqlevels'")
-    min_new2old <- suppressWarnings(min(new2old, na.rm=TRUE))
-    if (min_new2old != Inf) {
-        if (min_new2old < 1L || max(new2old, na.rm=TRUE) > old_N)
-            stop("non-NA values in 'new2old' must be >= 1 and <= N, ",
-                 "where N is the\n  nb of sequence levels in 'x'")
-    }
-    if (any(duplicated(new2old) & !is.na(new2old)))
-        stop("duplicates are not allowed among non-NA values in 'new2old'")
+    new2old <- normarg_new2old(new2old, new_N, old_N, new_what, old_what)
     S4Vectors:::reverseIntegerInjection(new2old, old_N)
 }
 
@@ -37,7 +54,9 @@ getDanglingSeqlevels <- function(x, new2old=NULL,
     new_N <- length(new_seqlevels)
     old_seqlevels <- seqlevels(x)
     old_N <- length(old_seqlevels)
-    old2new <- .reverseNew2old(new2old, new_N, old_N)
+    old2new <- .reverse_new2old(new2old, new_N, old_N,
+                                new_what="the supplied 'seqlevels'",
+                                old_what="the current 'seqlevels'")
     seqlevels_to_drop <- old_seqlevels[is.na(old2new)]
     seqlevels_in_use <- seqlevelsInUse(x)
     dangling_seqlevels <- intersect(seqlevels_to_drop, seqlevels_in_use)
@@ -48,12 +67,11 @@ getDanglingSeqlevels <- function(x, new2old=NULL,
                   "Please use the 'pruning.mode' argument to control how ",
                   "to prune 'x', that is, how to remove the ranges in 'x' ",
                   "that are on these sequences. For example, do something ",
-                  "like:\n\n",
-                  "seqlevels(x, pruning.mode=\"coarse\") <- new_seqlevels\n\n",
-                  "or\n\n",
-                  "keepSeqlevels(x, new_seqlevels, ",
-                                "pruning.mode=\"coarse\")\n\n",
-                  "See ?seqinfo for a description of the pruning modes."))
+                  "like:"),
+             "\n    seqlevels(x, pruning.mode=\"coarse\") <- new_seqlevels",
+             "\n  or:",
+             "\n    keepSeqlevels(x, new_seqlevels, pruning.mode=\"coarse\")",
+             "\n  See ?seqinfo for a description of the pruning modes.")
     dangling_seqlevels
 }
 
@@ -76,7 +94,9 @@ makeNewSeqnames <- function(x, new2old=NULL, new_seqlevels)
         levels(x_seqnames) <- new_seqlevels
         return(x_seqnames)
     }
-    old2new <- .reverseNew2old(new2old, new_N, old_N)
+    old2new <- .reverse_new2old(new2old, new_N, old_N,
+                                new_what="the supplied 'seqlevels'",
+                                old_what="the current 'seqlevels'")
     tmp <- runValue(x_seqnames)
     levels(tmp) <- new_seqlevels[old2new]
     runValue(x_seqnames) <- factor(as.character(tmp), levels=new_seqlevels)
@@ -117,10 +137,10 @@ getSeqlevelsReplacementMode <- function(new_seqlevels, old_seqlevels)
 }
 
 ### Returns a logical vector of the same length as 'new_seqinfo' indicating
-### whether the length or circularity flag of the corresponding sequence have
-### changed. Assumes that the 'new2old' mapping is valid (see .reverseNew2old()
-### function above for what this means exactly). NAs in 'new2old' are
-### propagated to the result.
+### whether the length or circularity flag of the corresponding sequence
+### have changed. Assumes that the 'new2old' mapping is valid (see
+### .reverse_new2old() function above for what this means exactly).
+### NAs in 'new2old' are propagated to the result.
 sequenceGeometryHasChanged <- function(new_seqinfo, old_seqinfo, new2old=NULL)
 {
     ans_len <- length(new_seqinfo)
