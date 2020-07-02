@@ -180,10 +180,23 @@ seqlevelsStyle(gr) <- "UCSC"
 gr
 
 ## On a Seqinfo object:
-si <- Seqinfo(genome="WBcel235")
+si <- si0 <- Seqinfo(genome="apiMel2")
+si
+seqlevelsStyle(si) <- "NCBI"
+si
+seqlevelsStyle(si) <- "RefSeq"
+si
+seqlevelsStyle(si) <- "UCSC"
+stopifnot(identical(si0, si))
+
+si <- si0 <- Seqinfo(genome="WBcel235")
 si
 seqlevelsStyle(si) <- "UCSC"
 si
+seqlevelsStyle(si) <- "RefSeq"
+si
+seqlevelsStyle(si) <- "NCBI"
+stopifnot(identical(si0, si))
 
 si <- Seqinfo(genome="macFas5")
 si

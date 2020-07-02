@@ -136,7 +136,7 @@ setReplaceMethod("seqlevelsStyle", "ANY",
 
 ### 'genome' must be a single string.
 ### Return "NCBI", "UCSC", or a character NA.
-.get_seqlevelsStyle_from_NCBI_or_UCSC_genome <- function(genome)
+.is_NCBI_assembly_or_UCSC_genome <- function(genome)
 {
     NCBI_assemblies <- registered_NCBI_assemblies()
     if (genome %in% NCBI_assemblies[ , "assembly"])
@@ -159,16 +159,34 @@ setReplaceMethod("seqlevelsStyle", "ANY",
     NA_character_
 }
 
+### A RefSeq accession begins with 2 or 3 upper case letters. Note that
+### the 3-letter prefix is rare e.g. chromosome 2 in NCBI33 (hg15) has
+### accession GPC_000001061.1.
+.is_RefSeq_accession <- function(seqnames)
+    grepl("^[A-Z][A-Z][A-Z]?_[0-9]+\\.[0-9]+$", seqnames)
+
+.get_seqlevelsStyle_for_NCBI_seqlevels <- function(seqlevels)
+{
+    is_refseq <- .is_RefSeq_accession(seqlevels)
+    if (all(is_refseq))
+        return("RefSeq")
+    if (any(is_refseq))
+        return(c("RefSeq", "NCBI"))
+    "NCBI"
+}
+
 ### 'genome' must be a single string or NA.
-### Tries to get the style first based on 'genome', then based on 'seqnames'.
+### Tries to get the style first based on 'genome', then based on 'seqlevels'.
 ### Can return more than 1 style.
-.get_seqlevelsStyle_from_seqnames_and_genome <- function(seqnames, genome)
+.get_seqlevelsStyle_from_seqlevels_and_genome <- function(seqlevels, genome)
 {
     if (is.na(genome))
-        return(seqlevelsStyle(seqnames))  # can return more than 1 style
-    ans <- .get_seqlevelsStyle_from_NCBI_or_UCSC_genome(genome)
+        return(seqlevelsStyle(seqlevels))  # can return more than 1 style
+    ans <- .is_NCBI_assembly_or_UCSC_genome(genome)
     if (is.na(ans))
-        return(seqlevelsStyle(seqnames))  # can return more than 1 style
+        return(seqlevelsStyle(seqlevels))  # can return more than 1 style
+    if (ans == "NCBI")
+        ans <- .get_seqlevelsStyle_for_NCBI_seqlevels(seqlevels)
     ans
 }
 
@@ -208,72 +226,103 @@ setReplaceMethod("seqlevelsStyle", "ANY",
 }
 
 ### 'genome' must be a single string or NA.
-### Return a 2-column DataFrame with 1 row per element in 'seqnames'.
-### The columns contain the (possibly) modified seqnames and genome
+### Return a 2-column DataFrame with 1 row per element in 'seqlevels'.
+### The columns contain the (possibly) modified seqlevels and genome
 ### associated with each seqname.
-.set_seqlevelsStyle_from_seqnames_and_genome <-
-    function(seqnames, genome, new_style)
+.set_seqlevelsStyle_from_seqlevels_and_genome <-
+    function(seqlevels, genome, new_style)
 {
-    ans <- DataFrame(seqnames=seqnames, genome=genome)
-    if (is.na(genome) || !(new_style %in% c("NCBI", "UCSC"))) {
-        ## Switch style based on seqnames only. 'genome' is untouched.
-        seqlevelsStyle(ans[ , "seqnames"]) <- new_style
+    ans <- DataFrame(seqlevels=seqlevels, genome=genome)
+    if (is.na(genome) || !(new_style %in% c("NCBI", "RefSeq", "UCSC"))) {
+        ## Switch style based on seqlevels only. 'genome' is untouched.
+        seqlevelsStyle(ans[ , "seqlevels"]) <- new_style
         return(ans)
     }
-    ans <- DataFrame(seqnames=seqnames, genome=genome)
-    old_style <- .get_seqlevelsStyle_from_NCBI_or_UCSC_genome(genome)
+    ans <- DataFrame(seqlevels=seqlevels, genome=genome)
+    old_style <- .is_NCBI_assembly_or_UCSC_genome(genome)
     if (is.na(old_style)) {
-        ## Switch style based on seqnames only. 'genome' is untouched.
-        seqlevelsStyle(ans[ , "seqnames"]) <- new_style
+        ## Switch style based on seqlevels only. 'genome' is untouched.
+        seqlevelsStyle(ans[ , "seqlevels"]) <- new_style
         return(ans)
     }
-    if (new_style == old_style)
+    if (old_style == "NCBI")
+        old_style <- .get_seqlevelsStyle_for_NCBI_seqlevels(seqlevels)
+    ## 'old_style' can be c("RefSeq", "NCBI") so we cannot use == here.
+    if (identical(new_style, old_style))
         return(ans)  # no-op
 
-    ## The user wants to switch between NCBI and UCSC style.
+    ## The user wants to switch between styles NCBI, RefSeq, and UCSC.
     ## We want to make sure that this switch is **reversible** i.e. that
-    ## switching from NCBI to UCSC then back to NCBI restores the original
-    ## seqnames and genome.
+    ## switching back to the original style restores the original seqlevels
+    ## and genome. Note that this is not always possible e.g. switching stuff
+    ## based on GRCh38.p2 to UCSC then back to NCBI or RefSeq will set the
+    ## genome to GRCh38.p12. See .map_UCSC_genome_to_NCBI_assembly() above
+    ## in this file.
     if (new_style == "UCSC") {
-        ## The user wants to switch from NCBI to UCSC style.
+        ## 'old_style' is "NCBI" or "RefSeq" or c("RefSeq", "NCBI") i.e. the            ## user wants to switch from NCBI or RefSeq to UCSC style.
         new_genome <- .map_NCBI_assembly_to_UCSC_genome(genome)
         if (is.na(new_genome)) {
             ## 'genome' is an NCBI assembly that this not linked to a UCSC
             ## genome. Note that we could still switch the style based on
-            ## seqnames only. However, since we cannot also switch the genome,
+            ## seqlevels only. However, since we cannot also switch the genome,
             ## this would result in a non-reversible operation because trying
             ## to switch back to NCBI would then be a no-op.
-            warning(wmsg("cannot switch ", genome, "'s ",
-                         "seqlevels from NCBI to UCSC style"))
+            warning(wmsg("cannot switch ", genome, "'s seqlevels ",
+                         "to ", new_style, " style"))
             return(ans)
         }
         chrominfo <- getChromInfoFromUCSC(new_genome, map.NCBI=TRUE)
-        NCBI_seqlevels <- chrominfo[ , "NCBI.SequenceName"]
+        SequenceName <- chrominfo[ , "NCBI.SequenceName"]
+        RefSeqAccn <- chrominfo[ , "NCBI.RefSeqAccn"]
         UCSC_seqlevels <- chrominfo[ , "chrom"]
-        m <- match(seqnames, NCBI_seqlevels)
-        new_seqnames <- UCSC_seqlevels[m]
-    } else {
-        ## The user wants to switch from UCSC to NCBI style.
+        m <- match(seqlevels, SequenceName)
+        m2 <- match(seqlevels, RefSeqAccn)
+        m[is.na(m)] <- m2[is.na(m)]
+        new_seqlevels <- UCSC_seqlevels[m]
+    } else if (identical(old_style, "UCSC")) {
+        ## 'new_style' is "NCBI" or "RefSeq" i.e. the user wants to switch
+        ## from UCSC to NCBI or RefSeq style.
         new_genome <- .map_UCSC_genome_to_NCBI_assembly(genome)
         if (is.na(new_genome)) {
             ## 'genome' is an UCSC genome that this not based on an NCBI
             ## assembly. Note that we could still switch the style based on
-            ## seqnames only. However, since we cannot also switch the genome,
+            ## seqlevels only. However, since we cannot also switch the genome,
             ## this would result in a non-reversible operation because trying
             ## to switch back to UCSC would then be a no-op.
-            warning(wmsg("cannot switch ", genome, "'s ",
-                         "seqlevels from UCSC to NCBI style"))
+            warning(wmsg("cannot switch ", genome, "'s seqlevels ",
+                         "from ", old_style, " to ", new_style, " style"))
             return(ans)
         }
         chrominfo <- getChromInfoFromUCSC(genome, map.NCBI=TRUE)
-        NCBI_seqlevels <- chrominfo[ , "NCBI.SequenceName"]
         UCSC_seqlevels <- chrominfo[ , "chrom"]
-        m <- match(seqnames, UCSC_seqlevels)
-        new_seqnames <- NCBI_seqlevels[m]
+        if (new_style == "NCBI") {
+            NCBI_seqlevels <- chrominfo[ , "NCBI.SequenceName"]
+        } else {
+            NCBI_seqlevels <- chrominfo[ , "NCBI.RefSeqAccn"]
+        }
+        m <- match(seqlevels, UCSC_seqlevels)
+        new_seqlevels <- NCBI_seqlevels[m]
+    } else {
+        ## The user wants to switch from NCBI to RefSeq style or vice-versa.
+        ## This does NOT touch the genome.
+        chrominfo <- getChromInfoFromNCBI(genome)
+        SequenceName <- chrominfo[ , "SequenceName"]
+        RefSeqAccn <- chrominfo[ , "RefSeqAccn"]
+        if (new_style == "RefSeq") {
+            ## 'old_style' is "NCBI" or c("RefSeq", "NCBI").
+            m <- match(seqlevels, SequenceName)
+            new_seqlevels <- RefSeqAccn[m]
+        } else {
+            ## 'old_style' is "RefSeq" or c("RefSeq", "NCBI")
+            ## and 'new_style' is "NCBI".
+            m <- match(seqlevels, RefSeqAccn)
+            new_seqlevels <- SequenceName[m]
+        }
+        new_genome <- genome
     }
-    ## Switch seqnames **and** genome.
-    replace_idx <- which(!is.na(new_seqnames))
-    ans[replace_idx, "seqnames"] <- new_seqnames[replace_idx]
+    ## Switch seqlevels **and** genome.
+    replace_idx <- which(!is.na(new_seqlevels))
+    ans[replace_idx, "seqlevels"] <- new_seqlevels[replace_idx]
     ans[replace_idx, "genome"] <- new_genome
     ans
 }
@@ -284,7 +333,7 @@ setReplaceMethod("seqlevelsStyle", "ANY",
     if (length(x_genome) == 0L)
         stop(wmsg("no seqlevels present in this object"))
     genome2seqlevels <- split(seqlevels(x), x_genome)
-    genome2style <- mapply(.get_seqlevelsStyle_from_seqnames_and_genome,
+    genome2style <- mapply(.get_seqlevelsStyle_from_seqlevels_and_genome,
                            genome2seqlevels, names(genome2seqlevels),
                            SIMPLIFY=FALSE, USE.NAMES=FALSE)
     unique(unlist(genome2style, use.names=FALSE))
@@ -297,12 +346,12 @@ setReplaceMethod("seqlevelsStyle", "ANY",
     if (length(x_genome) == 0L)
         return(x)
     genome2seqlevels <- split(seqlevels(x), x_genome)
-    genome2DF <- mapply(.set_seqlevelsStyle_from_seqnames_and_genome,
+    genome2DF <- mapply(.set_seqlevelsStyle_from_seqlevels_and_genome,
                         genome2seqlevels, names(genome2seqlevels),
                         MoreArgs=list(value),
                         SIMPLIFY=FALSE, USE.NAMES=FALSE)
     DF <- unsplit(as(genome2DF, "CompressedDataFrameList"), x_genome)
-    seqlevels(x) <- DF[ , "seqnames"]
+    seqlevels(x) <- DF[ , "seqlevels"]
     genome(x) <- DF[ , "genome"]
     x
 }
@@ -314,7 +363,7 @@ setReplaceMethod("seqlevelsStyle", "Seqinfo", .set_Seqinfo_seqlevelsStyle)
 setMethod("seqlevelsStyle", "character",
     function(x)
 {
-    if(length(x)==0)
+    if (length(x) == 0L)
         stop(wmsg("no seqlevels present in this object"))
 
     seqlevels <- unique(x)
@@ -328,6 +377,8 @@ setMethod("seqlevelsStyle", "character",
 
     if(length(ans)==1){
         if(is.na(ans)){
+            if (all(.is_RefSeq_accession(seqlevels)))
+                return("RefSeq")
             txt <- "The style does not have a compatible entry for the
             species supported by Seqname. Please see
             genomeStyles() for supported species/style"

@@ -67,37 +67,44 @@ test_seqlevelsStyle_character <- function()
 
 test_seqlevelsStyle_Seqinfo <- function()
 {
-    test_UCSC_NCBI_switch <- function(UCSC_genome, NCBI_assembly,
-                                      nmapped, UCSC_nunmapped, NCBI_nunmapped)
+    check_UCSC_NCBI_switch <- function(UCSC_genome, NCBI_assembly,
+                                       nmapped, UCSC_nunmapped, NCBI_nunmapped)
     {
-        si0 <- Seqinfo(genome=UCSC_genome)
+        ## Start with a Seqinfo object made from a UCSC genome.
+
+        si1 <- Seqinfo(genome=UCSC_genome)
         UCSC_nseqlevels <- nmapped + UCSC_nunmapped
-        checkEquals(UCSC_nseqlevels, length(si0))
-        checkIdentical("UCSC", seqlevelsStyle(si0))
-        si <- si0
-        seqlevelsStyle(si) <- "NCBI"
-        ugenomes <- unique(genome(si))
+        checkEquals(UCSC_nseqlevels, length(si1))
+        checkIdentical("UCSC", seqlevelsStyle(si1))
+
+        si2 <- si1
+        seqlevelsStyle(si2) <- "NCBI"
+        ugenomes <- unique(genome(si2))
         if (UCSC_nunmapped == 0L) {
             checkIdentical(NCBI_assembly, ugenomes)
-            checkIdentical("NCBI", seqlevelsStyle(si))
+            checkIdentical("NCBI", seqlevelsStyle(si2))
         } else {
             checkIdentical(c(NCBI_assembly, UCSC_genome), ugenomes)
-            checkEquals(nmapped, sum(genome(si) == NCBI_assembly))
-            checkIdentical(c("NCBI", "UCSC"), seqlevelsStyle(si))
+            checkEquals(nmapped, sum(genome(si2) == NCBI_assembly))
+            checkIdentical(c("NCBI", "UCSC"), seqlevelsStyle(si2))
         }
-        seqlevelsStyle(si) <- "UCSC"
-        checkIdentical(si0, si)
 
-        si0 <- Seqinfo(genome=NCBI_assembly)
+        seqlevelsStyle(si2) <- "UCSC"
+        checkIdentical(si1, si2)
+
+        ## Start with a Seqinfo object made from an NCBI assembly.
+
+        si1 <- Seqinfo(genome=NCBI_assembly)
         NCBI_nseqlevels <- nmapped + NCBI_nunmapped
-        checkEquals(NCBI_nseqlevels, length(si0))
-        checkIdentical("NCBI", seqlevelsStyle(si0))
-        si <- si0
-        seqlevelsStyle(si) <- "UCSC"
-        ugenomes <- unique(genome(si))
+        checkEquals(NCBI_nseqlevels, length(si1))
+        checkIdentical("NCBI", seqlevelsStyle(si1))
+
+        si2 <- si1
+        seqlevelsStyle(si2) <- "UCSC"
+        ugenomes <- unique(genome(si2))
         if (NCBI_nunmapped == 0L) {
             checkIdentical(UCSC_genome, ugenomes)
-            checkIdentical("UCSC", seqlevelsStyle(si))
+            checkIdentical("UCSC", seqlevelsStyle(si2))
         } else {
             ## 'ugenomes' will almost always be 'c(UCSC_genome, NCBI_assembly)'
             ## but the order is not 100% guaranteed (e.g. for
@@ -105,16 +112,17 @@ test_seqlevelsStyle_Seqinfo <- function()
             #checkIdentical(c(UCSC_genome, NCBI_assembly), ugenomes)
             checkEquals(2L, length(ugenomes))
             checkTrue(setequal(c(UCSC_genome, NCBI_assembly), ugenomes))
-            checkEquals(nmapped, sum(genome(si) == UCSC_genome))
-            ## 'seqlevelsStyle(si)' will almost always return c("UCSC", "NCBI")
+            checkEquals(nmapped, sum(genome(si2) == UCSC_genome))
+            ## 'seqlevelsStyle(si2)' will almost always return c("UCSC", "NCBI")
             ## but the order is not 100% guaranteed (e.g. for
             ## musFur1/MusPutFur1.0 it's the opposite order).
-            #checkIdentical(c("UCSC", "NCBI"), seqlevelsStyle(si))
-            checkEquals(2L, length(seqlevelsStyle(si)))
-            checkTrue(setequal(c("UCSC", "NCBI"), seqlevelsStyle(si)))
+            #checkIdentical(c("UCSC", "NCBI"), seqlevelsStyle(si2))
+            checkEquals(2L, length(seqlevelsStyle(si2)))
+            checkTrue(setequal(c("UCSC", "NCBI"), seqlevelsStyle(si2)))
         }
-        seqlevelsStyle(si) <- "NCBI"
-        checkIdentical(si0, si)
+
+        seqlevelsStyle(si2) <- "NCBI"
+        checkIdentical(si1, si2)
     }
 
     UCSC_NCBI <- list(
@@ -125,7 +133,7 @@ test_seqlevelsStyle_Seqinfo <- function()
         # Field 5: nb of NCBI seqlevels that are not mapped to UCSC
         #     1           2                               3      4        5
         list("apiMel2",  "Amel_2.0",                     16L,    1L,   7151L),
-        list("wuhCor1",  "ASM985889v3",                   1L,    0L,      0L),
+        #list("wuhCor1",  "ASM985889v3",                   1L,    0L,      0L),
         #list("bosTau6",  "Bos_taurus_UMD_3.1",         3317L,    0L,      0L),
         list("bosTau7",  "Btau_4.6.1",                11691L,    1L,      1L),
         list("bosTau8",  "Bos_taurus_UMD_3.1.1",       3179L,    0L,      0L),
@@ -145,9 +153,9 @@ test_seqlevelsStyle_Seqinfo <- function()
         list("galGal5",  "Gallus_gallus-5.0",         23475L,    0L,      0L),
         list("galGal6",  "GRCg6a",                      464L,    0L,      0L),
         list("hg15",     "NCBI33",                       24L,   20L,    140L),
-        list("hg16",     "NCBI34",                       24L,   18L,    138L),
-        list("hg17",     "NCBI35",                       26L,   20L,     86L),
-        list("hg18",     "NCBI36",                       26L,   23L,     97L),
+        #list("hg16",     "NCBI34",                       24L,   18L,    138L),
+        #list("hg17",     "NCBI35",                       26L,   20L,     86L),
+        #list("hg18",     "NCBI36",                       26L,   23L,     97L),
         list("hg19",     "GRCh37.p13",                  297L,    1L,      0L),
         list("hg38",     "GRCh38.p12",                  595L,    0L,      0L),
         list("macFas5",  "Macaca_fascicularis_5.0",    7601L,    0L,      0L),
@@ -175,8 +183,89 @@ test_seqlevelsStyle_Seqinfo <- function()
         list("susScr11", "Sscrofa11.1",                 613L,    0L,      0L),
         list("taeGut2",  "Taeniopygia_guttata-3.2.4", 37096L,    0L,      0L)
     )
-    for (i in seq_along(UCSC_NCBI))
-        do.call(test_UCSC_NCBI_switch, UCSC_NCBI[[i]])
+    for (i in seq_along(UCSC_NCBI)) {
+        args <- UCSC_NCBI[[i]]
+        do.call(check_UCSC_NCBI_switch, args)
+    }
+
+    check_RefSeq_switch <- function(UCSC_genome, NCBI_assembly, UCSC_nunmapped)
+    {
+        is_RefSeq_accession <- GenomeInfoDb:::.is_RefSeq_accession
+
+        ## Start with a Seqinfo object made from a UCSC genome.
+
+        si1 <- Seqinfo(genome=UCSC_genome)
+        ## Remove problematic seqlevel chrUn_KI270752v1 (does not have an
+        ## associated GenBank accession). Belongs to hg38.
+        si1 <- si1[setdiff(seqlevels(si1), "chrUn_KI270752v1")]
+
+        si2 <- si1
+        seqlevelsStyle(si2) <- "NCBI"
+
+        si3 <- si2
+        seqlevelsStyle(si3) <- "RefSeq"
+        checkIdentical(unname(genome(si2)), unname(genome(si3)))
+        style <- seqlevelsStyle(si3)
+        if (UCSC_nunmapped == 0L) {
+            checkTrue(identical("RefSeq", style) ||
+                      identical(c("RefSeq", "NCBI"), style))
+        } else {
+            checkIdentical(c("RefSeq", "UCSC"), style)
+        }
+        has_changed <- seqnames(si3) != seqnames(si2)
+        checkTrue(!any(has_changed & genome(si2) != NCBI_assembly))
+        checkTrue(all(is_RefSeq_accession(seqnames(si3)[has_changed])))
+
+        si4 <- si1
+        seqlevelsStyle(si4) <- "RefSeq"
+        checkIdentical(si3, si4)
+        seqlevelsStyle(si4) <- "UCSC"
+        checkIdentical(si1, si4)
+
+        seqlevelsStyle(si3) <- "NCBI"
+        checkIdentical(si2, si3)
+
+        seqlevelsStyle(si2) <- "UCSC"
+        checkIdentical(si1, si2)
+
+        ## Start with a Seqinfo object made from an NCBI assembly.
+
+        si1 <- Seqinfo(genome=NCBI_assembly)
+        ## Remove problematic seqlevel HSCHRUN_RANDOM_CTG29 (does not have an
+        ## associated GenBank accession). Belongs to GRCh37.p13 and GRCh38.p12.
+        si1 <- si1[setdiff(seqlevels(si1), "HSCHRUN_RANDOM_CTG29")]
+
+        si2 <- si1
+        seqlevelsStyle(si2) <- "UCSC"
+
+        si3 <- si1
+        seqlevelsStyle(si3) <- "RefSeq"
+        checkIdentical(unname(genome(si1)), unname(genome(si3)))
+        style <- seqlevelsStyle(si3)
+        checkTrue(identical("RefSeq", style) ||
+                  identical(c("RefSeq", "NCBI"), style))
+        has_changed <- seqnames(si3) != seqnames(si1)
+        checkTrue(all(is_RefSeq_accession(seqnames(si3)[has_changed])))
+
+        si4 <- si2
+        seqlevelsStyle(si4) <- "RefSeq"
+        checkIdentical(si3, si4)
+        seqlevelsStyle(si4) <- "NCBI"
+        checkIdentical(si1, si4)
+
+        seqlevelsStyle(si2) <- "NCBI"
+        checkIdentical(si1, si2)
+    }
+
+    ## Exclude some genomes from the RefSeq switch check. These genomes
+    ## fail to pass the check for reasons that need to be investigated.
+    skip_RefSeq_switch <- c("rheMac3", "panTro3")
+    for (i in seq_along(UCSC_NCBI)) {
+        args <- UCSC_NCBI[[i]][c(1L, 2L, 4L)]
+        if (args[[1L]] %in% skip_RefSeq_switch)
+            next
+        do.call(check_RefSeq_switch, args)
+    }
 }
 
 test_genomeStyles <- function()
