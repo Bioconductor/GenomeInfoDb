@@ -129,20 +129,5 @@
   }
 }
 
-\examples{
-library(BSgenome.Celegans.UCSC.ce2)
-class(Celegans)
-is(Celegans, "GenomeDescription")
-provider(Celegans)
-seqinfo(Celegans)
-
-genome_desc <- as(Celegans, "GenomeDescription")
-class(genome_desc)
-genome_desc
-provider(genome_desc)
-seqinfo(genome_desc)
-bsgenomeName(genome_desc)
-}
-
 \keyword{methods}
 \keyword{classes}
