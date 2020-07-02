@@ -172,6 +172,41 @@ setReplaceMethod("seqlevelsStyle", "ANY",
     ans
 }
 
+### Map GRCh38 and any GRCh38 patch level to hg38. This allows us to
+### switch the style of stuff like SNPlocs.Hsapiens.dbSNP144.GRCh38
+### (based on GRCh38.p2) to UCSC.
+.map_NCBI_assembly_to_UCSC_genome <- function(assembly)
+{
+    stopifnot(isSingleString(assembly))
+    UCSC_genomes <- registered_UCSC_genomes()
+    NCBI_assemblies <- UCSC_genomes[ , "NCBI_assembly"]
+    idx <- match(assembly, NCBI_assemblies)
+    if (!is.na(idx))
+        return(UCSC_genomes[idx, "genome"])
+    ## Remove patch level suffix (e.g. ".p2")
+    base_assembly <- sub("^(.*)(\\.p[0-9]+)$", "\\1", assembly)
+    NCBI_base_assemblies <- sub("^(.*)(\\.p[0-9]+)$", "\\1", NCBI_assemblies)
+    idx <- match(base_assembly, NCBI_base_assemblies)
+    UCSC_genomes[idx, "genome"]
+}
+
+### Map hg38 to GRCh38.p12 because that's what hg38 is officially
+### based on at the moment (as of June 2020).
+### See https://genome.ucsc.edu/cgi-bin/hgGateway?db=hg38
+### Note that this is not written in stone and the UCSC folks might
+### change this at any time in the future.
+### IMPORTANT: A round trip thru .map_NCBI_assembly_to_UCSC_genome() and
+### .map_UCSC_genome_to_NCBI_assembly() is in general a no-op **except**
+### for NCBI assemblies with patch levels! For example the round trip will
+### map any GRCh38 patch level to GRCh38.p12.
+.map_UCSC_genome_to_NCBI_assembly <- function(genome)
+{
+    stopifnot(isSingleString(genome))
+    UCSC_genomes <- registered_UCSC_genomes()
+    idx <- match(genome, UCSC_genomes[ , "genome"])
+    UCSC_genomes[idx, "NCBI_assembly"]
+}
+
 ### 'genome' must be a single string or NA.
 ### Return a 2-column DataFrame with 1 row per element in 'seqnames'.
 ### The columns contain the (possibly) modified seqnames and genome
@@ -199,11 +234,9 @@ setReplaceMethod("seqlevelsStyle", "ANY",
     ## We want to make sure that this switch is **reversible** i.e. that
     ## switching from NCBI to UCSC then back to NCBI restores the original
     ## seqnames and genome.
-    UCSC_genomes <- registered_UCSC_genomes()
     if (new_style == "UCSC") {
         ## The user wants to switch from NCBI to UCSC style.
-        idx <- match(genome, UCSC_genomes[ , "NCBI_assembly"])
-        new_genome <- UCSC_genomes[idx, "genome"]
+        new_genome <- .map_NCBI_assembly_to_UCSC_genome(genome)
         if (is.na(new_genome)) {
             ## 'genome' is an NCBI assembly that this not linked to a UCSC
             ## genome. Note that we could still switch the style based on
@@ -221,8 +254,7 @@ setReplaceMethod("seqlevelsStyle", "ANY",
         new_seqnames <- UCSC_seqlevels[m]
     } else {
         ## The user wants to switch from UCSC to NCBI style.
-        idx <- match(genome, UCSC_genomes[ , "genome"])
-        new_genome <- UCSC_genomes[idx, "NCBI_assembly"]
+        new_genome <- .map_UCSC_genome_to_NCBI_assembly(genome)
         if (is.na(new_genome)) {
             ## 'genome' is an UCSC genome that this not based on an NCBI
             ## assembly. Note that we could still switch the style based on
