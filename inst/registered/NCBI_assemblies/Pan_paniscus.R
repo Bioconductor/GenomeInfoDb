@@ -17,7 +17,7 @@ ASSEMBLIES <- list(
     list(assembly="Mhudiblu_PPA_v0",
          date="2020/05/15",
          extra_info=c(sex="female"),
-         assembly_accession="GCF_013052645.1",
+         assembly_accession="GCF_013052645.1",  # panPan3
          circ_seqs="MT")
 )
 
