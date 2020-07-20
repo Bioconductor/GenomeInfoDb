@@ -242,8 +242,9 @@ setValidity2("Seqinfo", .valid.Seqinfo)
     if (!is.null(names(genome))) {
         if (identical(names(genome), seqnames))
             return(unname(genome))
-        stop(wmsg("when 'genome' vector is named and contains more than ",
-                  "one distinct value, it cannot have duplicated names"))
+        stop(wmsg("when the supplied 'genome' vector contains more ",
+                  "than one distinct value, the names on it must be ",
+                  "identical to the seqlevels of the object"))
     }
     if (length(genome) == length(seqnames))
         return(genome)
