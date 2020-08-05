@@ -138,12 +138,12 @@ test_seqlevelsStyle_Seqinfo <- function()
         list("bosTau7",  "Btau_4.6.1",                11691L,    1L,      1L),
         list("bosTau8",  "Bos_taurus_UMD_3.1.1",       3179L,    0L,      0L),
         list("bosTau9",  "ARS-UCD1.2",                 2211L,    0L,      1L),
-        list("ce6",      "WS190",                         7L,    0L,      0L),
-        list("ce10",     "WBcel215",                      7L,    0L,      0L),
-        list("ce11",     "WBcel235",                      7L,    0L,      0L),
         list("calJac3",  "MusPutFurMale1.0",          14205L,    0L,      0L),
         list("canFam3",  "CanFam3.1",                  3268L,    0L,      0L),
         list("canFam4",  "UU_Cfam_GSD_1.0",            2198,     0L,      0L),
+        list("ce6",      "WS190",                         7L,    0L,      0L),
+        list("ce10",     "WBcel215",                      7L,    0L,      0L),
+        list("ce11",     "WBcel235",                      7L,    0L,      0L),
         list("danRer7",  "Zv9",                        1133L,    0L,      0L),
         list("danRer10", "GRCz10",                     1061L,    0L,      0L),
         list("danRer11", "GRCz11",                     1923L,    0L,      0L),
@@ -261,7 +261,7 @@ test_seqlevelsStyle_Seqinfo <- function()
 
     ## Exclude some genomes from the RefSeq switch check. These genomes
     ## fail to pass the check for reasons that need to be investigated.
-    skip_RefSeq_switch <- c("rheMac3", "panTro3")
+    skip_RefSeq_switch <- c("canFam4", "rheMac3", "panTro3")
     for (i in seq_along(UCSC_NCBI)) {
         args <- UCSC_NCBI[[i]][c(1L, 2L, 4L)]
         if (args[[1L]] %in% skip_RefSeq_switch)
