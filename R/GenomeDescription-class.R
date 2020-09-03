@@ -50,7 +50,15 @@ setGeneric("releaseDate", function(x) standardGeneric("releaseDate"))
 setMethod("releaseDate", "GenomeDescription", function(x) x@release_date)
 
 setGeneric("releaseName", function(x) standardGeneric("releaseName"))
-setMethod("releaseName", "GenomeDescription", function(x) x@release_name)
+setMethod("releaseName", "GenomeDescription",
+    function(x)
+    {
+        msg <- c("starting with Bioconductor 3.12, calling releaseName() ",
+                 "on a GenomeDescription object is deprecated")
+        .Deprecated(msg=c("  ", wmsg(msg)))
+        x@release_name
+    }
+)
 
 setGeneric("bsgenomeName", function(x) standardGeneric("bsgenomeName"))
 setMethod("bsgenomeName", "GenomeDescription",
@@ -166,10 +174,9 @@ compactPrintNamedAtomicVector <- function(x, margin="")
 showGenomeDescription <- function(x, margin="", print.seqlengths=FALSE)
 {
     cat(margin, "organism: ", organism(x), " (",  commonName(x), ")\n", sep="")
+    cat(margin, "genome: ", providerVersion(x), "\n", sep="")
     cat(margin, "provider: ", provider(x), "\n", sep="")
-    cat(margin, "provider version: ", providerVersion(x), "\n", sep="")
     cat(margin, "release date: ", releaseDate(x), "\n", sep="")
-    cat(margin, "release name: ", releaseName(x), "\n", sep="")
     if (print.seqlengths) {
         cat(margin, "---\n", sep="")
         cat(margin, "seqlengths:\n", sep="")

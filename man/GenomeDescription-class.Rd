@@ -13,10 +13,10 @@
 \alias{commonName,GenomeDescription-method}
 \alias{species}
 \alias{species,GenomeDescription-method}
-\alias{provider}
-\alias{provider,GenomeDescription-method}
 \alias{providerVersion}
 \alias{providerVersion,GenomeDescription-method}
+\alias{provider}
+\alias{provider,GenomeDescription-method}
 \alias{releaseDate}
 \alias{releaseDate,GenomeDescription-method}
 \alias{releaseName}
@@ -37,15 +37,14 @@
   a given genome.
 }
 
-\details{
-  In general the user will not need to manipulate directly a
-  GenomeDescription instance but will manipulate instead a higher-level
-  object that belongs to a class that extends the GenomeDescription class.
-  For example, the top-level object defined in any BSgenome data package
-  is a \link[BSgenome]{BSgenome} object and the \link[BSgenome]{BSgenome}
-  class contains the GenomeDescription class. Thus a \link[BSgenome]{BSgenome}
-  object is also a GenomeDescription object and can therefore be treated as
-  such. In other words all the methods described below will work on it.
+\section{Constructor}{
+  Even though a constructor function is provided (\code{GenomeDescription()}),
+  it is rarely needed
+  GenomeDescription objects are typically obtained by coercing a
+  \link[BSgenome]{BSgenome} object to GenomeDescription. This has the
+  effect of stripping the sequences from the object and retaining only
+  the meta information that describes the genome. See the Examples section
+  below for an example.
 }
 
 \section{Accessor methods}{
@@ -65,15 +64,16 @@
       \code{"Human"}, \code{"Mouse"}, \code{"Worm"}, etc...
     }
     \item{}{
+      \code{providerVersion(x)}:
+      Return the \emph{name} of the genome. This is typically the name of an
+      NCBI assembly (e.g. \code{GRCh38.p12}, \code{WBcel235}, \code{TAIR10.1},
+      \code{ARS-UCD1.2}, etc...) or UCSC genome (e.g. \code{hg38},
+      \code{bosTau9}, \code{galGal6}, \code{ce11}, etc...).
+    }
+    \item{}{
       \code{provider(x)}:
       Return the provider of this genome e.g. \code{"UCSC"}, \code{"BDGP"},
       \code{"FlyBase"}, etc...
-    }
-    \item{}{
-      \code{providerVersion(x)}:
-      Return the provider-side version of this genome.
-      For example UCSC uses versions \code{"hg18"}, \code{"hg17"}, etc...
-      for the different Builds of the Human genome.
     }
     \item{}{
       \code{releaseDate(x)}:
@@ -81,20 +81,27 @@
     }
     \item{}{
       \code{releaseName(x)}:
-      Return the release name of this genome, which is generally made of the
-      name of the organization who assembled it plus its Build version.
-      For example, UCSC uses \code{"hg18"} for the version of the
-      Human genome corresponding to the Build 36.1 from NCBI hence
+      IMPORTANT NOTE: The \code{releaseName()} methods for GenomeDescription
+      and \link[BSgenome]{BSgenome} objects are deprecated in BioC 3.12!
+
+      If \code{x} is a GenomeDescription object, \code{releaseName(x)}
+      returns the release name of this genome, which is usually made
+      of the name of the organization who assembled it plus its Build
+      version. For example, UCSC uses \code{"hg18"} for the version of
+      the Human genome corresponding to the Build 36.1 from NCBI hence
       the release name for this genome is \code{"NCBI Build 36.1"}.
+
+      If \code{x} is a \link[BSgenome]{BSgenome} object, \code{releaseName(x)}
+      returns \code{NA_character_}.
     }
     \item{}{
       \code{bsgenomeName(x)}:
-      Uses the meta information stored in \code{x} to make the name of
-      the corresponding BSgenome data package (see the
-      \code{\link[BSgenome]{available.genomes}} function in the \pkg{BSgenome}
-      package for details about the naming scheme used for those packages).
-      Of course there is no guarantee that a package with that name
-      actually exists.
+      Uses the meta information stored in GenomeDescription object \code{x}
+      to construct the name of the corresponding BSgenome data package (see
+      the \code{\link[BSgenome]{available.genomes}} function in the
+      \pkg{BSgenome} package for details about the naming scheme used
+      for those packages). Note that there is no guarantee that a package
+      with that name actually exists.
     }
     \item{\code{seqinfo(x)}}{
       Gets information about the genome sequences. This information
@@ -127,6 +134,12 @@
 
     \item The \link{Seqinfo} class.
   }
+}
+
+\examples{
+library(BSgenome.Celegans.UCSC.ce2)
+BSgenome.Celegans.UCSC.ce2
+as(BSgenome.Celegans.UCSC.ce2, "GenomeDescription")
 }
 
 \keyword{methods}
