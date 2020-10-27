@@ -5,11 +5,15 @@ Description: Contains data and functions that
 	sequence naming conventions (e.g., "chr1" versus "1"),
 	including a function that attempts to place sequence names in
 	their natural, rather than lexicographic, order.
+biocViews: Genetics, DataRepresentation, Annotation, GenomeAnnotation
+URL: https://bioconductor.org/packages/GenomeInfoDb
+Video: http://youtu.be/wdEjCYSXa7w
+BugReports: https://github.com/Bioconductor/GenomeInfoDb/issues
 Version: 1.25.11
+License: Artistic-2.0
 Encoding: UTF-8
 Author: Sonali Arora, Martin Morgan, Marc Carlson, H. Pagès
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
-biocViews: Genetics, DataRepresentation, Annotation, GenomeAnnotation
 Depends: R (>= 3.1), methods, BiocGenerics (>= 0.13.8),
 	S4Vectors (>= 0.25.12), IRanges (>= 2.13.12)
 Imports: stats, stats4, utils, RCurl, GenomeInfoDbData
@@ -20,7 +24,7 @@ Suggests: GenomicRanges, Rsamtools, GenomicAlignments, GenomicFeatures,
 	BSgenome.Celegans.UCSC.ce2,
 	BSgenome.Hsapiens.NCBI.GRCh38,
 	RUnit, BiocStyle, knitr
-License: Artistic-2.0
+VignetteBuilder: knitr
 Collate: utils.R
 	rankSeqlevels.R
 	NCBI-utils.R
@@ -38,5 +42,3 @@ Collate: utils.R
 	seqlevels-wrappers.R
 	GenomeDescription-class.R
 	zzz.R
-VignetteBuilder: knitr
-Video: http://youtu.be/wdEjCYSXa7w
