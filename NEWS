@@ -1,3 +1,41 @@
+CHANGES IN VERSION 1.26.0
+-------------------------
+
+NEW FEATURES
+
+    o The seqlevelsStyle() getter and setter now support style "RefSeq" when
+      the underlying genome is known.
+
+    o Register a bunch of new NCBI assemblies and UCSC genomes. Use
+      registered_NCBI_assemblies() and registered_UCSC_genomes() to get the
+      lists of supported NCBI assemblies and UCSC genomes.
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o The behaviors of the seqlevelsStyle() getter and setter have changed when
+      the underlying genome is known. The new behaviors address two
+      long-standing shortcomings of the old behaviors:
+      - In general, the seqlevelsStyle() setter didn't know how to rename
+        the scaffolds in an object. Now it does.
+      - Also, for some assemblies that use unconventional chromosome naming
+        conventions (e.g. Macaca_fascicularis_5.0), the seqlevelsStyle()
+        getter was not able to detect the naming style and the seqlevelsStyle()
+        setter was not able to rename the chromosomes. Now they both do the
+        right thing.
+      These improvements address these shortcomings but only in the situation
+      where the underlying genome is known e.g. when 'unique(genome(x))' is
+      "macFas5" or "Macaca_fascicularis_5.0". When the underlying genome is
+      not known, nothing has changed.
+
+DEPRECATED AND DEFUNCT
+
+    o Deprecate releaseName() method for GenomeDescription objects.
+
+BUG FIXES
+
+    o Small fix to getChromInfoFromNCBI().
+
+
 CHANGES IN VERSION 1.24.0
 -------------------------
 
