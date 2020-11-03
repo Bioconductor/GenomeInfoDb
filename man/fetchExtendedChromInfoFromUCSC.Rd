@@ -8,7 +8,7 @@
 
 \description{
   IMPORTANT NOTE: \code{fetchExtendedChromInfoFromUCSC} has been superseded
-  by \code{getChromInfoFromUCSC} and is now deprecated!
+  by \code{getChromInfoFromUCSC} and is now defunct!
 
   Fetch the chromosomes info for some UCSC genomes.
   Only supports hg38, hg19, hg18, panTro4, panTro3, panTro2, bosTau8, bosTau7,

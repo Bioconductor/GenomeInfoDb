@@ -31,7 +31,7 @@ loadTaxonomyDb <- function()
 
 available.species <- function()
 {
-    .Deprecated("loadTaxonomyDb")
+    .Defunct("loadTaxonomyDb")
     loadTaxonomyDb()
 }
 
