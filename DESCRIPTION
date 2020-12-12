@@ -9,12 +9,12 @@ biocViews: Genetics, DataRepresentation, Annotation, GenomeAnnotation
 URL: https://bioconductor.org/packages/GenomeInfoDb
 Video: http://youtu.be/wdEjCYSXa7w
 BugReports: https://github.com/Bioconductor/GenomeInfoDb/issues
-Version: 1.27.2
+Version: 1.27.3
 License: Artistic-2.0
 Encoding: UTF-8
 Author: Sonali Arora, Martin Morgan, Marc Carlson, H. Pagès
 Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
-Depends: R (>= 3.1), methods, BiocGenerics (>= 0.13.8),
+Depends: R (>= 4.0.0), methods, BiocGenerics (>= 0.37.0),
 	S4Vectors (>= 0.25.12), IRanges (>= 2.13.12)
 Imports: stats, stats4, utils, RCurl, GenomeInfoDbData
 Suggests: GenomicRanges, Rsamtools, GenomicAlignments, GenomicFeatures,
