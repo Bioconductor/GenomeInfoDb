@@ -173,28 +173,28 @@ setValidity2("Seqinfo", .valid.Seqinfo)
     if (identical(seqlengths, NA))
         return(rep.int(NA_integer_, length(seqnames)))
     if (!is.vector(seqlengths))
-        stop("supplied 'seqlengths' must be a vector")
+        stop(wmsg("supplied 'seqlengths' must be a vector"))
     if (length(seqlengths) != length(seqnames))
-        stop("length of supplied 'seqlengths' must equal ",
-             "the number of sequences")
+        stop(wmsg("the length of the supplied 'seqlengths' vector ",
+                  "must be equal to the number of sequences"))
     if (!is.null(names(seqlengths))
      && !identical(names(seqlengths), seqnames))
-        stop("when the supplied 'seqlengths' vector is named, ",
-             "the names must match the seqnames")
+        stop(wmsg("the names on the supplied 'seqlengths' vector ",
+                  "must be identical to the seqnames"))
     if (is.logical(seqlengths)) {
         if (all(is.na(seqlengths)))
             return(as.integer(seqlengths))
-        stop("bad supplied 'seqlengths' vector")
+        stop(wmsg("bad supplied 'seqlengths' vector"))
     }
     if (!is.numeric(seqlengths))
-        stop("bad supplied 'seqlengths' vector")
+        stop(wmsg("bad supplied 'seqlengths' vector"))
     if (is.integer(seqlengths)) {
         seqlengths <- unname(seqlengths)
     } else {
         seqlengths <- as.integer(seqlengths)
     }
     if (any(seqlengths < 0L, na.rm=TRUE))
-        stop("supplied 'seqlengths' contains negative values")
+        stop(wmsg("the supplied 'seqlengths' vector contains negative values"))
     seqlengths
 }
 
@@ -204,16 +204,16 @@ setValidity2("Seqinfo", .valid.Seqinfo)
     if (identical(isCircular, NA))
         return(rep.int(NA, length(seqnames)))
     if (!is.vector(isCircular))
-        stop("supplied 'isCircular' must be a vector")
+        stop(wmsg("supplied 'isCircular' must be a vector"))
     if (length(isCircular) != length(seqnames))
-        stop("length of supplied 'isCircular' must equal ",
-             "the number of sequences")
+        stop(wmsg("the length of the supplied 'isCircular' vector ",
+                  "must be equal to the number of sequences"))
     if (!is.null(names(isCircular))
      && !identical(names(isCircular), seqnames))
-        stop("when the supplied circularity flags are named, ",
-             "the names must match the seqnames")
+        stop(wmsg("the names on the supplied 'isCircular' vector ",
+                  "must be identical to the seqnames"))
     if (!is.logical(isCircular))
-        stop("bad supplied 'isCircular' vector")
+        stop(wmsg("bad supplied 'isCircular' vector"))
     unname(isCircular)
 }
 
@@ -249,19 +249,51 @@ setValidity2("Seqinfo", .valid.Seqinfo)
     if (length(genome) == length(seqnames))
         return(genome)
     if (length(genome) != 1L)
-        stop(wmsg("when length of supplied 'genome' vector is not 1, ",
-                  "then it must equal the number of sequences"))
+        stop(wmsg("when the length of the supplied 'genome' vector is not 1, ",
+                  "then it must be equal to the number of sequences"))
     rep.int(genome, length(seqnames))
 }
 
 Seqinfo <- function(seqnames=NULL, seqlengths=NA, isCircular=NA, genome=NA)
 {
+    ## Handle special case where only 'genome' is specified e.g.:
+    ##   Seqinfo(genome="hg38")
     if (is.null(seqnames)
      && identical(seqlengths, NA)
      && identical(isCircular, NA)
      && isSingleString(genome))
         return(.make_Seqinfo_from_genome(genome))
 
+    if (is.null(seqnames)) {
+        ## If 'seqnames' is omitted, then we try to infer it
+        ## from the other arguments.
+        seqnames1 <- seqnames2 <- seqnames3 <- NULL
+        if (!identical(seqlengths, NA)) {
+            if (!is.numeric(seqlengths))
+                stop(wmsg("when specified, 'seqlengths' ",
+                          "must be a numeric vector"))
+            seqnames1 <- names(seqlengths)
+        }
+        if (!identical(isCircular, NA)) {
+            if (!is.logical(isCircular))
+                stop(wmsg("when specified, 'isCircular' ",
+                          "must be a logical vector"))
+            seqnames2 <- names(isCircular)
+        }
+        if (!identical(genome, NA)) {
+            if (!(is.vector(genome) || is.factor(genome)))
+                stop(wmsg("when specified, 'genome' ",
+                          "must be a vector or factor"))
+            seqnames3 <- names(genome)
+        }
+        seqnames <- unique(c(seqnames1, seqnames2, seqnames3))
+        if (!(is.null(seqnames1) || identical(seqnames, seqnames1))
+         || !(is.null(seqnames2) || identical(seqnames, seqnames2))
+         || !(is.null(seqnames3) || identical(seqnames, seqnames3)))
+            stop(wmsg("the names on the supplied 'seqlengths', ",
+                      "'isCircular', and 'genome' vectors, if any, ",
+                      "must be identical"))
+    }
     seqnames <- .normarg_seqlevels(seqnames)
     seqlengths <- .normarg_seqlengths(seqlengths, seqnames)
     is_circular <- .normarg_isCircular(isCircular, seqnames)
