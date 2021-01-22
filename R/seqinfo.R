@@ -79,28 +79,72 @@ getDanglingSeqlevels <- function(x, new2old=NULL,
 ### Assumes that 'seqnames(x)' is a 'factor' Rle (which is true if 'x' is a
 ### GRanges or GAlignments object, but not if it's a GRangesList object),
 ### and returns a 'factor' Rle of the same length (and same runLength vector).
+### Always used in the context of the seqinfo() setter i.e. 'new_seqlevels'
+### comes from 'seqlevels(value)' where 'value' is the supplied Seqinfo object.
 makeNewSeqnames <- function(x, new2old=NULL, new_seqlevels)
 {
-    if (!is.character(new_seqlevels) || any(is.na(new_seqlevels)))
-        stop("the supplied 'seqlevels' must be a character vector with no NAs")
+    ## Should never happen.
+    stopifnot(is.character(new_seqlevels), all(!is.na(new_seqlevels)))
     new_N <- length(new_seqlevels)
     old_N <- length(seqlevels(x))
     x_seqnames <- seqnames(x)
-    if (is.null(new2old)) {
-        if (new_N < old_N ||
-            !identical(new_seqlevels[seq_len(old_N)], seqlevels(x)))
-            stop("when 'new2old' is NULL, the first elements in the\n",
-                 "  supplied 'seqlevels' must be identical to 'seqlevels(x)'")
+    if (!is.null(new2old)) {
+        old2new <- .reverse_new2old(new2old, new_N, old_N,
+                                    new_what="the supplied Seqinfo object",
+                                    old_what="seqinfo(x)")
+        tmp <- runValue(x_seqnames)
+        levels(tmp) <- new_seqlevels[old2new]
+        runValue(x_seqnames) <- factor(as.character(tmp), levels=new_seqlevels)
+        return(x_seqnames)
+    }
+    if (new_N >= old_N &&
+        identical(new_seqlevels[seq_len(old_N)], seqlevels(x)))
+    {
         levels(x_seqnames) <- new_seqlevels
         return(x_seqnames)
     }
-    old2new <- .reverse_new2old(new2old, new_N, old_N,
-                                new_what="the supplied 'seqlevels'",
-                                old_what="the current 'seqlevels'")
-    tmp <- runValue(x_seqnames)
-    levels(tmp) <- new_seqlevels[old2new]
-    runValue(x_seqnames) <- factor(as.character(tmp), levels=new_seqlevels)
-    return(x_seqnames)
+    SEQLEVELS_ARE_NOT_THE_SAME <- c(
+        "The seqlevels in the supplied Seqinfo object ",
+        "are not the same as the seqlevels in 'x'. "
+    )
+    if (length(intersect(seqlevels(x), new_seqlevels)) == 0L)
+        stop(wmsg(SEQLEVELS_ARE_NOT_THE_SAME,
+                  "Please use the 'new2old' argument to specify the ",
+                  "mapping between the formers and the latters."))
+    if (setequal(seqlevels(x), new_seqlevels))
+        stop(wmsg("The seqlevels in the supplied Seqinfo object ",
+                  "are not in the same order as the seqlevels in 'x'. ",
+                  "Please reorder the seqlevels in 'x' with:"),
+             "\n\n",
+             "    seqlevels(x) <- seqlevels(new_seqinfo)\n\n  ",
+             wmsg("before calling the 'seqinfo()' setter."),
+             "\n  ",
+             wmsg("For any more complicated mapping between the new ",
+                  "and old seqlevels (e.g. for a mapping that will ",
+                  "result in the renaming of some seqlevels in 'x'), ",
+                  "please use the 'new2old' argument."))
+    if (all(seqlevels(x) %in% new_seqlevels))
+        stop(wmsg(SEQLEVELS_ARE_NOT_THE_SAME,
+                  "To map them to the seqlevels of the same name in 'x', ",
+                  "the easiest way is to propagate them to 'x' with:"),
+             "\n\n",
+             "    seqlevels(x) <- seqlevels(new_seqinfo)\n\n  ",
+             wmsg("before calling the 'seqinfo()' setter."),
+             "\n  ",
+             wmsg("For any more complicated mapping, please use ",
+                  "the 'new2old' argument."))
+    stop(wmsg(SEQLEVELS_ARE_NOT_THE_SAME,
+              "To map them to the seqlevels of the same name in 'x', ",
+              "the easiest way is to propagate them to 'x' with:"),
+         "\n\n",
+         "    seqlevels(x) <- seqlevels(new_seqinfo)\n\n  ",
+         wmsg("before calling the 'seqinfo()' setter. ",
+	      "Note that you might need to specify a pruning mode ",
+              "(via the 'pruning.mode' argument) if this operation ",
+              "will drop seqlevels that are in use in 'x'."),
+         "\n  ",
+         wmsg("For any more complicated mapping, please use ",
+              "the 'new2old' argument."))
 }
 
 ### Return -3L for "renaming" mode, -2L for "strict subsetting" mode (no new
