@@ -218,8 +218,8 @@
       situations where the user might be combining or comparing objects
       that use different underlying genomes.
 
-      Note that \code{merge()} can take more than two Seqinfo objects in
-      which case the objects are merged from left to right e.g.
+      Note that \code{merge()} can take more than two Seqinfo objects,
+      in which case the objects are merged from left to right e.g.
       \preformatted{    merge(x1, x2, x3, x4)}
       is equivalent to
       \preformatted{    merge(merge(merge(x1, x2), x3), x4)}
