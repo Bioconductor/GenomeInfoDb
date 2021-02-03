@@ -47,19 +47,31 @@
 \title{Seqinfo objects}
 
 \description{
-  A Seqinfo object is a table-like object that contains basic information
-  about a set of genomic sequences. The table has 1 row per sequence and
-  1 column per sequence attribute.  Currently the only attributes are the
-  length, circularity flag, and genome provenance (e.g. hg19) of the
-  sequence, but more attributes might be added in the future as the need
-  arises.
+  A Seqinfo object is used to store basic information about a set of
+  genomic sequences, typically chromosomes, but not necessarily.
 }
 
 \details{
-  Typically Seqinfo objects are not used directly but are part of
-  higher level objects. Those higher level objects will generally
-  provide a \code{seqinfo} accessor for getting/setting their
-  Seqinfo component.
+  A Seqinfo object has one entry per sequence. Each entry contains the
+  following information about the sequence:
+  \itemize{
+    \item The sequence name (a.k.a. the \emph{seqlevel}) e.g. \code{"chr1"}.
+    \item The sequence length.
+    \item The sequence \emph{circularity flag}. This is a logical
+          indicating whether the sequence is circular (\code{TRUE})
+          or linear (\code{FALSE}).
+    \item Which genome the sequence belongs to e.g. \code{"hg19"}.
+  }
+  All entries must contain at least the sequence name. The other information
+  is optional. In addition, the \emph{seqnames} in a given Seqinfo object must
+  be unique, that is, the object is not allowed to have two entries with the
+  same sequence name.
+
+  Note that Seqinfo objects are usually not used as standalone objects
+  but are instead typically found inside higher level objects like
+  \link[GenomicRanges]{GRanges} or \link[GenomicFeatures]{TxDb} objects.
+  These higher level objects will generally provide a \code{seqinfo()}
+  accessor for getting/setting their Seqinfo component.
 }
 
 \section{Constructor}{
@@ -155,8 +167,8 @@
       \code{x[i]}:
       A Seqinfo object can be subsetted only by name i.e. \code{i}
       must be a character vector.
-      This is a convenient way to drop/add/reorder the rows (aka the
-      sequence levels) of a Seqinfo object.
+      This is a convenient way to drop/add/reorder the entries
+      in a Seqinfo object.
 
       See below for some examples.
     }
@@ -175,40 +187,49 @@
 }
 
 \section{Combining Seqinfo objects}{
-  There are no \code{c} or \code{rbind} method for Seqinfo objects.
-  Both would be expected to just append the rows in \code{y} to the rows
-  in \code{x} resulting in an object of length \code{length(x) + length(y)}.
-  But that would tend to break the constraint that the seqnames of a Seqinfo
-  object must be unique keys.
+  We provide no \code{c()} or \code{rbind()} methods for Seqinfo objects.
+  This is because these operations would be expected to return an object
+  of length \code{length(x) + length(y)} obtained by appending the entries
+  from input object \code{y} to those from input object \code{x}.
+  Such behavior would imply that the returned Seqinfo object is not
+  guaranteed to contain unique seqnames, which is a requirement for
+  Seqinfo objects.
 
-  So instead, a \code{merge} method is provided.
+  So instead, a \code{merge()} method is provided.
 
   In the code snippet below, \code{x} and \code{y} are Seqinfo objects.
 
   \describe{
     \item{}{
-      \code{merge(x, y)}:
+      \code{merge(x, y, ...)}:
       Merge \code{x} and \code{y} into a single Seqinfo object where the
-      keys (aka the seqnames) are \code{union(seqnames(x), seqnames(y))}.
-      If a row in \code{y} has the same key as a row in \code{x}, and if
-      the 2 rows contain compatible information (NA values are compatible
-      with anything), then they are merged into a single row in the result.
+      keys (i.e. the seqnames) are \code{union(seqnames(x), seqnames(y))}.
+      If an entry in \code{y} has the same key as an entry in \code{x}, and
+      if the two entries contain compatible information (NA values are treated
+      as wildcards i.e. they're compatible with anything), then the two entries
+      are merged into a single entry in the result.
       If they cannot be merged (because they contain different seqlengths,
       and/or circularity flags, and/or genome identifiers), then an error
       is raised.
       In addition to check for incompatible sequence information,
       \code{merge(x, y)} also compares \code{seqnames(x)} with
-      \code{seqnames(y)} and issues a warning if each of them has names not
-      in the other. The purpose of these checks is to try to detect situations
-      where the user might be combining or comparing objects based on
-      different reference genomes.
+      \code{seqnames(y)} and issues a warning if each of them has names
+      not in the other. The purpose of these checks is to try to detect
+      situations where the user might be combining or comparing objects
+      that use different underlying genomes.
+
+      Note that \code{merge()} can take more than two Seqinfo objects in
+      which case the objects are merged from left to right e.g.
+      \preformatted{    merge(x1, x2, x3, x4)}
+      is equivalent to
+      \preformatted{    merge(merge(merge(x1, x2), x3), x4)}
     }
     \item{}{
       \code{intersect(x, y)}: Finds the intersection between
       two \code{Seqinfo} objects by merging them and subsetting for the
       intersection of their sequence names. This makes it easy to avoid
-      warnings about the objects not being subsets of each other during
-      overlap operations.
+      warnings about each objects not being a subset of the other one
+      during overlap operations.
     }
   }
 
@@ -315,7 +336,8 @@ y <- Seqinfo(seqnames=c("chr3", "chr4", "chrM"),
 y
 
 ## This issues a warning:
-merge(x, y)  # rows for chr3 and chrM are merged
+merge(x, y)  # the entries for chr3 and chrM contain information merged
+             # from the corresponding entries in 'x' and 'y'
 
 ## To get rid of the above warning, either use suppressWarnings() or
 ## set the genome on 'y':
@@ -327,7 +349,7 @@ merge(x, y)
 ## a commutative operation, i.e., in general 'z1 <- merge(x, y)'
 ## is not identical to 'z2 <- merge(y, x)'. However 'z1' and 'z2'
 ## are guaranteed to contain the same information (i.e. the same
-## rows, but typically not in the same order):
+## entries, but typically not in the same order):
 merge(y, x)
 
 ## This contradicts what 'x' says about circularity of chr3 and chrM:
