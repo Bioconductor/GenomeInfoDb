@@ -284,7 +284,7 @@ build_and_save_assembly_accessions_table <- function(dir=".", quiet=FALSE)
 }
 
 ### Returns https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/GCA_000001405.15_GRCh38_assembly_report.txt for GCA_000001405.15
-.make_assembly_report_URL <- function(assembly_accession)
+.form_assembly_report_url <- function(assembly_accession)
 {
     assembly_accession <- .normarg_assembly_accession(assembly_accession)
     prefix <- substr(assembly_accession,
@@ -314,7 +314,7 @@ build_and_save_assembly_accessions_table <- function(dir=".", quiet=FALSE)
     paste0(url, part4, "/", part4, "_assembly_report.txt")
 }
 
-.fetch_assembly_report_from_URL <- function(url)
+.fetch_assembly_report_from_url <- function(url)
 {
     ## R doesn't like seeing dashes ("-") or slashes ("/") in the colnames
     ## of a data frame. So we remove them from the official field names used
@@ -323,8 +323,7 @@ build_and_save_assembly_accessions_table <- function(dir=".", quiet=FALSE)
                   "AssignedMoleculeLocationOrType", "GenBankAccn",
                   "Relationship", "RefSeqAccn", "AssemblyUnit" ,
                   "SequenceLength", "UCSCStyleName")
-    read.table(url, sep="\t", col.names=colnames, na.strings=c("NA", "na"),
-               stringsAsFactors=FALSE)
+    fetch_table_from_url(url, colnames=colnames, comment.char="#")
 }
 
 ### See .normarg_assembly_accession() for how 'assembly_accession' can be
@@ -342,9 +341,9 @@ fetch_assembly_report <- function(assembly_accession, AssemblyUnits=NULL)
     if (grepl("://", assembly_accession, fixed=TRUE)) {
         report_url <- assembly_accession
     } else {
-        report_url <- .make_assembly_report_URL(assembly_accession)
+        report_url <- .form_assembly_report_url(assembly_accession)
     }
-    ans <- .fetch_assembly_report_from_URL(report_url)
+    ans <- .fetch_assembly_report_from_url(report_url)
     if (!is.null(AssemblyUnits)) {
         stopifnot(all(AssemblyUnits %in% ans$AssemblyUnit))
         idx <- which(ans$AssemblyUnit %in% AssemblyUnits)

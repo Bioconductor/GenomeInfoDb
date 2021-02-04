@@ -213,6 +213,14 @@ list_ftp_dir <- function(url, subdirs.only=FALSE)
     do.call(read.table, args)
 }
 
+### Calling read.table() directly on an URL tends to be unreliable. For
+### example getChromInfoFromNCBI("CIEA01") was randomly failing for me with
+### a "line 18564 did not have 10 elements" error (exact line number would
+### vary) when getChromInfoFromNCBI() was calling read.table() on the URL
+### of the NCBI assembly report. In my experience, the 2-step approach
+### "first download the file, then call read.table() on the local file"
+### seems to be a lot more reliable! This is what fetch_table_from_url()
+### does. (And getChromInfoFromNCBI() now uses fetch_table_from_url().)
 ### Same interface as .simple_read_table() above.
 fetch_table_from_url <- function(url, ...)
 {
