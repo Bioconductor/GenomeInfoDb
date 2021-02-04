@@ -214,8 +214,15 @@ find_NCBI_assembly_info_for_accession <- function(accession)
 {
     ans <- drop_cols(assembly_report, "AssignedMoleculeLocationOrType")
 
+    ## Column "GenBankAccn".
+    GenBankAccn <- ans[ , "GenBankAccn"]
+    if (!is.character(GenBankAccn))
+        ans[ , "GenBankAccn"] <- as.character(GenBankAccn)
+
     ## Column "SequenceName".
     sequence_name <- as.character(ans[ , "SequenceName"])
+    if (all(is.na(sequence_name)))  # this happens for the CIEA01 assembly!
+        sequence_name <- ans[ , "GenBankAccn"]
     stopifnot(is_primary_key(sequence_name))
     ans[ , "SequenceName"] <- sequence_name
 
@@ -240,11 +247,6 @@ find_NCBI_assembly_info_for_accession <- function(accession)
     assembled_molecules <- ans[idx , "SequenceName"]
     ans[ , "AssignedMolecule"] <- factor(ans[ , "AssignedMolecule"],
                                          levels=assembled_molecules)
-
-    ## Column "GenBankAccn".
-    GenBankAccn <- ans[ , "GenBankAccn"]
-    if (!is.character(GenBankAccn))
-        ans[ , "GenBankAccn"] <- as.character(GenBankAccn)
 
     ## Column "Relationship".
     Relationship_levels <- c("=", "<>")
