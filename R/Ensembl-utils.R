@@ -153,7 +153,7 @@ use_species_index_from_Ensembl_FTP <- function(release=NA, division=NA,
     } else {
         ## Available in Ensembl Genomes release 17 (Feb 2013) and above.
         ## However the current format is used only since release 22 (March
-        ## 2014). See .fetch_species_index_from_url() below.
+        ## 2014). See .load_or_fetch_species_index_from_url() below.
         species_file <- switch(division,
             bacteria="species_EnsemblBacteria.txt",
             fungi="species_EnsemblFungi.txt",
@@ -177,39 +177,51 @@ use_species_index_from_Ensembl_FTP <- function(release=NA, division=NA,
     paste0(top_url, subdir, "/", species_file)
 }
 
+.fetch_species_index_from_url <- function(url)
+{
+    species_index <- fetch_table_from_url(url, header=TRUE)
+    species_index_ncol <- ncol(species_index)
+    if (species_index_ncol != 15L && species_index_ncol != 16L)
+        stop(wmsg(url, " does not contain the expected fields"))
+
+    ## This is the format used in Ensembl releases >= 96 and Ensembl
+    ## Genomes releases >= 22.
+    expected_colnames <- c(
+        "name", "species", "division", "taxonomy_id",
+        "assembly", "assembly_accession", "genebuild", "variation",
+        "pan_compara", "peptide_compara", "genome_alignments",
+        "other_alignments", "core_db", "species_id"
+    )
+    ## The "microarray" field was added in Ensembl 103 and Ensembl Genomes 50.
+    if (species_index_ncol == 16L)
+        expected_colnames <- append(expected_colnames, "microarray", after=8L)
+
+    ## Note that Ensembl species index files are broken: the header line
+    ## specifies 14 fields separated by 13 tabs BUT each line of data
+    ## contains 14 tabs! The last tab is an additional tab placed
+    ## at the end of the line i.e. after the 14th value in the line.
+    ## For read.table() this means that there are actually 15 values
+    ## and that the last value is missing! As a consequence the colnames
+    ## on the returned data frame are completely messed up!
+    expected_messed_up_colnames <- c("row.names", expected_colnames)
+    expected_messed_up_colnames[2L] <- "X.name"
+    if (!identical(colnames(species_index), expected_messed_up_colnames))
+        stop(wmsg(url, " does not contain the expected fields"))
+    colnames(species_index) <- c(expected_colnames,
+                                 paste0("V", species_index_ncol))
+
+    ## The last column should be filled with NAs. Drop it.
+    stopifnot(all(is.na(species_index[[species_index_ncol]])))
+    species_index[-species_index_ncol]
+}
+
 .cached_species_index <- new.env(parent=emptyenv())
 
-.fetch_species_index_from_url <- function(url)
+.load_or_fetch_species_index_from_url <- function(url)
 {
     species_index <- .cached_species_index[[url]]
     if (is.null(species_index)) {
-        ## This is the format used in Ensembl releases >= 96 and Ensembl
-        ## Genomes releases >= 22.
-        expected_colnames <- c(
-            "name", "species", "division", "taxonomy_id",
-            "assembly", "assembly_accession", "genebuild", "variation",
-            "pan_compara", "peptide_compara", "genome_alignments",
-            "other_alignments", "core_db", "species_id"
-        )
-        species_index <- fetch_table_from_url(url, header=TRUE)
-
-        ## Note that Ensembl species index files are broken: the header line
-        ## specifies 14 fields separated by 13 tabs BUT each line of data
-        ## contains 14 tabs! The last tab is an additional tab placed
-        ## at the end of the line i.e. after the 14th value in the line.
-        ## For read.table() this means that there are actually 15 values
-        ## and that the last value is missing! As a consequence the colnames
-        ## on the returned data frame are completely messed up!
-        expected_messed_up_colnames <- c("row.names", expected_colnames)
-        expected_messed_up_colnames[2L] <- "X.name"
-        if (!identical(colnames(species_index), expected_messed_up_colnames))
-            stop(wmsg(url, " does not contain the expected fields"))
-        colnames(species_index) <- c(expected_colnames, "V15")
-
-        ## The last column should be filled with NAs. Drop it.
-        stopifnot(all(is.na(species_index[[length(species_index)]])))
-        species_index <- species_index[-length(species_index)]
-
+        species_index <- .fetch_species_index_from_url(url)
         .cached_species_index[[url]] <- species_index
     }
     species_index
@@ -219,7 +231,7 @@ fetch_species_index_from_Ensembl_FTP <- function(release=NA, division=NA)
 {
     url <- .get_Ensembl_FTP_species_index_url(release=release,
                                               division=division)
-    .fetch_species_index_from_url(url)
+    .load_or_fetch_species_index_from_url(url)
 }
 
 .stop_on_ambiguous_lookup <- function(species_index, idx, max_print,
@@ -330,7 +342,7 @@ fetch_species_index_from_Ensembl_FTP <- function(release=NA, division=NA)
     stopifnot(isSingleString(species))
     url <- .get_Ensembl_FTP_species_index_url(release=release,
                                               division=division)
-    species_index <- .fetch_species_index_from_url(url)
+    species_index <- .load_or_fetch_species_index_from_url(url)
     idx <- .lookup_species(species, species_index, url)
     core_db <- species_index[idx, "core_db"]
     if (is.na(release)) {

@@ -138,7 +138,7 @@ test_seqlevelsStyle_Seqinfo <- function()
         list("bosTau7",  "Btau_4.6.1",                11691L,    1L,      1L),
         list("bosTau8",  "Bos_taurus_UMD_3.1.1",       3179L,    0L,      0L),
         list("bosTau9",  "ARS-UCD1.2",                 2211L,    0L,      1L),
-        list("calJac3",  "MusPutFurMale1.0",          14205L,    0L,      0L),
+        list("calJac3",  "Callithrix jacchus-3.2",    14205L,    0L,      0L),
         list("canFam3",  "CanFam3.1",                  3268L,    0L,      0L),
         list("canFam4",  "UU_Cfam_GSD_1.0",            2198,     0L,      0L),
         list("ce6",      "WS190",                         7L,    0L,      0L),
