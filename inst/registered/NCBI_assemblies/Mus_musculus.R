@@ -53,6 +53,12 @@ ASSEMBLIES <- list(
          date="2017/09/15",
          extra_info=c(strain="C57BL/6J"),
          assembly_accession="GCF_000001635.26",
+         circ_seqs="MT"),
+
+    list(assembly="GRCm39",
+         date="2020/06/24",
+         extra_info=c(strain="C57BL/6J"),
+         assembly_accession="GCF_000001635.27",
          circ_seqs="MT")
 )
 
