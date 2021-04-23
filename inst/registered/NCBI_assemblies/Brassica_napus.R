@@ -1,5 +1,5 @@
 ORGANISM <- "Brassica napus"
-  
+
 ### List of assemblies by date.
 ASSEMBLIES <- list(
     list(assembly="Bra_napus_v2.0",
