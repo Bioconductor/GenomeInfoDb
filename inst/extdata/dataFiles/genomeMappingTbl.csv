@@ -15,6 +15,7 @@ angola colobus,colobus angolensis palliatus,Cang.pa_1.0,91,Dec.2017,91,Dec.2017,
 anole lizard,anolis carolinensis,AnoCar1.0,54,May.2009,54,May.2009,anoCar1,Feb.2007,Broad Institute AnoCar1
 anole lizard,anolis carolinensis,AnoCar1.0,54,May.2009,58,May.2010,anoCar2,May.2010,Broad Institute AnoCar2
 anole lizard,anolis carolinensis,AnoCar2.0,61,Feb.2011,61,Feb.2011,anoCar2,May.2010,Broad Institute AnoCar2
+anole lizard,anolis carolinensis,AnoCar2.0v2,104,May.2021,104,May.2021,anoCar2,May.2010,Broad Institute AnoCar2
 arabian camel,camelus dromedarius,CamDro2,99,Jan.2020,99,Jan.2020,NA,NA,NA
 arctic ground squirrel,urocitellus parryii,ASM342692v1,96,Apr.2019,96,Apr.2019,NA,NA,NA
 argentine black and white tegu,salvator merianae,HLtupMer3,96,Apr.2019,96,Apr.2019,NA,NA,NA
@@ -100,11 +101,14 @@ ciona intestinalis,ciona intestinalis,JGI2,54,May.2009,54,May.2009,ci2,Mar.2005,
 ciona intestinalis,ciona intestinalis,KH,66,Feb.2012,66,Feb.2012,ci2,Mar.2005,JGI v2.0
 ciona savignyi,ciona savignyi,CSAV2.0,54,May.2009,54,May.2009,cioSav2,NA,NA
 climbing perch,anabas testudineus,fAnaTes1.1,94,Oct.2018,94,Oct.2018,NA,NA,NA
+climbing perch,anabas testudineus,FAnaTes1.2,103,Feb.2021,103,Feb.2021,NA,NA,NA
 clown anemonefish,amphiprion ocellaris,AmpOce1.0,94,Oct.2018,94,Oct.2018,NA,NA,NA
 cod,gadus morhua,gadMor1,65,Dec.2011,65,Dec.2011,gadMor1,May.2010,Genofisk GadMor_May2010
+cod,gadus morhua,gadMor3.0,103,Feb.2021,103,Feb.2021,gadMor1,May.2010,Genofisk GadMor_May2010
 coelacanth,latimeria chalumnae,LatCha1,66,Feb.2012,66,Feb.2012,latCha1,Aug.2011,Broad Institute LatCha1
 coho salmon,oncorhynchus kisutch,Okis_V2,101,Aug.2020,101,Aug.2020,NA,NA,NA
 flycatcher,ficedula albicollis,FicAlb_1.4,73,Sep.2013,73,Sep.2013,ficAlb1,NA,NA
+flycatcher,ficedula albicollis,FicAlb_1.5,104,May.2021,104,May.2021,ficAlb1,NA,NA
 common canary,serinus canaria,SCA1,96,Apr.2019,96,Apr.2019,NA,NA,NA
 common carp,cyprinus carpio,common_carp_genome,100,Apr.2020,100,Apr.2020,NA,NA,NA
 common carp german mirror,cyprinus carpio,German_Mirror_carp_1.0,99,Jan.2020,99,Jan.2020,NA,NA,NA
@@ -123,6 +127,7 @@ cow,bos taurus,UMD3.1,64,Sep.2011,76,Aug.2014,bosTau8,Jun.2014,University of Mar
 cow,bos taurus,UMD3.1,64,Sep.2011,92,Apr.2018,bosTau9,Apr.2018,USDA ARS
 cow,bos taurus,ARS-UCD1.2,95,Jan2019,95,Jan2019,bosTau9,Apr.2018,USDA ARS
 crab-eating macaque,macaca fascicularis,Macaca_fascicularis_5.0,91,Dec.2017,91,Dec.2017,macFas5,Jun.2013,Washington University Macaca_fascicularis_5.0
+crab-eating macaque,macaca fascicularis,Macaca_fascicularis_6.0,103,Feb.2021,103,Feb.2021,macFas5,Jun.2013,Washington University Macaca_fascicularis_5.0
 damara mole rat,fukomys damarensis,DMR_v1.0,90,Aug.2017,90,Aug.2017,NA,NA,NA
 dark-eyed junco,junco hyemalis,ASM382977v1,96,Apr.2019,96,Apr.2019,NA,NA,NA
 daurian ground squirrel,spermophilus dauricus,ASM240643v1,96,Apr.2019,96,Apr.2019,NA,NA,NA
@@ -164,6 +169,7 @@ fruitfly,drosophila melanogaster,BDGP5,65,Dec.2011,76,Aug.2014,dm6,Aug.2014,BDGP
 fruitfly,drosophila melanogaster,BDGP6,79,Mar.2015,79,Mar.2015,dm6,Aug.2014,BDGP Release 6 + ISO1 MT
 fruitfly,drosophila melanogaster,BDGP6.22,96,Apr.2019,96,Apr.2019,dm6,Aug.2014,BDGP Release 6 + ISO1 MT
 fruitfly,drosophila melanogaster,BDGP6.28,99,Jan.2020,99,Jan.2020,dm6,Aug.2014,BDGP Release 6 + ISO1 MT
+fruitfly,drosophila melanogaster,BDGP6.32,103,Feb.2021,103,Feb.2021,dm6,Aug.2014,BDGP Release 6 + ISO1 MT
 fugu,takifugu rubripes,FUGU4.0,54,May.2009,54,May.2009,fr2,Oct.2004,JGI v4.0
 fugu,takifugu rubripes,FUGU4.0,54,May.2009,65,Dec.2011,fr3,Oct.2011,JGI v5.0
 fugu,takifugu rubripes,FUGU5,94,Oct.2018,94,Oct.2018,fr3,Oct.2011,JGI v5.0
@@ -273,6 +279,7 @@ mangrove rivulus,kryptolebias marmoratus,ASM164957v1,94,Oct.2018,94,Oct.2018,NA,
 marmoset,callithrix jacchus,callJacc3,56,Sep.2009,56,Sep.2009,calJac3,Mar.2009,WUSTL Callithrix_jacchus-v3.2
 marmoset,callithrix jacchus,C_jacchus3.2.1,59,Aug.2010,59,Aug.2010,calJac3,Mar.2009,WUSTL Callithrix_jacchus-v3.2
 marmoset,callithrix jacchus,ASM275486v1,92,Apr.2018,92,Apr.2018,calJac3,Mar.2009,WUSTL Callithrix_jacchus-v3.2
+marmoset,callithrix jacchus,ASM275486v1,92,Apr.2018,101,Aug.2020,calJac4,May.2020,Washington University Callithrix_jacchus_cj1700_1.1
 medium ground-finch,geospiza fortis,GeoFor_1.0,100,Apr.2020,100,Apr.2020,NA,NA,NA
 meerkat,suricata suricatta,meerkat_22Aug2017_6uvM2_HiC,99,Jan.2020,99,Jan.2020,NA,NA,NA
 megabat,pteropus vampyrus,pteVam1,54,May.2009,54,May.2009,pteVam1,Jul.2008,Broad Institute Pteval1.0
@@ -291,6 +298,8 @@ mouse,mus musculus,GRCm38.p3,78,Dec.2014,78,Dec.2014,mm10,Dec.2011,Genome Refere
 mouse,mus musculus,GRCm38.p4,81,Jul.2015,81,Jul.2015,mm10,Dec.2011,Genome Reference Consortium GRCm38
 mouse,mus musculus,GRCm38.p5,87,Dec.2016,87,Dec.2016,mm10,Dec.2011,Genome Reference Consortium GRCm38
 mouse,mus musculus,GRCm38.p6,92,Apr.2018,92,Apr.2018,mm10,Dec.2011,Genome Reference Consortium GRCm38
+mouse,mus musculus,GRCm38.p6,92,Apr.2018,101,Aug.2020,mm39,Jun.2020,Genome Reference Consortium Mouse Build 39
+mouse,mus musculus,GRCm39,103,Feb.2021,103,Feb.2021,mm39,Jun.2020,Genome Reference Consortium Mouse Build 39
 mouse lemur,microcebus murinus,micMur1,54,May.2009,54,May.2009,micMur1,Jul.2007,Broad Institute MicMur1.0
 mouse lemur,microcebus murinus,micMur1,54,May.2009,85,Jul.2016,micMur2,May.2015,Baylor/Broad Institute Mmur_2.0
 mouse lemur,microcebus murinus,Mmur_2.0,86,Oct.2016,86,Oct.2016,micMur2,May.2015,Baylor/Broad Institute Mmur_2.0
@@ -321,6 +330,7 @@ oriental scops-owl,otus sunia,OtuSun1.0,101,Aug.2020,101,Aug.2020,NA,NA,NA
 pachon cavefish,astyanax mexicanus,Astyanax_mexicanus-1.0.2,98,Sept.2019,98,Sept.2019,NA,NA,NA
 painted turtle,chrysemys picta bellii,Chrysemys_picta_bellii-3.0.3,95,Jan.2019,95,Jan.2019,NA,NA,NA
 panda,ailuropoda melanoleuca,ailMel1,60,Nov.2012,60,Nov.2012,ailMel1,Dec.2009,BGI-Shenzhen AilMel 1.0
+panda,ailuropoda melanoleuca,ASM200744v2,103,Feb.2021,103,Feb.2021,ailMel1,Dec.2009,BGI-Shenzhen AilMel 1.0
 paramormyrops kingsleyae,paramormyrops kingsleyae,PKINGS_0.1,94,Oct.2018,94,Oct.2018,NA,NA,NA
 periophthalmus magnuspinnatus,periophthalmus magnuspinnatus,PM.fa,94,Oct.2018,94,Oct.2018,NA,NA,NA
 pig,sus scrofa,Sscrofa9,56,Sep.2009,56,Sep.2009,susScr2,Nov.2009,Swine Genome Sequencing Consortium Sscrofa9.2
@@ -349,6 +359,7 @@ rat,rattus norvegicus,RGSC3.4,54,May.2009,67,May.2012,rn5,Mar.2012,RGSC Rnor_5.0
 rat,rattus norvegicus,Rnor_5.0,70,Jan.2013,70,Jan.2013,rn5,Mar.2012,RGSC Rnor_5.0
 rat,rattus norvegicus,Rnor_5.0,70,Jan.2013,76,Aug.2014,rn6,Jul.2014,RGSC Rnor_6.0
 rat,rattus norvegicus,Rnor_6.0,80,May.2015,80,May.2015,rn6,Jul.2014,RGSC Rnor_6.0
+,rattus norvegicus,Rnor_6.0,80,May.2015,102,Nov.2020,rn7,Nov.2020,Wellcome Sanger Institute mRatBN7.2
 red fox,vulpes vulpes,VulVul2.2,95,Jan.2019,95,Jan.2019,NA,NA,NA
 red-bellied piranha,pygocentrus nattereri,Pygocentrus_nattereri-1.0.2,94,Oct.2018,94,Oct.2018,NA,NA,NA
 reedfish,erpetoichthys calabaricus,fErpCal1.1,98,Sept.2019,98,Sept.2019,NA,NA,NA
@@ -394,6 +405,7 @@ tarsier,tarsius syrichta,tarSyr1,54,May.2009,54,May.2009,tarSyr1,Aug.2008,WUSTL/
 tarsier,tarsius syrichta,tarSyr1,54,May.2009,73,Sep.2013,tarSyr2,Sep.2013,WashU Tarsius_syrichta-2.0.1
 tarsier,tarsius syrichta,Tarsius_syrichta-2.0.1,91,Dec.2017,91,Dec.2017,tarSyr2,Sep.2013,WashU Tarsius_syrichta-2.0.1
 tasmanian devil,sarcophilus harrisii,Devil_refv7.0,64,Sep.2011,64,Sep.2011,sarHar1,Feb.2011,Wellcome Trust Sanger Institute Devil_refv7.0
+tasmanian devil,sarcophilus harrisii,mSarHar1.11,102,Nov.2020,102,Nov.2020,sarHar1,Feb.2011,Wellcome Trust Sanger Institute Devil_refv7.0
 three-toed box turtle,terrapene carolina triunguis,T_m_triunguis-2.0,99,Jan.2020,99,Jan.2020,NA,NA,NA
 tetraodon,tetraodon nigroviridis,TETRAODON8.0,54,May.2009,54,May.2009,tetNig2,Mar.2007,Genoscope v7
 tiger,panthera tigris altaica,PanTig1.0,93,Jul.2018,93,Jul.2018,NA,NA,NA
@@ -404,9 +416,11 @@ tongue sole,cynoglossus semilaevis,Cse_v1.0,94,Oct.2018,94,Oct.2018,NA,NA,NA
 tree shrew,tupaia belangeri,tupBel1,54,May.2009,54,May.2009,tupBel1,Dec.2006,Broad Institute Tupbel1.0
 tuatara,sphenodon punctatus,ASM311381v1,95,Jan.2019,95,Jan.2019,NA,NA,NA
 turbot,scophthalmus maximus,ASM318616v1,94,Oct.2018,94,Oct.2018,NA,NA,NA
+turbot,scophthalmus maximus,ASM1334776v1,104,May.2021,104,May.2021,NA,NA,NA
 turkey,meleagris gallopavo,Turkey_2.01,57,Mar.2010,57,Mar.2010,melGal1,Dec.2009,Turkey Genome Consortium v2.01
 turkey,meleagris gallopavo,NA,59,Aug.2010,59,Aug.2010,melGal1,Dec.2009,Turkey Genome Consortium v2.01
 turkey,meleagris gallopavo,Turkey_2.01,61,Feb.2011,61,Feb.2011,melGal1,Dec.2009,Turkey Genome Consortium v2.01
+turkey,meleagris gallopavo,Turkey_5.1,104,May.2021,104,May.2021,melGal1,Dec.2009,Turkey Genome Consortium v2.01
 turquoise killifish,nothobranchius furzeri,Nfu_20140520,101,Aug.2020,101,Aug.2020,NA,NA,NA
 ugandan red colobus ,piliocolobus tephrosceles,ASM277652v2,96,Apr.2019,96,Apr.2019,NA,NA,NA
 upper galilee mountains blind mole rat,nannospalax galili,S.galili_v1.0,90,Aug.2017,90,Aug.2017,nanGal1,NA,NA
@@ -436,3 +450,4 @@ zebrafish,danio rerio,GRCz10,80,May.2015,80,May.2015,danRer10,Sep.2014,Genome Re
 zebrafish,danio rerio,GRCz10,80,May.2015,89,May.2017,danRer11,May.2017,Genome Reference Consortium GRCz11
 zebrafish,danio rerio,GRCz11,92,Apr.2018,92,Apr.2018,danRer11,May.2017,Genome Reference Consortium GRCz11
 zig-zag eel,mastacembelus armatus,fMasArm1.1,94,Oct.2018,94,Oct.2018,NA,NA,NA
+zig-zag eel,mastacembelus armatus,fMasArm1.2,103,Feb.2021,103,Feb.2021,NA,NA,NA
