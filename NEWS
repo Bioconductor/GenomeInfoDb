@@ -1,3 +1,22 @@
+CHANGES IN VERSION 1.28.0
+-------------------------
+
+NEW FEATURES
+
+    o Small improvement to the Seqinfo() constructor: if the user doesn't
+      supply the 'seqnames' argument when calling the Seqinfo() constructor,
+      now we try to infer the seqnames from the other arguments.
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o Improve seqinfo<- documentation and error messages.
+
+DEPRECATED AND DEFUNCT
+
+    o fetchExtendedChromInfoFromUCSC() is now defunct (was deprecated in
+      BioC 3.11)
+
+
 CHANGES IN VERSION 1.26.0
 -------------------------
 
