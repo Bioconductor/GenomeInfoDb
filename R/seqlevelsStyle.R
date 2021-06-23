@@ -322,6 +322,19 @@ setReplaceMethod("seqlevelsStyle", "ANY",
     }
     ## Switch seqlevels **and** genome.
     replace_idx <- which(!is.na(new_seqlevels))
+    if (length(replace_idx) == 0L) {
+        ## Can happen if the current seqlevels don't match the current genome
+        ## e.g.:
+        ##   gr <- GRanges("chrA:1-10")
+        ##   genome(gr) <- "GRCh38"
+        ##   seqlevelsStyle(gr) <- "RefSeq"
+        warning(wmsg("cannot switch ", genome, "'s seqlevels ",
+                     "from ", old_style, " to ", new_style, " style"))
+        return(ans)
+    }
+    if (length(replace_idx) < length(new_seqlevels))
+        warning(wmsg("cannot switch some of ", genome, "'s seqlevels ",
+                     "from ", old_style, " to ", new_style, " style"))
     ans[replace_idx, "seqlevels"] <- new_seqlevels[replace_idx]
     ans[replace_idx, "genome"] <- new_genome
     ans
