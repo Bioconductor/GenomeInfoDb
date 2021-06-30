@@ -16,7 +16,7 @@ ASSEMBLIES <- list(
     list(assembly="GRCm38",
          date="2012/01/09",
          extra_info=c(strain="C57BL/6J"),
-         assembly_accession="GCF_000001635.20",  # mm10
+         assembly_accession="GCF_000001635.20",
          circ_seqs="MT"),
 
     list(assembly="GRCm38.p1",
@@ -52,7 +52,7 @@ ASSEMBLIES <- list(
     list(assembly="GRCm38.p6",
          date="2017/09/15",
          extra_info=c(strain="C57BL/6J"),
-         assembly_accession="GCF_000001635.26",
+         assembly_accession="GCF_000001635.26",  # mm10
          circ_seqs="MT"),
 
     list(assembly="GRCm39",

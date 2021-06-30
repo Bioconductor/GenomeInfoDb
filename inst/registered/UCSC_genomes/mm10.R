@@ -18,21 +18,45 @@ library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
     stopifnot(!anyNA(oo1))
     idx1 <- idx1[oo1]
 
-    idx3 <- which(npart == 3L)
-    m3 <- matrix(unlist(tmp[idx3]), ncol=3L, byrow=TRUE)
+    ## fix patches
+    fix_patch_idx <- grep("_fix$", seqlevels)
+    m3 <- matrix(unlist(tmp[fix_patch_idx]), ncol=3L, byrow=TRUE)
     m31 <- match(m3[ , 1L], ASSEMBLED_MOLECULES)
     stopifnot(!anyNA(m31))
-    stopifnot(all(m3[ , 3L] == "random"))
     oo3 <- order(m31, m3[ , 2L])
+    fix_patch_idx <- fix_patch_idx[oo3]
+
+    ## novel patches
+    novel_patches <- c("chr1_KK082441_alt",
+                       "chr11_KZ289073_alt",
+                       "chr11_KZ289074_alt",
+                       "chr11_KZ289075_alt",
+                       "chr11_KZ289077_alt",
+                       "chr11_KZ289078_alt",
+                       "chr11_KZ289079_alt",
+                       "chr11_KZ289080_alt",
+                       "chr11_KZ289081_alt")
+    novel_patch_idx <- match(novel_patches, seqlevels)
+    stopifnot(!anyNA(novel_patch_idx))
+
+    ## alt scaffolds and unlocalized scaffolds
+    idx3 <- setdiff(which(npart == 3L), c(fix_patch_idx, novel_patch_idx))
+    m3 <- matrix(unlist(tmp[idx3]), ncol=3L, byrow=TRUE)
+    m31 <- match(m3[ , 1L], c(ASSEMBLED_MOLECULES, "chrna"))
+    stopifnot(!anyNA(m31))
+    m33 <- match(m3[ , 3L], c("alt", "random"))
+    stopifnot(!anyNA(m33))
+    oo3 <- order(m33, m31, m3[ , 2L])
     idx3 <- idx3[oo3]
 
+    ## unplaced scaffolds
     idx2 <- which(npart == 2L)
     m2 <- matrix(unlist(tmp[idx2]), ncol=2L, byrow=TRUE)
     stopifnot(all(m2[ , 1L] == "chrUn"))
     oo2 <- order(m2[ , 2L])
     idx2 <- idx2[oo2]
 
-    c(idx1, idx3, idx2)
+    c(idx1, idx3, idx2, fix_patch_idx, novel_patch_idx)
 }
 
 GET_CHROM_SIZES <- function(goldenPath.url=getOption("UCSC.goldenPath.url"))
@@ -44,8 +68,7 @@ GET_CHROM_SIZES <- function(goldenPath.url=getOption("UCSC.goldenPath.url"))
 }
 
 NCBI_LINKER <- list(
-    assembly_accession="GCF_000001635.20",
-    AssemblyUnits=c("C57BL/6J", "non-nuclear")
+    assembly_accession="GCF_000001635.26"
 )
 
 ENSEMBL_LINKER <- "ucscToEnsembl"
