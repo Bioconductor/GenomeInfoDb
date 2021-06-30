@@ -286,8 +286,19 @@
     ## GCF_000001405.25.
     if (assembly_accession != "GCF_000001405.25") {
         compare_idx <- which(!is.na(NCBI_chrom_info[ , "UCSCStyleName"]))
-        stopifnot(identical(UCSC_chrom_info[compare_idx, "chrom"],
-                            NCBI_chrom_info[compare_idx, "UCSCStyleName"]))
+        x <- UCSC_chrom_info[compare_idx, "chrom"]
+        y <- NCBI_chrom_info[compare_idx, "UCSCStyleName"]
+        ## See https://github.com/Bioconductor/GenomeInfoDb/issues/27#issuecomment-871639449
+        if (assembly_accession == "GCF_000001635.26") {
+            i1 <- match("chr9_KB469738_fix", x)
+            i2 <- match("chr9_KB469738v3_fix", y)
+            stopifnot(isFALSE(is.na(i1)),
+                      isFALSE(is.na(i2)),
+                      identical(i1, i2))
+            x <- x[-i1]
+            y <- y[-i2]
+        }
+        stopifnot(identical(x, y))
     }
 
     drop_columns <- c("SequenceLength", "UCSCStyleName", "circular")
