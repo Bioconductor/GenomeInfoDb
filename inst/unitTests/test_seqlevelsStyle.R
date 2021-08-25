@@ -179,6 +179,7 @@ test_seqlevelsStyle_Seqinfo <- function()
         list("panTro6",  "Clint_PTRv2",                4346L,    0L,      0L),
         list("rn5",      "Rnor_5.0",                   2739L,    0L,      0L),
         list("rn6",      "Rnor_6.0",                    953L,    0L,      2L),
+        list("rn7",      "mRatBN7.2",                   176L,    0L,      0L),
         list("sacCer3",  "R64",                          17L,    0L,      0L),
         list("susScr2",  "Sscrofa9.2",                   19L,    1L,      0L),
         list("susScr3",  "Sscrofa10.2",                4583L,    0L,      0L),

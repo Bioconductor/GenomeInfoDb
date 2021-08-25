@@ -15,6 +15,11 @@ ASSEMBLIES <- list(
     list(assembly="Rnor_6.0",
          date="2014/07/01",
          assembly_accession="GCA_000001895.4",  # rn6
+         circ_seqs="MT"),
+
+    list(assembly="mRatBN7.2",
+         date="2020/11/10",
+         assembly_accession="GCF_015227675.2",  # rn7
          circ_seqs="MT")
 )
 
