@@ -168,6 +168,7 @@ test_seqlevelsStyle_Seqinfo <- function()
         list("mm8",      "MGSCv36",                      21L,   13L,    360L),
         list("mm9",      "MGSCv37",                      22L,   13L,    283L),
         list("mm10",     "GRCm38.p6",                   239L,    0L,      0L),
+        list("mm39",     "GRCm39",                       61L,    0L,      0L),
         list("musFur1",  "MusPutFur1.0",               7741L,    0L,     42L),
         list("panPan1",  "panpan1",                   10867L,    0L,      0L),
         list("panPan2",  "panpan1.1",                 10274L,    0L,      0L),
