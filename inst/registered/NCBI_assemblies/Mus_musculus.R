@@ -58,7 +58,7 @@ ASSEMBLIES <- list(
     list(assembly="GRCm39",
          date="2020/06/24",
          extra_info=c(strain="C57BL/6J"),
-         assembly_accession="GCF_000001635.27",
+         assembly_accession="GCA_000001635.9",  # mm39
          circ_seqs="MT")
 )
 
