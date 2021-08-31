@@ -33,7 +33,7 @@ ASSEMBLIES <- list(
 
     list(assembly="Callithrix_jacchus_cj1700_1.1",
          date="2020/05/22",
-         assembly_accession="GCA_009663435.2",
+         assembly_accession="GCF_009663435.1",  # calJac4
          circ_seqs="MT"),
 
     list(assembly="CJA1912RKC",
