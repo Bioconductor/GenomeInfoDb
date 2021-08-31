@@ -23,6 +23,12 @@ ASSEMBLIES <- list(
          assembly_accession="GCF_000002285.3",  # canFam3
          circ_seqs="MT"),
 
+    list(assembly="UMICH_Zoey_3.1",
+         date="2019/05/30",
+         extra_info=c(breed="Great Dane"),
+         assembly_accession="GCA_005444595.1",  # canFam5
+         circ_seqs="chrM"),
+
     list(assembly="UU_Cfam_GSD_1.0",
          date="2020/03/10",
          extra_info=c(breed="German Shepherd"),
