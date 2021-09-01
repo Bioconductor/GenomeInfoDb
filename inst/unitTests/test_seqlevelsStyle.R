@@ -142,7 +142,7 @@ test_seqlevelsStyle_Seqinfo <- function()
         list("calJac4",  "Callithrix_jacchus_cj1700_1.1", 964L,  0L,      0L),
         list("canFam3",  "CanFam3.1",                  3268L,    0L,      0L),
         list("canFam4",  "UU_Cfam_GSD_1.0",            2198L,    0L,      0L),
-        list("canFam5",  "UMICH_Zoey_3.1",               42L,    0L,      0L),
+        list("canFam5",  "UMICH_Zoey_3.1",              794L,    0L,      0L),
         list("ce6",      "WS190",                         7L,    0L,      0L),
         list("ce10",     "WBcel215",                      7L,    0L,      0L),
         list("ce11",     "WBcel235",                      7L,    0L,      0L),
