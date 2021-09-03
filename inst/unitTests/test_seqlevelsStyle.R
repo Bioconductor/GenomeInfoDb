@@ -264,8 +264,10 @@ test_seqlevelsStyle_Seqinfo <- function()
     }
 
     ## Exclude some genomes from the RefSeq switch check. These genomes
-    ## fail to pass the check for reasons that need to be investigated.
-    skip_RefSeq_switch <- c("canFam4", "rheMac3", "panTro3")
+    ## fail to pass the check for reasons that need to be investigated
+    ## (in the case of canFam5 it's because chrM is not mapped to a RefSeq
+    ## accession).
+    skip_RefSeq_switch <- c("canFam4", "canFam5", "rheMac3", "panTro3")
     for (i in seq_along(UCSC_NCBI)) {
         args <- UCSC_NCBI[[i]][c(1L, 2L, 4L)]
         if (args[[1L]] %in% skip_RefSeq_switch)
