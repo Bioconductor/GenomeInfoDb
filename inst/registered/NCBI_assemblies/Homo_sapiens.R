@@ -94,7 +94,7 @@ ASSEMBLIES <- list(
 
     list(assembly="GRCh38.p12",
          date="2017/12/21",
-         assembly_accession="GCF_000001405.38",  # hg38
+         assembly_accession="GCF_000001405.38",
          circ_seqs="MT"),
 
     list(assembly="GRCh38.p13",
@@ -102,7 +102,7 @@ ASSEMBLIES <- list(
          ## Ensembl uses GCA_000001405.28 for homo_sapiens in release
          ## 99 which is the same as GCF_000001405.39 **except** that
          ## the former does NOT have the RefSeq accessions!
-         assembly_accession="GCF_000001405.39",
+         assembly_accession="GCF_000001405.39",  # hg38
          circ_seqs="MT")
 )
 

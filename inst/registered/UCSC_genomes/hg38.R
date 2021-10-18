@@ -31,7 +31,8 @@ library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
                               "KN",  # fix-patch or novel-patch
                               "KQ",  # fix-patch or novel-patch
                               "KV",  # fix-patch or novel-patch
-                              "KZ")  # fix-patch or novel-patch
+                              "KZ",  # fix-patch or novel-patch
+                              "ML")  # fix-patch or novel-patch
     m32 <- match(substr(m3[ , 2L], 1L, 2L), GenBankAccn_prefixes)
     stopifnot(!anyNA(m32))
     is_alt_scaffold <- m33 == 1L & m32 <= 4L
@@ -77,7 +78,7 @@ GET_CHROM_SIZES <- function(goldenPath.url=getOption("UCSC.goldenPath.url"))
 #)
 
 NCBI_LINKER <- list(
-    assembly_accession="GCF_000001405.38"  # GRCh38.p12
+    assembly_accession="GCF_000001405.39"  # GRCh38.p13
 )
 
 ### Sequences not in the original GRCh38 are not mapped to Ensembl!
