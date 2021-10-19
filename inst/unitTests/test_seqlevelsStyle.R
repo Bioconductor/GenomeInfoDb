@@ -160,7 +160,7 @@ test_seqlevelsStyle_Seqinfo <- function()
         #list("hg17",     "NCBI35",                       26L,   20L,     86L),
         #list("hg18",     "NCBI36",                       26L,   23L,     97L),
         list("hg19",     "GRCh37.p13",                  297L,    1L,      0L),
-        list("hg38",     "GRCh38.p12",                  595L,    0L,      0L),
+        list("hg38",     "GRCh38.p13",                  640L,    0L,      0L),
         list("macFas5",  "Macaca_fascicularis_5.0",    7601L,    0L,      0L),
         list("rheMac2",  "Mmul_051212",                  21L,    1L, 122143L),
         list("rheMac3",  "CR_1.0",                    34102L,    1L,      0L),
@@ -238,7 +238,8 @@ test_seqlevelsStyle_Seqinfo <- function()
 
         si1 <- Seqinfo(genome=NCBI_assembly)
         ## Remove problematic seqlevel HSCHRUN_RANDOM_CTG29 (does not have an
-        ## associated GenBank accession). Belongs to GRCh37.p13 and GRCh38.p12.
+        ## associated RefSeq accession). Belongs to GRCh37.p13, GRCh38.p12,
+        ## and GRCh38.p13. This is chrUn_KI270752v1 in hg38.
         si1 <- si1[setdiff(seqlevels(si1), "HSCHRUN_RANDOM_CTG29")]
 
         si2 <- si1

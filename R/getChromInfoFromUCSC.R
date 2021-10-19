@@ -245,7 +245,7 @@
         ## Before we drop the unmapped UCSC seqlevels, we want to make sure
         ## that all the NCBI seqlevels are reverse mapped. For example, in
         ## the case of hg38, the chromInfo table at UCSC contains sequences
-        ## that belong to GRCh38.p12 but not to GRCh38. So we want to make
+        ## that belong to GRCh38.p13 but not to GRCh38. So we want to make
         ## sure that after we drop these "foreign sequences", we are left
         ## with a one-to-one mapping between UCSC seqlevels and the 455 NCBI
         ## seqlevels that are in the assembly report for GRCh38.

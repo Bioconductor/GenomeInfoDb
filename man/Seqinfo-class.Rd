@@ -82,7 +82,7 @@
 
       One special form of calling the \code{Seqinfo()} constructor is
       to specify only the \code{genome} argument and set it to the name
-      of an NCBI assembly (e.g. \code{Seqinfo(genome="GRCh38.p12")})
+      of an NCBI assembly (e.g. \code{Seqinfo(genome="GRCh38.p13")})
       or UCSC genome (e.g. \code{Seqinfo(genome="hg38")}), in which
       case the sequence information is fetched from NCBI or UCSC.
       See Examples section below for some examples.
@@ -269,7 +269,7 @@ if (interactive()) {
   ## NCBI assemblies (see '?registered_NCBI_assemblies' for the list of
   ## NCBI assemblies that are currently supported):
   Seqinfo(genome="GRCh38")
-  Seqinfo(genome="GRCh38.p12")
+  Seqinfo(genome="GRCh38.p13")
   Seqinfo(genome="Amel_HAv3.1")
   Seqinfo(genome="WBcel235")
   Seqinfo(genome="TAIR10.1")

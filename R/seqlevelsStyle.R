@@ -208,15 +208,15 @@ setReplaceMethod("seqlevelsStyle", "ANY",
     UCSC_genomes[idx, "genome"]
 }
 
-### Map hg38 to GRCh38.p12 because that's what hg38 is officially
-### based on at the moment (as of June 2020).
+### Map hg38 to GRCh38.p13 because that's what hg38 is officially based
+### on at the moment (as of Oct 2021, used to be GRCh38.p12 before that).
 ### See https://genome.ucsc.edu/cgi-bin/hgGateway?db=hg38
 ### Note that this is not written in stone and the UCSC folks might
 ### change this at any time in the future.
 ### IMPORTANT: A round trip thru .map_NCBI_assembly_to_UCSC_genome() and
 ### .map_UCSC_genome_to_NCBI_assembly() is in general a no-op **except**
 ### for NCBI assemblies with patch levels! For example the round trip will
-### map any GRCh38 patch level to GRCh38.p12.
+### map any GRCh38 patch level to GRCh38.p13.
 .map_UCSC_genome_to_NCBI_assembly <- function(genome)
 {
     stopifnot(isSingleString(genome))
@@ -256,7 +256,7 @@ setReplaceMethod("seqlevelsStyle", "ANY",
     ## switching back to the original style restores the original seqlevels
     ## and genome. Note that this is not always possible e.g. switching stuff
     ## based on GRCh38.p2 to UCSC then back to NCBI or RefSeq will set the
-    ## genome to GRCh38.p12. See .map_UCSC_genome_to_NCBI_assembly() above
+    ## genome to GRCh38.p13. See .map_UCSC_genome_to_NCBI_assembly() above
     ## in this file.
     if (new_style == "UCSC") {
         ## 'old_style' is "NCBI" or "RefSeq" or c("RefSeq", "NCBI") i.e. the            ## user wants to switch from NCBI or RefSeq to UCSC style.

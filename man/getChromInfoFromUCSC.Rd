@@ -189,7 +189,7 @@ getChromInfoFromUCSC("hg19", assembled.molecules.only=TRUE)
 getChromInfoFromUCSC("panTro6", assembled.molecules.only=TRUE)
 
 ## Map the hg38 sequences to their corresponding sequences in
-## the GRCh38.p12 assembly:
+## the GRCh38.p13 assembly:
 getChromInfoFromUCSC("hg38", map.NCBI=TRUE)[c(1, 5)]
 
 ## Note that some NCBI-based UCSC assemblies contain sequences that

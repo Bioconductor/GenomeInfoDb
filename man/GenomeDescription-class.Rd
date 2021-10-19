@@ -66,7 +66,7 @@
     \item{}{
       \code{providerVersion(x)}:
       Return the \emph{name} of the genome. This is typically the name of an
-      NCBI assembly (e.g. \code{GRCh38.p12}, \code{WBcel235}, \code{TAIR10.1},
+      NCBI assembly (e.g. \code{GRCh38.p13}, \code{WBcel235}, \code{TAIR10.1},
       \code{ARS-UCD1.2}, etc...) or UCSC genome (e.g. \code{hg38},
       \code{bosTau9}, \code{galGal6}, \code{ce11}, etc...).
     }

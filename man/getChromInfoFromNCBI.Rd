@@ -147,22 +147,22 @@ getChromInfoFromNCBI("TAIR10.1", assembly.units="non-nuclear")
 ## List of NCBI assemblies currently registered in the package:
 registered_NCBI_assemblies()
 
-## The GRCh38.p12 assembly only adds "patch sequences" to the GRCh38
+## The GRCh38.p13 assembly only adds "patch sequences" to the GRCh38
 ## assembly:
 GRCh38 <- getChromInfoFromNCBI("GRCh38")
 table(GRCh38$SequenceRole)
-GRCh38.p12 <- getChromInfoFromNCBI("GRCh38.p12")
-table(GRCh38.p12$SequenceRole)  # 140 patch sequences (70 fix + 70 novel)
+GRCh38.p13 <- getChromInfoFromNCBI("GRCh38.p13")
+table(GRCh38.p13$SequenceRole)  # 185 patch sequences (113 fix + 72 novel)
 
 ## Sanity checks:
-idx <- match(GRCh38$SequenceName, GRCh38.p12$SequenceName)
+idx <- match(GRCh38$SequenceName, GRCh38.p13$SequenceName)
 stopifnot(!anyNA(idx))
-tmp1 <- GRCh38.p12[idx, ]
+tmp1 <- GRCh38.p13[idx, ]
 rownames(tmp1) <- NULL
-tmp2 <- GRCh38.p12[-idx, ]
+tmp2 <- GRCh38.p13[-idx, ]
 stopifnot(
   identical(tmp1[ , -(5:7)], GRCh38[ , -(5:7)]),
-  identical(tmp2, GRCh38.p12[GRCh38.p12$AssemblyUnit == "PATCHES", ])
+  identical(tmp2, GRCh38.p13[GRCh38.p13$AssemblyUnit == "PATCHES", ])
 )
 }
 
