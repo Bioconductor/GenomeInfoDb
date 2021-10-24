@@ -1,3 +1,29 @@
+CHANGES IN VERSION 1.30.0
+-------------------------
+
+NEW FEATURES
+
+    o Register NCBI assemblies:
+        - mRatBN7.2
+        - UMICH_Zoey_3.1
+        - Callithrix_jacchus_cj1700_1.1
+        - MU-UCD_Fhet_4.1 (GCA_011125445.2)
+
+    o Register UCSC genomes:
+        - rn7
+        - canFam5
+        - calJac4
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o UCSC hg38 genome is now based on GRCh38.p13 instead of GRCh38.p12
+
+    o UCSC mm10 genome is now based on GRCm38.p6 instead of GRCm38
+
+    o seqlevelsStyle() setter now issues a warning when some seqlevels
+      cannot be switched.
+
+
 CHANGES IN VERSION 1.28.0
 -------------------------
 
