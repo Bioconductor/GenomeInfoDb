@@ -53,9 +53,9 @@ setGeneric("releaseName", function(x) standardGeneric("releaseName"))
 setMethod("releaseName", "GenomeDescription",
     function(x)
     {
-        msg <- c("starting with Bioconductor 3.12, calling releaseName() ",
-                 "on a GenomeDescription object is deprecated")
-        .Deprecated(msg=c("  ", wmsg(msg)))
+        msg <- c("starting with Bioconductor 3.15, calling releaseName() ",
+                 "on a GenomeDescription object is defunct")
+        .Defunct(msg=c("  ", wmsg(msg)))
         x@release_name
     }
 )

@@ -81,8 +81,9 @@
     }
     \item{}{
       \code{releaseName(x)}:
-      IMPORTANT NOTE: The \code{releaseName()} methods for GenomeDescription
-      and \link[BSgenome]{BSgenome} objects are deprecated in BioC 3.12!
+      IMPORTANT NOTE: After being deprecated in Bioconductor 3.12,
+      the \code{releaseName()} methods for GenomeDescription and
+      \link[BSgenome]{BSgenome} objects are defunct in Bioconductor 3.15!
 
       If \code{x} is a GenomeDescription object, \code{releaseName(x)}
       returns the release name of this genome, which is usually made
