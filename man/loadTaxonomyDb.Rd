@@ -1,7 +1,6 @@
 \name{loadTaxonomyDb}
 
 \alias{loadTaxonomyDb}
-\alias{available.species}
 
 \title{
   Return a data.frame that lists the known taxonomy IDs and their

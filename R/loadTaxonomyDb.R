@@ -29,12 +29,6 @@ loadTaxonomyDb <- function()
     taxdb
 }
 
-available.species <- function()
-{
-    .Defunct("loadTaxonomyDb")
-    loadTaxonomyDb()
-}
-
 ### NOT exported but used in the GenomicFeatures package.
 ### Not vectorized.
 lookup_organism_by_tax_id <- function(tax_id, all=FALSE)
