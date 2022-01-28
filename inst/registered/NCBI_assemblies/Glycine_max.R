@@ -32,6 +32,6 @@ ASSEMBLIES <- list(
          date="2021/10/15",
          extra_info=c(Cultivar="EMBRAPA BRS 537"),
          assembly_accession="GCA_012273815.2",
-         circ_seqs=c("MT", "Pltd"))
+         circ_seqs=character(0))
 )
 
