@@ -7,21 +7,13 @@
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Obtain URL to the core db of a given species on the Ensembl FTP servers
+### get_Ensembl_FTP_mysql_url() and get_Ensembl_FTP_gtf_url()
 ###
 
 .ENSEMBL_FTP_PUB_URL <- "ftp://ftp.ensembl.org/pub/"
 .ENSEMBL_FTP_PUB_GRCH37_URL <- "ftp://ftp.ensembl.org/pub/grch37/"
 .ENSEMBLGENOMES_FTP_PUB_URL <- "ftp://ftp.ensemblgenomes.org/pub/"
 .ENSEMBL_FTP_RELEASE_PREFIX <- "release-"
-
-check_species_info <- function(species_info)
-{
-    stopifnot(is.list(species_info))
-    fields <- names(species_info)
-    stopifnot(!is.null(fields), is_primary_key(fields),
-              all(c("species", "Ensembl_release") %in% fields))
-}
 
 ### 'division' must be NA or one of the Ensembl Genomes divisions i.e.
 ### "bacteria", "fungi", "metazoa", "plants", or "protists".
@@ -44,6 +36,49 @@ check_species_info <- function(species_info)
     }
     top_url
 }
+
+### 'division' must be NA or one of the Ensembl Genomes divisions i.e.
+### "bacteria", "fungi", "metazoa", "plants", or "protists".
+get_Ensembl_FTP_mysql_url <- function(release=NA, division=NA,
+                                      use.grch37=FALSE)
+{
+    if (!is_single_value(release))
+        stop(wmsg("'release' must be a single value"))
+    top_url <- .get_Ensembl_FTP_top_url(division=division,
+                                        use.grch37=use.grch37)
+    if (!is.na(release)) {
+        mysql_subdir <- paste0(.ENSEMBL_FTP_RELEASE_PREFIX, release, "/mysql")
+    } else if (is.na(division) && !use.grch37) {
+        mysql_subdir <- "current_mysql"
+    } else {
+        mysql_subdir <- "current/mysql"
+    }
+    paste0(top_url, mysql_subdir, "/")
+}
+
+### 'division' must be NA or one of the Ensembl Genomes divisions i.e.
+### "bacteria", "fungi", "metazoa", "plants", or "protists".
+get_Ensembl_FTP_gtf_url <- function(release=NA, division=NA,
+                                    use.grch37=FALSE)
+{
+    if (!is_single_value(release))
+        stop(wmsg("'release' must be a single value"))
+    top_url <- .get_Ensembl_FTP_top_url(division=division,
+                                        use.grch37=use.grch37)
+    if (!is.na(release)) {
+        gtf_subdir <- paste0(.ENSEMBL_FTP_RELEASE_PREFIX, release, "/gtf")
+    } else if (is.na(division) && !use.grch37) {
+        gtf_subdir <- "current_gtf"
+    } else {
+        gtf_subdir <- "current/gtf"
+    }
+    paste0(top_url, gtf_subdir, "/")
+}
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### list_Ensembl_FTP_releases()
+###
 
 ### The keys are FTP URLs to Ensembl division top-level directories e.g.
 ###   "ftp://ftp.ensembl.org/pub/"
@@ -74,49 +109,10 @@ list_Ensembl_FTP_releases <- function(division=NA, use.grch37=FALSE,
     releases
 }
 
-### Returns a single string with the "species_info" attribute (named list)
-### on it.
-.predict_core_db_in_Ensembl_FTP_grch37 <- function(species=NA, release=NA)
-{
-    ## User-supplied 'species' will be ignored.
-    warn <- TRUE
-    if (missing(species))
-        warn <- FALSE
-    if (warn && is_single_value(species)) {
-        if (is.na(species)) {
-            ok <- TRUE
-        } else if (is.character(species)) {
-            ok <- species == "" ||
-                  grepl("human", species, ignore.case=TRUE) ||
-                  grepl("homo", species, ignore.case=TRUE) ||
-                  grepl("sapiens", species, ignore.case=TRUE) ||
-                  grepl("GRCh37", species, ignore.case=TRUE)
-        } else {
-            ok <- FALSE
-        }
-        warn <- !ok
-    }
-    if (warn)
-        warning(wmsg("you've set 'use.grch37' to TRUE ",
-                     "so 'species' was ignored"))
-    if (is.na(release)) {
-        release <- tail(list_Ensembl_FTP_releases(), n=1L)  # latest
-    } else {
-        release <- as.integer(release)
-    }
-    core_db <- paste0("homo_sapiens_core_", release, "_37")
-    attr(core_db, "species_info") <- list(
-        name="Human",
-        species="homo_sapiens",
-        division="EnsemblVertebrates",
-        Ensembl_release=release,
-        taxonomy_id=9606L,
-        assembly="GRCh37",
-        assembly_accession="GCF_000001405.13",
-        core_db=core_db
-    )
-    core_db
-}
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### fetch_species_index_from_Ensembl_FTP()
+###
 
 ### The species index file can be used with Ensembl releases >= 96 and
 ### Ensembl Genomes releases >= 22.
@@ -234,6 +230,13 @@ fetch_species_index_from_Ensembl_FTP <- function(release=NA, division=NA)
     .load_or_fetch_species_index_from_url(url)
 }
 
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### .lookup_species_in_species_index()
+###
+
+.normalize_species <- function(species) chartr(" ", "_", tolower(species))
+
 .stop_on_ambiguous_lookup <- function(species_index, idx, max_print,
                                       species, column, url)
 {
@@ -267,24 +270,29 @@ fetch_species_index_from_Ensembl_FTP <- function(release=NA, division=NA)
               "\n    ", url)
 }
 
-### Matches a 'species' supplied as the name of a BioMart dataset (e.g.
-### "hsapiens" or "hsapiens_gene_ensembl") to its corresponding core db.
-.lookup_abbrev_species_in_core_dbs <- function(species, core_dbs)
+### Find the core db in 'core_dbs' that matches 'species'.
+.lookup_species_in_core_dbs <- function(species, core_dbs)
 {
     trimmed_core_dbs <- sub("_core_.*$", "", core_dbs)
+    ## First assume that 'species' was supplied as the name of a core db
+    ## (after removal of the _core_.* suffix) e.g. "homo_sapiens".
+    idx <- grep(species, trimmed_core_dbs)
+    if (length(idx) == 1L)
+        return(idx)
+    ## Then assume that 'species' was supplied as the name of a BioMart
+    ## dataset e.g. "hsapiens" or "hsapiens_gene_ensembl".
     abbrev_core_dbs <- sub("^(.)[^_]*_", "\\1", trimmed_core_dbs)
     if (species == "mfuro_gene_ensembl") {
         abbrev_species <- "mputorius_furo"
     } else {
         abbrev_species <- strsplit(species, "_", fixed=TRUE)[[1L]][[1L]]
     }
-    which(abbrev_core_dbs == abbrev_species)
+    which(abbrev_species == abbrev_core_dbs)
 }
 
-.lookup_species <- function(species, species_index, url)
+### Find the row in 'species_index' that matches 'species'.
+.lookup_species_in_species_index <- function(species, species_index, url)
 {
-    .normalize_species <- function(species) chartr(" ", "_", tolower(species))
-
     ## Exact match (case insensitive).
     search_columns <- c("name", "species", "taxonomy_id",
                         "assembly", "assembly_accession", "core_db")
@@ -302,10 +310,9 @@ fetch_species_index_from_Ensembl_FTP <- function(release=NA, division=NA)
                                       species, column, url)
     }
 
-    ## Matches a 'species' supplied as the name of a BioMart dataset (e.g.
-    ## "hsapiens_gene_ensembl" or "hsapiens") to the "core_db" column.
-    idx <- .lookup_abbrev_species_in_core_dbs(.normalize_species(species),
-                                              species_index[ , "core_db"])
+    ## Lookup 'species' in the "core_db" column.
+    idx <- .lookup_species_in_core_dbs(.normalize_species(species),
+                                       species_index[ , "core_db"])
     if (length(idx) == 1L)
         return(idx)
     if (length(idx) > 1L)
@@ -334,6 +341,68 @@ fetch_species_index_from_Ensembl_FTP <- function(release=NA, division=NA)
          "\n    ", url)
 }
 
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Low-level utilities for obtaining/making/checking "species_info" objects
+###
+### A "species_info" object is just a named list at the moment.
+###
+
+.extract_species_info_from_species_index <- function(species_index, idx,
+                                                     release=NA)
+{
+    stopifnot(is_single_value(release))
+    if (is.na(release)) {
+        release <- tail(list_Ensembl_FTP_releases(), n=1L)  # latest
+    } else {
+        release <- as.integer(release)
+    }
+    list(
+        name=species_index[idx, "name"],
+        species=species_index[idx, "species"],
+        division=species_index[idx, "division"],
+        Ensembl_release=release,
+        taxonomy_id=species_index[idx, "taxonomy_id"],
+        assembly=species_index[idx, "assembly"],
+        assembly_accession=species_index[idx, "assembly_accession"],
+        core_db=species_index[idx, "core_db"]
+    )
+}
+
+.make_species_info_for_grch37 <- function(release=NA)
+{
+    stopifnot(is_single_value(release))
+    if (is.na(release)) {
+        release <- tail(list_Ensembl_FTP_releases(), n=1L)  # latest
+    } else {
+        release <- as.integer(release)
+    }
+    core_db <- paste0("homo_sapiens_core_", release, "_37")
+    list(
+        name="Human",
+        species="homo_sapiens",
+        division="EnsemblVertebrates",
+        Ensembl_release=release,
+        taxonomy_id=9606L,
+        assembly="GRCh37",
+        assembly_accession="GCF_000001405.13",
+        core_db=core_db
+    )
+}
+
+check_species_info <- function(species_info)
+{
+    stopifnot(is.list(species_info))
+    fields <- names(species_info)
+    stopifnot(!is.null(fields), is_primary_key(fields),
+              all(c("species", "Ensembl_release") %in% fields))
+}
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### get_Ensembl_FTP_core_db_url()
+###
+
 ### Returns a single string with the "species_info" attribute (named list)
 ### on it.
 .find_core_db_in_Ensembl_FTP_species_index <- function(species,
@@ -343,62 +412,43 @@ fetch_species_index_from_Ensembl_FTP <- function(release=NA, division=NA)
     url <- .get_Ensembl_FTP_species_index_url(release=release,
                                               division=division)
     species_index <- .load_or_fetch_species_index_from_url(url)
-    idx <- .lookup_species(species, species_index, url)
-    core_db <- species_index[idx, "core_db"]
-    if (is.na(release)) {
-        release <- tail(list_Ensembl_FTP_releases(), n=1L)  # latest
-    } else {
-        release <- as.integer(release)
-    }
-    attr(core_db, "species_info") <- list(
-        name=species_index[idx, "name"],
-        species=species_index[idx, "species"],
-        division=species_index[idx, "division"],
-        Ensembl_release=release,
-        taxonomy_id=species_index[idx, "taxonomy_id"],
-        assembly=species_index[idx, "assembly"],
-        assembly_accession=species_index[idx, "assembly_accession"],
-        core_db=core_db
-    )
+    idx <- .lookup_species_in_species_index(species, species_index, url)
+    species_info <- .extract_species_info_from_species_index(species_index,
+                                                             idx, release)
+    core_db <- species_info$core_db
+    attr(core_db, "species_info") <- species_info
     core_db
 }
 
-### 'division' must be NA or one of the Ensembl Genomes divisions i.e.
-### "bacteria", "fungi", "metazoa", "plants", or "protists".
-get_Ensembl_FTP_mysql_url <- function(release=NA, division=NA,
-                                      use.grch37=FALSE)
+.warn_species_was_ignored <- function(species)
 {
-    if (!is_single_value(release))
-        stop(wmsg("'release' must be a single value"))
-    top_url <- .get_Ensembl_FTP_top_url(division=division,
-                                        use.grch37=use.grch37)
-    if (!is.na(release)) {
-        mysql_subdir <- paste0(.ENSEMBL_FTP_RELEASE_PREFIX, release, "/mysql")
-    } else if (is.na(division) && !use.grch37) {
-        mysql_subdir <- "current_mysql"
-    } else {
-        mysql_subdir <- "current/mysql"
+    if (missing(species))
+        return(invisible(NULL))
+    ok <- FALSE
+    if (is_single_value(species)) {
+        if (is.na(species)) {
+            ok <- TRUE
+        } else if (is.character(species)) {
+            ok <- species == "" ||
+                  grepl("human", species, ignore.case=TRUE) ||
+                  grepl("homo", species, ignore.case=TRUE) ||
+                  grepl("sapiens", species, ignore.case=TRUE) ||
+                  grepl("GRCh37", species, ignore.case=TRUE)
+        }
     }
-    paste0(top_url, mysql_subdir, "/")
+    if (!ok)
+        warning(wmsg("you've set 'use.grch37' to TRUE ",
+                     "so 'species' was ignored"))
 }
 
-### 'division' must be NA or one of the Ensembl Genomes divisions i.e.
-### "bacteria", "fungi", "metazoa", "plants", or "protists".
-get_Ensembl_FTP_gtf_url <- function(release=NA, division=NA,
-                                    use.grch37=FALSE)
+### Returns a single string with the "species_info" attribute (named list)
+### on it.
+.predict_core_db_in_Ensembl_FTP_grch37 <- function(release=NA)
 {
-    if (!is_single_value(release))
-        stop(wmsg("'release' must be a single value"))
-    top_url <- .get_Ensembl_FTP_top_url(division=division,
-                                        use.grch37=use.grch37)
-    if (!is.na(release)) {
-        gtf_subdir <- paste0(.ENSEMBL_FTP_RELEASE_PREFIX, release, "/gtf")
-    } else if (is.na(division) && !use.grch37) {
-        gtf_subdir <- "current_gtf"
-    } else {
-        gtf_subdir <- "current/gtf"
-    }
-    paste0(top_url, gtf_subdir, "/")
+    species_info <- .make_species_info_for_grch37(release)
+    core_db <- species_info$core_db
+    attr(core_db, "species_info") <- species_info
+    core_db
 }
 
 ### The keys are FTP URLs to "mysql" directories e.g.
@@ -428,13 +478,13 @@ get_Ensembl_FTP_gtf_url <- function(release=NA, division=NA,
 
 ### Returns a single string with the "species_info" attribute (named list)
 ### on it.
-.find_core_db_in_Ensembl_FTP_core_dbs <-
-    function(mysql_url, species, release=NA)
+.find_core_db_in_Ensembl_FTP_core_dbs <- function(mysql_url, species,
+                                                  release=NA)
 {
     stopifnot(isSingleString(species))
     core_dbs <- .list_Ensembl_FTP_core_dbs(mysql_url, release=release)
-    species2 <- chartr(" ", "_", tolower(species))
-    idx <- .lookup_abbrev_species_in_core_dbs(species2, core_dbs)
+    species2 <- .normalize_species(species)
+    idx <- .lookup_species_in_core_dbs(species2, core_dbs)
     if (length(idx) != 1L)
         stop(wmsg("found 0 or more than 1 subdir for \"", species,
                   "\" species at ", mysql_url))
@@ -463,9 +513,9 @@ get_Ensembl_FTP_core_db_url <- function(species, release=NA, division=NA,
                                            division=division,
                                            use.grch37=use.grch37)
     if (use.grch37) {
-        core_db <- .predict_core_db_in_Ensembl_FTP_grch37(
-                                           species,
-                                           release=release)
+        ## We ignore user-supplied 'species'.
+        .warn_species_was_ignored(species)
+        core_db <- .predict_core_db_in_Ensembl_FTP_grch37(release)
     } else {
         if (!isSingleString(species) || species == "")
             stop(wmsg("'species' must be a single non-empty string"))
@@ -481,9 +531,6 @@ get_Ensembl_FTP_core_db_url <- function(species, release=NA, division=NA,
                                            division=division)
         } else {
             ## The old way. Dumb, unreliable, and slow!
-            ## Only works if 'species' is supplied as the name of a BioMart
-            ## dataset e.g. "celegans_gene_ensembl" (or "celegans").
-            ## Ridiculously stiff and outdated!
             core_db <- .find_core_db_in_Ensembl_FTP_core_dbs(
                                            mysql_url,
                                            species, release=release)
