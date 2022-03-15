@@ -32,77 +32,97 @@ ASSEMBLIES <- list(
          assembly_accession="GCF_000001405.25",  # hg19
          circ_seqs="MT"),
 
+    ## 455 sequences.
     list(assembly="GRCh38",
          date="2013/12/17",
          assembly_accession="GCF_000001405.26",
          circ_seqs="MT"),
 
+    ## 471 sequences.
     list(assembly="GRCh38.p1",
          date="2014/10/03",
          assembly_accession="GCF_000001405.27",
          circ_seqs="MT"),
 
+    ## 486 sequences.
     list(assembly="GRCh38.p2",
          date="2014/12/05",
          assembly_accession="GCF_000001405.28",
          circ_seqs="MT"),
 
+    ## 494 sequences.
     list(assembly="GRCh38.p3",
          date="2015/04/03",
          assembly_accession="GCF_000001405.29",
          circ_seqs="MT"),
 
+    ## 510 sequences.
     list(assembly="GRCh38.p4",
          date="2015/06/25",
          assembly_accession="GCF_000001405.30",
          circ_seqs="MT"),
 
+    ## 517 sequences.
     list(assembly="GRCh38.p5",
          date="2015/09/22",
          assembly_accession="GCF_000001405.31",
          circ_seqs="MT"),
 
+    ## 521 sequences.
     list(assembly="GRCh38.p6",
          date="2015/12/21",
          assembly_accession="GCF_000001405.32",
          circ_seqs="MT"),
 
+    ## 525 sequences.
     list(assembly="GRCh38.p7",
          date="2016/03/21",
          assembly_accession="GCF_000001405.33",
          circ_seqs="MT"),
 
+    ## 543 sequences.
     list(assembly="GRCh38.p8",
          date="2016/06/30",
          assembly_accession="GCF_000001405.34",
          circ_seqs="MT"),
 
+    ## 551 sequences.
     list(assembly="GRCh38.p9",
          date="2016/09/26",
          assembly_accession="GCF_000001405.35",
          circ_seqs="MT"),
 
+    ## 557 sequences.
     list(assembly="GRCh38.p10",
          date="2017/01/06",
          assembly_accession="GCF_000001405.36",
          circ_seqs="MT"),
 
+    ## 578 sequences.
     list(assembly="GRCh38.p11",
          date="2017/06/14",
          assembly_accession="GCF_000001405.37",
          circ_seqs="MT"),
 
+    ## 595 sequences.
     list(assembly="GRCh38.p12",
          date="2017/12/21",
          assembly_accession="GCF_000001405.38",
          circ_seqs="MT"),
 
+    ## 640 sequences.
     list(assembly="GRCh38.p13",
          date="2019/02/28",
          ## Ensembl uses GCA_000001405.28 for homo_sapiens in release
          ## 99 which is the same as GCF_000001405.39 **except** that
          ## the former does NOT have the RefSeq accessions!
          assembly_accession="GCF_000001405.39",  # hg38
+         circ_seqs="MT"),
+
+    ## 709 sequences.
+    list(assembly="GRCh38.p14",
+         date="2022/02/03",
+         assembly_accession="GCA_000001405.29",
          circ_seqs="MT")
 )
 
