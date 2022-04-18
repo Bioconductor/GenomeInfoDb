@@ -281,14 +281,16 @@ find_NCBI_assembly_info_for_accession <- function(accession)
 
 .NCBI_cached_chrom_info <- new.env(parent=emptyenv())
 
-.get_NCBI_chrom_info_from_accession <- function(accession, circ_seqs=NULL,
+.get_NCBI_chrom_info_from_accession <- function(accession, assembly_name=NA,
+    circ_seqs=NULL,
     assembled.molecules.only=FALSE,
     assembly.units=NULL,
     recache=FALSE)
 {
     ans <- .NCBI_cached_chrom_info[[accession]]
     if (is.null(ans) || recache) {
-        assembly_report <- fetch_assembly_report(accession)
+        assembly_report <- fetch_assembly_report(accession,
+                                                 assembly_name=assembly_name)
         ans <- .format_NCBI_chrom_info(assembly_report, circ_seqs=circ_seqs)
         .NCBI_cached_chrom_info[[accession]] <- ans
     }
@@ -372,8 +374,14 @@ getChromInfoFromNCBI <- function(assembly,
             circ_seqs <- NULL
         }
     }
+    if (is.null(NCBI_assembly_info)) {
+        assembly_name <- assembly
+    } else {
+        assembly_name <- NCBI_assembly_info$assembly
+    }
 
     ans <- .get_NCBI_chrom_info_from_accession(accession,
+                assembly_name=assembly_name,
                 circ_seqs=circ_seqs,
                 assembled.molecules.only=assembled.molecules.only,
                 assembly.units=assembly.units,
@@ -383,14 +391,9 @@ getChromInfoFromNCBI <- function(assembly,
         attr(ans, "NCBI_assembly_info") <- NCBI_assembly_info
         return(ans)
     }
-    if (is.null(NCBI_assembly_info)) {
-        ans_genome <- assembly
-    } else {
-        ans_genome <- NCBI_assembly_info$assembly
-    }
     Seqinfo(seqnames=ans[ , "SequenceName"],
             seqlengths=ans[ , "SequenceLength"],
             isCircular=ans[ , "circular"],
-            genome=ans_genome)
+            genome=assembly_name)
 }
 
