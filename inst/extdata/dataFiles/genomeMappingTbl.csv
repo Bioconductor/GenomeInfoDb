@@ -28,7 +28,8 @@ asian bonytongue,scleropages formosus,ASM162426v1,94,Oct.2018,94,Oct.2018,NA,NA,
 asian bonytongue,scleropages formosus,fSclFor1.1,99,Jan.2020,99,Jan.2020,NA,NA,NA
 asiatic black bear,ursus thibetanus thibetanus,ASM966005v1,100,Apr.2020,100,Apr.2020,NA,NA,NA
 atlantic herring,clupea harengus,Ch_v2.0.2,98,Sept.2019,98,Sept.2019,NA,NA,NA
-atlantic salmon,salmo salar,ICSASG_v2,99,Jan.2020,99,Jan.2020,NA,NA,NA
+atlantic salmon,salmo salar,ICSASG_v2,99,Jan.2020,105,Dec.2020,NA,NA,NA
+atlantic salmon,salmo salar,Ssal_v3.1,106,Apr.2022,106,Apr.2022,NA,NA,NA
 australian saltwater crocodile,crocodylus porosus,CroPor_comp1,96,Apr.2019,96,Apr.2019,NA,NA,NA
 ballan wrasse,labrus bergylta,BallGen_V1,94,Oct.2018,94,Oct.2018,NA,NA,NA
 barramundi perch,lates calcarifer,ASB_HGAPassembly_v1,97,Jul.2019,97,Jul.2019,NA,NA,NA
@@ -110,7 +111,7 @@ coho salmon,oncorhynchus kisutch,Okis_V2,101,Aug.2020,101,Aug.2020,NA,NA,NA
 flycatcher,ficedula albicollis,FicAlb_1.4,73,Sep.2013,73,Sep.2013,ficAlb1,NA,NA
 flycatcher,ficedula albicollis,FicAlb_1.5,104,May.2021,104,May.2021,ficAlb1,NA,NA
 common canary,serinus canaria,SCA1,96,Apr.2019,96,Apr.2019,NA,NA,NA
-common carp,cyprinus carpio,common_carp_genome,100,Apr.2020,100,Apr.2020,NA,NA,NA
+common carp,cyprinus carpio,Cypcar_WagV4.0,106,Apr.2022,106,Apr.2022,NA,NA,NA
 common carp german mirror,cyprinus carpio,German_Mirror_carp_1.0,99,Jan.2020,99,Jan.2020,NA,NA,NA
 common carp hebao red,cyprinus carpio,Hebao_red_carp_1.0,99,Jan.2020,99,Jan.2020,NA,NA,NA
 common carp huanghe,cyprinus carpio,Hunaghe_carp_2.0,99,Jan.2020,99,Jan.2020,NA,NA,NA
@@ -139,6 +140,7 @@ dog,canis familiaris,CanFam2.0,54,May.2009,64,Sep.2011,canFam3,Sep.2011,Broad In
 dog,canis familiaris,CanFam3.1,68,Jul.2012,68,Jul.2012,canFam3,Sep.2011,Broad Institute v3.1
 dog,canis familiaris,CanFam3.1,68,Jul.2012,99,Jan.2020,canFam4,Mar.2020,Uppsala Universary
 dog,canis familiaris,CanFam3.1,100,Apr.2020,100,Apr.2020,canFam4,Mar.2020,Uppsala Universary
+dog,canis familiaris,CanFam3.1,100,Apr.2020,100,Apr.2020,canFam6,Oct.2020,Dog Genome Sequencing Consortium Dog10K_Boxer_Tasha
 dolphin,tursiops truncatus,turTru1,54,May.2009,64,Sept.2011,NA,NA,NA
 dolphin,tursiops truncatus,turTru1,54,May.2009,65,Dec.2011,turTru2,Oct.2011,Baylor College of Medicine Ttru_1.4
 domestic yak,bos grunniens,LU_Bosgru_v3.0,99,Jan.2020,99,Jan.2020,NA,NA,NA
@@ -160,7 +162,8 @@ emu,dromaius novaehollandiae,droNov1,96,Apr.2019,96,Apr.2019,NA,NA,NA
 eurasian eagle-owl,bubo bubo,BubBub1.0,101,Aug.2020,101,Aug.2020,NA,NA,NA
 eurasian red squirrel,sciurus vulgaris,mSciVul1.1,101,Aug.2020,101,Aug.2020,NA,NA,NA
 eurasian sparrowhawk,accipiter nisus,Accipiter_nisus_ver1.0,99,Jan.2020,99,Jan.2020,NA,NA,NA
-european seabass,dicentrarchus labrax,seabass_V1.0,100,Apr.2020,100,Apr.2020,NA,NA,NA
+european seabass,dicentrarchus labrax,seabass_V1.0,100,Apr.2020,105,Dec.2021,NA,NA,NA
+european seabass,dicentrarchus labrax,dlabrax2021,106,Apr.2022,106,Apr.2022,NA,NA,NA
 fruitfly,drosophila melanogaster,BDGP5.4,54,May.2009,54,May.2009,dm3,Apr.2006,BDGP Release 5
 fruitfly,drosophila melanogaster,BDGP5.13,58,May.2010,58,May.2010,dm3,Apr.2006,BDGP Release 5
 fruitfly,drosophila melanogaster,BDGP5.25,59,Aug.2010,59,Aug.2010,dm3,Apr.2006,BDGP Release 5
@@ -279,7 +282,8 @@ mangrove rivulus,kryptolebias marmoratus,ASM164957v1,94,Oct.2018,94,Oct.2018,NA,
 marmoset,callithrix jacchus,callJacc3,56,Sep.2009,56,Sep.2009,calJac3,Mar.2009,WUSTL Callithrix_jacchus-v3.2
 marmoset,callithrix jacchus,C_jacchus3.2.1,59,Aug.2010,59,Aug.2010,calJac3,Mar.2009,WUSTL Callithrix_jacchus-v3.2
 marmoset,callithrix jacchus,ASM275486v1,92,Apr.2018,92,Apr.2018,calJac3,Mar.2009,WUSTL Callithrix_jacchus-v3.2
-marmoset,callithrix jacchus,ASM275486v1,92,Apr.2018,101,Aug.2020,calJac4,May.2020,Washington University Callithrix_jacchus_cj1700_1.1
+marmoset,callithrix jacchus,ASM275486v1,92,Apr.2018,105,Dec.2021,calJac4,May.2020,Washington University Callithrix_jacchus_cj1700_1.1
+marmoset,callithrix jacchus,mCalJac1.pat.X,106,Apr.2022,106,Apr.2022,calJac4,May.2020,Washington University Callithrix_jacchus_cj1700_1.1
 medium ground-finch,geospiza fortis,GeoFor_1.0,100,Apr.2020,100,Apr.2020,NA,NA,NA
 meerkat,suricata suricatta,meerkat_22Aug2017_6uvM2_HiC,99,Jan.2020,99,Jan.2020,NA,NA,NA
 megabat,pteropus vampyrus,pteVam1,54,May.2009,54,May.2009,pteVam1,Jul.2008,Broad Institute Pteval1.0
@@ -324,7 +328,8 @@ opossum,monodelphis domestica,monDom5,54,May.2009,54,May.2009,monDom5,Oct.2006,B
 opossum,monodelphis domestica,ASM229v1,98,Sept.2019,98,Sept.2019,monDom5,Oct.2006,Broad Institute release MonDom5
 orange clownfish,amphiprion percula,Nemo_v1,94,Oct.2018,94,Oct.2018,NA,NA,NA
 orangutan,pongo abelii,PPYG2,54,May.2009,54,May.2009,ponAbe2,Jul.2007,WUSTL Pongo_albelii-2.0.2
-orangutan,pongo abelii,PPYG2,54,May.2009,92,Apr.2018,ponAbe3,Jan.2018,Susie_PABv2/ponAbe3
+orangutan,pongo abelii,PPYG2,54,May.2009,105,Dec.2021,ponAbe3,Jan.2018,Susie_PABv2/ponAbe3
+orangutan,pongo abelii,Susie_PABv2,106,Apr.2022,106,Apr.2022,ponAbe3,Jan.2018,Susie_PABv2/ponAbe3
 orbiculate cardinalfish,sphaeramia orbicularis,fSphaOr1.1,99,Jan.2020,99,Jan.2020,NA,NA,NA
 oriental scops-owl,otus sunia,OtuSun1.0,101,Aug.2020,101,Aug.2020,NA,NA,NA
 pachon cavefish,astyanax mexicanus,Astyanax_mexicanus-1.0.2,98,Sept.2019,98,Sept.2019,NA,NA,NA
@@ -353,13 +358,15 @@ polar bear,ursus maritimus,UrsMar_1.0,95,Jan.2019,95,Jan.2019,NA,NA,NA
 prairie vole,microtus ochrogaster,MicOch1.0,90,Aug.2017,90,Aug.2017,micOch1,NA,NA
 rabbit,oryctolagus cuniculus,RABBIT,54,May.2009,54,May.2009,oryCun2,Apr.2009,Broad Institute release OryCun2
 rabbit,oryctolagus cuniculus,OryCun2.0,59,Aug.2010,59,Aug.2010,oryCun2,Apr.2009,Broad Institute release OryCun2
-rainbow trout,oncorhynchus mykiss,Omyk_1.0,100,Apr.2020,100,Apr.2020,NA,NA,NA
+rainbow trout,oncorhynchus mykiss,Omyk_1.0,100,Apr.2020,105,Dec.2021,NA,NA,NA
+rainbow trout,oncorhynchus mykiss,USDA_OmykA_1.1,106,Apr.2022,106,Apr.2022,,,
 rat,rattus norvegicus,RGSC3.4,54,May.2009,54,May.2009,rn4,Nov.2004,Baylor College of Medicine HGSC v3.4
 rat,rattus norvegicus,RGSC3.4,54,May.2009,67,May.2012,rn5,Mar.2012,RGSC Rnor_5.0
 rat,rattus norvegicus,Rnor_5.0,70,Jan.2013,70,Jan.2013,rn5,Mar.2012,RGSC Rnor_5.0
 rat,rattus norvegicus,Rnor_5.0,70,Jan.2013,76,Aug.2014,rn6,Jul.2014,RGSC Rnor_6.0
 rat,rattus norvegicus,Rnor_6.0,80,May.2015,80,May.2015,rn6,Jul.2014,RGSC Rnor_6.0
-,rattus norvegicus,Rnor_6.0,80,May.2015,102,Nov.2020,rn7,Nov.2020,Wellcome Sanger Institute mRatBN7.2
+rat,rattus norvegicus,Rnor_6.0,80,May.2015,105,Dec.2021,rn7,Nov.2020,Wellcome Sanger Institute mRatBN7.2
+rat,rattus norvegicus,mRatBN7.2,106,Apr.2022,106,Apr.2022,rn7,Nov.2020,Wellcome Sanger Institute mRatBN7.2
 red fox,vulpes vulpes,VulVul2.2,95,Jan.2019,95,Jan.2019,NA,NA,NA
 red-bellied piranha,pygocentrus nattereri,Pygocentrus_nattereri-1.0.2,94,Oct.2018,94,Oct.2018,NA,NA,NA
 reedfish,erpetoichthys calabaricus,fErpCal1.1,98,Sept.2019,98,Sept.2019,NA,NA,NA
