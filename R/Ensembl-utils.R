@@ -720,7 +720,9 @@ fetch_default_coord_systems_from_Ensembl_FTP <- function(core_db_url)
         stop(wmsg("'codes' must be a character vector"))
     if (anyDuplicated(codes))
         stop(wmsg("'codes' cannot contain duplicates"))
-    ## Get the first 99 rows of 'attrib_type' table.
+
+    ## UGLY HACK (AND TIME BOMB!): Get only the first 99 rows of
+    ## the 'attrib_type' table!
     ## The reason we don't read in the entire table is because some rows at
     ## the bottom of the table (rows with attrib_type_id >= 416, these rows
     ## were added in Ensembl 75) contain embedded EOL characters that break
@@ -731,8 +733,31 @@ fetch_default_coord_systems_from_Ensembl_FTP <- function(core_db_url)
     ## of 6 and the lines in the file seem to always be ordered by
     ## attrib_type_id), reading in the first 99 rows should be way enough
     ## to get what we need.
-    attrib_type <- fetch_table_from_Ensembl_FTP(core_db_url, "attrib_type",
-                                                nrows=99L)
+    ##
+    ## APRIL 2022 UPDATE: It didn't take that long for the above time bomb
+    ## to explode! In Ensembl release 106, the rows in 'attrib_type.txt.gz'
+    ## for "celegans" are shuffled. See:
+    ##   http://ftp.ensembl.org/pub/release-106/mysql/caenorhabditis_elegans_core_106_279/
+    ## This is unseen before! Unfortunately this breaks our ugly hack. The
+    ## good news is that the issue that motivated our ugly hack in the first
+    ## place seems to have vanished! Tested with:
+    ##   for (release in c(75:88, 90:106)) {
+    ##     cat(release, "\n")
+    ##     core_db_url <- GenomeInfoDb:::get_Ensembl_FTP_core_db_url(
+    ##                                               "hsapiens",
+    ##                                               release=release)
+    ##     attrib_type <- GenomeInfoDb:::fetch_table_from_Ensembl_FTP(
+    ##                                               core_db_url,
+    ##                                               "attrib_type")
+    ##   }
+    ## Note that we skip release 89 because the dump files there are broken:
+    ##   http://ftp.ensembl.org/pub/release-89/mysql/homo_sapiens_core_89_38/
+    ## e.g. many of them (including dump file for "attrib_type" table) have
+    ## extension .gz.bz2 which is a mess!
+    #attrib_type <- fetch_table_from_Ensembl_FTP(core_db_url, "attrib_type",
+    #                                            nrows=99L)
+    attrib_type <- fetch_table_from_Ensembl_FTP(core_db_url, "attrib_type")
+
     m <- solid_match(codes, attrib_type[ , "code"],
                      x_what="supplied code",
                      table_what="\"attrib_type.code\" value")
