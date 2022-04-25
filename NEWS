@@ -1,3 +1,14 @@
+CHANGES IN VERSION 1.32.0
+-------------------------
+
+DEPRECATED AND DEFUNCT
+
+    o releaseName() is now defunct on GenomeDescription objects.
+
+    o Remove fetchExtendedChromInfoFromUCSC() and available.species().
+      Both were defunct in BioC 3.14.
+
+
 CHANGES IN VERSION 1.30.0
 -------------------------
 
