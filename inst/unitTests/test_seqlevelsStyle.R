@@ -151,6 +151,8 @@ test_seqlevelsStyle_Seqinfo <- function()
         list("danRer11", "GRCz11",                     1923L,    0L,      0L),
         list("dm3",      "Release 5",                    14L,    1L,      0L),
         list("dm6",      "Release 6 plus ISO1 MT",     1870L,    0L,      0L),
+        list("equCab2",  "EquCab2.0",                    33L,    1L,   9604L),
+        list("equCab3",  "EquCab3.0",                  4701L,    0L,      0L),
         list("galGal3",  "Gallus_gallus-2.1",            34L,   23L,  17118L),
         list("galGal4",  "Gallus_gallus-4.0",         15932L,    0L,      0L),
         list("galGal5",  "Gallus_gallus-5.0",         23475L,    0L,      0L),
