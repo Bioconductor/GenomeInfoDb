@@ -49,17 +49,6 @@ setMethod("providerVersion", "GenomeDescription", function(x) x@provider_version
 setGeneric("releaseDate", function(x) standardGeneric("releaseDate"))
 setMethod("releaseDate", "GenomeDescription", function(x) x@release_date)
 
-setGeneric("releaseName", function(x) standardGeneric("releaseName"))
-setMethod("releaseName", "GenomeDescription",
-    function(x)
-    {
-        msg <- c("starting with Bioconductor 3.15, calling releaseName() ",
-                 "on a GenomeDescription object is defunct")
-        .Defunct(msg=c("  ", wmsg(msg)))
-        x@release_name
-    }
-)
-
 setGeneric("bsgenomeName", function(x) standardGeneric("bsgenomeName"))
 setMethod("bsgenomeName", "GenomeDescription",
     function(x)

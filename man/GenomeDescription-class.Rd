@@ -19,8 +19,6 @@
 \alias{provider,GenomeDescription-method}
 \alias{releaseDate}
 \alias{releaseDate,GenomeDescription-method}
-\alias{releaseName}
-\alias{releaseName,GenomeDescription-method}
 \alias{bsgenomeName}
 \alias{bsgenomeName,GenomeDescription-method}
 \alias{seqinfo,GenomeDescription-method}
@@ -78,22 +76,6 @@
     \item{}{
       \code{releaseDate(x)}:
       Return the release date of this genome e.g. \code{"Mar. 2006"}.
-    }
-    \item{}{
-      \code{releaseName(x)}:
-      IMPORTANT NOTE: After being deprecated in Bioconductor 3.12,
-      the \code{releaseName()} methods for GenomeDescription and
-      \link[BSgenome]{BSgenome} objects are defunct in Bioconductor 3.15!
-
-      If \code{x} is a GenomeDescription object, \code{releaseName(x)}
-      returns the release name of this genome, which is usually made
-      of the name of the organization who assembled it plus its Build
-      version. For example, UCSC uses \code{"hg18"} for the version of
-      the Human genome corresponding to the Build 36.1 from NCBI hence
-      the release name for this genome is \code{"NCBI Build 36.1"}.
-
-      If \code{x} is a \link[BSgenome]{BSgenome} object, \code{releaseName(x)}
-      returns \code{NA_character_}.
     }
     \item{}{
       \code{bsgenomeName(x)}:
