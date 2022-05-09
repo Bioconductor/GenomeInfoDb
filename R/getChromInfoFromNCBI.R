@@ -158,8 +158,10 @@
     col
 }
 
-registered_NCBI_assemblies <- function()
+registered_NCBI_assemblies <- function(organism=NA)
 {
+    if (!isSingleStringOrNA(organism))
+        stop(wmsg("'organism' must be a single string or NA"))
     if (length(.NCBI_accession2assembly_info) == 0L)
         .load_registered_NCBI_assemblies()
     assemblies <- unname(as.list(.NCBI_accession2assembly_info, all.names=TRUE))
@@ -184,9 +186,14 @@ registered_NCBI_assemblies <- function()
     }
 
     listData <- lapply(setNames(colnames, colnames), make_col)
-    ans <- S4Vectors:::new_DataFrame(listData, nrows=length(assemblies))
-    oo <- order(ans$organism, ans$rank_within_organism)
-    as.data.frame(drop_cols(ans, "rank_within_organism")[oo, , drop=FALSE])
+    DF <- S4Vectors:::new_DataFrame(listData, nrows=length(assemblies))
+    oo <- order(DF$organism, DF$rank_within_organism)
+    DF <- drop_cols(DF, "rank_within_organism")[oo, , drop=FALSE]
+    if (!is.na(organism)) {
+        keep_idx <- grep(organism, DF$organism, ignore.case=TRUE)
+        DF <- DF[keep_idx, , drop=FALSE]
+    }
+    as.data.frame(DF)
 }
 
 .lookup_NCBI_assembly2accession <- function(assembly)

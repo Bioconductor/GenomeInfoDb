@@ -27,7 +27,7 @@ getChromInfoFromNCBI(assembly,
                      recache=FALSE,
                      as.Seqinfo=FALSE)
 
-registered_NCBI_assemblies()
+registered_NCBI_assemblies(organism=NA)
 }
 
 \arguments{
@@ -72,6 +72,15 @@ registered_NCBI_assemblies()
     only the \code{SequenceName}, \code{SequenceLength}, and \code{circular}
     columns of the data frame are used to make the \link{Seqinfo} object.
     All the other columns are ignored (and lost).
+  }
+  \item{organism}{
+    When \code{organism} is specified, \code{registered_NCBI_assemblies()}
+    will only return the subset of assemblies that are registered for that
+    organism.
+    \code{organism} must be specified as a single string and will be used
+    to perform a search (with \code{grep()}) on the \code{"organism"} column
+    of the data frame returned by \code{registered_NCBI_assemblies()}.
+    The search is case-insensitive.
   }
 }
 
@@ -132,37 +141,38 @@ registered_NCBI_assemblies()
 }
 
 \examples{
+## All registered NCBI assemblies for Triticum aestivum (bread wheat):
+registered_NCBI_assemblies("tri")[1:4]
+
+## All registered NCBI assemblies for Homo sapiens:
+registered_NCBI_assemblies("homo")[1:4]
+
 ## Internet access required!
-
 getChromInfoFromNCBI("GRCh37")
-
 getChromInfoFromNCBI("GRCh37", as.Seqinfo=TRUE)
-
 getChromInfoFromNCBI("GRCh37", assembled.molecules.only=TRUE)
 
-getChromInfoFromNCBI("TAIR10.1")
-
-getChromInfoFromNCBI("TAIR10.1", assembly.units="non-nuclear")
-
-## List of NCBI assemblies currently registered in the package:
-registered_NCBI_assemblies()
-
-## The GRCh38.p13 assembly only adds "patch sequences" to the GRCh38
+## The GRCh38.p14 assembly only adds "patch sequences" to the GRCh38
 ## assembly:
 GRCh38 <- getChromInfoFromNCBI("GRCh38")
 table(GRCh38$SequenceRole)
-GRCh38.p13 <- getChromInfoFromNCBI("GRCh38.p13")
-table(GRCh38.p13$SequenceRole)  # 185 patch sequences (113 fix + 72 novel)
+GRCh38.p14 <- getChromInfoFromNCBI("GRCh38.p14")
+table(GRCh38.p14$SequenceRole)  # 254 patch sequences (164 fix + 90 novel)
+
+## All registered NCBI assemblies for Arabidopsis thaliana:
+registered_NCBI_assemblies("arabi")[1:4]
+getChromInfoFromNCBI("TAIR10.1")
+getChromInfoFromNCBI("TAIR10.1", assembly.units="non-nuclear")
 
 ## Sanity checks:
-idx <- match(GRCh38$SequenceName, GRCh38.p13$SequenceName)
+idx <- match(GRCh38$SequenceName, GRCh38.p14$SequenceName)
 stopifnot(!anyNA(idx))
-tmp1 <- GRCh38.p13[idx, ]
+tmp1 <- GRCh38.p14[idx, ]
 rownames(tmp1) <- NULL
-tmp2 <- GRCh38.p13[-idx, ]
+tmp2 <- GRCh38.p14[-idx, ]
 stopifnot(
   identical(tmp1[ , -(5:7)], GRCh38[ , -(5:7)]),
-  identical(tmp2, GRCh38.p13[GRCh38.p13$AssemblyUnit == "PATCHES", ])
+  identical(tmp2, GRCh38.p14[GRCh38.p14$AssemblyUnit == "PATCHES", ])
 )
 }
 
