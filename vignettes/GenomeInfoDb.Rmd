@@ -1,7 +1,7 @@
 ---
 title: "An Introduction to [*GenomeInfoDb*](http://bioconductor.org/packages/GenomeInfoDb)"
 date: "Modified 26 June, 2020.  Compiled  `r format(Sys.time(), '%B %d, %Y')`"
-author: "Martin Morgan, Hervé Pagès, Marc Carlson, Sonali Arora}"
+author: "Martin Morgan, Hervé Pagès, Marc Carlson, Sonali Arora"
 vignette: >
   %\VignetteDepends{}
   %\VignetteKeywords{organism, GenomeInfoDb}
