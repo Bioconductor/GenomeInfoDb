@@ -49,6 +49,7 @@ bonobo,pan paniscus,panpan1.1,91,Dec.2017,91,Dec.2017,panPan2,Dec.2015,Max-Planc
 bonobo,pan paniscus,panpan1.1,91,Dec.2017,101,Aug.2020,panPan3,May.2020,University of Washington
 brazillian guinea pig,cavia aperea,CavAp1.0,90,Aug.2017,90,Aug.2017,NA,NA,NA
 budgerigar,melopsittacus undulatus,Melopsittacus_undulatus_6.3,96,Apr.2019,96,Apr.2019,NA,NA,NA
+budgerigar,melopsittacus undulatus,bMelUnd1.mat.Z,107,Jul.2022,107,Jul.2022,NA,NA,NA
 burrowing owl,athene cunicularia,athCun1,99,Jan.2020,99,Jan.2020,NA,NA,NA
 burton's mouthbrooder,haplochromis burtoni,AstBur1.0,94,Oct.2018,94,Oct.2018,NA,NA,NA
 bushbaby,otolemur garnettii,otoGar1,54,May.2009,54,May.2009,NA,NA,NA
@@ -84,6 +85,7 @@ chicken,gallus gallus,Galgal4,71,Apr.2013,83,Dec.2015,galGal5,Dec.2015,ICGC Gall
 chicken,gallus gallus,Gallus_Gallus-5.0,86,Oct.2016,86,Oct.2016,galGal5,Dec.2015,ICGC Gallus-gallus-5.0
 chicken,gallus gallus,Gallus_Gallus-5.0,86,Oct.2016,92,Apr.2018,galGal6,Mar.2018,ICGC Gallus-gallus-5.0
 chicken,gallus gallus,GRCg6a,95,Jan.2019,95,Jan.2019,galGal6,Mar.2018,GRCg6 Gallus-gallus-6.0
+chicken,gallus gallus,bGalGal1.mat.broiler.GRCg7b,107,Jul.2022,107,Jul.2022,galGal6,Mar.2018,GRCg6 Gallus-gallus-6.0
 chilean tinamou,nothoprocta perdicaria,notPer1,96,Apr.2019,96,Apr.2019,NA,NA,NA
 chimpanzee,pan troglodytes,CHIMP2.1,54,May.2009,54,May.2009,panTro2,Mar.2006,CGSC Build 2.1
 chimpanzee,pan troglodytes,CHIMP2.1,54,May.2009,60,Nov.2010,panTro3,Oct.2010,CGSC Build 2.1.3
@@ -314,6 +316,7 @@ naked mole-rat female,heterocephalus glaber,HetGla_female_1.0,90,Aug.2017,90,Aug
 naked mole-rat male,heterocephalus glaber,HetGla_1.0,90,Aug.2017,90,Aug.2017,hetGla1,Jul.2011,Beijing Genomics Institute HetGla_1.0
 narwhal,monodon monoceros,NGI_Narwhal_1,101,Aug.2020,101,Aug.2020,NA,NA,NA
 new Caledonian crow,corvus moneduloides,UO_Cmon_1.0,101,Aug.2020,101,Aug.2020,NA,NA,NA
+new Caledonian crow,corvus moneduloides,bCorMon1.pri,107,Jul.2022,107,Jul.2022,NA,NA,NA
 deer mouse,peromyscus maniculatus bairdii,Pman_1.0,90,Aug.2017,95,Jan.2019,perManBai1,NA,NA
 deer mouse,peromyscus maniculatus bairdii,HU_Pman_2.1,96,Apr.2019,96,Apr.2019,perManBai1,NA,NA
 northern pike,esox lucius,Eluc_V3,94,Oct.2018,94,Oct.2018,NA,NA,NA
@@ -393,6 +396,7 @@ siberian musk deer,moschus moschiferus,MosMos_v2_BIUU_UCD,99,Jan.2020,99,Jan.202
 silver-eye,zosterops lateralis melanops,ASM128173v1,100,Apr.2020,100,Apr.2020,NA,NA,NA
 sloth,choloepus hoffmanni,choHof1,54,May.2009,54,May.2009,choHof1,Jul.2008,Broad Institute ChoHof1.0
 small tree finch,camarhynchus parvulus,STF_HiC,100,Apr.2020,100,Apr.2020,NA,NA,NA
+small tree finch,camarhynchus parvulus,Camarhynchus_parvulus_V1.1,107,Jul.2022,107,Jul.2022,NA,NA,NA
 sooty mangabey,cercocebus atys,Caty_1.0,91,Dec.2017,91,Dec.2017,NA,NA,NA
 sperm whale,physeter catodon,ASM283717v2,99,Jan.2020,99,Jan.2020,NA,NA,NA
 spiny chromis,acanthochromis polyacanthusASM210954v1,ASM210954v1,94,Oct.2018,94,Oct.2018,NA,NA,NA
@@ -444,6 +448,7 @@ xenopus,xenopus tropicalis,JGI4.1,54,May.2009,54,May.2009,xenTro3,Nov.2009,JGI v
 xenopus,xenopus tropicalis,JGI4.2,62,Apr.2011,62,Apr.2011,xenTro3,Nov.2009,JGI v.4.2
 xenopus,xenopus tropicalis,JGI4.2,62,Apr.2011,69,Oct.2012,xenTro7,Sep.2012,JGI v.7.0
 xenopus,xenopus tropicalis,Xenopus_tropicalis_v9.1,98,Sept.2019,98,Sept.2019,xenTro7,Sep.2012,JGI v.7.0
+xenopus,xenopus tropicalis,UCB.Xtro_10.0,107,Jul.2022,107,Jul.2022,xenTro7,Sep.2012,JGI v.7.0
 yellowtail amberjack,seriola lalandi dorsalis,Sedor1,94,Oct.2018,94,Oct.2018,NA,NA,NA
 zebra finch,taeniopygia guttata,taeGut3.2.4,54,May.2009,54,May.2009,taeGut1,Jul.2008,WUSTL v3.2.4
 zebra finch,taeniopygia guttata,taeGut3.2.4,54,May.2009,71,Apr.2013,taeGut2,Feb.2013,WashU taeGut324
