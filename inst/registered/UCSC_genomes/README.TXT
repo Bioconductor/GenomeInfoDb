@@ -45,8 +45,8 @@ All the above variables are recognized by getChromInfoFromUCSC(). They
 must be defined at the top-level of the script and their names must be
 in UPPER CASE.
 
-The script can define its own top-level variables and functions but by
-convention their name should be in lower case and start with a dot.
+The script can define its own top-level variables and functions, but, by
+convention, their names should be in lower case and start with a dot.
 
 See the files in this folder for numerous examples.
 
