@@ -1,7 +1,7 @@
 import(methods)
 importFrom(utils, data, download.file, read.delim, read.table, read.csv,
                   as.roman)
-importFrom(stats, setNames)
+importFrom(stats, setNames, update)
 importFrom(stats4, summary)
 
 importFrom(RCurl, getURL)
@@ -28,7 +28,11 @@ exportClasses(
 
 S3method(as.data.frame, Seqinfo)
 
+S3method(merge, Seqinfo)
+
 S3method(summary, Seqinfo)
+
+S3method(update, Seqinfo)
 
 ### We also export them thru the export() directive so that (a) they can be
 ### called directly, (b) tab-completion on the name of the generic shows them,
@@ -36,7 +40,11 @@ S3method(summary, Seqinfo)
 export(
     as.data.frame.Seqinfo,
 
-    summary.Seqinfo
+    merge.Seqinfo,
+
+    summary.Seqinfo,
+
+    update.Seqinfo
 )
 
 
@@ -51,6 +59,9 @@ exportMethods(
     as.data.frame,
     show,
     merge,
+
+    ## Generics defined in the stats package:
+    update,
 
     ## Generics defined in the stats4 package:
     summary,
