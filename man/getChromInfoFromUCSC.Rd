@@ -102,7 +102,7 @@ registered_UCSC_genomes()
 }
 
 \details{
-  \emph{registered} vs \emph{unregistered} UCSC genomes:
+  *** \emph{Registered} vs \emph{unregistered} UCSC genomes ***
   \itemize{
     \item \code{assembled.molecules.only=TRUE} is supported only for
           \emph{registered} genomes. For \emph{unregistered}
@@ -121,6 +121,28 @@ registered_UCSC_genomes()
 
   Please contact the maintainer of the \pkg{GenomeInfoDb} package to
   request registration of additional genomes.
+
+  *** Offline mode ***
+
+  \code{getChromInfoFromUCSC()} supports an "offline mode" when called
+  with \code{assembled.molecules.only=TRUE}, but only for a selection of
+  \emph{registered} genomes. The "offline mode" works thanks to a collection
+  of tab-delimited files stored in the package, that contain the "assembled
+  molecules info" for the supported genomes. This makes calls like:
+  \preformatted{    getChromInfoFromUCSC("hg38", assembled.molecules.only=TRUE)}
+  fast and reliable i.e. the call will always work, even when offline!
+
+  See README.TXT in GenomeInfoDb/inst/extdata/assembled_molecules_info/UCSC/
+  for more information.
+
+  Note that calling \code{getChromInfoFromUCSC()} with
+  \code{assembled.molecules.only=FALSE} (the default), or with
+  \code{recache=TRUE}, will trigger retrieval of the chromosome
+  info from UCSC, and will issue a warning if this info no longer
+  matches the "assembled molecules info" stored in the package.
+
+  Please contact the maintainer of the \pkg{GenomeInfoDb} package to
+  request genome additions to the "offline mode".
 }
 
 \value{
@@ -179,21 +201,17 @@ registered_UCSC_genomes()
 ## A. BASIC EXAMPLES
 ## ---------------------------------------------------------------------
 
-## Internet access required!
+## --- Internet access required! ---
 
 getChromInfoFromUCSC("hg19")
 
 getChromInfoFromUCSC("hg19", as.Seqinfo=TRUE)
 
-getChromInfoFromUCSC("hg19", assembled.molecules.only=TRUE)
-
-getChromInfoFromUCSC("panTro6", assembled.molecules.only=TRUE)
-
 ## Map the hg38 sequences to their corresponding sequences in
 ## the GRCh38.p13 assembly:
 getChromInfoFromUCSC("hg38", map.NCBI=TRUE)[c(1, 5)]
 
-## Note that some NCBI-based UCSC assemblies contain sequences that
+## Note that some NCBI-based UCSC genomes contain sequences that
 ## are not mapped. For example this is the case for chrM in hg19:
 hg19 <- getChromInfoFromUCSC("hg19", map.NCBI=TRUE)
 hg19[is.na(hg19$NCBI.SequenceName), ]
@@ -201,7 +219,16 @@ hg19[is.na(hg19$NCBI.SequenceName), ]
 ## Map the hg19 sequences to the Ensembl sequence names:
 getChromInfoFromUCSC("hg19", add.ensembl.col=TRUE)
 
-## List of UCSC genome assemblies currently registered in the package:
+## --- No internet access required! (offline mode) ---
+
+getChromInfoFromUCSC("hg19", assembled.molecules.only=TRUE)
+
+getChromInfoFromUCSC("panTro6", assembled.molecules.only=TRUE)
+
+getChromInfoFromUCSC("bosTau9", assembled.molecules.only=TRUE)
+
+## --- List of UCSC genomes currently registered in the package ---
+
 registered_UCSC_genomes()
 
 ## ---------------------------------------------------------------------
