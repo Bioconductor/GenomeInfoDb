@@ -2,6 +2,7 @@
 
 \alias{getChromInfoFromUCSC}
 \alias{registered_UCSC_genomes}
+\alias{saveAssembledMoleculesInfoFromUCSC}
 
 \title{
   Get chromosome information for a UCSC genome

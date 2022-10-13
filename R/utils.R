@@ -2,7 +2,7 @@
 ### Miscellaneous low-level utils
 ### -------------------------------------------------------------------------
 ###
-### Nothing in this file is exported.
+### Unless stated otherwise, nothing in this file is exported.
 ###
 
 
@@ -197,10 +197,10 @@ list_ftp_dir <- function(url, subdirs.only=FALSE)
 }
 
 ### Provides a simpler interface to read.table().
-.simple_read_table <- function(file,
-                               header=FALSE, colnames=NULL, col2class=NULL,
-                               nrows=-1L, skip=0L,
-                               sep="\t", quote="", comment.char="")
+simple_read_table <- function(file,
+                              header=FALSE, colnames=NULL, col2class=NULL,
+                              nrows=-1L, skip=0L,
+                              sep="\t", quote="", comment.char="")
 {
     if (is.null(col2class))
         col2class <- NA
@@ -221,12 +221,12 @@ list_ftp_dir <- function(url, subdirs.only=FALSE)
 ### "first download the file, then call read.table() on the local file"
 ### seems to be a lot more reliable! This is what fetch_table_from_url()
 ### does. (And getChromInfoFromNCBI() now uses fetch_table_from_url().)
-### Same interface as .simple_read_table() above.
+### Same interface as simple_read_table() above.
 fetch_table_from_url <- function(url, ...)
 {
     destfile <- tempfile()
     suppressWarnings(download.file(url, destfile, quiet=TRUE))
-    ans <- .simple_read_table(destfile, ...)
+    ans <- simple_read_table(destfile, ...)
     unlink(destfile)
     ans
 }

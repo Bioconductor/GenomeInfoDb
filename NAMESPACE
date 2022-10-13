@@ -1,6 +1,6 @@
 import(methods)
 importFrom(utils, data, download.file, read.delim, read.table, read.csv,
-                  as.roman)
+                  write.table, as.roman)
 importFrom(stats, setNames, update)
 importFrom(stats4, summary)
 
@@ -86,6 +86,7 @@ export(
     ## getChromInfoFromNCBI.R:
     registered_NCBI_assemblies,
     getChromInfoFromNCBI,
+    saveAssembledMoleculesInfoFromUCSC,
 
     ## getChromInfoFromUCSC.R:
     registered_UCSC_genomes,

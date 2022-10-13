@@ -1,12 +1,12 @@
-This folder contains "registration files" for UCSC genome assemblies.
+This folder contains "registration files" for UCSC genomes.
 
 These files are used by the getChromInfoFromUCSC() function defined in
 the GenomeInfoDb package.
 
-There must be one file per assembly.
+There must be one file per genome.
 
 Each file must be an R script (.R extension) and its name must be the name
-of the genome assembly (e.g. 'danRer11.R').
+of the genome (e.g. 'danRer11.R').
 
 The script should be able to work as a standalone script so should
 explicitly load packages if needed (e.g. with 'library(IRanges)'
