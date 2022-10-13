@@ -48,7 +48,8 @@ library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
     c(idx1, idx3A, idx2, idx3B)
 }
 
-GET_CHROM_SIZES <- function(goldenPath.url=getOption("UCSC.goldenPath.url"))
+FETCH_ORDERED_CHROM_SIZES <-
+    function(goldenPath.url=getOption("UCSC.goldenPath.url"))
 {
     chrom_sizes <- GenomeInfoDb:::fetch_chrom_sizes_from_UCSC(GENOME,
                                               goldenPath.url=goldenPath.url)

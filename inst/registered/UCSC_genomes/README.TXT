@@ -25,9 +25,10 @@ At a minimum, the script must define the 4 following variables:
 
 Additionally, it can also define any (or both) of the following variables:
 
-  o GET_CHROM_SIZES:     Function with 1 argument. Must return a 2-column
+  o FETCH_ORDERED_CHROM_SIZES: Function with 1 argument. Must return a 2-column
                          data frame with columns "chrom" (character)
-                         and "size" (integer).
+                         and "size" (integer). Rows must be in "canonical"
+                         chromosome order.
 
   o NCBI_LINKER:         Named list.
 
