@@ -896,28 +896,33 @@ getChromInfoFromUCSC <- function(genome,
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### saveAssembledMoleculesInfoFromUCSC()
 ###
-### Use case is to add "assembled molecules info" for a given **registered**
-### UCSC genome to the GenomeInfoDb package. See README.TXT in the
-### GenomeInfoDb/inst/extdata/assembled_molecules_info/UCSC/ folder
-### for more information.
 ### Not intended for the end user.
+### Use case is to add "assembled molecules info" for the specified UCSC
+### genomes to the GenomeInfoDb package. The genomes must be **registered**.
+### See README.TXT in GenomeInfoDb/inst/extdata/assembled_molecules_info/UCSC/
+### for more information.
 
+### Vectorized.
 saveAssembledMoleculesInfoFromUCSC <- function(
-    genome, dir=".",
+    genomes, dir=".",
     goldenPath.url=getOption("UCSC.goldenPath.url"))
 {
+    if (!is.character(genomes))
+        stop(wmsg("'genomes' must be a character vector"))
     if (!isSingleString(dir))
         stop(wmsg("'dir' must be a single string specifying the path ",
                   "to the directory where to save the RDS file"))
-    chrominfo <- getChromInfoFromUCSC(genome, assembled.molecules.only=TRUE,
-                                      goldenPath.url=goldenPath.url,
-                                      recache=TRUE)
     expected_colnames <- c("chrom", "size", "assembled", "circular")
-    stopifnot(identical(colnames(chrominfo), expected_colnames))
-    chrominfo <- chrominfo[ , -3L]
-    filename <- paste0(genome, ".tab")
-    filepath <- file.path(dir, filename)
-    write.table(chrominfo, file=filepath,
-                quote=FALSE, sep="\t", row.names=FALSE)
+    for (genome in genomes) {
+        chrominfo <- getChromInfoFromUCSC(genome, assembled.molecules.only=TRUE,
+                                          goldenPath.url=goldenPath.url,
+                                          recache=TRUE)
+        stopifnot(identical(colnames(chrominfo), expected_colnames))
+        chrominfo <- chrominfo[ , -3L]
+        filename <- paste0(genome, ".tab")
+        filepath <- file.path(dir, filename)
+        write.table(chrominfo, file=filepath,
+                    quote=FALSE, sep="\t", row.names=FALSE)
+    }
 }
 
