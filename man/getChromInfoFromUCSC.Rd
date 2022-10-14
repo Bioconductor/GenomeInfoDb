@@ -104,9 +104,12 @@ registered_UCSC_genomes()
 \details{
   *** \emph{Registered} vs \emph{unregistered} UCSC genomes ***
   \itemize{
-    \item \code{assembled.molecules.only=TRUE} is supported only for
-          \emph{registered} genomes. For \emph{unregistered}
-          genomes, the argument is ignored with a warning.
+    \item For \emph{registered} genomes, the returned data frame contains
+          information about which sequences are assembled molecules and which
+          are not, and the \code{assembled.molecules.only} argument is
+          supported. For \emph{unregistered} genomes, this information is
+          missing, and the \code{assembled.molecules.only} argument is ignored
+          with a warning.
 
     \item For \emph{registered} genomes, the returned
           circularity flags are guaranteed to be accurate.
@@ -116,7 +119,7 @@ registered_UCSC_genomes()
     \item For \emph{registered} genomes, special care is taken
           to make sure that the sequences are returned in a sensible order.
           For \emph{unregistered} genomes, a heuristic is used
-          to return the sequence in a sensible order.
+          to return the sequences in a sensible order.
   }
 
   Please contact the maintainer of the \pkg{GenomeInfoDb} package to
