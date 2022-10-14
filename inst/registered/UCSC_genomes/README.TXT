@@ -28,11 +28,12 @@ Additionally, it can also define any (or both) of the following variables:
   o FETCH_ORDERED_CHROM_SIZES: Function with 1 argument. Must return a 2-column
                          data frame with columns "chrom" (character)
                          and "size" (integer). Rows must be in "canonical"
-                         chromosome order.
+                         chromosome order. A requirement is that the assembled
+                         molecules come first.
                          Note that defining this function is not needed if
-                         all the sequences in the genome are **assembled
-                         molecules**. See for example registration files
-                         for Worm (ce*.R files).
+                         all the sequences in the genome are assembled
+                         molecules. See for example registration files for
+                         Worm (ce*.R files).
 
   o NCBI_LINKER:         Named list.
 
