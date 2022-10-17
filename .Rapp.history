@@ -1,5 +1,0 @@
-packageVersion("BSgenome")
-packageVersion("BSgenome")
-registered_UCSC_genomes()
-library(BSgenome)
-registered_UCSC_genomes()
