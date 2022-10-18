@@ -39,5 +39,5 @@ ASSEMBLIES <- list(
          date="2020/10/06",
          extra_info=c(breed="boxer"),
          assembly_accession="GCF_000002285.5",  # canFam6
-         circ_seqs="chrM")
+         circ_seqs="MT")
 )
