@@ -36,3 +36,9 @@ FETCH_ORDERED_CHROM_SIZES <-
     oo <- .order_seqlevels(chrom_sizes[ , "chrom"])
     S4Vectors:::extract_data_frame_rows(chrom_sizes, oo)
 }
+
+NCBI_LINKER <- list(
+    assembly_accession="GCF_000002285.5",
+    special_mappings=c(chrM="MT")
+)
+
