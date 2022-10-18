@@ -23,7 +23,7 @@ At a minimum, the script must define the 4 following variables:
 
   o CIRC_SEQS:           Character vector (subset of ASSEMBLED_MOLECULES).
 
-Additionally, it can also define any (or both) of the following variables:
+Additionally, it can also define any of the following variables:
 
   o FETCH_ORDERED_CHROM_SIZES: Function with 1 argument. Must return a 2-column
                          data frame with columns "chrom" (character)
