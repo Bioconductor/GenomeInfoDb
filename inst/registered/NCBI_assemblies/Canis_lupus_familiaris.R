@@ -33,6 +33,11 @@ ASSEMBLIES <- list(
          date="2020/03/10",
          extra_info=c(breed="German Shepherd"),
          assembly_accession="GCA_011100685.1",  # canFam4
-         circ_seqs="chrM")
-)
+         circ_seqs="chrM"),
 
+    list(assembly="Dog10K_Boxer_Tasha",
+         date="2020/10/06",
+         extra_info=c(breed="boxer"),
+         assembly_accession="GCF_000002285.5",  # canFam6
+         circ_seqs="MT")
+)
