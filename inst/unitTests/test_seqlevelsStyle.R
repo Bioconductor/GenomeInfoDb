@@ -164,6 +164,7 @@ test_seqlevelsStyle_Seqinfo <- function()
         #list("hg18",     "NCBI36",                       26L,   23L,     97L),
         list("hg19",     "GRCh37.p13",                  297L,    1L,      0L),
         list("hg38",     "GRCh38.p13",                  640L,    0L,      0L),
+        list("hs1",      "T2T-CHM13v2.0",                25L,    0L,      0L),
         list("macFas5",  "Macaca_fascicularis_5.0",    7601L,    0L,      0L),
         list("mm8",      "MGSCv36",                      21L,   13L,    360L),
         list("mm9",      "MGSCv37",                      22L,   13L,    283L),
@@ -268,10 +269,12 @@ test_seqlevelsStyle_Seqinfo <- function()
     }
 
     ## Exclude some genomes from the RefSeq switch check. These genomes
-    ## fail to pass the check for reasons that need to be investigated
-    ## (in the case of canFam5 it's because chrM is not mapped to a RefSeq
-    ## accession).
-    skip_RefSeq_switch <- c("canFam4", "canFam5", "rheMac3", "panTro3")
+    ## fail to pass the check for reasons that need to be investigated!
+    ## In the case of canFam5 and hs1, it's because chrM is not mapped
+    ## to a RefSeq accession, that is, RefSeqAccn is NA for chrM in
+    ## getChromInfoFromNCBI("UMICH_Zoey_3.1"), and for MT in
+    ## getChromInfoFromNCBI("T2T-CHM13v2.0").
+    skip_RefSeq_switch <- c("canFam4", "canFam5", "hs1", "rheMac3", "panTro3")
     for (i in seq_along(UCSC_NCBI)) {
         args <- UCSC_NCBI[[i]][c(1L, 2L, 4L)]
         if (args[[1L]] %in% skip_RefSeq_switch)
