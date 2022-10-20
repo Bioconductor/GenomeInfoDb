@@ -178,7 +178,7 @@ ASSEMBLIES <- list(
     list(assembly="T2T-CHM13v2.0",
          assembly_level="Complete Genome",
          date="2022/01/24",
-         assembly_accession="GCA_009914755.4",
+         assembly_accession="GCA_009914755.4",   # hs1
          circ_seqs="MT")
 )
 
