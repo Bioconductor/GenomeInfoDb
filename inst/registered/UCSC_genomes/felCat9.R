@@ -52,5 +52,9 @@ FETCH_ORDERED_CHROM_SIZES <-
     S4Vectors:::extract_data_frame_rows(chrom_sizes, oo)
 }
 
+NCBI_LINKER <- list(
+    assembly_accession="GCF_000181335.3",
+    special_mappings=c(chrM="MT")
+)
 
 
