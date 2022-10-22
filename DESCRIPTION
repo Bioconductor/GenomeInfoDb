@@ -9,7 +9,7 @@ biocViews: Genetics, DataRepresentation, Annotation, GenomeAnnotation
 URL: https://bioconductor.org/packages/GenomeInfoDb
 Video: http://youtu.be/wdEjCYSXa7w
 BugReports: https://github.com/Bioconductor/GenomeInfoDb/issues
-Version: 1.33.14
+Version: 1.33.15
 License: Artistic-2.0
 Encoding: UTF-8
 Authors@R: c(
@@ -18,7 +18,8 @@ Authors@R: c(
 	person("Marc", "Carlson", role="aut"),
 	person("Hervé", "Pagès", role=c("aut", "cre"),
 		email="hpages.on.github@gmail.com"),
-	person("Prisca Chidimma", "Maduka", role="ctb"))
+	person("Prisca Chidimma", "Maduka", role="ctb"),
+	person("Atuhurira Kirabo", "Kakopo", role="ctb"))
 Depends: R (>= 4.0.0), methods, BiocGenerics (>= 0.37.0),
 	S4Vectors (>= 0.25.12), IRanges (>= 2.13.12)
 Imports: stats, stats4, utils, RCurl, GenomeInfoDbData
