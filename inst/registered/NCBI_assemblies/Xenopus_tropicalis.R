@@ -8,7 +8,7 @@ ASSEMBLIES <- list(
          date="2019/11/14",
          extra_info=c(strain="Nigerian"),
          assembly_accession="GCA_000004195.4",
-         circ_seqs=character(0)),
+         circ_seqs="MT"),
 
     list(assembly="ASM1336827v1",
     	 assembly_level="Chromosome",
