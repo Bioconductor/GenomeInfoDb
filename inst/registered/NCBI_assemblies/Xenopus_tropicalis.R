@@ -14,6 +14,6 @@ ASSEMBLIES <- list(
     	 assembly_level="Chromosome",
          date="2020/06/23",
          extra_info=c(strain="Nigerian"),
-         assembly_accession="GCF_013368275.1",
+         assembly_accession="GCA_013368275.1",
          circ_seqs=character(0))
 )
