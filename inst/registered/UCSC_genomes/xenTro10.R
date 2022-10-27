@@ -36,3 +36,4 @@ FETCH_ORDERED_CHROM_SIZES <-
     oo <- .order_seqlevels(chrom_sizes[ , "chrom"])
     S4Vectors:::extract_data_frame_rows(chrom_sizes, oo)
 }
+
