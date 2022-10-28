@@ -1,7 +1,7 @@
 \name{NCBI-utils}
 
 \alias{NCBI-utils}
-\alias{find_assembly_ftp_dir}
+\alias{find_NCBI_assembly_ftp_dir}
 
 
 \title{Utility functions to access NCBI resources}
@@ -12,7 +12,7 @@
 }
 
 \usage{
-find_assembly_ftp_dir(assembly_accession, assembly_name=NA)
+find_NCBI_assembly_ftp_dir(assembly_accession, assembly_name=NA)
 }
 
 \arguments{
@@ -32,7 +32,7 @@ find_assembly_ftp_dir(assembly_accession, assembly_name=NA)
 }
 
 \examples{
-find_assembly_ftp_dir("GCA_000001405.15")
+find_NCBI_assembly_ftp_dir("GCA_000001405.15")
 }
 
 \keyword{manip}

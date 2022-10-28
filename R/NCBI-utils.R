@@ -266,7 +266,7 @@ build_and_save_assembly_accessions_table <- function(dir=".", quiet=FALSE)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### find_assembly_ftp_dir()
+### find_NCBI_assembly_ftp_dir()
 ###
 
 ### 'assembly_accession' can be:
@@ -287,7 +287,7 @@ build_and_save_assembly_accessions_table <- function(dir=".", quiet=FALSE)
 }
 
 ### Returns a length-2 character vector.
-find_assembly_ftp_dir <- function(assembly_accession, assembly_name=NA)
+find_NCBI_assembly_ftp_dir <- function(assembly_accession, assembly_name=NA)
 {
     assembly_accession <- .normarg_assembly_accession(assembly_accession)
     if (!isSingleStringOrNA(assembly_name))
@@ -342,8 +342,8 @@ find_assembly_ftp_dir <- function(assembly_accession, assembly_name=NA)
 ### Returns https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/GCA_000001405.15_GRCh38_assembly_report.txt for GCA_000001405.15
 .form_assembly_report_url <- function(assembly_accession, assembly_name=NA)
 {
-    ftp_dir <- find_assembly_ftp_dir(assembly_accession,
-                                     assembly_name=assembly_name)
+    ftp_dir <- find_NCBI_assembly_ftp_dir(assembly_accession,
+                                          assembly_name=assembly_name)
     paste0(ftp_dir[[1L]], ftp_dir[[2L]], "/",
            ftp_dir[[2L]], "_assembly_report.txt")
 }
