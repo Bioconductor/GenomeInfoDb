@@ -83,6 +83,9 @@ export(
     orderSeqlevels,
     rankSeqlevels,
 
+    ## NCBI-utils.R:
+    find_assembly_ftp_dir,
+
     ## getChromInfoFromNCBI.R:
     registered_NCBI_assemblies,
     getChromInfoFromNCBI,
