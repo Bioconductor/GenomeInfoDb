@@ -28,7 +28,9 @@ find_NCBI_assembly_ftp_dir(assembly_accession, assembly_name=NA)
 }
 
 \value{
-  A length-2 character vector.
+  A length-2 character vector. The 1st element in the vector is the
+  URL to the FTP dir and the 2nd element the prefix used for the names
+  of all the files in the FTP dir.
 }
 
 \examples{
