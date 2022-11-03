@@ -1,7 +1,8 @@
 \name{getChromInfoFromUCSC}
 
-\alias{getChromInfoFromUCSC}
 \alias{registered_UCSC_genomes}
+\alias{getChromInfoFromUCSC}
+\alias{get_and_fix_chrom_info_from_UCSC}
 \alias{saveAssembledMoleculesInfoFromUCSC}
 
 \title{
