@@ -30,7 +30,7 @@ getChromInfoFromUCSC(genome,
                      recache=FALSE,
                      as.Seqinfo=FALSE)
 
-registered_UCSC_genomes()
+registered_UCSC_genomes(organism=NA)
 }
 
 \arguments{
@@ -98,6 +98,15 @@ registered_UCSC_genomes()
     only the \code{chrom}, \code{size}, and \code{circular} columns of
     the data frame are used to make the \link{Seqinfo} object. All the
     other columns are ignored (and lost).
+    }
+  \item{organism}{
+    When \code{organism} is specified, \code{registered_UCSC_genomes()}
+    will only return the subset of assemblies that are registered for that
+    organism.
+    \code{organism} must be specified as a single string and will be used
+    to perform a search (with \code{grep()}) on the \code{"organism"} column
+    of the data frame returned by \code{registered_UCSC_genomes()}.
+    The search is case-insensitive.
   }
 }
 
