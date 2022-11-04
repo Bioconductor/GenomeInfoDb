@@ -102,7 +102,7 @@ registered_UCSC_genomes(organism=NA)
     }
   \item{organism}{
     When \code{organism} is specified, \code{registered_UCSC_genomes()}
-    will only return the subset of assemblies that are registered for that
+    will only return the subset of genomes that are registered for that
     organism.
     \code{organism} must be specified as a single string and will be used
     to perform a search (with \code{grep()}) on the \code{"organism"} column
@@ -243,6 +243,12 @@ getChromInfoFromUCSC("bosTau9", assembled.molecules.only=TRUE)
 ## --- List of UCSC genomes currently registered in the package ---
 
 registered_UCSC_genomes()
+
+## All registered UCSC genomes for Felis catus (domestic cat):
+registered_UCSC_genomes(organism = Felis catus")
+
+## All registered UCSC genomes for Homo sapiens:
+registered_UCSC_genomes("homo")
 
 ## ---------------------------------------------------------------------
 ## B. USING getChromInfoFromUCSC() TO SET UCSC SEQUENCE NAMES ON THE

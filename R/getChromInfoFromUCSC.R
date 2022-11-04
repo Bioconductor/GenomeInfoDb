@@ -622,8 +622,8 @@ registered_UCSC_genomes <- function(organism=NA)
     oo <- order(DF$organism, as.integer(genome_trailing_digits))
     DF <- DF[oo, , drop=FALSE]
     if (!is.na(organism)) {
-      keep_idx <- grep(organism, DF$organism, ignore.case=TRUE)
-      DF <- DF[keep_idx, , drop=FALSE]
+        keep_idx <- grep(organism, DF$organism, ignore.case=TRUE)
+        DF <- DF[keep_idx, , drop=FALSE]
     }
     as.data.frame(DF)
 }
