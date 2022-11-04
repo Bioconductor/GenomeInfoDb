@@ -562,8 +562,10 @@
          ENSEMBL_LINKER=ENSEMBL_LINKER)
 }
 
-registered_UCSC_genomes <- function()
+registered_UCSC_genomes <- function(organism=NA)
 {
+    if (!isSingleStringOrNA(organism))
+        stop(wmsg("'organism' must be a single string or NA"))
     dir_path <- system.file("registered", "UCSC_genomes",
                              package="GenomeInfoDb")
     file_paths <- list.files(dir_path, pattern="\\.R$", full.names=TRUE)
@@ -615,10 +617,15 @@ registered_UCSC_genomes <- function()
     }
 
     listData <- lapply(setNames(seq_along(colnames), colnames), make_col)
-    ans <- S4Vectors:::new_DataFrame(listData, nrows=length(assemblies))
-    genome_trailing_digits <- sub("(.*[^0-9])([0-9]*)$", "\\2", ans$genome)
-    oo <- order(ans$organism, as.integer(genome_trailing_digits))
-    as.data.frame(ans[oo, , drop=FALSE])
+    DF <- S4Vectors:::new_DataFrame(listData, nrows=length(assemblies))
+    genome_trailing_digits <- sub("(.*[^0-9])([0-9]*)$", "\\2", DF$genome)
+    oo <- order(DF$organism, as.integer(genome_trailing_digits))
+    DF <- DF[oo, , drop=FALSE]
+    if (!is.na(organism)) {
+        keep_idx <- grep(organism, DF$organism, ignore.case=TRUE)
+        DF <- DF[keep_idx, , drop=FALSE]
+    }
+    as.data.frame(DF)
 }
 
 
