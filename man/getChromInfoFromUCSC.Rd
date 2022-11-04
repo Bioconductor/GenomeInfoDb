@@ -245,7 +245,7 @@ getChromInfoFromUCSC("bosTau9", assembled.molecules.only=TRUE)
 registered_UCSC_genomes()
 
 ## All registered UCSC genomes for Felis catus (domestic cat):
-registered_UCSC_genomes(organism = Felis catus")
+registered_UCSC_genomes(organism = "Felis catus")
 
 ## All registered UCSC genomes for Homo sapiens:
 registered_UCSC_genomes("homo")
