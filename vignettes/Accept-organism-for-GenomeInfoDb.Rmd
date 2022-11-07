@@ -11,7 +11,10 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 output:
-  BiocStyle::html_document
+  BiocStyle::html_document:
+  number_sections: yes
+  toc: yes
+  toc_depth: 4
 ---
 
 This document is meant for package developers wanting to submit an organism which does not already exist in [*GenomeInfoDb*](http://bioconductor.org/packages/release/bioc/html/GenomeInfoDb.html), to be a part of [*GenomeInfoDb*](http://bioconductor.org/packages/release/bioc/html/GenomeInfoDb.html).
@@ -33,7 +36,7 @@ names(genomeStyles())
 
 If your favorite organism does not exist in the above list, one can submit a tab-delimited file in the following format and request for your organism to be added to [*GenomeInfoDb*](http://bioconductor.org/packages/release/bioc/html/GenomeInfoDb.html)
 
-1.  The file name should be in the following format:
+1.  The file name should be in the following format: \'genus\\\_{}species.txt\'
 
 2.  The columns should be tab-delimited in the following order
 
