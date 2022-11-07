@@ -562,8 +562,10 @@
          ENSEMBL_LINKER=ENSEMBL_LINKER)
 }
 
-registered_UCSC_genomes <- function()
+registered_UCSC_genomes <- function(organism=NA)
 {
+    if (!isSingleStringOrNA(organism))
+        stop(wmsg("'organism' must be a single string or NA"))
     dir_path <- system.file("registered", "UCSC_genomes",
                              package="GenomeInfoDb")
     file_paths <- list.files(dir_path, pattern="\\.R$", full.names=TRUE)
@@ -615,10 +617,15 @@ registered_UCSC_genomes <- function()
     }
 
     listData <- lapply(setNames(seq_along(colnames), colnames), make_col)
-    ans <- S4Vectors:::new_DataFrame(listData, nrows=length(assemblies))
-    genome_trailing_digits <- sub("(.*[^0-9])([0-9]*)$", "\\2", ans$genome)
-    oo <- order(ans$organism, as.integer(genome_trailing_digits))
-    as.data.frame(ans[oo, , drop=FALSE])
+    DF <- S4Vectors:::new_DataFrame(listData, nrows=length(assemblies))
+    genome_trailing_digits <- sub("(.*[^0-9])([0-9]*)$", "\\2", DF$genome)
+    oo <- order(DF$organism, as.integer(genome_trailing_digits))
+    DF <- DF[oo, , drop=FALSE]
+    if (!is.na(organism)) {
+        keep_idx <- grep(organism, DF$organism, ignore.case=TRUE)
+        DF <- DF[keep_idx, , drop=FALSE]
+    }
+    as.data.frame(DF)
 }
 
 
@@ -847,6 +854,14 @@ registered_UCSC_genomes <- function()
     ans
 }
 
+.make_Seqinfo_from_UCSC_chrominfo <- function(chrominfo, genome=NA)
+{
+    Seqinfo(seqnames=chrominfo[ , "chrom"],
+            seqlengths=chrominfo[ , "size"],
+            isCircular=chrominfo[ , "circular"],
+            genome=genome)
+}
+
 ### By default, return a "raw" chrom info data.frame, that is, a 4-column
 ### data.frame with columns "chrom" (character), "size" (integer),
 ### "assembled" (logical), and "circular" (logical).
@@ -902,12 +917,107 @@ getChromInfoFromUCSC <- function(genome,
                     recache=recache)
     }
 
-    if (!as.Seqinfo)
-        return(ans)
-    Seqinfo(seqnames=ans[ , "chrom"],
-            seqlengths=ans[ , "size"],
-            isCircular=ans[ , "circular"],
-            genome=genome)
+    if (as.Seqinfo)
+        ans <- .make_Seqinfo_from_UCSC_chrominfo(ans, genome=genome)
+    ans
+}
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### get_and_fix_chrom_info_from_UCSC()
+###
+### A wrapper to getChromInfoFromUCSC() that tries to improve handling of
+### non-registered genomes by:
+### - ordering the sequences based on the heuristic implemented in
+###   rankSeqlevels()/orderSeqlevels()
+### - warning the user about the circularity flags being just a guess
+###   if the caller doesn't supply 'circ_seqs'
+### To use in higher-level functions like makeTxDbFromUCSC() in the
+### GenomicFeatures package.
+
+.warn_about_circularity_guess <- function(genome, circ_seqs,
+                                          warning_tip1="", warning_tip2="")
+{
+    if (length(circ_seqs) == 0L) {
+        guess <- c("no sequence in ", genome , " is circular")
+    } else if (length(circ_seqs) == 1L) {
+        guess <- c("sequence ", circ_seqs, " is circular")
+    } else {
+        in1string <- paste(circ_seqs, collapse=", ")
+        guess <- c(length(circ_seqs), " sequences (",
+                   in1string, ") are circular")
+    }
+    warning(wmsg("UCSC genome ", genome, " is not registered in the ",
+                 "GenomeInfoDb package (see '?registered_UCSC_genomes'), ",
+                 "so we made the following guess about this genome: ",
+                 guess, ". ", warning_tip1),
+            "\n  ",
+            wmsg("If you believe that this guess is incorrect, please ",
+                 "let us know by opening an issue at:"),
+            "\n      https://github.com/Bioconductor/GenomeInfoDb\n  ",
+            wmsg("In the meantime, you can supply your own list of circular ",
+                 "sequences (as a character vector) via the 'circ_seqs' ",
+                 "argument. ", warning_tip2))
+}
+
+### 'warning_tip1' and 'warning_tip2' must be single strings. They will be
+### added to the warning that we will issue if getChromInfoFromUCSC() had
+### to guess the circularity flags.
+get_and_fix_chrom_info_from_UCSC <- function(genome,
+    ...,
+    as.Seqinfo=FALSE,
+    circ_seqs=NULL,
+    warning_tip1="",
+    warning_tip2="")
+{
+    if (!isSingleString(genome))
+        stop(wmsg("'genome' must be a single string"))
+    if (!isTRUEorFALSE(as.Seqinfo))
+        stop(wmsg("'as.Seqinfo' must be TRUE or FALSE"))
+    if (!isSingleString(warning_tip1))
+        stop(wmsg("'warning_tip1' must be a single string"))
+    if (!isSingleString(warning_tip2))
+        stop(wmsg("'warning_tip2' must be a single string"))
+
+    UCSC_genomes <- registered_UCSC_genomes()[ , "genome"]
+    is_registered <- genome %in% UCSC_genomes
+
+    ans <- getChromInfoFromUCSC(genome, ..., as.Seqinfo=FALSE)
+    if (!is_registered) {
+        oo <- orderSeqlevels(ans[ , "chrom"])
+        ans <- S4Vectors:::extract_data_frame_rows(ans, oo)
+    }
+    seqlevels <- ans[ , "chrom"]
+    if (!is.null(circ_seqs)) {
+        ## The user supplied 'circ_seqs', so we use their input to infer the
+        ## circularity flags.
+        ## Note that the user would typically supply 'circ_seqs' when the
+        ## genome is NOT registered. In the case of a registered genome,
+        ## they don't need to do this, because, in this case, the circularity
+        ## flags returned by getChromInfoFromUCSC() should be accurate (they
+        ## were manually curated). However, if the user does supply the
+        ## 'circ_seqs' for a registered genome, we assume that they know
+        ## what they are doing, so we still use their input to replace the
+        ## circularity flags returned by getChromInfoFromUCSC().
+        ans[ , "circular"] <- make_circ_flags_from_circ_seqs(
+                                              seqlevels,
+                                              circ_seqs=circ_seqs)
+    } else if (!is_registered) {
+        ## The user did NOT supply 'circ_seqs'. And also because 'genome'
+        ## is NOT a registered UCSC genome, getChromInfoFromUCSC() had to
+        ## guess the circularity flags that it returned in 'ans'. Note
+        ## that this uncertainty about the circularity flags is reflected
+        ## in the presence of NA's instead of FALSE's in 'ans[ , "circular"]'.
+        ## In addition to those NA's (which are easy to miss), we also warn
+        ## the user about this guess with an explicit warning.
+        circ_seqs <- seqlevels[which(ans[ , "circular"])]
+        .warn_about_circularity_guess(genome, circ_seqs,
+                                      warning_tip1, warning_tip2)
+    }
+
+    if (as.Seqinfo)
+        ans <- .make_Seqinfo_from_UCSC_chrominfo(ans, genome=genome)
+    ans
 }
 
 
