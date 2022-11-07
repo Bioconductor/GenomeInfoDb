@@ -97,7 +97,7 @@ fetch_assembly_summary <- function(genbank_or_refseq, quiet=FALSE)
         "gbrs_paired_asm", "paired_asm_comp", "ftp_path",
         "excluded_from_refseq")
     if (!identical(expected_colnames, colnames(ans)))
-        stop(url, " does not contain the expected fields")
+        stop(wmsg(url, " does not contain the expected fields"))
     colnames(ans)[1L] <- "assembly_accession"
     .check_assembly_summary(ans, genbank_or_refseq)
     assign(objname, ans, envir=.assembly_summary_cache)
@@ -133,7 +133,7 @@ fetch_assembly_summary <- function(genbank_or_refseq, quiet=FALSE)
     refseq_accession <- ans[ , "refseq_accession"]
     if (anyDuplicated(genbank_accession, incomparables=NA)
      || anyDuplicated(refseq_accession, incomparables=NA))
-        stop("GenomeInfoDb internal error")
+        stop(wmsg("GenomeInfoDb internal error"))
 
     m1 <- match(genbank_accession, genbank_accession0)
     m2 <- match(refseq_accession, refseq_accession0)
@@ -211,59 +211,7 @@ build_and_save_assembly_accessions_table <- function(dir=".", quiet=FALSE)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### .find_assembly_ftp_dir()
-###
-
-.find_assembly_ftp_dir <- function(assembly_accession, assembly_name=NA)
-{
-    assembly_accession <- .normarg_assembly_accession(assembly_accession)
-    if (!isSingleStringOrNA(assembly_name))
-        stop("'assembly_name' must be a single string or NA")
-    prefix <- substr(assembly_accession,
-                     1L, nchar(.GENBANK_ASSEMBLY_ACCESSION_PREFIX))
-    if (prefix == .GENBANK_ASSEMBLY_ACCESSION_PREFIX) {
-        url <- "GCA"
-    } else if (prefix == .REFSEQ_ASSEMBLY_ACCESSION_PREFIX) {
-        url <- "GCF"
-    } else {
-        stop(wmsg("unable to find FTP dir for assembly ", assembly_accession))
-    }
-    parts_end <- nchar(prefix) + (1:3) * 3L
-    parts <- substring(assembly_accession, parts_end - 2L, parts_end)
-    url <- paste0(.NCBI_ALL_ASSEMBLY_URL, "/", url, "/",
-                  paste0(parts, collapse="/"), "/")
-    listing <- list_ftp_dir(url)
-    idx <- which(paste0(assembly_accession, "_") ==
-                 substr(listing, 1L, nchar(assembly_accession)+1L))
-    if (length(idx) == 0L)
-        stop(wmsg("unable to find FTP dir for assembly ", assembly_accession))
-    if (length(idx) > 1L) {
-        if (is.na(assembly_name))
-            stop(wmsg("More than one FTP dir found for assembly ",
-                      assembly_accession, ":"),
-                 "\n",
-                 paste0("    - ", listing[idx], "\n"),
-                 "  ",
-                 wmsg("Please specify the name of the assembly (via ",
-                      "the 'assembly_name' argument) in addition to ",
-                      "its accession."))
-        subdir <- paste0(assembly_accession, "_", assembly_name)
-        idx <- which(subdir == listing)
-        if (length(idx) == 0L)
-            stop(wmsg("unable to find FTP dir for assembly ",
-                      assembly_accession, " (", assembly_name, ")"))
-        if (length(idx) > 1L)  # should never happen
-            stop(wmsg("more than one FTP dir found for assembly ",
-                      assembly_accession))
-    }
-    c(url, listing[[idx]])
-}
-
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### fetch_assembly_report()
-###
-### This is the workhorse behind getChromInfoFromNCBI().
+### .lookup_refseq_assembly_accession()
 ###
 
 ### 'assembly_accession' can be:
@@ -297,8 +245,8 @@ build_and_save_assembly_accessions_table <- function(dir=".", quiet=FALSE)
     if (length(idx) == 1L)
         return(assembly_accessions[idx , "refseq_accession"])
     if (length(idx) >= 2L)
-        stop("more than one RefSeq assembly accession found for ",
-             "\"", assembly_accession, "\"")
+        stop(wmsg("more than one RefSeq assembly accession found for ",
+                  "\"", assembly_accession, "\""))
 
     ## Fuzzy match.
     warning("No RefSeq assembly accession found for ",
@@ -310,11 +258,71 @@ build_and_save_assembly_accessions_table <- function(dir=".", quiet=FALSE)
     if (length(idx) == 1L)
         return(assembly_accessions[idx, "refseq_accession"])
     if (length(idx) >= 2L)
-        stop("more than one RefSeq assembly accession found for regular ",
-             "expression \"", assembly_accession, "\"")
+        stop(wmsg("more than one RefSeq assembly accession found for ",
+                  "regular expression \"", assembly_accession, "\""))
 
     NA_character_
 }
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### find_NCBI_assembly_ftp_dir()
+###
+
+### Return a length-2 character vector. The 1st element in the vector is the
+### URL to the FTP dir and the 2nd element the prefix of all the files in the
+### FTP dir.
+find_NCBI_assembly_ftp_dir <- function(assembly_accession, assembly_name=NA)
+{
+    if (!isSingleString(assembly_accession))
+        stop(wmsg("'assembly_accession' must be a single string"))
+    if (.is_genbank_assembly_accession(assembly_accession)) {
+        url <- "GCA"
+    } else if (.is_refseq_assembly_accession(assembly_accession)) {
+        url <- "GCF"
+    } else {
+        stop(wmsg("malformed assembly accession: ", assembly_accession))
+    }
+    if (!isSingleStringOrNA(assembly_name))
+        stop(wmsg("'assembly_name' must be a single string or NA"))
+    parts_end <- 4L + (1:3) * 3L
+    parts <- substring(assembly_accession, parts_end - 2L, parts_end)
+    url <- paste0(.NCBI_ALL_ASSEMBLY_URL, "/", url, "/",
+                  paste0(parts, collapse="/"), "/")
+    listing <- list_ftp_dir(url)
+    idx <- which(paste0(assembly_accession, "_") ==
+                 substr(listing, 1L, nchar(assembly_accession)+1L))
+    if (length(idx) == 0L)
+        stop(wmsg("unable to find FTP dir for assembly ", assembly_accession))
+    if (length(idx) > 1L) {
+        if (is.na(assembly_name))
+            stop(wmsg("More than one FTP dir found for assembly ",
+                      assembly_accession, ":"),
+                 "\n",
+                 paste0("    - ", listing[idx], "\n"),
+                 "  ",
+                 wmsg("Please specify the name of the assembly (via ",
+                      "the 'assembly_name' argument) in addition to ",
+                      "its accession."))
+        subdir <- paste0(assembly_accession, "_", assembly_name)
+        idx <- which(subdir == listing)
+        if (length(idx) == 0L)
+            stop(wmsg("unable to find FTP dir for assembly ",
+                      assembly_accession, " (", assembly_name, ")"))
+        if (length(idx) > 1L)  # should never happen
+            stop(wmsg("more than one FTP dir found for assembly ",
+                      assembly_accession))
+    }
+    prefix <- listing[[idx]]
+    c(paste0(url, prefix), prefix)
+}
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### fetch_assembly_report()
+###
+### This is the workhorse behind getChromInfoFromNCBI().
+###
 
 ### 'assembly_accession' can be:
 ###   (a) a GenBank assembly accession (e.g. "GCA_000001405.15");
@@ -328,18 +336,17 @@ build_and_save_assembly_accessions_table <- function(dir=".", quiet=FALSE)
     accession0 <- assembly_accession
     assembly_accession <- .lookup_refseq_assembly_accession(accession0)
     if (is.na(assembly_accession))
-        stop("cannot find a RefSeq assembly accession for \"",
-             accession0, "\"")
+        stop(wmsg("cannot find a RefSeq assembly accession for \"",
+                  accession0, "\""))
     assembly_accession
 }
 
 ### Returns https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/405/GCA_000001405.15_GRCh38/GCA_000001405.15_GRCh38_assembly_report.txt for GCA_000001405.15
 .form_assembly_report_url <- function(assembly_accession, assembly_name=NA)
 {
-    ftp_dir <- .find_assembly_ftp_dir(assembly_accession,
-                                      assembly_name=assembly_name)
-    paste0(ftp_dir[[1L]], ftp_dir[[2L]], "/",
-           ftp_dir[[2L]], "_assembly_report.txt")
+    ftp_dir <- find_NCBI_assembly_ftp_dir(assembly_accession,
+                                          assembly_name=assembly_name)
+    paste0(ftp_dir[[1L]], "/", ftp_dir[[2L]], "_assembly_report.txt")
 }
 
 .fetch_assembly_report_from_url <- function(url)
@@ -354,9 +361,10 @@ build_and_save_assembly_accessions_table <- function(dir=".", quiet=FALSE)
     fetch_table_from_url(url, colnames=colnames, comment.char="#")
 }
 
-### See .normarg_assembly_accession() for how 'assembly_accession' can be
-### specified. In addition, here 'assembly_accession' can be the URL to an
-### assembly report (a.k.a. full sequence report). Examples of such URLs:
+### See .normarg_assembly_accession() above for how 'assembly_accession'
+### can be specified. In addition, here 'assembly_accession' can be the URL
+### to an assembly report (a.k.a. "full sequence report"). Examples of such
+### URLs:
 ###   ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/All/GCF_000001405.26.assembly.txt
 ###   ftp://ftp.ncbi.nlm.nih.gov/genbank/genomes/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh38/GCA_000001405.15_GRCh38_assembly_report.txt
 ### Note that the 2 URls above both point to the assembly report for GRCh38,
@@ -366,12 +374,13 @@ fetch_assembly_report <- function(assembly_accession, assembly_name=NA,
                                   AssemblyUnits=NULL)
 {
     if (!isSingleString(assembly_accession))
-        stop("'assembly_accession' must be a single string")
+        stop(wmsg("'assembly_accession' must be a single string"))
     if (!isSingleStringOrNA(assembly_name))
-        stop("'assembly_name' must be a single string or NA")
+        stop(wmsg("'assembly_name' must be a single string or NA"))
     if (grepl("://", assembly_accession, fixed=TRUE)) {
         report_url <- assembly_accession
     } else {
+        assembly_accession <- .normarg_assembly_accession(assembly_accession)
         report_url <- .form_assembly_report_url(assembly_accession,
                                                 assembly_name=assembly_name)
     }

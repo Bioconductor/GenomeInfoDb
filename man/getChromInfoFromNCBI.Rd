@@ -1,7 +1,7 @@
 \name{getChromInfoFromNCBI}
 
-\alias{getChromInfoFromNCBI}
 \alias{registered_NCBI_assemblies}
+\alias{getChromInfoFromNCBI}
 
 \title{
   Get chromosome information for an NCBI assembly
