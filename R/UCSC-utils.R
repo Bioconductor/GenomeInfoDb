@@ -24,13 +24,30 @@ fetch_table_from_UCSC_database <- function(genome, table, col2class,
 ### fetch_chrom_sizes_from_UCSC()
 ###
 
+.check_chrom_sizes <- function(chrom_sizes, in_what)
+{
+    chroms <- chrom_sizes[ , "chrom"]
+    if (!is_primary_key(chroms))
+        stop(wmsg("invalid data in ", in_what, ": ",
+                  "\"chrom\" column contains NAs, empty strings, ",
+                  "or duplicates"))
+    sizes <- chrom_sizes[ , "size"]
+    if (anyNA(sizes) || any(sizes < 0L))
+        stop(wmsg("invalid data in ", in_what, ": ",
+                  "\"size\" column contains NAs or negative values"))
+}
+
 .fetch_chrom_sizes_from_UCSC_database <- function(genome,
     goldenPath.url=getOption("UCSC.goldenPath.url"))
 {
     col2class <- c(chrom="character", size="integer", fileName="NULL")
-    fetch_table_from_UCSC_database(genome, "chromInfo",
-                                   col2class=col2class,
-                                   goldenPath.url=goldenPath.url)
+    ans <- fetch_table_from_UCSC_database(genome, "chromInfo",
+                                          col2class=col2class,
+                                          goldenPath.url=goldenPath.url)
+    ## Some sanity checks that should never fail.
+    in_what <- paste0("\"chromInfo\" table for UCSC genome ", genome)
+    .check_chrom_sizes(ans, in_what)
+    ans
 }
 
 .fetch_chrom_sizes_from_UCSC_bigZips <- function(genome, use.latest=FALSE,
@@ -42,7 +59,12 @@ fetch_table_from_UCSC_database <- function(genome, table, col2class,
         url <- paste(url, "latest", sep="/")
     url <- paste(url, filename, sep="/")
     col2class <- c(chrom="character", size="integer")
-    fetch_table_from_url(url, colnames=names(col2class), col2class=col2class)
+    ans <- fetch_table_from_url(url, colnames=names(col2class),
+                                     col2class=col2class)
+    ## Some sanity checks that should never fail.
+    in_what <- paste0("UCSC file ", filename)
+    .check_chrom_sizes(ans, in_what)
+    ans
 }
 
 ### UCSC chrom sizes can be fetched from two locations:
@@ -80,16 +102,6 @@ fetch_chrom_sizes_from_UCSC <- function(genome,
                                   use.latest=use_latest,
                                   goldenPath.url=goldenPath.url)
     }
-    ## Should never happen!
-    ans_chroms <- ans[ , "chrom"]
-    if (!is_primary_key(ans_chroms))
-        stop(wmsg("invalid data in \"chromInfo\" table for UCSC genome ",
-                  genome, ": \"chrom\" column contains NAs, empty strings, ",
-                  "or duplicates"))
-    ans_sizes <- ans[ , "size"]
-    if (anyNA(ans_sizes) || any(ans_sizes < 0L))
-        stop(wmsg("invalid data in \"chromInfo\" table for UCSC genome ",
-                  genome, ": \"size\" column contains NAs or negative values"))
     ans
 }
 
