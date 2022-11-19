@@ -18,9 +18,8 @@ find_NCBI_assembly_ftp_dir(assembly_accession, assembly_name=NA)
 \arguments{
   \item{assembly_accession}{
     A single string containing a GenBank assembly accession (e.g.
-    \code{"GCA_000001405.15"}), a RefSeq assembly accession (e.g.
-    \code{"GCF_000001405.26"}), or an NCBI assembly name (e.g.
-    \code{"GRCh38"}).
+    \code{"GCA_000001405.15"}) or a RefSeq assembly accession (e.g.
+    \code{"GCF_000001405.26"}).
   }
   \item{assembly_name}{
     A single string or \code{NA}.
