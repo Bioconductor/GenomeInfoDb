@@ -20,6 +20,8 @@ Authors@R: c(
 		email="hpages.on.github@gmail.com"),
 	person("Prisca Chidimma", "Maduka", role="ctb"),
 	person("Atuhurira Kirabo", "Kakopo", role="ctb"),
+	person("Haleema", "Khan", role="ctb",
+		comment="vignette translation from Sweave to Rmarkdown / HTML"),
 	person("Emmanuel Chigozie", "Elendu", role="ctb"))
 Depends: R (>= 4.0.0), methods, BiocGenerics (>= 0.37.0),
 	S4Vectors (>= 0.25.12), IRanges (>= 2.13.12)

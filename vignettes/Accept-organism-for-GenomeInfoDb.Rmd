@@ -1,0 +1,75 @@
+---
+title: "Submitting your organism to GenomeInfoDb"
+author:
+- name: "Sonali Arora"
+- name: "H. Khan"
+  affiliation: "Vignette translation from Sweave to Rmarkdown / HTML"
+date: "Modified: 16 January 2013; Compiled: `r format(Sys.time(), '%d %B, %Y')`"
+package: GenomeInfoDb
+vignette: >
+  %\VignetteIndexEntry{Submitting your organism to GenomeInfoDb}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+output:
+  BiocStyle::html_document:
+  number_sections: true
+  toc: true
+  toc_depth: 4
+---
+
+This document is meant for package developers wanting to submit an organism
+which does not already exist in `r Biocpkg("GenomeInfoDb")`, to be a part of
+`r Biocpkg("GenomeInfoDb")`.
+
+# Background
+
+*GenomeInfoDb* provides a multitude of functions to subset and access seqName
+mappings and styles associated with an organism. One can use the supplementary
+manual "GenomeInfoDb.pdf" to see such functions. Alternately if there is no
+support for an organism for one's choice, one can submit a tab delimited file
+(as detailed by the sections below) to request their favorite organism to become
+a part of GenomeInfoDb package.
+
+# Support for existing organisms
+
+GenomeInfoDb already provides support for a multitude of organisms, to see a
+detailed list of organism and the supported seqname styles associated with those
+organism, one can simply run :
+
+```{r message=FALSE}
+library(GenomeInfoDb)
+names(genomeStyles())
+```
+
+# File format for new organism
+
+If your favorite organism does not exist in the above list, one can submit a tab
+delimited file in the following format and request for your organism to be added
+to `r Biocpkg("GenomeInfoDb")`
+
+1.  The file name should be in the following format: `genus\_{}species.txt`
+
+2.  The columns should be tab-delimited in the following order
+
+    -   circular
+    -   auto
+    -   sex
+    -   1 column per seqname style and 1 row per chromosome name (not all
+    chromosomes of a given organism necessarily belong to the mapping) where
+    circular denotes all the circular chromosomes, auto denotes all the
+    autosomes and sex denotes all the allosomes or sex chromosomes.
+
+3.  The entries should be in T/F format for columns circular, auto and sex.
+
+# Example File
+
+One can look at existing organism files under GenomeInfoDb/extdata/dataFiles in
+their R/library to get a further idea about the format of files.
+
+# Contacting us with your new file
+
+Once your file is ready, Please send your file to:
+
+```{r}
+packageDescription("GenomeInfoDb")$Maintainer
+```
