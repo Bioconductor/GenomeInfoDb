@@ -2,14 +2,14 @@
 ### Some low-level utilities to fetch data from NCBI
 ### -------------------------------------------------------------------------
 ###
-### Nothing in this file is exported.
+### Unless stated otherwise, nothing in this file is exported.
 ###
 
 
 .NCBI_ASSEMBLY_REPORTS_URL <-
     "https://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/"
 
-.NCBI_ALL_ASSEMBLY_URL <- "ftp://ftp.ncbi.nlm.nih.gov/genomes/all"
+.NCBI_ALL_ASSEMBLY_FTP_DIR <- "ftp.ncbi.nlm.nih.gov/genomes/all"
 .GENBANK_ASSEMBLY_ACCESSION_PREFIX <- "GCA_"
 .REFSEQ_ASSEMBLY_ACCESSION_PREFIX <- "GCF_"
 
@@ -268,6 +268,17 @@ build_and_save_assembly_accessions_table <- function(dir=".", quiet=FALSE)
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### find_NCBI_assembly_ftp_dir()
 ###
+### This is exported!
+
+.assembly_not_found_msg <- function(shortmsg,
+                                    assembly_accession, assembly_name=NA,
+                                    ftp_dir=.NCBI_ALL_ASSEMBLY_FTP_DIR)
+{
+    msg <- paste0(shortmsg, " for assembly ", assembly_accession)
+    if (!is.na(assembly_name))
+        msg <- paste0(msg, " (", assembly_name, ")")
+    paste0(msg, " in ", ftp_dir, "/")
+}
 
 ### Return a length-2 character vector. The 1st element in the vector is the
 ### URL to the FTP dir and the 2nd element the prefix of all the files in the
@@ -287,34 +298,54 @@ find_NCBI_assembly_ftp_dir <- function(assembly_accession, assembly_name=NA)
         stop(wmsg("'assembly_name' must be a single string or NA"))
     parts_end <- 4L + (1:3) * 3L
     parts <- substring(assembly_accession, parts_end - 2L, parts_end)
-    url <- paste0(.NCBI_ALL_ASSEMBLY_URL, "/", url, "/",
-                  paste0(parts, collapse="/"), "/")
-    listing <- list_ftp_dir(url)
+    ftp_dir <- paste(.NCBI_ALL_ASSEMBLY_FTP_DIR, url,
+                     paste0(parts, collapse="/"), sep="/")
+    listing <- try(list_ftp_dir(ftp_dir), silent=TRUE)
+    if (inherits(listing, "try-error")) {
+        condition <- attr(listing, "condition")
+        if (inherits(condition, "REMOTE_ACCESS_DENIED")) {
+            new_msg <- .assembly_not_found_msg("unable to find FTP dir",
+                                               assembly_accession)
+            condition$message <- wmsg(new_msg)
+        }
+        stop(condition)
+    }
     idx <- which(paste0(assembly_accession, "_") ==
                  substr(listing, 1L, nchar(assembly_accession)+1L))
-    if (length(idx) == 0L)
-        stop(wmsg("unable to find FTP dir for assembly ", assembly_accession))
+    if (length(idx) == 0L) {
+        msg <- .assembly_not_found_msg("unable to find FTP dir",
+                                       assembly_accession, ftp_dir=ftp_dir)
+        stop(wmsg(msg))
+    }
     if (length(idx) > 1L) {
-        if (is.na(assembly_name))
-            stop(wmsg("More than one FTP dir found for assembly ",
-                      assembly_accession, ":"),
+        if (is.na(assembly_name)) {
+            msg <- .assembly_not_found_msg("More than one FTP dir found",
+                                           assembly_accession, ftp_dir=ftp_dir)
+            stop(wmsg(msg, ":"),
                  "\n",
                  paste0("    - ", listing[idx], "\n"),
                  "  ",
                  wmsg("Please specify the name of the assembly (via ",
                       "the 'assembly_name' argument) in addition to ",
                       "its accession."))
+        }
         subdir <- paste0(assembly_accession, "_", assembly_name)
         idx <- which(subdir == listing)
-        if (length(idx) == 0L)
-            stop(wmsg("unable to find FTP dir for assembly ",
-                      assembly_accession, " (", assembly_name, ")"))
-        if (length(idx) > 1L)  # should never happen
-            stop(wmsg("more than one FTP dir found for assembly ",
-                      assembly_accession))
+        if (length(idx) == 0L) {
+            msg <- .assembly_not_found_msg("unable to find FTP dir",
+                                           assembly_accession, assembly_name,
+                                           ftp_dir=ftp_dir)
+            stop(wmsg(msg))
+        }
+        if (length(idx) > 1L) {  # should never happen
+            msg <- .assembly_not_found_msg("more than one FTP dir found",
+                                           assembly_accession, assembly_name,
+                                           ftp_dir=ftp_dir)
+            stop(wmsg(msg))
+        }
     }
     prefix <- listing[[idx]]
-    c(paste0(url, prefix), prefix)
+    c(paste0(ftp_dir, prefix), prefix)
 }
 
 

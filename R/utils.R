@@ -182,20 +182,6 @@ join_dfs <- function(Ldf, Rdf, Lcolumn, Rcolumn,
 ### Other stuff
 ###
 
-### Uses RCurl to access and list the content of an FTP dir.
-list_ftp_dir <- function(url, subdirs.only=FALSE)
-{
-    doc <- getURL(url)
-    listing <- strsplit(doc, "\n", fixed=TRUE)[[1L]]
-    if (subdirs.only)
-        listing <- listing[substr(listing, 1L, 1L) == "d"]
-    ## Keep field no. 8 only
-    pattern <- paste(c("^", rep.int("[^[:space:]]+[[:space:]]+", 8L)),
-                     collapse="")
-    listing <- sub(pattern, "", listing)
-    sub("[[:space:]].*$", "", listing)
-}
-
 ### Provides a simpler interface to read.table().
 simple_read_table <- function(file,
                               header=FALSE, colnames=NULL, col2class=NULL,

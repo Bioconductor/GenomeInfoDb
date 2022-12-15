@@ -9,7 +9,7 @@ biocViews: Genetics, DataRepresentation, Annotation, GenomeAnnotation
 URL: https://bioconductor.org/packages/GenomeInfoDb
 Video: http://youtu.be/wdEjCYSXa7w
 BugReports: https://github.com/Bioconductor/GenomeInfoDb/issues
-Version: 1.35.7
+Version: 1.35.8
 License: Artistic-2.0
 Encoding: UTF-8
 Authors@R: c(
@@ -35,6 +35,7 @@ Suggests: GenomicRanges, Rsamtools, GenomicAlignments, GenomicFeatures,
 	RUnit, BiocStyle, knitr
 VignetteBuilder: knitr
 Collate: utils.R
+	list_ftp_dir.R
 	rankSeqlevels.R
 	NCBI-utils.R
 	UCSC-utils.R
