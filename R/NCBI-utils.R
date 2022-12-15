@@ -9,7 +9,7 @@
 .NCBI_ASSEMBLY_REPORTS_URL <-
     "https://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/"
 
-.NCBI_ALL_ASSEMBLY_FTP_DIR <- "ftp.ncbi.nlm.nih.gov/genomes/all"
+.NCBI_ALL_ASSEMBLY_FTP_DIR <- "https://ftp.ncbi.nlm.nih.gov/genomes/all/"
 .GENBANK_ASSEMBLY_ACCESSION_PREFIX <- "GCA_"
 .REFSEQ_ASSEMBLY_ACCESSION_PREFIX <- "GCF_"
 
@@ -270,14 +270,15 @@ build_and_save_assembly_accessions_table <- function(dir=".", quiet=FALSE)
 ###
 ### This is exported!
 
-.assembly_not_found_msg <- function(shortmsg,
-                                    assembly_accession, assembly_name=NA,
-                                    ftp_dir=.NCBI_ALL_ASSEMBLY_FTP_DIR)
+.assembly_not_found_msg <- function(shortmsg, assembly_accession,
+                                    assembly_name=NA, ftp_dir=NA)
 {
     msg <- paste0(shortmsg, " for assembly ", assembly_accession)
     if (!is.na(assembly_name))
         msg <- paste0(msg, " (", assembly_name, ")")
-    paste0(msg, " in ", ftp_dir, "/")
+    if (!is.na(ftp_dir))
+        msg <- paste0(msg, " in ", ftp_dir)
+    msg
 }
 
 ### Return a length-2 character vector. The 1st element in the vector is the
@@ -288,24 +289,25 @@ find_NCBI_assembly_ftp_dir <- function(assembly_accession, assembly_name=NA)
     if (!isSingleString(assembly_accession))
         stop(wmsg("'assembly_accession' must be a single string"))
     if (.is_genbank_assembly_accession(assembly_accession)) {
-        url <- "GCA"
+        GCA_or_GCF <- "GCA"
     } else if (.is_refseq_assembly_accession(assembly_accession)) {
-        url <- "GCF"
+        GCA_or_GCF <- "GCF"
     } else {
         stop(wmsg("malformed assembly accession: ", assembly_accession))
     }
     if (!isSingleStringOrNA(assembly_name))
         stop(wmsg("'assembly_name' must be a single string or NA"))
+    GCA_or_GCF_ftp_dir <- paste0(.NCBI_ALL_ASSEMBLY_FTP_DIR, GCA_or_GCF, "/")
     parts_end <- 4L + (1:3) * 3L
     parts <- substring(assembly_accession, parts_end - 2L, parts_end)
-    ftp_dir <- paste(.NCBI_ALL_ASSEMBLY_FTP_DIR, url,
-                     paste0(parts, collapse="/"), sep="/")
+    ftp_dir <- paste0(GCA_or_GCF_ftp_dir, paste0(parts, collapse="/"), "/")
     listing <- try(list_ftp_dir(ftp_dir), silent=TRUE)
     if (inherits(listing, "try-error")) {
         condition <- attr(listing, "condition")
         if (inherits(condition, "REMOTE_ACCESS_DENIED")) {
             new_msg <- .assembly_not_found_msg("unable to find FTP dir",
-                                               assembly_accession)
+                                               assembly_accession,
+                                               ftp_dir=GCA_or_GCF_ftp_dir)
             condition$message <- wmsg(new_msg)
         }
         stop(condition)
@@ -314,13 +316,15 @@ find_NCBI_assembly_ftp_dir <- function(assembly_accession, assembly_name=NA)
                  substr(listing, 1L, nchar(assembly_accession)+1L))
     if (length(idx) == 0L) {
         msg <- .assembly_not_found_msg("unable to find FTP dir",
-                                       assembly_accession, ftp_dir=ftp_dir)
+                                       assembly_accession,
+                                       ftp_dir=ftp_dir)
         stop(wmsg(msg))
     }
     if (length(idx) > 1L) {
         if (is.na(assembly_name)) {
             msg <- .assembly_not_found_msg("More than one FTP dir found",
-                                           assembly_accession, ftp_dir=ftp_dir)
+                                           assembly_accession,
+                                           ftp_dir=ftp_dir)
             stop(wmsg(msg, ":"),
                  "\n",
                  paste0("    - ", listing[idx], "\n"),
@@ -333,13 +337,15 @@ find_NCBI_assembly_ftp_dir <- function(assembly_accession, assembly_name=NA)
         idx <- which(subdir == listing)
         if (length(idx) == 0L) {
             msg <- .assembly_not_found_msg("unable to find FTP dir",
-                                           assembly_accession, assembly_name,
+                                           assembly_accession,
+                                           assembly_name=assembly_name,
                                            ftp_dir=ftp_dir)
             stop(wmsg(msg))
         }
         if (length(idx) > 1L) {  # should never happen
             msg <- .assembly_not_found_msg("more than one FTP dir found",
-                                           assembly_accession, assembly_name,
+                                           assembly_accession,
+                                           assembly_name=assembly_name,
                                            ftp_dir=ftp_dir)
             stop(wmsg(msg))
         }

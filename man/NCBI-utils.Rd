@@ -17,9 +17,9 @@ find_NCBI_assembly_ftp_dir(assembly_accession, assembly_name=NA)
 
 \arguments{
   \item{assembly_accession}{
-    A single string containing a GenBank assembly accession (e.g.
-    \code{"GCA_000001405.15"}) or a RefSeq assembly accession (e.g.
-    \code{"GCF_000001405.26"}).
+    A single string containing either a GenBank assembly accession
+    (e.g. \code{"GCA_000001405.15"}) or a RefSeq assembly accession
+    (e.g. \code{"GCF_000001405.26"}).
   }
   \item{assembly_name}{
     A single string or \code{NA}.
@@ -27,9 +27,13 @@ find_NCBI_assembly_ftp_dir(assembly_accession, assembly_name=NA)
 }
 
 \value{
-  A length-2 character vector. The 1st element in the vector is the
-  URL to the FTP dir and the 2nd element the prefix used for the names
-  of all the files in the FTP dir.
+  A length-2 character vector:
+  \itemize{
+    \item The 1st element in the vector is the URL to the FTP dir,
+          without the trailing slash.
+    \item The the 2nd element in the vector is the prefix used for
+          the names of all the files in the FTP dir.
+  }
 }
 
 \examples{
