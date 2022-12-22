@@ -103,22 +103,37 @@ setValidity("GenomeDescription",
 ### Constructor-like functions
 ###
 
+.norm_GenomeDescription_arg <- function(arg, argname)
+{
+    if (!isSingleStringOrNA(arg))
+        stop(wmsg("'", argname, "' must be a single string or NA"))
+    if (toupper(arg) %in% c(NA, "NA", ""))
+        arg <- NA_character_
+    arg
+}
+
 ### NOTE: In BioC 3.1, the 'species' argument was replaced with the
 ### 'common_name' argument but the former was kept for backward compatibility
 ### (essentially with existing SNPlocs and XtraSNPlocs packages).
 ### TODO: At some point the 'species' argument needs to be deprecated.
-GenomeDescription <- function(organism, common_name,
-                              provider, provider_version,
-                              release_date, release_name,
+GenomeDescription <- function(organism=NA, common_name=NA,
+                              provider=NA, provider_version=NA,
+                              release_date=NA, release_name=NA,
                               seqinfo,
-                              species=NA_character_)
+                              species=NA)
 {
-    if (identical(organism, "NA")) organism <- NA_character_
-    if (missing(common_name))
+    organism <- .norm_GenomeDescription_arg(organism, "organism")
+    species <- .norm_GenomeDescription_arg(species, "species")
+    if (missing(common_name)) {
         common_name <- species
-    if (identical(common_name, "NA")) common_name <- NA_character_
-    if (identical(release_date, "NA")) release_date <- NA_character_
-    if (identical(release_name, "NA")) release_name <- NA_character_
+    } else {
+        common_name <- .norm_GenomeDescription_arg(common_name, "common_name")
+    }
+    provider <- .norm_GenomeDescription_arg(provider, "provider")
+    provider_version <- .norm_GenomeDescription_arg(provider_version,
+                                                    "provider_version")
+    release_date <- .norm_GenomeDescription_arg(release_date, "release_date")
+    release_name <- .norm_GenomeDescription_arg(release_name, "release_name")
     new("GenomeDescription",
         organism=organism,
         common_name=common_name,
@@ -162,7 +177,11 @@ compactPrintNamedAtomicVector <- function(x, margin="")
 ### NOT exported (but used in the BSgenome package).
 showGenomeDescription <- function(x, margin="", print.seqlengths=FALSE)
 {
-    cat(margin, "organism: ", organism(x), " (",  commonName(x), ")\n", sep="")
+    cat(margin, "organism: ", organism(x), sep="")
+    common_name <- commonName(x)
+    if (!is.na(common_name))
+        cat(" (",  common_name, ")", sep="")
+    cat("\n")
     cat(margin, "genome: ", providerVersion(x), "\n", sep="")
     cat(margin, "provider: ", provider(x), "\n", sep="")
     cat(margin, "release date: ", releaseDate(x), "\n", sep="")

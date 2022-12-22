@@ -590,9 +590,12 @@ showCompactDataFrame <- function(x, rownames.label="", left.margin="")
 setMethod("show", "Seqinfo",
     function(object)
     {
-        cat(class(object), " object with ", summary(object), ":\n", sep="")
-        if (length(object) == 0L)
+        cat(class(object), " object with ", summary(object), sep="")
+        if (length(object) == 0L) {
+            cat("\n")
             return(NULL)
+        }
+        cat(":\n")
         showCompactDataFrame(as.data.frame(object),
                              rownames.label="seqnames", left.margin="  ")
     }
