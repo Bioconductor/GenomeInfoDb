@@ -238,7 +238,6 @@ setReplaceMethod("seqlevelsStyle", "ANY",
         seqlevelsStyle(ans[ , "seqlevels"]) <- new_style
         return(ans)
     }
-    ans <- DataFrame(seqlevels=seqlevels, genome=genome)
     old_style <- .is_NCBI_assembly_or_UCSC_genome(genome)
     if (is.na(old_style)) {
         ## Switch style based on seqlevels only. 'genome' is untouched.
@@ -333,7 +332,7 @@ setReplaceMethod("seqlevelsStyle", "ANY",
         return(ans)
     }
     if (length(replace_idx) < length(new_seqlevels))
-        warning(wmsg("cannot switch some of ", genome, "'s seqlevels ",
+        warning(wmsg("cannot switch some ", genome, "'s seqlevels ",
                      "from ", old_style, " to ", new_style, " style"))
     ans[replace_idx, "seqlevels"] <- new_seqlevels[replace_idx]
     ans[replace_idx, "genome"] <- new_genome
