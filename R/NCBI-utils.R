@@ -286,8 +286,8 @@ build_and_save_assembly_accessions_table <- function(dir=".", quiet=FALSE)
 ### FTP dir.
 find_NCBI_assembly_ftp_dir <- function(assembly_accession, assembly_name=NA)
 {
-    if (!isSingleString(assembly_accession))
-        stop(wmsg("'assembly_accession' must be a single string"))
+    if (!isSingleString(assembly_accession) || assembly_accession == "")
+        stop(wmsg("'assembly_accession' must be a single (non-empty) string"))
     if (.is_genbank_assembly_accession(assembly_accession)) {
         GCA_or_GCF <- "GCA"
     } else if (.is_refseq_assembly_accession(assembly_accession)) {
@@ -358,8 +358,8 @@ find_NCBI_assembly_ftp_dir <- function(assembly_accession, assembly_name=NA)
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### fetch_assembly_report()
 ###
-### This is the workhorse behind getChromInfoFromNCBI().
-###
+### This is exported!
+### Workhorse behind getChromInfoFromNCBI().
 
 ### 'assembly_accession' can be:
 ###   (a) a GenBank assembly accession (e.g. "GCA_000001405.15");
@@ -410,8 +410,8 @@ find_NCBI_assembly_ftp_dir <- function(assembly_accession, assembly_name=NA)
 fetch_assembly_report <- function(assembly_accession, assembly_name=NA,
                                   AssemblyUnits=NULL)
 {
-    if (!isSingleString(assembly_accession))
-        stop(wmsg("'assembly_accession' must be a single string"))
+    if (!isSingleString(assembly_accession) || assembly_accession == "")
+        stop(wmsg("'assembly_accession' must be a single (non-empty) string"))
     if (!isSingleStringOrNA(assembly_name))
         stop(wmsg("'assembly_name' must be a single string or NA"))
     if (grepl("://", assembly_accession, fixed=TRUE)) {
