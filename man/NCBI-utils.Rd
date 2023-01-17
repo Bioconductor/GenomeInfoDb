@@ -103,4 +103,3 @@ stopifnot(identical(assembly_report, assembly_report2))
 }
 
 \keyword{manip}
-
