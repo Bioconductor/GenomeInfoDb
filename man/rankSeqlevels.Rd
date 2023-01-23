@@ -64,4 +64,3 @@ rankSeqlevels(newchr)
 }
 
 \keyword{manip}
-

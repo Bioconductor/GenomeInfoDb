@@ -3,7 +3,7 @@ ORGANISM <- "Homo sapiens"
 ASSEMBLED_MOLECULES <- paste0("chr", c(1:22, "X", "Y", "M"))
 CIRC_SEQS <- "chrM"
 
-library(GenomeInfoDb)
+library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
 
 .order_seqlevels <- function(seqlevels)
 {
@@ -15,12 +15,9 @@ library(GenomeInfoDb)
 FETCH_ORDERED_CHROM_SIZES <-
     function(goldenPath.url=getOption("UCSC.goldenPath.url"))
 {
-    filename <- paste0(GENOME, ".chrom.sizes.txt")
-    url <- paste(goldenPath.url, GENOME, "bigZips", filename, sep="/")
-    col2class <- c(chrom="character", size="integer")
-    chrom_sizes <- GenomeInfoDb:::fetch_table_from_url(url,
-                                              colnames=names(col2class),
-                                              col2class=col2class)
+    chrom_sizes <- GenomeInfoDb:::fetch_chrom_sizes_from_UCSC(GENOME,
+                                              from="bigZips",
+                                              goldenPath.url=goldenPath.url)
     oo <- .order_seqlevels(chrom_sizes[ , "chrom"])
     S4Vectors:::extract_data_frame_rows(chrom_sizes, oo)
 }

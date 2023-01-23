@@ -193,6 +193,7 @@ test_seqlevelsStyle_Seqinfo <- function()
         list("susScr3",  "Sscrofa10.2",                4583L,    0L,      0L),
         list("susScr11", "Sscrofa11.1",                 613L,    0L,      0L),
         list("taeGut2",  "Taeniopygia_guttata-3.2.4", 37096L,    0L,      0L),
+        list("xenLae2",  "Xenopus_laevis_v2",        108033L,    0L,      0L),
         list("xenTro10", "UCB_Xtro_10.0",               167L,    0L,      0L)
     )
     for (i in seq_along(UCSC_NCBI)) {

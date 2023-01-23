@@ -33,6 +33,7 @@ Suggests: GenomicRanges, Rsamtools, GenomicAlignments, GenomicFeatures,
 	RUnit, BiocStyle, knitr
 VignetteBuilder: knitr
 Collate: utils.R
+	list_ftp_dir.R
 	rankSeqlevels.R
 	NCBI-utils.R
 	UCSC-utils.R

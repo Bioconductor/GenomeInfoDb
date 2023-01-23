@@ -322,9 +322,9 @@
     goldenPath.url=getOption("UCSC.goldenPath.url"))
 {
     col2class <- c(ucsc="character", ensembl="character")
-    fetch_table_from_UCSC(genome, "ucscToEnsembl",
-                          col2class=col2class,
-                          goldenPath.url=goldenPath.url)
+    fetch_table_from_UCSC_database(genome, "ucscToEnsembl",
+                     col2class=col2class,
+                     goldenPath.url=goldenPath.url)
 }
 
 ### Filters and reformats the chromAlias data to so it's returned in the
@@ -334,9 +334,9 @@
     goldenPath.url=getOption("UCSC.goldenPath.url"))
 {
     col2class <- c(ensembl="character", ucsc="character", source="factor")
-    chromAlias <- fetch_table_from_UCSC(genome, "chromAlias",
-                                        col2class=col2class,
-                                        goldenPath.url=goldenPath.url)
+    chromAlias <- fetch_table_from_UCSC_database(genome, "chromAlias",
+                                   col2class=col2class,
+                                   goldenPath.url=goldenPath.url)
     ## Filters and reformats.
     keep_idx <- grep("ensembl", chromAlias[ , "source"], fixed=TRUE)
     ucsc2ensembl <- chromAlias[keep_idx, c("ucsc", "ensembl")]
