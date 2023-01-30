@@ -147,7 +147,7 @@ ASSEMBLIES <- list(
     list(assembly="GRCh38.p14",
          assembly_level="Chromosome",
          date="2022/02/03",
-         assembly_accession="GCA_000001405.29",
+         assembly_accession="GCF_000001405.40",
          circ_seqs="MT"),
 
     ## --- T2T-CHM13 project by the Telomere-to-Telomere Consortium ---

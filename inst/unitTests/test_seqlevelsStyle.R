@@ -164,7 +164,7 @@ test_seqlevelsStyle_Seqinfo <- function()
         #list("hg17",     "NCBI35",                       26L,   20L,     86L),
         #list("hg18",     "NCBI36",                       26L,   23L,     97L),
         list("hg19",     "GRCh37.p13",                  297L,    1L,      0L),
-        list("hg38",     "GRCh38.p13",                  640L,    0L,      0L),
+        list("hg38",     "GRCh38.p14",                  709L,    2L,      0L),
         list("hs1",      "T2T-CHM13v2.0",                25L,    0L,      0L),
         list("macFas5",  "Macaca_fascicularis_5.0",    7601L,    0L,      0L),
         list("mm8",      "MGSCv36",                      21L,   13L,    360L),
