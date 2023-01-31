@@ -205,12 +205,33 @@ test_seqlevelsStyle_Seqinfo <- function()
     {
         is_RefSeq_accession <- GenomeInfoDb:::.is_RefSeq_accession
 
+        ## Ugly hack! Hardcode list of NCBI seqlevels (+ their UCSC names)
+        ## NOT associated with a RefSeq accession in the "Full sequence
+        ## report" for GRCh38.p14:
+        if (NCBI_assembly == "GRCh38.p14") {
+            problematic_NCBI_seqlevels <- c(
+                "HSCHR10_1_CTG4",
+                "HSCHR11_CTG1_UNLOCALIZED",
+                "HSCHR22_UNLOCALIZED_CTG4",
+                "HSCHRUN_RANDOM_CTG29"
+            )
+            ## Their UCSC names.
+            problematic_UCSC_seqlevels <- c(
+                "chr10_KI270825v1_alt",
+                "chr11_KI270721v1_random",
+                "chr22_KI270734v1_random",
+                "chrUn_KI270752v1"
+            )
+        } else {
+            problematic_NCBI_seqlevels <- character(0)
+            problematic_UCSC_seqlevels <- character(0)
+        }
+
         ## Start with a Seqinfo object made from a UCSC genome.
 
         si1 <- Seqinfo(genome=UCSC_genome)
-        ## Remove problematic seqlevel chrUn_KI270752v1 (does not have an
-        ## associated GenBank accession). Belongs to hg38.
-        si1 <- si1[setdiff(seqlevels(si1), "chrUn_KI270752v1")]
+        ## Remove problematic UCSC seqlevels:
+        si1 <- si1[setdiff(seqlevels(si1), problematic_UCSC_seqlevels)]
 
         si2 <- si1
         seqlevelsStyle(si2) <- "NCBI"
@@ -244,10 +265,8 @@ test_seqlevelsStyle_Seqinfo <- function()
         ## Start with a Seqinfo object made from an NCBI assembly.
 
         si1 <- Seqinfo(genome=NCBI_assembly)
-        ## Remove problematic seqlevel HSCHRUN_RANDOM_CTG29 (does not have an
-        ## associated RefSeq accession). Belongs to GRCh37.p13, GRCh38.p12,
-        ## and GRCh38.p13. This is chrUn_KI270752v1 in hg38.
-        si1 <- si1[setdiff(seqlevels(si1), "HSCHRUN_RANDOM_CTG29")]
+        ## Remove problematic NCBI seqlevels:
+        si1 <- si1[setdiff(seqlevels(si1), problematic_NCBI_seqlevels)]
 
         si2 <- si1
         seqlevelsStyle(si2) <- "UCSC"
@@ -271,12 +290,13 @@ test_seqlevelsStyle_Seqinfo <- function()
         checkIdentical(si1, si2)
     }
 
-    ## Exclude some genomes from the RefSeq switch check. These genomes
-    ## fail to pass the check for reasons that need to be investigated!
-    ## In the case of canFam5 and hs1, it's because chrM is not mapped
-    ## to a RefSeq accession, that is, RefSeqAccn is NA for chrM in
-    ## getChromInfoFromNCBI("UMICH_Zoey_3.1"), and for MT in
-    ## getChromInfoFromNCBI("T2T-CHM13v2.0").
+    ## Exclude some problematic genomes from the RefSeq switch check:
+    ## - In the case of canFam5 and hs1, it's because chrM is not mapped
+    ##   to a RefSeq accession, that is, RefSeqAccn is NA for chrM in
+    ##   getChromInfoFromNCBI("UMICH_Zoey_3.1"), and for MT in
+    ##   getChromInfoFromNCBI("T2T-CHM13v2.0").
+    ## - For the other genomes (canFam4, rheMac3, panTro3), the reasons
+    ##   causing check_RefSeq_switch() still need to be investigated!
     skip_RefSeq_switch <- c("canFam4", "canFam5", "hs1", "rheMac3", "panTro3")
     for (i in seq_along(UCSC_NCBI)) {
         args <- UCSC_NCBI[[i]][c(1L, 2L, 4L)]
