@@ -190,8 +190,8 @@ setReplaceMethod("seqlevelsStyle", "ANY",
     ans
 }
 
-### Map GRCh38 and any GRCh38 patch level to hg38. This allows us to
-### switch the style of stuff like SNPlocs.Hsapiens.dbSNP144.GRCh38
+### Will map GRCh38 and any GRCh38 patch level to hg38. This will allow
+### us to switch the style of stuff like SNPlocs.Hsapiens.dbSNP144.GRCh38
 ### (based on GRCh38.p2) to UCSC.
 .map_NCBI_assembly_to_UCSC_genome <- function(assembly)
 {
@@ -208,21 +208,47 @@ setReplaceMethod("seqlevelsStyle", "ANY",
     UCSC_genomes[idx, "genome"]
 }
 
-### Map hg38 to GRCh38.p13 because that's what hg38 is officially based
-### on at the moment (as of Oct 2021, used to be GRCh38.p12 before that).
+### Will map hg38 to GRCh38.p14 because that's what hg38 is officially based
+### on at the moment (as of Jan 31, 2023, used to be GRCh38.p13 before that).
 ### See https://genome.ucsc.edu/cgi-bin/hgGateway?db=hg38
 ### Note that this is not written in stone and the UCSC folks might
 ### change this at any time in the future.
 ### IMPORTANT: A round trip thru .map_NCBI_assembly_to_UCSC_genome() and
 ### .map_UCSC_genome_to_NCBI_assembly() is in general a no-op **except**
 ### for NCBI assemblies with patch levels! For example the round trip will
-### map any GRCh38 patch level to GRCh38.p13.
+### map any GRCh38 patch level to GRCh38.p14.
 .map_UCSC_genome_to_NCBI_assembly <- function(genome)
 {
     stopifnot(isSingleString(genome))
     UCSC_genomes <- registered_UCSC_genomes()
     idx <- match(genome, UCSC_genomes[ , "genome"])
     UCSC_genomes[idx, "NCBI_assembly"]
+}
+
+.switch_NCBI_or_RefSeq_seqlevels_to_UCSC <- function(seqlevels, new_genome)
+{
+    chrominfo <- getChromInfoFromUCSC(new_genome, map.NCBI=TRUE)
+    UCSC_seqlevels <- chrominfo[ , "chrom"]
+    SequenceName <- chrominfo[ , "NCBI.SequenceName"]
+    RefSeqAccn <- chrominfo[ , "NCBI.RefSeqAccn"]
+    m <- match(seqlevels, SequenceName)
+    m2 <- match(seqlevels, RefSeqAccn)
+    m[is.na(m)] <- m2[is.na(m)]
+    UCSC_seqlevels[m]
+}
+
+.switch_UCSC_seqlevels_to_NCBI_or_RefSeq <- function(seqlevels, old_genome,
+                                                     new_style)
+{
+    chrominfo <- getChromInfoFromUCSC(old_genome, map.NCBI=TRUE)
+    UCSC_seqlevels <- chrominfo[ , "chrom"]
+    if (new_style == "NCBI") {
+        NCBI_seqlevels <- chrominfo[ , "NCBI.SequenceName"]
+    } else {
+        NCBI_seqlevels <- chrominfo[ , "NCBI.RefSeqAccn"]
+    }
+    m <- match(seqlevels, UCSC_seqlevels)
+    NCBI_seqlevels[m]
 }
 
 ### 'genome' must be a single string or NA.
@@ -255,7 +281,7 @@ setReplaceMethod("seqlevelsStyle", "ANY",
     ## switching back to the original style restores the original seqlevels
     ## and genome. Note that this is not always possible e.g. switching stuff
     ## based on GRCh38.p2 to UCSC then back to NCBI or RefSeq will set the
-    ## genome to GRCh38.p13. See .map_UCSC_genome_to_NCBI_assembly() above
+    ## genome to GRCh38.p14. See .map_UCSC_genome_to_NCBI_assembly() above
     ## in this file.
     if (new_style == "UCSC") {
         ## 'old_style' is "NCBI" or "RefSeq" or c("RefSeq", "NCBI") i.e. the            ## user wants to switch from NCBI or RefSeq to UCSC style.
@@ -270,14 +296,8 @@ setReplaceMethod("seqlevelsStyle", "ANY",
                          "to ", new_style, " style"))
             return(ans)
         }
-        chrominfo <- getChromInfoFromUCSC(new_genome, map.NCBI=TRUE)
-        SequenceName <- chrominfo[ , "NCBI.SequenceName"]
-        RefSeqAccn <- chrominfo[ , "NCBI.RefSeqAccn"]
-        UCSC_seqlevels <- chrominfo[ , "chrom"]
-        m <- match(seqlevels, SequenceName)
-        m2 <- match(seqlevels, RefSeqAccn)
-        m[is.na(m)] <- m2[is.na(m)]
-        new_seqlevels <- UCSC_seqlevels[m]
+        new_seqlevels <- .switch_NCBI_or_RefSeq_seqlevels_to_UCSC(
+                                                seqlevels, new_genome)
     } else if (identical(old_style, "UCSC")) {
         ## 'new_style' is "NCBI" or "RefSeq" i.e. the user wants to switch
         ## from UCSC to NCBI or RefSeq style.
@@ -292,15 +312,8 @@ setReplaceMethod("seqlevelsStyle", "ANY",
                          "from ", old_style, " to ", new_style, " style"))
             return(ans)
         }
-        chrominfo <- getChromInfoFromUCSC(genome, map.NCBI=TRUE)
-        UCSC_seqlevels <- chrominfo[ , "chrom"]
-        if (new_style == "NCBI") {
-            NCBI_seqlevels <- chrominfo[ , "NCBI.SequenceName"]
-        } else {
-            NCBI_seqlevels <- chrominfo[ , "NCBI.RefSeqAccn"]
-        }
-        m <- match(seqlevels, UCSC_seqlevels)
-        new_seqlevels <- NCBI_seqlevels[m]
+        new_seqlevels <- .switch_UCSC_seqlevels_to_NCBI_or_RefSeq(
+                                                seqlevels, genome, new_style)
     } else {
         ## The user wants to switch from NCBI to RefSeq style or vice-versa.
         ## This does NOT touch the genome.
