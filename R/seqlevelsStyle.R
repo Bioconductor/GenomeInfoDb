@@ -4,135 +4,11 @@
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Helper functions
+### .set_seqlevelsStyle_from_seqlevels_and_genome()
 ###
-
-.getDatadir <- function()
-{
-    system.file(package = "GenomeInfoDb","extdata","dataFiles")
-}
-
-.getNamedFiles <- function()
-{
-    filePath <- .getDatadir()
-    files <- dir(filePath, full.names=TRUE, pattern =".txt$")
-    setNames(files, sub(".txt$", "", basename(files)))
-}
-
-.normalize_organism <- function(organism)
-{
-    parts <- CharacterList(strsplit(organism, "_| "))
-    parts_eltNROWS <- elementNROWS(parts)
-    ## If 3 parts or more (e.g. "Canis_lupus_familiaris") then remove part 2.
-    idx3 <- which(parts_eltNROWS >= 3L)
-    if (length(idx3) != 0L)
-        parts[idx3] <- parts[idx3][rep.int(list(-2L), length(idx3))]
-    unstrsplit(parts, sep="_")
-}
-
-.getDataInFile <- function(organism)
-{
-    organism2 <- .normalize_organism(organism)
-    filename <- paste0(.getDatadir(), "/", organism2, ".txt")
-    if (file.exists(filename)) {
-        read.table(filename, header=TRUE, sep="\t", stringsAsFactors=FALSE)
-    } else {
-        stop("Organism ", organism, " is not supported by GenomeInfoDb")
-    }
-
-}
-
-.supportedSeqlevelsStyles <- function()
-{
-    dom <- lapply(.getNamedFiles(), scan, nlines=1, what=character(),
-                  quiet=TRUE)
-    lapply(dom, function(x) {x[!(x %in% c("circular","auto","sex"))] })
-}
-
-
-.isSupportedSeqnamesStyle <- function(organism, style)
-{
-    organism <- .normalize_organism(organism)
-    possible <- lapply(.getNamedFiles(), scan, nlines=1, what=character(),
-                       quiet=TRUE)
-    availStyles <- possible[[organism]]
-    style %in% availStyles[-which(availStyles %in% c("circular","auto","sex"))]
-}
-
-.supportedSeqnameMappings <- function()
-{
-    dom <-  lapply(.getNamedFiles(), read.table, header=TRUE, sep="\t",
-                   stringsAsFactors=FALSE)
-    lapply(dom, function(x) {x[,-c(1:3)] })
-}
-
-.guessSpeciesStyle <- function(seqnames)
-{
-    zz <- .supportedSeqnameMappings()
-    got2 <- lapply(zz ,function(y) lapply(y, function(z)
-        sum(z %in% seqnames)) )
-    unlistgot2 <- unlist(got2, recursive=TRUE,use.names=TRUE)
-
-    if (max(unlistgot2) == 0) {
-       ans <- NA
-    }else{
-        ##vec is in format "Homo_sapiens.UCSC"
-        vec <- names(which(unlistgot2==max(unlistgot2)))
-        organism <- .normalize_organism(sub("(.*?)[.].*", "\\1", vec))
-        style <- gsub("^[^.]+.","", vec)
-        ans <- list(species=organism, style=style)
-    }
-    ans
-}
-
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### seqlevelsStyle() getter and setter
+### This is the workhorse behing the seqlevelsStyle() setter for Seqinfo
+### objects.
 ###
-
-setGeneric("seqlevelsStyle",
-    function(x) standardGeneric("seqlevelsStyle")
-)
-
-setGeneric("seqlevelsStyle<-", signature="x",
-    function(x, value) standardGeneric("seqlevelsStyle<-")
-)
-
-### Works on any object 'x' with a working seqinfo() getter.
-setMethod("seqlevelsStyle", "ANY", function(x) seqlevelsStyle(seqinfo(x)))
-
-.normarg_seqlevelsStyle <- function(seqlevelsStyle)
-{
-    if (!(is.character(seqlevelsStyle) && length(seqlevelsStyle) >= 1L))
-        stop(wmsg("the supplied seqlevels style must be a single string"))
-    if (length(seqlevelsStyle) > 1L) {
-        warning(wmsg("more than one seqlevels style supplied, ",
-                     "using the 1st one only"))
-        seqlevelsStyle <- seqlevelsStyle[[1L]]
-    }
-    if (is.na(seqlevelsStyle))
-        stop(wmsg("the supplied seqlevels style cannot be NA"))
-    seqlevelsStyle
-}
-
-### Works on any object 'x' with a working seqinfo() setter.
-setReplaceMethod("seqlevelsStyle", "ANY",
-     function (x, value)
-     {
-         x_seqinfo <- seqinfo(x)
-         seqlevelsStyle(x_seqinfo) <- value
-         seqinfo(x, new2old=seq_along(x_seqinfo)) <- x_seqinfo
-         x
-     }
-)
-
-.get_genome_as_factor <- function(x)
-{
-    ## genome(x) can be a mix of several genomes (including NAs).
-    x_genome <- unname(genome(x))
-    factor(x_genome, levels=unique(x_genome),
-           exclude=character(0))  # keep NA in levels
-}
 
 ### 'genome' must be a single string.
 ### Return "NCBI", "UCSC", or a character NA.
@@ -175,21 +51,6 @@ setReplaceMethod("seqlevelsStyle", "ANY",
     "NCBI"
 }
 
-### 'genome' must be a single string or NA.
-### Tries to get the style first based on 'genome', then based on 'seqlevels'.
-### Can return more than 1 style.
-.get_seqlevelsStyle_from_seqlevels_and_genome <- function(seqlevels, genome)
-{
-    if (is.na(genome))
-        return(seqlevelsStyle(seqlevels))  # can return more than 1 style
-    ans <- .is_NCBI_assembly_or_UCSC_genome(genome)
-    if (is.na(ans))
-        return(seqlevelsStyle(seqlevels))  # can return more than 1 style
-    if (ans == "NCBI")
-        ans <- .get_seqlevelsStyle_for_NCBI_seqlevels(seqlevels)
-    ans
-}
-
 ### Will map GRCh38 and any GRCh38 patch level to hg38. This will allow
 ### us to switch the style of stuff like SNPlocs.Hsapiens.dbSNP144.GRCh38
 ### (based on GRCh38.p2) to UCSC.
@@ -225,7 +86,7 @@ setReplaceMethod("seqlevelsStyle", "ANY",
     UCSC_genomes[idx, "NCBI_assembly"]
 }
 
-.switch_NCBI_or_RefSeq_seqlevels_to_UCSC <- function(seqlevels, new_genome)
+.map_NCBI_or_RefSeq_seqlevels_to_UCSC <- function(seqlevels, new_genome)
 {
     chrominfo <- getChromInfoFromUCSC(new_genome, map.NCBI=TRUE)
     UCSC_seqlevels <- chrominfo[ , "chrom"]
@@ -237,10 +98,14 @@ setReplaceMethod("seqlevelsStyle", "ANY",
     UCSC_seqlevels[m]
 }
 
-.switch_UCSC_seqlevels_to_NCBI_or_RefSeq <- function(seqlevels, old_genome,
-                                                     new_style)
+### Returns the new seqlevels in a named character vector parallel
+### to 'seqlevels'. The returned vector will contain NA's for input
+### seqlevels that could not be mapped, and the names on those elements
+### will be set to "". The names on the non-NA elements (mapped seqlevels)
+### will be set to the NCBI assembly associated with 'genome'.
+.map_UCSC_seqlevels_to_NCBI_or_RefSeq <- function(seqlevels, genome, new_style)
 {
-    chrominfo <- getChromInfoFromUCSC(old_genome, map.NCBI=TRUE)
+    chrominfo <- getChromInfoFromUCSC(genome, map.NCBI=TRUE)
     UCSC_seqlevels <- chrominfo[ , "chrom"]
     if (new_style == "NCBI") {
         NCBI_seqlevels <- chrominfo[ , "NCBI.SequenceName"]
@@ -248,7 +113,68 @@ setReplaceMethod("seqlevelsStyle", "ANY",
         NCBI_seqlevels <- chrominfo[ , "NCBI.RefSeqAccn"]
     }
     m <- match(seqlevels, UCSC_seqlevels)
-    NCBI_seqlevels[m]
+    new_seqlevels <- NCBI_seqlevels[m]
+
+    ## Set names (new genome) on 'new_seqlevels'.
+    new_genome <- character(length(new_seqlevels))
+    NCBI_assembly_info <- attributes(chrominfo)$NCBI_assembly_info
+    new_genome[!is.na(new_seqlevels)] <- NCBI_assembly_info$assembly
+    setNames(new_seqlevels, new_genome)
+}
+
+### UGLY HACK! We need to special-case hg38 because it contains 2 sequences
+### that do NOT belong to GRCh38.p14. But they can be found in GRCh38.p13!
+.hg38_FOREIGN_ASSEMBLY <- "GRCh38.p13"
+.hg38_FOREIGN_MAPPINGS <- c(chr11_KQ759759v1_fix="KQ759759.1",
+                            chr22_KQ759762v1_fix="KQ759762.1")
+
+.map_NCBI_or_RefSeq_seqlevels_to_hg38 <- function(seqlevels)
+{
+    new_seqlevels <- .map_NCBI_or_RefSeq_seqlevels_to_UCSC(seqlevels, "hg38")
+
+    ## Take care of the foreign sequences. Note that they are not
+    ## necessarily present in 'seqlevels'.
+    chrominfo <- getChromInfoFromNCBI(.hg38_FOREIGN_ASSEMBLY)
+    foreign_idx <- match(.hg38_FOREIGN_MAPPINGS, chrominfo[ , "GenBankAccn"])
+    stopifnot(!anyNA(foreign_idx))  # sanity check
+    foreign_SequenceName <- chrominfo[foreign_idx, "SequenceName"]
+    foreign_RefSeqAccn <- chrominfo[foreign_idx, "RefSeqAccn"]
+    m <- match(seqlevels, foreign_SequenceName)
+    m2 <- match(seqlevels, foreign_RefSeqAccn)
+    m[is.na(m)] <- m2[is.na(m)]
+    new_seqlevels2 <- names(.hg38_FOREIGN_MAPPINGS)[m]
+
+    ## Merge 'new_seqlevels2' into 'new_seqlevels'.
+    idx2 <- which(!is.na(new_seqlevels2))
+    stopifnot(all(is.na(new_seqlevels[idx2])))  # sanity check
+    new_seqlevels[idx2] <- new_seqlevels2[idx2]
+    new_seqlevels
+}
+
+.map_hg38_seqlevels_to_NCBI_or_RefSeq <- function(seqlevels, new_style)
+{
+    new_seqlevels <- .map_UCSC_seqlevels_to_NCBI_or_RefSeq(
+                                         seqlevels, "hg38", new_style)
+
+    ## Take care of the foreign sequences. Note that they are not
+    ## necessarily present in 'seqlevels'.
+    chrominfo <- getChromInfoFromNCBI(.hg38_FOREIGN_ASSEMBLY)
+    foreign_idx <- match(.hg38_FOREIGN_MAPPINGS, chrominfo[ , "GenBankAccn"])
+    stopifnot(!anyNA(foreign_idx))  # sanity check
+    m <- match(seqlevels, names(.hg38_FOREIGN_MAPPINGS))
+    if (new_style == "NCBI") {
+        NCBI_seqlevels <- chrominfo[ , "SequenceName"]
+    } else {
+        NCBI_seqlevels <- chrominfo[ , "RefSeqAccn"]
+    }
+    new_seqlevels2 <- NCBI_seqlevels[foreign_idx[m]]
+
+    ## Merge 'new_seqlevels2' into 'new_seqlevels'.
+    idx2 <- which(!is.na(new_seqlevels2))
+    stopifnot(all(is.na(new_seqlevels[idx2])))  # sanity check
+    new_seqlevels[idx2] <- new_seqlevels2[idx2]
+    names(new_seqlevels)[idx2] <- .hg38_FOREIGN_ASSEMBLY
+    new_seqlevels
 }
 
 ### 'genome' must be a single string or NA.
@@ -296,8 +222,13 @@ setReplaceMethod("seqlevelsStyle", "ANY",
                          "to ", new_style, " style"))
             return(ans)
         }
-        new_seqlevels <- .switch_NCBI_or_RefSeq_seqlevels_to_UCSC(
-                                                seqlevels, new_genome)
+        ## UGLY HACK!
+        if (new_genome == "hg38") {
+            new_seqlevels <- .map_NCBI_or_RefSeq_seqlevels_to_hg38(seqlevels)
+        } else {
+            new_seqlevels <- .map_NCBI_or_RefSeq_seqlevels_to_UCSC(
+                                                 seqlevels, new_genome)
+        }
     } else if (identical(old_style, "UCSC")) {
         ## 'new_style' is "NCBI" or "RefSeq" i.e. the user wants to switch
         ## from UCSC to NCBI or RefSeq style.
@@ -312,8 +243,15 @@ setReplaceMethod("seqlevelsStyle", "ANY",
                          "from ", old_style, " to ", new_style, " style"))
             return(ans)
         }
-        new_seqlevels <- .switch_UCSC_seqlevels_to_NCBI_or_RefSeq(
-                                                seqlevels, genome, new_style)
+        ## UGLY HACK!
+        if (genome == "hg38") {
+            new_seqlevels <- .map_hg38_seqlevels_to_NCBI_or_RefSeq(
+                                                 seqlevels, new_style)
+        } else {
+            new_seqlevels <- .map_UCSC_seqlevels_to_NCBI_or_RefSeq(
+                                                 seqlevels, genome, new_style)
+        }
+        new_genome <- names(new_seqlevels)[!is.na(new_seqlevels)]
     } else {
         ## The user wants to switch from NCBI to RefSeq style or vice-versa.
         ## This does NOT touch the genome.
@@ -341,15 +279,72 @@ setReplaceMethod("seqlevelsStyle", "ANY",
         ##   genome(gr) <- "GRCh38"
         ##   seqlevelsStyle(gr) <- "RefSeq"
         warning(wmsg("cannot switch ", genome, "'s seqlevels ",
-                     "from ", old_style, " to ", new_style, " style"))
+                     "from ", paste(old_style, collapse="/"), " ",
+                     "to ", new_style, " style"))
         return(ans)
     }
     if (length(replace_idx) < length(new_seqlevels))
         warning(wmsg("cannot switch some ", genome, "'s seqlevels ",
-                     "from ", old_style, " to ", new_style, " style"))
+                     "from ", paste(old_style, collapse="/"), " ",
+                     "to ", new_style, " style"))
     ans[replace_idx, "seqlevels"] <- new_seqlevels[replace_idx]
     ans[replace_idx, "genome"] <- new_genome
     ans
+}
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### seqlevelsStyle() generic getter and setter
+###
+
+setGeneric("seqlevelsStyle",
+    function(x) standardGeneric("seqlevelsStyle")
+)
+
+setGeneric("seqlevelsStyle<-", signature="x",
+    function(x, value) standardGeneric("seqlevelsStyle<-")
+)
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### seqlevelsStyle() getter and setter methods for Seqinfo objects
+###
+
+.get_genome_as_factor <- function(x)
+{
+    ## genome(x) can be a mix of several genomes (including NAs).
+    x_genome <- unname(genome(x))
+    factor(x_genome, levels=unique(x_genome),
+           exclude=character(0))  # keep NA in levels
+}
+
+### 'genome' must be a single string or NA.
+### Tries to get the style first based on 'genome', then based on 'seqlevels'.
+### Can return more than 1 style.
+.get_seqlevelsStyle_from_seqlevels_and_genome <- function(seqlevels, genome)
+{
+    if (is.na(genome))
+        return(seqlevelsStyle(seqlevels))  # can return more than 1 style
+    ans <- .is_NCBI_assembly_or_UCSC_genome(genome)
+    if (is.na(ans))
+        return(seqlevelsStyle(seqlevels))  # can return more than 1 style
+    if (ans == "NCBI")
+        ans <- .get_seqlevelsStyle_for_NCBI_seqlevels(seqlevels)
+    ans
+}
+
+.normarg_seqlevelsStyle <- function(seqlevelsStyle)
+{
+    if (!(is.character(seqlevelsStyle) && length(seqlevelsStyle) >= 1L))
+        stop(wmsg("the supplied seqlevels style must be a single string"))
+    if (length(seqlevelsStyle) > 1L) {
+        warning(wmsg("more than one seqlevels style supplied, ",
+                     "using the 1st one only"))
+        seqlevelsStyle <- seqlevelsStyle[[1L]]
+    }
+    if (is.na(seqlevelsStyle))
+        stop(wmsg("the supplied seqlevels style cannot be NA"))
+    seqlevelsStyle
 }
 
 .get_Seqinfo_seqlevelsStyle <- function(x)
@@ -385,6 +380,79 @@ setMethod("seqlevelsStyle", "Seqinfo", .get_Seqinfo_seqlevelsStyle)
 
 setReplaceMethod("seqlevelsStyle", "Seqinfo", .set_Seqinfo_seqlevelsStyle)
 
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Default seqlevelsStyle() getter and setter methods
+###
+
+### Works on any object 'x' with a working seqinfo() getter.
+setMethod("seqlevelsStyle", "ANY", function(x) seqlevelsStyle(seqinfo(x)))
+
+### Works on any object 'x' with a working seqinfo() getter and setter.
+setReplaceMethod("seqlevelsStyle", "ANY",
+     function (x, value)
+     {
+         x_seqinfo <- seqinfo(x)
+         seqlevelsStyle(x_seqinfo) <- value
+         seqinfo(x, new2old=seq_along(x_seqinfo)) <- x_seqinfo
+         x
+     }
+)
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### seqlevelsStyle() getter and setter methods for character vectors
+###
+
+.getDatadir <- function()
+{
+    system.file(package = "GenomeInfoDb","extdata","dataFiles")
+}
+
+.getNamedFiles <- function()
+{
+    filePath <- .getDatadir()
+    files <- dir(filePath, full.names=TRUE, pattern =".txt$")
+    setNames(files, sub(".txt$", "", basename(files)))
+}
+
+.supportedSeqnameMappings <- function()
+{
+    dom <-  lapply(.getNamedFiles(), read.table, header=TRUE, sep="\t",
+                   stringsAsFactors=FALSE)
+    lapply(dom, function(x) {x[,-c(1:3)] })
+}
+
+.normalize_organism <- function(organism)
+{
+    parts <- CharacterList(strsplit(organism, "_| "))
+    parts_eltNROWS <- elementNROWS(parts)
+    ## If 3 parts or more (e.g. "Canis_lupus_familiaris") then remove part 2.
+    idx3 <- which(parts_eltNROWS >= 3L)
+    if (length(idx3) != 0L)
+        parts[idx3] <- parts[idx3][rep.int(list(-2L), length(idx3))]
+    unstrsplit(parts, sep="_")
+}
+
+.guessSpeciesStyle <- function(seqnames)
+{
+    zz <- .supportedSeqnameMappings()
+    got2 <- lapply(zz ,function(y) lapply(y, function(z)
+        sum(z %in% seqnames)) )
+    unlistgot2 <- unlist(got2, recursive=TRUE,use.names=TRUE)
+
+    if (max(unlistgot2) == 0) {
+       ans <- NA
+    }else{
+        ##vec is in format "Homo_sapiens.UCSC"
+        vec <- names(which(unlistgot2==max(unlistgot2)))
+        organism <- .normalize_organism(sub("(.*?)[.].*", "\\1", vec))
+        style <- gsub("^[^.]+.","", vec)
+        ans <- list(species=organism, style=style)
+    }
+    ans
+}
+
 setMethod("seqlevelsStyle", "character",
     function(x)
 {
@@ -395,7 +463,7 @@ setMethod("seqlevelsStyle", "character",
     ans <- .guessSpeciesStyle(seqlevels)
 
     ## 3 cases -
-    ## 1. if no style found - ans is na - stop with message 
+    ## 1. if no style found - ans is na - stop with message
     ## 2. if multiple styles returned then print message saying that it could
     ##    be any of these styles
     ## 3. if one style returned - hurray!
@@ -442,16 +510,48 @@ setReplaceMethod("seqlevelsStyle", "character",
         x_seqlevels <- unique(x)
         new_seqlevels <- .replace_seqlevels_style(x_seqlevels, value)
         new_seqlevels[match(x, x_seqlevels)]
-     }
+    }
 )
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Related low-level utilities
-###
+### Other user-facing low-level utilities related to the seqlevelsStyle()
+### getter and setter methods for character vectors:
+###   - genomeStyles()
+###   - extractSeqlevels()
+###   - extractSeqlevelsByGroup()
+###   - mapSeqlevels()
+###   - seqlevelsInGroup()
 
-genomeStyles <-
-    function(species)
+.isSupportedSeqnamesStyle <- function(organism, style)
+{
+    organism <- .normalize_organism(organism)
+    possible <- lapply(.getNamedFiles(), scan, nlines=1, what=character(),
+                       quiet=TRUE)
+    availStyles <- possible[[organism]]
+    style %in% availStyles[-which(availStyles %in% c("circular","auto","sex"))]
+}
+
+.getDataInFile <- function(organism)
+{
+    organism2 <- .normalize_organism(organism)
+    filename <- paste0(.getDatadir(), "/", organism2, ".txt")
+    if (file.exists(filename)) {
+        read.table(filename, header=TRUE, sep="\t", stringsAsFactors=FALSE)
+    } else {
+        stop("Organism ", organism, " is not supported by GenomeInfoDb")
+    }
+
+}
+
+.supportedSeqlevelsStyles <- function()
+{
+    dom <- lapply(.getNamedFiles(), scan, nlines=1, what=character(),
+                  quiet=TRUE)
+    lapply(dom, function(x) {x[!(x %in% c("circular","auto","sex"))] })
+}
+
+genomeStyles <- function(species)
 {
     if (missing(species))
         lapply(.getNamedFiles(), read.table, header=TRUE, sep="\t",

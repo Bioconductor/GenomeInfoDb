@@ -80,7 +80,13 @@ test_seqlevelsStyle_Seqinfo <- function()
         si2 <- si1
         seqlevelsStyle(si2) <- "NCBI"
         ugenomes <- unique(genome(si2))
-        if (UCSC_nunmapped == 0L) {
+        ## UGLY HACK! We need to special-case hg38 because it contains 2
+        ## sequences that do NOT belong to GRCh38.p14. But they can be
+        ## found in GRCh38.p13!
+        if (UCSC_genome == "hg38") {
+            checkIdentical(c("GRCh38.p14", "GRCh38.p13"), ugenomes)
+            checkIdentical("NCBI", seqlevelsStyle(si2))
+	} else if (UCSC_nunmapped == 0L) {
             checkIdentical(NCBI_assembly, ugenomes)
             checkIdentical("NCBI", seqlevelsStyle(si2))
         } else {
@@ -102,7 +108,7 @@ test_seqlevelsStyle_Seqinfo <- function()
         si2 <- si1
         seqlevelsStyle(si2) <- "UCSC"
         ugenomes <- unique(genome(si2))
-        if (NCBI_nunmapped == 0L) {
+        if (NCBI_nunmapped <= 0L) {  # <= 0 because of hg38 special case!
             checkIdentical(UCSC_genome, ugenomes)
             checkIdentical("UCSC", seqlevelsStyle(si2))
         } else {
@@ -164,7 +170,7 @@ test_seqlevelsStyle_Seqinfo <- function()
         #list("hg17",     "NCBI35",                       26L,   20L,     86L),
         #list("hg18",     "NCBI36",                       26L,   23L,     97L),
         list("hg19",     "GRCh37.p13",                  297L,    1L,      0L),
-        list("hg38",     "GRCh38.p14",                  709L,    2L,      0L),
+        list("hg38",     "GRCh38.p14",                  711L,    0L,     -2L),
         list("hs1",      "T2T-CHM13v2.0",                25L,    0L,      0L),
         list("macFas5",  "Macaca_fascicularis_5.0",    7601L,    0L,      0L),
         list("mm8",      "MGSCv36",                      21L,   13L,    360L),
@@ -205,7 +211,7 @@ test_seqlevelsStyle_Seqinfo <- function()
     {
         is_RefSeq_accession <- GenomeInfoDb:::.is_RefSeq_accession
 
-        ## Ugly hack! Hardcode list of NCBI seqlevels (+ their UCSC names)
+        ## UGLY HACK! Hardcode list of NCBI seqlevels (+ their UCSC names)
         ## NOT associated with a RefSeq accession in the "Full sequence
         ## report" for GRCh38.p14:
         if (NCBI_assembly == "GRCh38.p14") {
@@ -247,7 +253,15 @@ test_seqlevelsStyle_Seqinfo <- function()
             checkIdentical(c("RefSeq", "UCSC"), style)
         }
         has_changed <- seqnames(si3) != seqnames(si2)
-        checkTrue(!any(has_changed & genome(si2) != NCBI_assembly))
+        ## UGLY HACK! We need to special-case hg38 because it contains 2
+        ## sequences that do NOT belong to GRCh38.p14. But they can be
+        ## found in GRCh38.p13!
+        if (UCSC_genome == "hg38") {
+            genome_is_ok <- genome(si2) %in% c("GRCh38.p14", "GRCh38.p13")
+        } else {
+            genome_is_ok <- genome(si2) == NCBI_assembly
+        }
+        checkTrue(all(genome_is_ok | !has_changed))
         checkTrue(all(is_RefSeq_accession(seqnames(si3)[has_changed])))
 
         si4 <- si1
