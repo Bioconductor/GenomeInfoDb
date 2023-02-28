@@ -1,7 +1,7 @@
 GENOME <- "gorGor6"
 ORGANISM <- "Gorilla gorilla gorilla"
 ASSEMBLED_MOLECULES <- paste0("chr",
-                          c("1", "2A", "2B", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "X", "M"))
+                              c("1", "2A", "2B", 3:22, "X", "M"))
 CIRC_SEQS <- "chrM"
 
 library(IRanges)       # for CharacterList()
@@ -47,3 +47,7 @@ FETCH_ORDERED_CHROM_SIZES <-
     S4Vectors:::extract_data_frame_rows(chrom_sizes, oo)
 }
 
+NCBI_LINKER <- list(
+  assembly_accession="GCF_008122165.1",
+  special_mappings=c(chrM="MT")
+)
