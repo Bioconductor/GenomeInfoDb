@@ -80,7 +80,13 @@ test_seqlevelsStyle_Seqinfo <- function()
         si2 <- si1
         seqlevelsStyle(si2) <- "NCBI"
         ugenomes <- unique(genome(si2))
-        if (UCSC_nunmapped == 0L) {
+        ## UGLY HACK! We need to special-case hg38 because it contains 2
+        ## sequences that do NOT belong to GRCh38.p14. But they can be
+        ## found in GRCh38.p13!
+        if (UCSC_genome == "hg38") {
+            checkIdentical(c("GRCh38.p14", "GRCh38.p13"), ugenomes)
+            checkIdentical("NCBI", seqlevelsStyle(si2))
+	} else if (UCSC_nunmapped == 0L) {
             checkIdentical(NCBI_assembly, ugenomes)
             checkIdentical("NCBI", seqlevelsStyle(si2))
         } else {
@@ -102,7 +108,7 @@ test_seqlevelsStyle_Seqinfo <- function()
         si2 <- si1
         seqlevelsStyle(si2) <- "UCSC"
         ugenomes <- unique(genome(si2))
-        if (NCBI_nunmapped == 0L) {
+        if (NCBI_nunmapped <= 0L) {  # <= 0 because of hg38 special case!
             checkIdentical(UCSC_genome, ugenomes)
             checkIdentical("UCSC", seqlevelsStyle(si2))
         } else {
@@ -164,7 +170,7 @@ test_seqlevelsStyle_Seqinfo <- function()
         #list("hg17",     "NCBI35",                       26L,   20L,     86L),
         #list("hg18",     "NCBI36",                       26L,   23L,     97L),
         list("hg19",     "GRCh37.p13",                  297L,    1L,      0L),
-        list("hg38",     "GRCh38.p13",                  640L,    0L,      0L),
+        list("hg38",     "GRCh38.p14",                  711L,    0L,     -2L),
         list("hs1",      "T2T-CHM13v2.0",                25L,    0L,      0L),
         list("macFas5",  "Macaca_fascicularis_5.0",    7601L,    0L,      0L),
         list("mm8",      "MGSCv36",                      21L,   13L,    360L),
@@ -193,6 +199,7 @@ test_seqlevelsStyle_Seqinfo <- function()
         list("susScr3",  "Sscrofa10.2",                4583L,    0L,      0L),
         list("susScr11", "Sscrofa11.1",                 613L,    0L,      0L),
         list("taeGut2",  "Taeniopygia_guttata-3.2.4", 37096L,    0L,      0L),
+        list("xenLae2",  "Xenopus_laevis_v2",        108033L,    0L,      0L),
         list("xenTro10", "UCB_Xtro_10.0",               167L,    0L,      0L)
     )
     for (i in seq_along(UCSC_NCBI)) {
@@ -204,12 +211,33 @@ test_seqlevelsStyle_Seqinfo <- function()
     {
         is_RefSeq_accession <- GenomeInfoDb:::.is_RefSeq_accession
 
+        ## UGLY HACK! Hardcode list of NCBI seqlevels (+ their UCSC names)
+        ## NOT associated with a RefSeq accession in the "Full sequence
+        ## report" for GRCh38.p14:
+        if (NCBI_assembly == "GRCh38.p14") {
+            problematic_NCBI_seqlevels <- c(
+                "HSCHR10_1_CTG4",
+                "HSCHR11_CTG1_UNLOCALIZED",
+                "HSCHR22_UNLOCALIZED_CTG4",
+                "HSCHRUN_RANDOM_CTG29"
+            )
+            ## Their UCSC names.
+            problematic_UCSC_seqlevels <- c(
+                "chr10_KI270825v1_alt",
+                "chr11_KI270721v1_random",
+                "chr22_KI270734v1_random",
+                "chrUn_KI270752v1"
+            )
+        } else {
+            problematic_NCBI_seqlevels <- character(0)
+            problematic_UCSC_seqlevels <- character(0)
+        }
+
         ## Start with a Seqinfo object made from a UCSC genome.
 
         si1 <- Seqinfo(genome=UCSC_genome)
-        ## Remove problematic seqlevel chrUn_KI270752v1 (does not have an
-        ## associated GenBank accession). Belongs to hg38.
-        si1 <- si1[setdiff(seqlevels(si1), "chrUn_KI270752v1")]
+        ## Remove problematic UCSC seqlevels:
+        si1 <- si1[setdiff(seqlevels(si1), problematic_UCSC_seqlevels)]
 
         si2 <- si1
         seqlevelsStyle(si2) <- "NCBI"
@@ -225,7 +253,15 @@ test_seqlevelsStyle_Seqinfo <- function()
             checkIdentical(c("RefSeq", "UCSC"), style)
         }
         has_changed <- seqnames(si3) != seqnames(si2)
-        checkTrue(!any(has_changed & genome(si2) != NCBI_assembly))
+        ## UGLY HACK! We need to special-case hg38 because it contains 2
+        ## sequences that do NOT belong to GRCh38.p14. But they can be
+        ## found in GRCh38.p13!
+        if (UCSC_genome == "hg38") {
+            genome_is_ok <- genome(si2) %in% c("GRCh38.p14", "GRCh38.p13")
+        } else {
+            genome_is_ok <- genome(si2) == NCBI_assembly
+        }
+        checkTrue(all(genome_is_ok | !has_changed))
         checkTrue(all(is_RefSeq_accession(seqnames(si3)[has_changed])))
 
         si4 <- si1
@@ -243,10 +279,8 @@ test_seqlevelsStyle_Seqinfo <- function()
         ## Start with a Seqinfo object made from an NCBI assembly.
 
         si1 <- Seqinfo(genome=NCBI_assembly)
-        ## Remove problematic seqlevel HSCHRUN_RANDOM_CTG29 (does not have an
-        ## associated RefSeq accession). Belongs to GRCh37.p13, GRCh38.p12,
-        ## and GRCh38.p13. This is chrUn_KI270752v1 in hg38.
-        si1 <- si1[setdiff(seqlevels(si1), "HSCHRUN_RANDOM_CTG29")]
+        ## Remove problematic NCBI seqlevels:
+        si1 <- si1[setdiff(seqlevels(si1), problematic_NCBI_seqlevels)]
 
         si2 <- si1
         seqlevelsStyle(si2) <- "UCSC"
@@ -270,12 +304,13 @@ test_seqlevelsStyle_Seqinfo <- function()
         checkIdentical(si1, si2)
     }
 
-    ## Exclude some genomes from the RefSeq switch check. These genomes
-    ## fail to pass the check for reasons that need to be investigated!
-    ## In the case of canFam5 and hs1, it's because chrM is not mapped
-    ## to a RefSeq accession, that is, RefSeqAccn is NA for chrM in
-    ## getChromInfoFromNCBI("UMICH_Zoey_3.1"), and for MT in
-    ## getChromInfoFromNCBI("T2T-CHM13v2.0").
+    ## Exclude some problematic genomes from the RefSeq switch check:
+    ## - In the case of canFam5 and hs1, it's because chrM is not mapped
+    ##   to a RefSeq accession, that is, RefSeqAccn is NA for chrM in
+    ##   getChromInfoFromNCBI("UMICH_Zoey_3.1"), and for MT in
+    ##   getChromInfoFromNCBI("T2T-CHM13v2.0").
+    ## - For the other genomes (canFam4, rheMac3, panTro3), the reasons
+    ##   causing check_RefSeq_switch() still need to be investigated!
     skip_RefSeq_switch <- c("canFam4", "canFam5", "hs1", "rheMac3", "panTro3")
     for (i in seq_along(UCSC_NCBI)) {
         args <- UCSC_NCBI[[i]][c(1L, 2L, 4L)]

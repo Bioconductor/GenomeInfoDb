@@ -32,7 +32,8 @@ library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
                               "KQ",  # fix-patch or novel-patch
                               "KV",  # fix-patch or novel-patch
                               "KZ",  # fix-patch or novel-patch
-                              "ML")  # fix-patch or novel-patch
+                              "ML",  # fix-patch or novel-patch
+                              "MU")  # fix-patch or novel-patch
     m32 <- match(substr(m3[ , 2L], 1L, 2L), GenBankAccn_prefixes)
     stopifnot(!anyNA(m32))
     is_alt_scaffold <- m33 == 1L & m32 <= 4L
@@ -79,7 +80,23 @@ FETCH_ORDERED_CHROM_SIZES <-
 #)
 
 NCBI_LINKER <- list(
-    assembly_accession="GCF_000001405.39"  # GRCh38.p13
+    assembly_accession="GCF_000001405.40",  # GRCh38.p14
+    ## Note that FIX PATCH sequences HG107_PATCH and HG1311_PATCH
+    ## in GRCh38.p13 have been replaced with FIX PATCH sequences
+    ## HG107_HG2565_PATCH and HG1311_HG2539_PATCH in GRCh38.p14!
+    ## However, when UCSC sneakily modified their hg38 genome towards the
+    ## end of January 2023 to base it on GRCh38.p14 instead of GRCh38.p13,
+    ## they did the following:
+    ## - They kept the old HG107_PATCH and HG1311_PATCH sequences, even
+    ##   though these sequences do not belong to GRCh38.p14. These are
+    ##   named chr11_KQ759759v1_fix and chr22_KQ759762v1_fix in hg38.
+    ## - They also included their replacements, HG107_HG2565_PATCH and
+    ##   HG1311_HG2539_PATCH. These are named chr11_KQ759759v2_fix and
+    ##   chr22_KQ759762v2_fix in hg38.
+    ## This means that hg38 has 2 extra sequences w.r.t. GRCh38.p14 (711
+    ## sequences in hg38 vs 709 sequences in GRCh38.p14).
+    unmapped_seqs=list(`fix-patch`=c("chr11_KQ759759v1_fix",
+                                     "chr22_KQ759762v1_fix"))
 )
 
 ### Sequences not in the original GRCh38 are not mapped to Ensembl!

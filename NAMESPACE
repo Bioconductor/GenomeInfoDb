@@ -79,12 +79,16 @@ export(
     ## utils.R:
     DEFAULT_CIRC_SEQS,
 
+    ## list_ftp_dir.R:
+    list_ftp_dir,
+
     ## rankSeqlevels.R:
     orderSeqlevels,
     rankSeqlevels,
 
     ## NCBI-utils.R:
     find_NCBI_assembly_ftp_dir,
+    fetch_assembly_report,
 
     ## getChromInfoFromNCBI.R:
     registered_NCBI_assemblies,
