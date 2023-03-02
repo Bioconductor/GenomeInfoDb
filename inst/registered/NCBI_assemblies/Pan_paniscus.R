@@ -5,7 +5,7 @@ ASSEMBLIES <- list(
     list(assembly="panpan1",
          date="2012/04/24",
          extra_info=c(sex="female"),
-         assembly_accession="GCA_000258655.1",  # panTro1
+         assembly_accession="GCA_000258655.1",  # panPan1
          circ_seqs="MT"),
 
     list(assembly="panpan1.1",
