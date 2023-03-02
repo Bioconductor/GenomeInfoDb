@@ -41,7 +41,7 @@ FETCH_ORDERED_CHROM_SIZES <-
     function(goldenPath.url=getOption("UCSC.goldenPath.url"))
 {
     chrom_sizes <- GenomeInfoDb:::fetch_chrom_sizes_from_UCSC(GENOME,
-                                               goldenPath.url=goldenPath.url)
+                                              goldenPath.url=goldenPath.url)
     oo <- .order_seqlevels(chrom_sizes[ , "chrom"])
     S4Vectors:::extract_data_frame_rows(chrom_sizes, oo)
 }
