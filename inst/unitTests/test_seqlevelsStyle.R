@@ -165,6 +165,7 @@ test_seqlevelsStyle_Seqinfo <- function()
         list("galGal4",  "Gallus_gallus-4.0",         15932L,    0L,      0L),
         list("galGal5",  "Gallus_gallus-5.0",         23475L,    0L,      0L),
         list("galGal6",  "GRCg6a",                      464L,    0L,      0L),
+        list("gorGor6",  "Kamilah_GGO_v0",             5486L,    0L,      0L),
         list("hg15",     "NCBI33",                       24L,   20L,    140L),
         #list("hg16",     "NCBI34",                       24L,   18L,    138L),
         #list("hg17",     "NCBI35",                       26L,   20L,     86L),
