@@ -1,3 +1,40 @@
+CHANGES IN VERSION 1.36.0
+-------------------------
+
+NEW FEATURES
+
+    o Register the following NCBI assemblies:
+      - the bCatUst1.alt.v2 and bCatUst1.pri.v2 assemblies
+      - the felCat9.1_X and F.catus_Fca126_mat1.0 assemblies
+      - the Gossypium_hirsutum_v2.1 assembly
+      - the Kamilah_GGO_v0 assembly
+      - the Xenopus_laevis_v2 and Xenopus_laevis_v10.1 assemblies
+
+    o Register the following UCSC genomes:
+      - gorGor6 (linked to Kamilah_GGO_v0)
+      - xenLae2 (linked to Xenopus_laevis_v2)
+
+    o Add Gossypium_hirsutum.txt to inst/extdata/dataFiles/ (provided
+      by Emory Lucas <bararayung123@hotmail.com>)
+
+    o Add 'organism' argument to registered_UCSC_genomes() (contributed by
+      Kirabo Kakopo).
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o UCSC genome hg38 is now based on GRCh38.p14 instead of GRCh38.p13 (this
+      change originated at UCSC). See commit 091b5d2.
+
+    o The submitters for NCBI assembly Dog10K_Boxer_Tasha have updated
+      the info for the MT sequence, which is reflected in the output of
+      getChromInfoFromNCBI("Dog10K_Boxer_Tasha"). See commit 79a066c.
+
+    o The Accept-organism-for-GenomeInfoDb vignette was converted from
+      Rnw to Rmd (thanks to Haleema Khan and Jen Wokaty for this conversion).
+
+    o Small improvements to low-level helper find_NCBI_assembly_ftp_dir().
+
+
 CHANGES IN VERSION 1.34.0
 -------------------------
 
