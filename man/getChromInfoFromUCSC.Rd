@@ -37,7 +37,7 @@ registered_UCSC_genomes(organism=NA)
 \arguments{
   \item{genome}{
     A single string specifying the name of a UCSC genome
-    (e.g. \code{"panTro6"}).
+    e.g. \code{"panTro6"}, \code{"mm39"}, \code{"sacCer3"}, etc...
   }
   \item{assembled.molecules.only}{
     If \code{FALSE} (the default) then chromosome information is returned

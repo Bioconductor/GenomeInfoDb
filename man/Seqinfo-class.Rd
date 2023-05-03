@@ -80,8 +80,7 @@
 
 \section{Constructor}{
   \describe{
-    \item{}{
-      \code{Seqinfo(seqnames, seqlengths=NA, isCircular=NA, genome=NA)}:
+    \item{\code{Seqinfo(seqnames, seqlengths=NA, isCircular=NA, genome=NA)}:}{
       Create a Seqinfo object and populate it with the supplied data.
 
       One special form of calling the \code{Seqinfo()} constructor is
@@ -98,12 +97,10 @@
   In the code snippets below, \code{x} is a Seqinfo object.
 
   \describe{
-    \item{}{
-      \code{length(x)}:
+    \item{\code{length(x)}:}{
       Return the number of sequences in \code{x}.
     }
-    \item{}{
-      \code{seqnames(x)}, \code{seqnames(x) <- value}:
+    \item{\code{seqnames(x)}, \code{seqnames(x) <- value}:}{
       Get/set the names of the sequences in \code{x}.
       Those names must be non-NA, non-empty and unique.
       They are also called the \emph{sequence levels} or the \emph{keys}
@@ -113,16 +110,13 @@
       sequence levels with \code{seqnames(x) <- value}. The recommended way
       to do this is with \code{seqlevels(x) <- value} as described below.
     }
-    \item{}{
-      \code{names(x)}, \code{names(x) <- value}:
+    \item{\code{names(x)}, \code{names(x) <- value}:}{
       Same as \code{seqnames(x)} and \code{seqnames(x) <- value}.
     }
-    \item{}{
-      \code{seqlevels(x)}:
+    \item{\code{seqlevels(x)}:}{
       Same as \code{seqnames(x)}.
     }
-    \item{}{
-      \code{seqlevels(x) <- value}:
+    \item{\code{seqlevels(x) <- value}:}{
       Can be used to rename, drop, add and/or reorder the sequence levels.
       \code{value} must be either a named or unnamed character vector.
       When \code{value} has names, the names only serve the purpose of
@@ -147,16 +141,13 @@
 
       See below for some examples.
     }
-    \item{}{
-      \code{seqlengths(x)}, \code{seqlengths(x) <- value}:
+    \item{\code{seqlengths(x)}, \code{seqlengths(x) <- value}:}{
       Get/set the length for each sequence in \code{x}.
     }
-    \item{}{
-      \code{isCircular(x)}, \code{isCircular(x) <- value}:
+    \item{\code{isCircular(x)}, \code{isCircular(x) <- value}:}{
       Get/set the circularity flag for each sequence in \code{x}.
     }
-    \item{}{
-      \code{genome(x)}, \code{genome(x) <- value}:
+    \item{\code{genome(x)}, \code{genome(x) <- value}:}{
       Get/set the genome identifier or assembly name for each sequence
       in \code{x}.
     }
@@ -167,8 +158,7 @@
   In the code snippets below, \code{x} is a Seqinfo object.
 
   \describe{
-    \item{}{
-      \code{x[i]}:
+    \item{\code{x[i]}:}{
       A Seqinfo object can be subsetted only by name i.e. \code{i}
       must be a character vector.
       This is a convenient way to drop/add/reorder the entries
@@ -183,8 +173,7 @@
   In the code snippets below, \code{x} is a Seqinfo object.
 
   \describe{
-    \item{}{
-      \code{as.data.frame(x)}:
+    \item{\code{as.data.frame(x)}:}{
       Turns \code{x} into a data frame.
     }
   }
@@ -223,8 +212,7 @@
   \code{value}, are Seqinfo objects.
 
   \describe{
-    \item{}{
-      \code{merge(x, y, ...)}:
+    \item{\code{merge(x, y, ...)}:}{
       Merge \code{x} and \code{y} into a single Seqinfo object where the
       keys (i.e. the seqnames) are \code{union(seqnames(x), seqnames(y))}.
       If an entry in \code{y} has the same key as an entry in \code{x}, and
@@ -247,15 +235,13 @@
       is equivalent to
       \preformatted{    merge(merge(merge(x1, x2), x3), x4)}
     }
-    \item{}{
-      \code{intersect(x, y)}: Finds the intersection between
+    \item{\code{intersect(x, y)}:}{ Finds the intersection between
       two \code{Seqinfo} objects by merging them and subsetting for the
       intersection of their sequence names. This makes it easy to avoid
       warnings about each objects not being a subset of the other one
       during overlap operations.
     }
-    \item{}{
-      \code{update(object, value)}: Update the entries in Seqinfo object
+    \item{\code{update(object, value)}:}{ Update the entries in Seqinfo object
       \code{object} with the corresponding entries in Seqinfo object
       \code{value}. Note that the seqnames in \code{value} must be a subset
       of the seqnames in \code{object}.
