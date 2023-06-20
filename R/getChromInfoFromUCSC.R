@@ -231,11 +231,10 @@
                                        NCBI_GenBankAccn,
                                        NCBI_RefSeqAccn,
                                        special_mappings=special_mappings)
+    if (length(unmapped_seqs) != 0L)
+        L2R[unmapped_idx] <- NA_integer_
     L2R_is_NA <- is.na(L2R)
     mapped_idx <- which(!L2R_is_NA)
-
-    if (length(unmapped_seqs) != 0L)
-        stopifnot(all(L2R_is_NA[unmapped_idx]))
 
     if (isTRUE(drop_unmapped)) {
         UCSC_chrom_info <-
@@ -271,7 +270,7 @@
     ## NCBI columns "circular", "SequenceLength", and "UCSCStyleName"
     ## are expected to be redundant with UCSC columns "circular", "size",
     ## and "chrom", respectively. Let's make sure these 3 NCBI columns
-    ## agree with their UCSC counterpart before dropping them.
+    ## agree with their UCSC counterpart before we drop them.
 
     stopifnot(identical(UCSC_chrom_info[mapped_idx, "circular"],
                         NCBI_chrom_info[mapped_idx, "circular"]))
