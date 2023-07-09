@@ -1,6 +1,7 @@
 \name{GenomeInfoDb internals}
 
 \alias{DEFAULT_CIRC_SEQS}
+\alias{list_ftp_dir}
 
 \title{GenomeInfoDb internals}
 

@@ -36,19 +36,22 @@
 \alias{show,Seqinfo-method}
 
 % Combine:
+\alias{merge.Seqinfo}
 \alias{merge,Seqinfo,missing-method}
 \alias{merge,missing,Seqinfo-method}
 \alias{merge,Seqinfo,NULL-method}
 \alias{merge,NULL,Seqinfo-method}
 \alias{merge,Seqinfo,Seqinfo-method}
 \alias{intersect,Seqinfo,Seqinfo-method}
+\alias{update.Seqinfo}
+\alias{update,Seqinfo-method}
 \alias{checkCompatibleSeqinfo}
 
 \title{Seqinfo objects}
 
 \description{
   A Seqinfo object is used to store basic information about a set of
-  genomic sequences, typically chromosomes, but not necessarily.
+  genomic sequences, typically chromosomes (but not necessarily).
 }
 
 \details{
@@ -65,7 +68,8 @@
   All entries must contain at least the sequence name. The other information
   is optional. In addition, the \emph{seqnames} in a given Seqinfo object must
   be unique, that is, the object is not allowed to have two entries with the
-  same sequence name.
+  same sequence name. In other words, the sequence name is used as the
+  \emph{primary key} of a Seqinfo object.
 
   Note that Seqinfo objects are usually not used as standalone objects
   but are instead typically found inside higher level objects like
@@ -76,8 +80,7 @@
 
 \section{Constructor}{
   \describe{
-    \item{}{
-      \code{Seqinfo(seqnames, seqlengths=NA, isCircular=NA, genome=NA)}:
+    \item{\code{Seqinfo(seqnames, seqlengths=NA, isCircular=NA, genome=NA)}:}{
       Create a Seqinfo object and populate it with the supplied data.
 
       One special form of calling the \code{Seqinfo()} constructor is
@@ -94,12 +97,10 @@
   In the code snippets below, \code{x} is a Seqinfo object.
 
   \describe{
-    \item{}{
-      \code{length(x)}:
+    \item{\code{length(x)}:}{
       Return the number of sequences in \code{x}.
     }
-    \item{}{
-      \code{seqnames(x)}, \code{seqnames(x) <- value}:
+    \item{\code{seqnames(x)}, \code{seqnames(x) <- value}:}{
       Get/set the names of the sequences in \code{x}.
       Those names must be non-NA, non-empty and unique.
       They are also called the \emph{sequence levels} or the \emph{keys}
@@ -109,16 +110,13 @@
       sequence levels with \code{seqnames(x) <- value}. The recommended way
       to do this is with \code{seqlevels(x) <- value} as described below.
     }
-    \item{}{
-      \code{names(x)}, \code{names(x) <- value}:
+    \item{\code{names(x)}, \code{names(x) <- value}:}{
       Same as \code{seqnames(x)} and \code{seqnames(x) <- value}.
     }
-    \item{}{
-      \code{seqlevels(x)}:
+    \item{\code{seqlevels(x)}:}{
       Same as \code{seqnames(x)}.
     }
-    \item{}{
-      \code{seqlevels(x) <- value}:
+    \item{\code{seqlevels(x) <- value}:}{
       Can be used to rename, drop, add and/or reorder the sequence levels.
       \code{value} must be either a named or unnamed character vector.
       When \code{value} has names, the names only serve the purpose of
@@ -143,16 +141,13 @@
 
       See below for some examples.
     }
-    \item{}{
-      \code{seqlengths(x)}, \code{seqlengths(x) <- value}:
+    \item{\code{seqlengths(x)}, \code{seqlengths(x) <- value}:}{
       Get/set the length for each sequence in \code{x}.
     }
-    \item{}{
-      \code{isCircular(x)}, \code{isCircular(x) <- value}:
+    \item{\code{isCircular(x)}, \code{isCircular(x) <- value}:}{
       Get/set the circularity flag for each sequence in \code{x}.
     }
-    \item{}{
-      \code{genome(x)}, \code{genome(x) <- value}:
+    \item{\code{genome(x)}, \code{genome(x) <- value}:}{
       Get/set the genome identifier or assembly name for each sequence
       in \code{x}.
     }
@@ -163,8 +158,7 @@
   In the code snippets below, \code{x} is a Seqinfo object.
 
   \describe{
-    \item{}{
-      \code{x[i]}:
+    \item{\code{x[i]}:}{
       A Seqinfo object can be subsetted only by name i.e. \code{i}
       must be a character vector.
       This is a convenient way to drop/add/reorder the entries
@@ -179,29 +173,46 @@
   In the code snippets below, \code{x} is a Seqinfo object.
 
   \describe{
-    \item{}{
-      \code{as.data.frame(x)}:
+    \item{\code{as.data.frame(x)}:}{
       Turns \code{x} into a data frame.
     }
   }
 }
 
 \section{Combining Seqinfo objects}{
-  We provide no \code{c()} or \code{rbind()} methods for Seqinfo objects.
-  This is because these operations would be expected to return an object
-  of length \code{length(x) + length(y)} obtained by appending the entries
-  from input object \code{y} to those from input object \code{x}.
-  Such behavior would imply that the returned Seqinfo object is not
-  guaranteed to contain unique seqnames, which is a requirement for
-  Seqinfo objects.
+  Note that we provide no \code{c()} or \code{rbind()} methods for Seqinfo
+  objects. Here is why:
 
-  So instead, a \code{merge()} method is provided.
+  \code{c()} (like \code{rbind()}) is expected to follow an "appending
+  semantic", that is, \code{c(x, y)} is expected to form a new object by
+  \emph{appending} the entries in \code{y} to the entries in \code{x},
+  thus resulting in an object with \code{length(x) + length(y)} entries.
+  The problem with such operation is that it won't be very useful in general,
+  because it will tend to break the constraint that the seqnames of a
+  Seqinfo object must be unique (primary key).
 
-  In the code snippet below, \code{x} and \code{y} are Seqinfo objects.
+  So instead, a \code{merge()} method is provided, with a more useful
+  semantic. \code{merge(x, y)} does the following:
+  \itemize{
+    \item If an entry in Seqinfo object \code{x} has the same seqname as an
+          entry in Seqinfo object \code{y}, then the 2 entries are fusioned
+          together to produce a single entry in the result. This fusion only
+          happens if the 2 entries contain compatible information.
+    \item If 2 entries cannot be fusioned because they contain incompatible
+          information (e.g. different seqlengths or different circularity
+          flags), then \code{merge(x, y)} fails with an informative error
+          of why \code{x} and \code{y} could not be merged.
+  }
+
+  We also implement an \code{update()} method for Seqinfo objects.
+
+  See below for the details.
+
+  In the code snippet below, \code{x}, \code{y}, \code{object}, and
+  \code{value}, are Seqinfo objects.
 
   \describe{
-    \item{}{
-      \code{merge(x, y, ...)}:
+    \item{\code{merge(x, y, ...)}:}{
       Merge \code{x} and \code{y} into a single Seqinfo object where the
       keys (i.e. the seqnames) are \code{union(seqnames(x), seqnames(y))}.
       If an entry in \code{y} has the same key as an entry in \code{x}, and
@@ -224,17 +235,21 @@
       is equivalent to
       \preformatted{    merge(merge(merge(x1, x2), x3), x4)}
     }
-    \item{}{
-      \code{intersect(x, y)}: Finds the intersection between
+    \item{\code{intersect(x, y)}:}{ Finds the intersection between
       two \code{Seqinfo} objects by merging them and subsetting for the
       intersection of their sequence names. This makes it easy to avoid
       warnings about each objects not being a subset of the other one
       during overlap operations.
     }
+    \item{\code{update(object, value)}:}{ Update the entries in Seqinfo object
+      \code{object} with the corresponding entries in Seqinfo object
+      \code{value}. Note that the seqnames in \code{value} must be a subset
+      of the seqnames in \code{object}.
+    }
   }
 
   A convenience wrapper, \code{checkCompatibleSeqinfo()}, is provided
-  for checking whether 2 objects have compatible seqinfo components
+  for checking whether 2 objects have compatible Seqinfo components
   or not. \code{checkCompatibleSeqinfo(x, y)} is equivalent to
   \code{merge(seqinfo(x), seqinfo(y))} so will work on any objects
   \code{x} and \code{y} that support \code{\link{seqinfo}()}.
@@ -245,7 +260,7 @@
 
 \seealso{
   \itemize{
-    \item \code{\link{seqinfo}}
+    \item The \code{\link{seqinfo}} getter and setter.
 
     \item The \code{\link{getChromInfoFromNCBI}} and
           \code{\link{getChromInfoFromUCSC}} utility functions
@@ -298,7 +313,7 @@ if (interactive()) {
 x <- Seqinfo(seqnames=c("chr1", "chr2", "chr3", "chrM"),
              seqlengths=c(100, 200, NA, 15),
              isCircular=c(NA, FALSE, FALSE, TRUE),
-             genome="toy")
+             genome="sasquatch")
 x
 
 ## Accessors:
@@ -328,12 +343,14 @@ seqlevels(xx) <- c(chY="Y", ch1="1", "22")  # rename/reorder/drop/add
 xx
 
 ## ---------------------------------------------------------------------
-## C. MERGING 2 Seqinfo OBJECTS
+## C. COMBINING 2 Seqinfo OBJECTS
 ## ---------------------------------------------------------------------
 
 y <- Seqinfo(seqnames=c("chr3", "chr4", "chrM"),
              seqlengths=c(300, NA, 15))
 y
+
+## ------ merge() ------
 
 ## This issues a warning:
 merge(x, y)  # the entries for chr3 and chrM contain information merged
@@ -346,17 +363,22 @@ genome(y) <- genome(x)
 merge(x, y)
 
 ## Note that, strictly speaking, merging 2 Seqinfo objects is not
-## a commutative operation, i.e., in general 'z1 <- merge(x, y)'
-## is not identical to 'z2 <- merge(y, x)'. However 'z1' and 'z2'
-## are guaranteed to contain the same information (i.e. the same
-## entries, but typically not in the same order):
+## a commutative operation:
 merge(y, x)
 
+## More precisely: In general, 'z1 <- merge(x, y)' is not identical
+## to 'z2 <- merge(y, x)'. However 'z1' and 'z2' are guaranteed to
+## contain the same information but with their entries possibly in
+## different order.
+
 ## This contradicts what 'x' says about circularity of chr3 and chrM:
-isCircular(y)[c("chr3", "chrM")] <- c(TRUE, FALSE)
-y
+yy <- y
+isCircular(yy)[c("chr3", "chrM")] <- c(TRUE, FALSE)
+
+## We say that 'x' and 'yy' are incompatible Seqinfo objects.
+yy
 if (interactive()) {
-  merge(x, y)  # raises an error
+  merge(x, yy)  # raises an error
 }
 
 ## Sanity checks:
@@ -364,9 +386,40 @@ stopifnot(identical(x, merge(x, Seqinfo())))
 stopifnot(identical(x, merge(Seqinfo(), x)))
 stopifnot(identical(x, merge(x, x)))
 
+## ------ update() ------
+
+z <- Seqinfo(seqnames=c("chrM", "chr2", "chr3"),
+             seqlengths=c(25, NA, 300),
+             genome="chupacabra")
+z
+
+update(x, z)
+
+if (interactive()) {
+  update(z, x)  # not allowed
+  update(x, y)  # not allowed
+}
+
+## The seqnames in the 2nd argument can always be forced to be a subset
+## of the seqnames in the 1st argument with:
+update(x, y[intersect(seqnames(x), seqnames(y))])  # replace entries
+
+## Note that the above is not the same as:
+merge(x, y)[seqnames(x)]                           # fusion entries
+
+## The former is guaranteed to work, whatever the Seqinfo objects 'x'
+## and 'y'. The latter requires 'x' and 'y' to be compatible.
+
+## Sanity checks:
+stopifnot(identical(x, update(x, Seqinfo())))
+stopifnot(identical(x, update(x, x)))
+stopifnot(identical(z, update(x, z)[seqnames(z)]))
+
 ## ---------------------------------------------------------------------
 ## D. checkCompatibleSeqinfo()
 ## ---------------------------------------------------------------------
+## A simple convenience wrapper to check that 2 objects have compatible
+## Seqinfo components.
 
 library(GenomicRanges)
 gr1 <- GRanges("chr3:15-25", seqinfo=x)

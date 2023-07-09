@@ -231,11 +231,10 @@
                                        NCBI_GenBankAccn,
                                        NCBI_RefSeqAccn,
                                        special_mappings=special_mappings)
+    if (length(unmapped_seqs) != 0L)
+        L2R[unmapped_idx] <- NA_integer_
     L2R_is_NA <- is.na(L2R)
     mapped_idx <- which(!L2R_is_NA)
-
-    if (length(unmapped_seqs) != 0L)
-        stopifnot(all(L2R_is_NA[unmapped_idx]))
 
     if (isTRUE(drop_unmapped)) {
         UCSC_chrom_info <-
@@ -271,7 +270,7 @@
     ## NCBI columns "circular", "SequenceLength", and "UCSCStyleName"
     ## are expected to be redundant with UCSC columns "circular", "size",
     ## and "chrom", respectively. Let's make sure these 3 NCBI columns
-    ## agree with their UCSC counterpart before dropping them.
+    ## agree with their UCSC counterpart before we drop them.
 
     stopifnot(identical(UCSC_chrom_info[mapped_idx, "circular"],
                         NCBI_chrom_info[mapped_idx, "circular"]))
@@ -322,9 +321,9 @@
     goldenPath.url=getOption("UCSC.goldenPath.url"))
 {
     col2class <- c(ucsc="character", ensembl="character")
-    fetch_table_from_UCSC(genome, "ucscToEnsembl",
-                          col2class=col2class,
-                          goldenPath.url=goldenPath.url)
+    fetch_table_from_UCSC_database(genome, "ucscToEnsembl",
+                     col2class=col2class,
+                     goldenPath.url=goldenPath.url)
 }
 
 ### Filters and reformats the chromAlias data to so it's returned in the
@@ -334,9 +333,9 @@
     goldenPath.url=getOption("UCSC.goldenPath.url"))
 {
     col2class <- c(ensembl="character", ucsc="character", source="factor")
-    chromAlias <- fetch_table_from_UCSC(genome, "chromAlias",
-                                        col2class=col2class,
-                                        goldenPath.url=goldenPath.url)
+    chromAlias <- fetch_table_from_UCSC_database(genome, "chromAlias",
+                                   col2class=col2class,
+                                   goldenPath.url=goldenPath.url)
     ## Filters and reformats.
     keep_idx <- grep("ensembl", chromAlias[ , "source"], fixed=TRUE)
     ucsc2ensembl <- chromAlias[keep_idx, c("ucsc", "ensembl")]
@@ -473,7 +472,7 @@
     ## See README.TXT in inst/registered/UCSC_genomes/ for the list of
     ## variables.
     GENOME <- ORGANISM <- ASSEMBLED_MOLECULES <- CIRC_SEQS <- NULL
-    GET_CHROM_SIZES <- NCBI_LINKER <- ENSEMBL_LINKER <- NULL
+    FETCH_ORDERED_CHROM_SIZES <- NCBI_LINKER <- ENSEMBL_LINKER <- NULL
     source(script_path, local=TRUE)
 
     stop_if <- function(notok, ...) {
@@ -513,10 +512,10 @@
     stop_if(!all(CIRC_SEQS %in% ASSEMBLED_MOLECULES),
             "'CIRC_SEQS' must be a subset of 'ASSEMBLED_MOLECULES'")
 
-    ## Check GET_CHROM_SIZES.
-    if (!is.null(GET_CHROM_SIZES)) {
-        stop_if(!is.function(GET_CHROM_SIZES),
-                "when defined, 'GET_CHROM_SIZES' must be a function")
+    ## Check FETCH_ORDERED_CHROM_SIZES.
+    if (!is.null(FETCH_ORDERED_CHROM_SIZES)) {
+        stop_if(!is.function(FETCH_ORDERED_CHROM_SIZES),
+                "when defined, 'FETCH_ORDERED_CHROM_SIZES' must be a function")
     }
 
     ## Check NCBI_LINKER.
@@ -557,13 +556,15 @@
          ORGANISM=ORGANISM,
          ASSEMBLED_MOLECULES=ASSEMBLED_MOLECULES,
          CIRC_SEQS=CIRC_SEQS,
-         GET_CHROM_SIZES=GET_CHROM_SIZES,
+         FETCH_ORDERED_CHROM_SIZES=FETCH_ORDERED_CHROM_SIZES,
          NCBI_LINKER=NCBI_LINKER,
          ENSEMBL_LINKER=ENSEMBL_LINKER)
 }
 
-registered_UCSC_genomes <- function()
+registered_UCSC_genomes <- function(organism=NA)
 {
+    if (!isSingleStringOrNA(organism))
+        stop(wmsg("'organism' must be a single string or NA"))
     dir_path <- system.file("registered", "UCSC_genomes",
                              package="GenomeInfoDb")
     file_paths <- list.files(dir_path, pattern="\\.R$", full.names=TRUE)
@@ -615,10 +616,15 @@ registered_UCSC_genomes <- function()
     }
 
     listData <- lapply(setNames(seq_along(colnames), colnames), make_col)
-    ans <- S4Vectors:::new_DataFrame(listData, nrows=length(assemblies))
-    genome_trailing_digits <- sub("(.*[^0-9])([0-9]*)$", "\\2", ans$genome)
-    oo <- order(ans$organism, as.integer(genome_trailing_digits))
-    as.data.frame(ans[oo, , drop=FALSE])
+    DF <- S4Vectors:::new_DataFrame(listData, nrows=length(assemblies))
+    genome_trailing_digits <- sub("(.*[^0-9])([0-9]*)$", "\\2", DF$genome)
+    oo <- order(DF$organism, as.integer(genome_trailing_digits))
+    DF <- DF[oo, , drop=FALSE]
+    if (!is.na(organism)) {
+        keep_idx <- grep(organism, DF$organism, ignore.case=TRUE)
+        DF <- DF[keep_idx, , drop=FALSE]
+    }
+    as.data.frame(DF)
 }
 
 
@@ -670,6 +676,107 @@ registered_UCSC_genomes <- function()
     ans
 }
 
+### Return NULL or a "raw" chrom info data.frame, that is, a 4-column
+### data.frame with columns "chrom" (character), "size" (integer),
+### "assembled" (logical), and "circular" (logical).
+### The returned data.frame must have one row per assembled molecule.
+.load_stored_amol_info_for_UCSC_genome <-
+    function(GENOME, ASSEMBLED_MOLECULES, CIRC_SEQS)
+{
+    filename <- paste0(GENOME, ".tab")
+    filepath <- system.file("extdata", "assembled_molecules_info", "UCSC",
+                            filename, package="GenomeInfoDb")
+    if (identical(filepath, ""))
+        return(NULL)
+    ans <- read_UCSC_assembled_molecules_info_table(filepath)
+    expected_circular <- make_circ_flags_from_circ_seqs(ASSEMBLED_MOLECULES,
+                                                        CIRC_SEQS)
+    stopifnot(
+        identical(sapply(ans, class),
+                  c(chrom="character", size="integer", circular="logical")),
+        identical(ans[ , "chrom"], ASSEMBLED_MOLECULES),
+        identical(ans[ , "circular"], expected_circular)
+    )
+
+    ## Add "assembled" column.
+    cbind(ans[ , c("chrom", "size")],
+          assembled=rep.int(TRUE, nrow(ans)),
+          circular=ans[ , "circular"])
+}
+
+### Return a "raw" chrom info data.frame (i.e. 4 core columns only, see above).
+.fetch_raw_chrom_info_from_UCSC <- function(GENOME,
+    ASSEMBLED_MOLECULES,
+    CIRC_SEQS,
+    FETCH_ORDERED_CHROM_SIZES=NULL,
+    goldenPath.url=getOption("UCSC.goldenPath.url"))
+{
+    nb_assembled <- length(ASSEMBLED_MOLECULES)
+
+    ## Obtain chrom sizes from UCSC.
+    if (is.null(FETCH_ORDERED_CHROM_SIZES)) {
+        chrom_sizes <- fetch_chrom_sizes_from_UCSC(GENOME,
+                             goldenPath.url=goldenPath.url)
+        stopifnot(nrow(chrom_sizes) == nb_assembled)
+        oo <- match(ASSEMBLED_MOLECULES, chrom_sizes[ , "chrom"])
+        stopifnot(!anyNA(oo))
+        chrom_sizes <- S4Vectors:::extract_data_frame_rows(chrom_sizes, oo)
+    } else {
+        chrom_sizes <- FETCH_ORDERED_CHROM_SIZES(goldenPath.url=goldenPath.url)
+        stopifnot(is.data.frame(chrom_sizes),
+                  identical(sapply(chrom_sizes, class),
+                            c(chrom="character", size="integer")),
+                  identical(head(chrom_sizes[ , "chrom"], n=nb_assembled),
+                            ASSEMBLED_MOLECULES),
+                  is_primary_key(chrom_sizes[ , "chrom"]))
+    }
+
+    ## Prepare "assembled" column.
+    assembled <- logical(nrow(chrom_sizes))
+    assembled[seq_len(nb_assembled)] <- TRUE
+
+    ## Prepare "circular" column.
+    circular <- make_circ_flags_from_circ_seqs(chrom_sizes[ , "chrom"],
+                                               CIRC_SEQS)
+
+    ## Add "assembled" and "circular" columns.
+    cbind(chrom_sizes, assembled=assembled, circular=circular)
+}
+
+### Return a "raw" chrom info data.frame (i.e. 4 core columns only, see above).
+.get_raw_chrom_info_for_registered_UCSC_genome <- function(GENOME,
+    ASSEMBLED_MOLECULES,
+    CIRC_SEQS,
+    FETCH_ORDERED_CHROM_SIZES=NULL,
+    assembled.molecules.only=FALSE,
+    goldenPath.url=getOption("UCSC.goldenPath.url"),
+    recache=FALSE)
+{
+    stored_amol_info <- .load_stored_amol_info_for_UCSC_genome(GENOME,
+                                          ASSEMBLED_MOLECULES, CIRC_SEQS)
+    if (!is.null(stored_amol_info) && assembled.molecules.only && !recache)
+        return(stored_amol_info)
+    ans <- .UCSC_cached_chrom_info[[GENOME]]
+    if (is.null(ans) || recache) {
+        ans <- .fetch_raw_chrom_info_from_UCSC(GENOME, ASSEMBLED_MOLECULES,
+                                      CIRC_SEQS, FETCH_ORDERED_CHROM_SIZES,
+                                      goldenPath.url=goldenPath.url)
+        if (!is.null(stored_amol_info)) {
+            assembled_idx <- seq_along(ASSEMBLED_MOLECULES)
+            latest_amol_info <- S4Vectors:::extract_data_frame_rows(ans,
+                                                         assembled_idx)
+            if (!identical(stored_amol_info, latest_amol_info))
+                warning(wmsg("The chromosome info obtained from UCSC ",
+                             "for genome ", GENOME, " no longer matches ",
+                             "the records stored in the GenomeInfoDb ",
+                             "package. Could it be that ", GENOME, " has ",
+                             "changed?"))
+        }
+        .UCSC_cached_chrom_info[[GENOME]] <- ans
+    }
+    ans
+}
+
 .get_NCBI_linker <- function(map.NCBI, linker, GENOME)
 {
     if (is.list(map.NCBI))
@@ -711,38 +818,13 @@ registered_UCSC_genomes <- function()
     GENOME <- vars$GENOME
     ASSEMBLED_MOLECULES <- vars$ASSEMBLED_MOLECULES
 
-    nb_assembled <- length(ASSEMBLED_MOLECULES)
-    assembled_idx <- seq_len(nb_assembled)
-
-    ans <- .UCSC_cached_chrom_info[[GENOME]]
-    if (is.null(ans) || recache) {
-        GET_CHROM_SIZES <- vars$GET_CHROM_SIZES
-        if (is.null(GET_CHROM_SIZES)) {
-            ans <- fetch_chrom_sizes_from_UCSC(GENOME,
-                                               goldenPath.url=goldenPath.url)
-            stopifnot(nrow(ans) == nb_assembled)
-            oo <- match(ASSEMBLED_MOLECULES, ans[ , "chrom"])
-            stopifnot(!anyNA(oo))
-            ans <- S4Vectors:::extract_data_frame_rows(ans, oo)
-        } else {
-            ans <- GET_CHROM_SIZES(goldenPath.url=goldenPath.url)
-            stopifnot(is.data.frame(ans),
-                      identical(sapply(ans, class),
-                                c(chrom="character", size="integer")),
-                      identical(head(ans[ , "chrom"], n=nb_assembled),
-                                ASSEMBLED_MOLECULES),
-                      is_primary_key(ans[ , "chrom"]))
-        }
-
-        ## Add columns "assembled" and "circular".
-        assembled <- logical(nrow(ans))
-        assembled[assembled_idx] <- TRUE
-        circular <- make_circ_flags_from_circ_seqs(ans[ , "chrom"],
-                                                   vars$CIRC_SEQS)
-        ans <- cbind(ans, assembled=assembled, circular=circular)
-
-        .UCSC_cached_chrom_info[[GENOME]] <- ans
-    }
+    ## Get "raw" chrom info (i.e. 4 core columns only).
+    ans <- .get_raw_chrom_info_for_registered_UCSC_genome(GENOME,
+                     ASSEMBLED_MOLECULES, vars$CIRC_SEQS,
+                     FETCH_ORDERED_CHROM_SIZES=vars$FETCH_ORDERED_CHROM_SIZES,
+                     assembled.molecules.only=assembled.molecules.only,
+                     goldenPath.url=goldenPath.url,
+                     recache=recache)
 
     ## Add NCBI cols.
     NCBI_linker <- .get_NCBI_linker(map.NCBI, vars$NCBI_LINKER, GENOME)
@@ -757,8 +839,10 @@ registered_UCSC_genomes <- function()
         ans <- .add_ensembl_column(ans, GENOME, table=Ensemb_linker,
                                    goldenPath.url=goldenPath.url)
 
-    if (assembled.molecules.only)
+    if (assembled.molecules.only) {
+        assembled_idx <- seq_along(ASSEMBLED_MOLECULES)
         ans <- S4Vectors:::extract_data_frame_rows(ans, assembled_idx)
+    }
 
     if (!is.null(NCBI_linker)) {
         assembly_accession <- NCBI_linker$assembly_accession
@@ -769,8 +853,17 @@ registered_UCSC_genomes <- function()
     ans
 }
 
-### Return a 4-column data.frame with columns "chrom" (character), "size"
-### (integer), "assembled" (logical), and "circular" (logical).
+.make_Seqinfo_from_UCSC_chrominfo <- function(chrominfo, genome=NA)
+{
+    Seqinfo(seqnames=chrominfo[ , "chrom"],
+            seqlengths=chrominfo[ , "size"],
+            isCircular=chrominfo[ , "circular"],
+            genome=genome)
+}
+
+### By default, return a "raw" chrom info data.frame, that is, a 4-column
+### data.frame with columns "chrom" (character), "size" (integer),
+### "assembled" (logical), and "circular" (logical).
 getChromInfoFromUCSC <- function(genome,
     assembled.molecules.only=FALSE,
     map.NCBI=FALSE,
@@ -823,11 +916,140 @@ getChromInfoFromUCSC <- function(genome,
                     recache=recache)
     }
 
-    if (!as.Seqinfo)
-        return(ans)
-    Seqinfo(seqnames=ans[ , "chrom"],
-            seqlengths=ans[ , "size"],
-            isCircular=ans[ , "circular"],
-            genome=genome)
+    if (as.Seqinfo)
+        ans <- .make_Seqinfo_from_UCSC_chrominfo(ans, genome=genome)
+    ans
+}
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### get_and_fix_chrom_info_from_UCSC()
+###
+### A wrapper to getChromInfoFromUCSC() that tries to improve handling of
+### non-registered genomes by:
+### - ordering the sequences based on the heuristic implemented in
+###   rankSeqlevels()/orderSeqlevels()
+### - warning the user about the circularity flags being just a guess
+###   if the caller doesn't supply 'circ_seqs'
+### To use in higher-level functions like makeTxDbFromUCSC() in the
+### GenomicFeatures package.
+
+.warn_about_circularity_guess <- function(genome, circ_seqs,
+                                          warning_tip1="", warning_tip2="")
+{
+    if (length(circ_seqs) == 0L) {
+        guess <- c("no sequence in ", genome , " is circular")
+    } else if (length(circ_seqs) == 1L) {
+        guess <- c("sequence ", circ_seqs, " is circular")
+    } else {
+        in1string <- paste(circ_seqs, collapse=", ")
+        guess <- c(length(circ_seqs), " sequences (",
+                   in1string, ") are circular")
+    }
+    warning(wmsg("UCSC genome ", genome, " is not registered in the ",
+                 "GenomeInfoDb package (see '?registered_UCSC_genomes'), ",
+                 "so we made the following guess about this genome: ",
+                 guess, ". ", warning_tip1),
+            "\n  ",
+            wmsg("If you believe that this guess is incorrect, please ",
+                 "let us know by opening an issue at:"),
+            "\n      https://github.com/Bioconductor/GenomeInfoDb\n  ",
+            wmsg("In the meantime, you can supply your own list of circular ",
+                 "sequences (as a character vector) via the 'circ_seqs' ",
+                 "argument. ", warning_tip2))
+}
+
+### 'warning_tip1' and 'warning_tip2' must be single strings. They will be
+### added to the warning that we will issue if getChromInfoFromUCSC() had
+### to guess the circularity flags.
+get_and_fix_chrom_info_from_UCSC <- function(genome,
+    ...,
+    as.Seqinfo=FALSE,
+    circ_seqs=NULL,
+    warning_tip1="",
+    warning_tip2="")
+{
+    if (!isSingleString(genome))
+        stop(wmsg("'genome' must be a single string"))
+    if (!isTRUEorFALSE(as.Seqinfo))
+        stop(wmsg("'as.Seqinfo' must be TRUE or FALSE"))
+    if (!isSingleString(warning_tip1))
+        stop(wmsg("'warning_tip1' must be a single string"))
+    if (!isSingleString(warning_tip2))
+        stop(wmsg("'warning_tip2' must be a single string"))
+
+    UCSC_genomes <- registered_UCSC_genomes()[ , "genome"]
+    is_registered <- genome %in% UCSC_genomes
+
+    ans <- getChromInfoFromUCSC(genome, ..., as.Seqinfo=FALSE)
+    if (!is_registered) {
+        oo <- orderSeqlevels(ans[ , "chrom"])
+        ans <- S4Vectors:::extract_data_frame_rows(ans, oo)
+    }
+    seqlevels <- ans[ , "chrom"]
+    if (!is.null(circ_seqs)) {
+        ## The user supplied 'circ_seqs', so we use their input to infer the
+        ## circularity flags.
+        ## Note that the user would typically supply 'circ_seqs' when the
+        ## genome is NOT registered. In the case of a registered genome,
+        ## they don't need to do this, because, in this case, the circularity
+        ## flags returned by getChromInfoFromUCSC() should be accurate (they
+        ## were manually curated). However, if the user does supply the
+        ## 'circ_seqs' for a registered genome, we assume that they know
+        ## what they are doing, so we still use their input to replace the
+        ## circularity flags returned by getChromInfoFromUCSC().
+        ans[ , "circular"] <- make_circ_flags_from_circ_seqs(
+                                              seqlevels,
+                                              circ_seqs=circ_seqs)
+    } else if (!is_registered) {
+        ## The user did NOT supply 'circ_seqs'. And also because 'genome'
+        ## is NOT a registered UCSC genome, getChromInfoFromUCSC() had to
+        ## guess the circularity flags that it returned in 'ans'. Note
+        ## that this uncertainty about the circularity flags is reflected
+        ## in the presence of NA's instead of FALSE's in 'ans[ , "circular"]'.
+        ## In addition to those NA's (which are easy to miss), we also warn
+        ## the user about this guess with an explicit warning.
+        circ_seqs <- seqlevels[which(ans[ , "circular"])]
+        .warn_about_circularity_guess(genome, circ_seqs,
+                                      warning_tip1, warning_tip2)
+    }
+
+    if (as.Seqinfo)
+        ans <- .make_Seqinfo_from_UCSC_chrominfo(ans, genome=genome)
+    ans
+}
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### saveAssembledMoleculesInfoFromUCSC()
+###
+### Not intended for the end user.
+### Use case is to add "assembled molecules info" for the specified UCSC
+### genomes to the GenomeInfoDb package. The genomes must be **registered**.
+### See README.TXT in GenomeInfoDb/inst/extdata/assembled_molecules_info/UCSC/
+### for more information.
+
+### Vectorized.
+saveAssembledMoleculesInfoFromUCSC <- function(
+    genomes, dir=".",
+    goldenPath.url=getOption("UCSC.goldenPath.url"))
+{
+    if (!is.character(genomes))
+        stop(wmsg("'genomes' must be a character vector"))
+    if (!isSingleString(dir))
+        stop(wmsg("'dir' must be a single string specifying the path ",
+                  "to the directory where to save the RDS file"))
+    expected_colnames <- c("chrom", "size", "assembled", "circular")
+    for (genome in genomes) {
+        chrominfo <- getChromInfoFromUCSC(genome, assembled.molecules.only=TRUE,
+                                          goldenPath.url=goldenPath.url,
+                                          recache=TRUE)
+        stopifnot(identical(colnames(chrominfo), expected_colnames))
+        chrominfo <- chrominfo[ , -3L]
+        filename <- paste0(genome, ".tab")
+        filepath <- file.path(dir, filename)
+        write.table(chrominfo, file=filepath,
+                    quote=FALSE, sep="\t", row.names=FALSE)
+    }
 }
 

@@ -3,11 +3,12 @@
 ### -------------------------------------------------------------------------
 ###
 ### A Seqinfo object is a table-like object that contains basic information
-### about a set of genomic sequences. The table has 1 row per sequence and
-### 1 column per sequence attribute. Currently the only attributes are the
-### length, circularity flag, and genome provenance (e.g. hg19) of the
-### sequence, but more attributes might be added in the future as the need
-### arises.
+### about a set of genomic sequences. The table has one entry per sequence,
+### with each entry containing the following sequence attributes:
+###   - sequence name (primary key)
+###   - sequence length
+###   - circularity flag
+###   - genome (e.g. hg19)
 ###
 
 setClass("Seqinfo",
@@ -18,9 +19,6 @@ setClass("Seqinfo",
         genome="character"
     )
 )
-
-### NOTE: Other possible (maybe better) names: GSeqinfo or GenomicSeqinfo
-### for Genome/Genomic Sequence info.
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -429,7 +427,7 @@ setReplaceMethod("genome", "Seqinfo",
 ### Coercion
 ###
 
-### S3/S4 combo for as.data.frame.Vector
+### S3/S4 combo for as.data.frame.Seqinfo
 as.data.frame.Seqinfo <- function(x, row.names=NULL, optional=FALSE, ...)
 {
     if (!is.null(row.names))
@@ -592,9 +590,12 @@ showCompactDataFrame <- function(x, rownames.label="", left.margin="")
 setMethod("show", "Seqinfo",
     function(object)
     {
-        cat(class(object), " object with ", summary(object), ":\n", sep="")
-        if (length(object) == 0L)
+        cat(class(object), " object with ", summary(object), sep="")
+        if (length(object) == 0L) {
+            cat("\n")
             return(NULL)
+        }
+        cat(":\n")
         showCompactDataFrame(as.data.frame(object),
                              rownames.label="seqnames", left.margin="  ")
     }
@@ -604,19 +605,29 @@ setMethod("show", "Seqinfo",
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Combining
 ###
-### Why no "c" or "rbind" method for Seqinfo objects?
-### 'c(x, y)' would be expected to just append the rows in 'y' to the rows in
-### 'x' resulting in an object of length 'length(x) + length(y)'. But that
-### would tend to break the constraint that the seqnames of a Seqinfo object
-### must be unique.
-### So what we really need is the ability to "merge" Seqinfo objects, that is,
-### if a row in 'x' has the same seqname as a row in 'y', then the 2 rows must
-### be merged in a single row before it's put in the result. If 2 rows cannot
-### be merged because they contain incompatible information (e.g. different
-### seqlengths or different circularity flags), then an error must be raised.
+### Why no c() or rbind() method for Seqinfo objects?
+###
+### c() is expected to follow an "appending semantic", that is, 'c(x, y)' is
+### expected to form a new object by **appending** the entries in 'y' to the
+### entries in 'x', thus resulting in an object with 'length(x) + length(y)'
+### entries. Problem with such operation is that it won't be very useful in
+### general, because it will tend to break the constraint that the seqnames
+### of a Seqinfo object must be unique (primary key).
+### A more useful operation is a "merge" operation that does the following:
+### - If an entry in Seqinfo object 'x' has the same seqname as an entry in
+###   Seqinfo object 'y', then the 2 entries are fusioned/melded together
+###   to produce a single entry in the result. This fusion only happens if
+###   the 2 entries contain compatible information.
+### - If 2 entries cannot be fusioned/melded because they contain incompatible
+###   information (e.g. different seqlengths or different circularity flags),
+###   then the "merge" operation fails with an informative error of why 'x'
+###   and 'y' could not be merged.
+###
+### We also implement an "update" operation for Seqinfo objects. See below.
 ###
 
-.Seqinfo.mergexy <- function(x, y)
+### Binary merge.
+.merge_two_Seqinfo_objects <- function(x, y)
 {
     ans_seqnames    <- union(seqnames(x), seqnames(y))
     ans_genome      <- mergeNamedAtomicVectors(genome(x), genome(y),
@@ -653,7 +664,8 @@ setMethod("show", "Seqinfo",
             isCircular=ans_is_circular, genome=ans_genome)
 }
 
-.Seqinfo.merge <- function(...)
+## N-ary merge.
+.merge_Seqinfo_objects <- function(...)
 {
     args <- unname(list(...))
     ## Remove NULL elements...
@@ -669,35 +681,65 @@ setMethod("show", "Seqinfo",
     if (!all(sapply(args, is, class(x))))
         stop("all arguments in must be ", class(x), " objects (or NULLs)")
     for (y in args)
-        x <- .Seqinfo.mergexy(x, y)
+        x <- .merge_two_Seqinfo_objects(x, y)
     x
 }
+
+### S3 merge() method for Seqinfo objects.
+merge.Seqinfo <- function(x, y, ...) .merge_Seqinfo_objects(x, y, ...)
 
 ### These methods should not be called with named arguments: this tends to
 ### break dispatch!
 setMethod("merge", c("Seqinfo", "missing"),
-    function(x, y, ...) .Seqinfo.merge(x, ...)
+    function(x, y, ...) .merge_Seqinfo_objects(x, ...)
 )
 
 setMethod("merge", c("missing", "Seqinfo"),
-    function(x, y, ...) .Seqinfo.merge(y, ...)
+    function(x, y, ...) .merge_Seqinfo_objects(y, ...)
 )
 
 setMethod("merge", c("Seqinfo", "NULL"),
-    function(x, y, ...) .Seqinfo.merge(x, ...)
+    function(x, y, ...) .merge_Seqinfo_objects(x, ...)
 )
 
 setMethod("merge", c("NULL", "Seqinfo"),
-    function(x, y, ...) .Seqinfo.merge(y, ...)
+    function(x, y, ...) .merge_Seqinfo_objects(y, ...)
 )
 
 setMethod("merge", c("Seqinfo", "Seqinfo"),
-    function(x, y, ...) .Seqinfo.merge(x, y, ...)
+    function(x, y, ...) .merge_Seqinfo_objects(x, y, ...)
 )
 
 setMethod("intersect", c("Seqinfo", "Seqinfo"), function(x, y) {
   merge(x, y)[intersect(seqnames(x), seqnames(y))]
 })
+
+### Update the entries in Seqinfo object 'object' with the corresponding
+### entries in Seqinfo object 'value'. Note that the seqnames in 'value'
+### must be a subset of the seqnames in 'object'.
+.update_Seqinfo <- function(object, value)
+{
+   if (!is(object, "Seqinfo"))
+        stop("object to update 'object' must be a Seqinfo object")
+   if (!is(value, "Seqinfo"))
+        stop("replacement value must be a Seqinfo object")
+
+    ## Infer 'i'.
+    i <- match(seqnames(value), seqnames(object))
+    if (anyNA(i))
+        stop(wmsg("the seqnames in replacement Seqinfo object must be ",
+                  "a subset of the seqnames in Seqinfo object to update"))
+
+    ## Modify and return 'object'.
+    object@seqlengths[i] <- value@seqlengths
+    object@is_circular[i] <- value@is_circular
+    object@genome[i] <- value@genome
+    object
+}
+
+### S3/S4 combo for update.Seqinfo
+update.Seqinfo <- function(object, ...) .update_Seqinfo(object, ...)
+setMethod("update", "Seqinfo", update.Seqinfo)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

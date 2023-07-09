@@ -298,6 +298,16 @@ find_NCBI_assembly_info_for_accession <- function(accession)
     if (is.null(ans) || recache) {
         assembly_report <- fetch_assembly_report(accession,
                                                  assembly_name=assembly_name)
+        ## Hardcoded special treatment of GCF_000002285.5 (Dog10K_Boxer_Tasha).
+        ## See inst/registered/NCBI_assemblies/Canis_lupus_familiaris.R
+        if (accession == "GCF_000002285.5") {
+            ## Full sequence report for GCF_000002285.5 has 2 entries for MT.
+            ## Remove the bogus one!
+            GenBankAccn <- assembly_report[ , "GenBankAccn"]
+            keep_idx <- which(!(GenBankAccn %in% "CM023446.1"))
+            assembly_report <-
+                S4Vectors:::extract_data_frame_rows(assembly_report, keep_idx)
+        }
         ans <- .format_NCBI_chrom_info(assembly_report, circ_seqs=circ_seqs)
         .NCBI_cached_chrom_info[[accession]] <- ans
     }

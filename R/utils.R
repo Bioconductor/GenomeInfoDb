@@ -2,7 +2,7 @@
 ### Miscellaneous low-level utils
 ### -------------------------------------------------------------------------
 ###
-### Nothing in this file is exported.
+### Unless stated otherwise, nothing in this file is exported.
 ###
 
 
@@ -182,25 +182,11 @@ join_dfs <- function(Ldf, Rdf, Lcolumn, Rcolumn,
 ### Other stuff
 ###
 
-### Uses RCurl to access and list the content of an FTP dir.
-list_ftp_dir <- function(url, subdirs.only=FALSE)
-{
-    doc <- getURL(url)
-    listing <- strsplit(doc, "\n", fixed=TRUE)[[1L]]
-    if (subdirs.only)
-        listing <- listing[substr(listing, 1L, 1L) == "d"]
-    ## Keep field no. 8 only
-    pattern <- paste(c("^", rep.int("[^[:space:]]+[[:space:]]+", 8L)),
-                     collapse="")
-    listing <- sub(pattern, "", listing)
-    sub("[[:space:]].*$", "", listing)
-}
-
 ### Provides a simpler interface to read.table().
-.simple_read_table <- function(file,
-                               header=FALSE, colnames=NULL, col2class=NULL,
-                               nrows=-1L, skip=0L,
-                               sep="\t", quote="", comment.char="")
+simple_read_table <- function(file,
+                              header=FALSE, colnames=NULL, col2class=NULL,
+                              nrows=-1L, skip=0L,
+                              sep="\t", quote="", comment.char="")
 {
     if (is.null(col2class))
         col2class <- NA
@@ -213,6 +199,8 @@ list_ftp_dir <- function(url, subdirs.only=FALSE)
     do.call(read.table, args)
 }
 
+### Used by fetch_assembly_report(), getChromInfoFromNCBI(),
+### getChromInfoFromUCSC(), and more...
 ### Calling read.table() directly on an URL tends to be unreliable. For
 ### example getChromInfoFromNCBI("CIEA01") was randomly failing for me with
 ### a "line 18564 did not have 10 elements" error (exact line number would
@@ -220,15 +208,18 @@ list_ftp_dir <- function(url, subdirs.only=FALSE)
 ### of the NCBI assembly report. In my experience, the 2-step approach
 ### "first download the file, then call read.table() on the local file"
 ### seems to be a lot more reliable! This is what fetch_table_from_url()
-### does. (And getChromInfoFromNCBI() now uses fetch_table_from_url().)
-### Same interface as .simple_read_table() above.
+### does.
+### Same interface as simple_read_table() above.
 fetch_table_from_url <- function(url, ...)
 {
     destfile <- tempfile()
-    suppressWarnings(download.file(url, destfile, quiet=TRUE))
-    ans <- .simple_read_table(destfile, ...)
-    unlink(destfile)
-    ans
+    ## download.file() will not necessarily remove the destination file
+    ## in case of an error. See ?download.file
+    on.exit(unlink(destfile))
+    code <- suppressWarnings(download.file(url, destfile, quiet=TRUE))
+    if (code != 0L)
+        stop(wmsg("download failed"))
+    simple_read_table(destfile, ...)
 }
 
 ### Global character vector to hold default names for circular sequences.

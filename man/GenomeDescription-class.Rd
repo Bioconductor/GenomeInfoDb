@@ -50,35 +50,29 @@
   GenomeDescription object.
 
   \describe{
-    \item{}{
-      \code{organism(object)}:
+    \item{\code{organism(object)}:}{
       Return the scientific name of the organism of the genome e.g.
       \code{"Homo sapiens"}, \code{"Mus musculus"},
       \code{"Caenorhabditis elegans"}, etc...
     }
-    \item{}{
-      \code{commonName(object)}:
+    \item{\code{commonName(object)}:}{
       Return the common name of the organism of the genome e.g.
       \code{"Human"}, \code{"Mouse"}, \code{"Worm"}, etc...
     }
-    \item{}{
-      \code{providerVersion(x)}:
+    \item{\code{providerVersion(x)}:}{
       Return the \emph{name} of the genome. This is typically the name of an
       NCBI assembly (e.g. \code{GRCh38.p13}, \code{WBcel235}, \code{TAIR10.1},
       \code{ARS-UCD1.2}, etc...) or UCSC genome (e.g. \code{hg38},
       \code{bosTau9}, \code{galGal6}, \code{ce11}, etc...).
     }
-    \item{}{
-      \code{provider(x)}:
+    \item{\code{provider(x)}:}{
       Return the provider of this genome e.g. \code{"UCSC"}, \code{"BDGP"},
       \code{"FlyBase"}, etc...
     }
-    \item{}{
-      \code{releaseDate(x)}:
+    \item{\code{releaseDate(x)}:}{
       Return the release date of this genome e.g. \code{"Mar. 2006"}.
     }
-    \item{}{
-      \code{bsgenomeName(x)}:
+    \item{\code{bsgenomeName(x)}:}{
       Uses the meta information stored in GenomeDescription object \code{x}
       to construct the name of the corresponding BSgenome data package (see
       the \code{\link[BSgenome]{available.genomes}} function in the

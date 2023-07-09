@@ -1,7 +1,7 @@
 import(methods)
 importFrom(utils, data, download.file, read.delim, read.table, read.csv,
-                  as.roman)
-importFrom(stats, setNames)
+                  write.table, as.roman)
+importFrom(stats, setNames, update)
 importFrom(stats4, summary)
 
 importFrom(RCurl, getURL)
@@ -28,7 +28,11 @@ exportClasses(
 
 S3method(as.data.frame, Seqinfo)
 
+S3method(merge, Seqinfo)
+
 S3method(summary, Seqinfo)
+
+S3method(update, Seqinfo)
 
 ### We also export them thru the export() directive so that (a) they can be
 ### called directly, (b) tab-completion on the name of the generic shows them,
@@ -36,7 +40,11 @@ S3method(summary, Seqinfo)
 export(
     as.data.frame.Seqinfo,
 
-    summary.Seqinfo
+    merge.Seqinfo,
+
+    summary.Seqinfo,
+
+    update.Seqinfo
 )
 
 
@@ -51,6 +59,9 @@ exportMethods(
     as.data.frame,
     show,
     merge,
+
+    ## Generics defined in the stats package:
+    update,
 
     ## Generics defined in the stats4 package:
     summary,
@@ -68,9 +79,16 @@ export(
     ## utils.R:
     DEFAULT_CIRC_SEQS,
 
+    ## list_ftp_dir.R:
+    list_ftp_dir,
+
     ## rankSeqlevels.R:
     orderSeqlevels,
     rankSeqlevels,
+
+    ## NCBI-utils.R:
+    find_NCBI_assembly_ftp_dir,
+    fetch_assembly_report,
 
     ## getChromInfoFromNCBI.R:
     registered_NCBI_assemblies,
@@ -79,6 +97,8 @@ export(
     ## getChromInfoFromUCSC.R:
     registered_UCSC_genomes,
     getChromInfoFromUCSC,
+    get_and_fix_chrom_info_from_UCSC,
+    saveAssembledMoleculesInfoFromUCSC,
 
     ## getChromInfoFromEnsembl.R:
     getChromInfoFromEnsembl,
