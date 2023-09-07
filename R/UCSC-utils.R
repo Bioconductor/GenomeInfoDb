@@ -107,10 +107,10 @@ fetch_chrom_sizes_from_UCSC <- function(genome,
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### read_UCSC_assembled_molecules_info_table()
+### read_UCSC_assembled_molecules_db_table()
 ###
 
-read_UCSC_assembled_molecules_info_table <- function(file)
+read_UCSC_assembled_molecules_db_table <- function(file)
 {
     col2class <- c(chrom="character", size="integer", circular="logical")
     simple_read_table(file, header=TRUE, col2class=col2class)

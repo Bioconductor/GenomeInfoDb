@@ -145,7 +145,7 @@ registered_UCSC_genomes(organism=NA)
   \preformatted{    getChromInfoFromUCSC("hg38", assembled.molecules.only=TRUE)}
   fast and reliable i.e. the call will always work, even when offline!
 
-  See README.TXT in GenomeInfoDb/inst/extdata/assembled_molecules_info/UCSC/
+  See README.TXT in GenomeInfoDb/inst/extdata/assembled_molecules_db/UCSC/
   for more information.
 
   Note that calling \code{getChromInfoFromUCSC()} with

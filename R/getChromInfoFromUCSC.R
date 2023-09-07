@@ -684,11 +684,11 @@ registered_UCSC_genomes <- function(organism=NA)
     function(GENOME, ASSEMBLED_MOLECULES, CIRC_SEQS)
 {
     filename <- paste0(GENOME, ".tab")
-    filepath <- system.file("extdata", "assembled_molecules_info", "UCSC",
+    filepath <- system.file("extdata", "assembled_molecules_db", "UCSC",
                             filename, package="GenomeInfoDb")
     if (identical(filepath, ""))
         return(NULL)
-    ans <- read_UCSC_assembled_molecules_info_table(filepath)
+    ans <- read_UCSC_assembled_molecules_db_table(filepath)
     expected_circular <- make_circ_flags_from_circ_seqs(ASSEMBLED_MOLECULES,
                                                         CIRC_SEQS)
     stopifnot(
@@ -1026,7 +1026,7 @@ get_and_fix_chrom_info_from_UCSC <- function(genome,
 ### Not intended for the end user.
 ### Use case is to add "assembled molecules info" for the specified UCSC
 ### genomes to the GenomeInfoDb package. The genomes must be **registered**.
-### See README.TXT in GenomeInfoDb/inst/extdata/assembled_molecules_info/UCSC/
+### See README.TXT in GenomeInfoDb/inst/extdata/assembled_molecules_db/UCSC/
 ### for more information.
 
 ### Vectorized.
