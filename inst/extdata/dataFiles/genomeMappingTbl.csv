@@ -96,7 +96,8 @@ chimpanzee,pan troglodytes,Pan_tro_3.0,91,Dec.2017,91,Dec.2017,panTro5,May.2016,
 chimpanzee,pan troglodytes,Pan_tro_3.0,91,Dec.2017,92,Apr.2018,panTro6,Jan.2018,Clint_PTRv2
 chinese hamster CHOK1GS,cricetulus griseus,CHOK1GS_HDv1,90,Aug.2017,90,Aug.2017,criGri1,Jul.2013,Beijing Genomics Institution-Shenzhen C_griseus_v1.0
 chinese hamster CriGri,cricetulus griseus,CriGri_1.0,90,Aug.2017,90,Aug.2017,criGri1,Jul.2013,Beijing Genomics Institution-Shenzhen C_griseus_v1.0
-chinese hamster PICR,cricetulus griseus,CriGri-PICR,96,Apr.2019,96,Apr.2019,NA,NA,NA
+chinese hamster PICR,cricetulus griseus,CriGri-PICR,96,Apr.2019,109,Feb.2023,NA,NA,NA
+chinese hamster PICR,cricetulus griseus,CriGri-PICR-1.0,110,Jul.2023,110,Jul.2023,NA,NA,NA
 chinese medaka,oryzias sinensis,ASM858656v1,100,Apr.2020,100,Apr.2020,NA,NA,NA
 chinese softshell turtle,pelodiscus sinensis,PelSin_1.0,68,Jul.2012,68,Jul.2012,pelSin1,NA,NA
 chinook salmon,oncorhynchus tshawytscha,Otsh_v1.0,100,Apr.2020,100,Apr.2020,NA,NA,NA
@@ -146,7 +147,8 @@ dog,canis familiaris,CanFam3.1,100,Apr.2020,100,Apr.2020,canFam6,Oct.2020,Dog Ge
 dolphin,tursiops truncatus,turTru1,54,May.2009,64,Sept.2011,NA,NA,NA
 dolphin,tursiops truncatus,turTru1,54,May.2009,65,Dec.2011,turTru2,Oct.2011,Baylor College of Medicine Ttru_1.4
 domestic yak,bos grunniens,LU_Bosgru_v3.0,99,Jan.2020,99,Jan.2020,NA,NA,NA
-donkey,qquus asinus asinus,ASM303372v1,95,Jan2019,95,Jan2019,NA,NA,NA
+donkey,qquus asinus asinus,ASM303372v1,95,Jan2019,109,Feb.2023,NA,NA,NA
+donkey,qquus asinus asinus,ASM1607732v2,110,Jul.2023,110,Jul.2023,NA,NA,NA
 drill,mandrillus leucophaeus,Mleu.le_1.0,91,Dec.2017,91,Dec.2017,NA,NA,NA
 ferret,mustela putorius furo,MusPutFur1.0,69,Oct.2012,69,Oct.2012,musFur,Apr.2011,Ferret Genome Sequencing Consortium MusPutFur1.0
 duck,anas platyrhynchos,BGI_duck_1.0,73,Sep.2013,95,Jan.2019,anaPlat1,NA,NA
@@ -238,7 +240,9 @@ human,homo sapiens,GRCh38.p5,83,Dec.2015,83,Dec.2015,hg38,Dec.2013,Genome Refere
 human,homo sapiens,GRCh38.p7,85,Jul.2016,85,Jul.2016,hg38,Dec.2013,Genome Reference Consortium GRCh38
 human,homo sapiens,GRCh38.p10,88,Mar.2017,88,Mar.2017,hg38,Dec.2013,Genome Reference Consortium GRCh38
 human,homo sapiens,GRCh38.p12,92,Apr.2018,92,Apr.2018,hg38,Dec.2013,Genome Reference Consortium GRCh38
-human,homo sapiens,GRCh38.p13,98,Sept.2019,98,Sept.2019,hg38,Dec.2013,Genome Reference Consortium GRCh38
+human,homo sapiens,GRCh38.p13,98,Sept.2019,105,Dec.2021,hg38,Dec.2013,Genome Reference Consortium GRCh38
+human,homo sapiens,GRCh38.p13,106,Apr.2022,109,Feb.2023,hs1,Jan.2022,T2T Consortium CHM13v2.0
+human,homo sapiens,GRCh38.p14,110,Jul.2023,110,Jul.2023,hs1,Jan.2022,T2T Consortium CHM13v2.0
 hybrid-bos indicus,bos indicus x bos taurus,UOA_Brahman_1,97,Jul.2019,97,Jul.2019,NA,NA,NA
 hybrid-bos taurus,bos indicus x bos taurus,UOA_Angus_1,97,Jul.2019,97,Jul.2019,NA,NA,NA
 hyrax,procavia capensis,proCap1,54,May.2009,54,May.2009,proCap1,Jul.2008,Baylor College of Medicine HGSC Procap1.0
@@ -312,8 +316,10 @@ mouse lemur,microcebus murinus,Mmur_2.0,86,Oct.2016,86,Oct.2016,micMur2,May.2015
 mouse lemur,microcebus murinus,Mmur_3.0,91,Dec.2017,91,Dec.2017,micMur2,May.2015,Baylor/Broad Institute Mmur_2.0
 mummichog,fundulus heteroclitus,Fundulus_heteroclitus-3.0.2,94,Oct.2018,94,Oct.2018,NA,NA,NA
 muscovy Duck,cairina moschata domestica,CaiMos1.0,101,Aug.2020,101,Aug.2020,NA,NA,NA
-naked mole-rat female,heterocephalus glaber,HetGla_female_1.0,90,Aug.2017,90,Aug.2017,hetGla2,Jan.2012,Broad Institute HetGla_female_1.0
-naked mole-rat male,heterocephalus glaber,HetGla_1.0,90,Aug.2017,90,Aug.2017,hetGla1,Jul.2011,Beijing Genomics Institute HetGla_1.0
+naked mole-rat female,heterocephalus glaber,HetGla_female_1.0,90,Aug.2017,109,Feb.2023,hetGla2,Jan.2012,Broad Institute HetGla_female_1.0
+naked mole-rat female,heterocephalus glaber,Naked-mole-rat-maternal,110,Jul.2023,110,Jul.2023,hetGla2,Jan.2012,Broad Institute HetGla_female_1.0
+naked mole-rat male,heterocephalus glaber,HetGla_1.0,90,Aug.2017,109,Feb.2023,hetGla1,Jul.2011,Beijing Genomics Institute HetGla_1.0
+naked mole-rat male,heterocephalus glaber,Naked-mole-rat-paternal,110,Jul.2023,110,Jul.2023,hetGla1,Jul.2011,Beijing Genomics Institute HetGla_1.0
 narwhal,monodon monoceros,NGI_Narwhal_1,101,Aug.2020,101,Aug.2020,NA,NA,NA
 new Caledonian crow,corvus moneduloides,UO_Cmon_1.0,101,Aug.2020,101,Aug.2020,NA,NA,NA
 new Caledonian crow,corvus moneduloides,bCorMon1.pri,107,Jul.2022,107,Jul.2022,NA,NA,NA
