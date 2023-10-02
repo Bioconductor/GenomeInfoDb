@@ -3,12 +3,9 @@ ORGANISM <- "Sus scrofa"
 ASSEMBLED_MOLECULES <- paste0("chr", c(1:18, "X", "Y", "M"))
 CIRC_SEQS <- "chrM"
 
-library(IRanges)       # for CharacterList()
-library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
-
 .order_seqlevels <- function(seqlevels)
 {
-    tmp <- CharacterList(strsplit(seqlevels, "-"))
+    tmp <- IRanges::CharacterList(strsplit(seqlevels, "-"))
     npart <- lengths(tmp)
     stopifnot(all(npart <= 2L))
 

@@ -10,8 +10,6 @@ CIRC_SEQS <- "chrM"
                             c(1:2, 4:8, 10:13, 16:18, 20, 22, 25, 28, "W", "Z",
                             "E22C19W28_E50C23", "E64", "Un"), "_random")
 
-library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
-
 .order_seqlevels <- function(seqlevels)
 {
     ordered_seqlevels <- c(ASSEMBLED_MOLECULES, .random_sequences)

@@ -3,12 +3,9 @@ ORGANISM <- "Danio rerio"
 ASSEMBLED_MOLECULES <- paste0("chr", c(1:25, "M"))
 CIRC_SEQS <- "chrM"
 
-library(IRanges)       # for CharacterList()
-library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
-
 .order_seqlevels <- function(seqlevels)
 {
-    tmp <- CharacterList(strsplit(seqlevels, "_"))
+    tmp <- IRanges::CharacterList(strsplit(seqlevels, "_"))
     npart <- lengths(tmp)
     stopifnot(all(npart <= 3L))
 

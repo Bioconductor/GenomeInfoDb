@@ -3,8 +3,6 @@ ORGANISM <- "Canis lupus familiaris"
 ASSEMBLED_MOLECULES <- paste0("chr", c(1:38, "X", "M"))
 CIRC_SEQS <- "chrM"
 
-library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
-
 .order_seqlevels <- function(seqlevels)
 {
     ordered_seqlevels <- c(ASSEMBLED_MOLECULES, "chrUn")

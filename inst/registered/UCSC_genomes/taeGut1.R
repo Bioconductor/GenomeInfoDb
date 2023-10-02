@@ -6,8 +6,6 @@ ASSEMBLED_MOLECULES <- paste0("chr",
                                 "M"))
 CIRC_SEQS <- "chrM"
 
-library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
-
 .order_seqlevels <- function(seqlevels)
 {
     random <- paste0(head(ASSEMBLED_MOLECULES, n=33L), "_random")

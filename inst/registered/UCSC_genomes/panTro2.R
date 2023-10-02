@@ -3,15 +3,12 @@ ORGANISM <- "Pan troglodytes"
 ASSEMBLED_MOLECULES <- paste0("chr", c(1, "2a", "2b", 3:22, "X", "Y", "M"))
 CIRC_SEQS <- "chrM"
 
-library(IRanges)       # for CharacterList()
-library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
-
 .order_seqlevels <- function(seqlevels)
 {
     idx_chrUn <- match("chrUn", seqlevels)
     stopifnot(!anyNA(idx_chrUn))
 
-    tmp <- CharacterList(strsplit(seqlevels, "_"))
+    tmp <- IRanges::CharacterList(strsplit(seqlevels, "_"))
     npart <- lengths(tmp)
     stopifnot(all(npart <= 3L))
 

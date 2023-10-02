@@ -3,8 +3,6 @@ ORGANISM <- "Bos taurus"
 ASSEMBLED_MOLECULES <- paste0("chr", c(1:29, "X", "M"))
 CIRC_SEQS <- "chrM"
 
-library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
-
 .order_seqlevels <- function(seqlevels)
 {
     scaffolds <- paste0("scaffold", 1:98058)

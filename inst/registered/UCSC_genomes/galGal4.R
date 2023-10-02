@@ -6,15 +6,12 @@ ASSEMBLED_MOLECULES <- paste0("chr",
                                 "M"))
 CIRC_SEQS <- "chrM"
 
-library(IRanges)       # for CharacterList()
-library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
-
 .order_seqlevels <- function(seqlevels)
 {
     idx1 <- match(ASSEMBLED_MOLECULES, seqlevels)
     stopifnot(!anyNA(idx1))
 
-    tmp <- CharacterList(strsplit(seqlevels, "_"))
+    tmp <- IRanges::CharacterList(strsplit(seqlevels, "_"))
     npart <- lengths(tmp)
     stopifnot(all(npart <= 3L))
 
