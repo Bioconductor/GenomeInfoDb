@@ -3,8 +3,6 @@ ORGANISM <- "Drosophila melanogaster"
 ASSEMBLED_MOLECULES <- paste0("chr", c("2L", "2R", "3L", "3R", "4", "X"))
 CIRC_SEQS <- character(0)
 
-library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
-
 .order_seqlevels <- function(seqlevels)
 {
     het <- paste0("chr", c("2h", "3h", "Xh", "Yh"))

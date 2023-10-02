@@ -8,9 +8,10 @@ There must be one file per genome.
 Each file must be an R script (.R extension) and its name must be the name
 of the genome (e.g. 'danRer11.R').
 
-The script should be able to work as a standalone script so should
-explicitly load packages if needed (e.g. with 'library(IRanges)'
-and/or 'library(GenomeInfoDb)').
+The script should be able to work as a standalone script but without
+explicitly loading any package in order to not alter the users search()
+path. In other words, it should not use things like 'library(IRanges)'
+or 'library(GenomeInfoDb)'.
 
 At a minimum, the script must define the 4 following variables:
 
@@ -47,12 +48,12 @@ Additionally, it can also define any of the following variables:
   o ENSEMBL_LINKER:      Single non-empty string (can only be "ucscToEnsembl"
                          or "chromAlias" at the moment).
 
-All the above variables are recognized by getChromInfoFromUCSC(). They
-must be defined at the top-level of the script and their names must be
+All the above variables are recognized by getChromInfoFromUCSC().
+They must be defined as top-level variables and their names must be
 in UPPER CASE.
 
-The script can define its own top-level variables and functions, but, by
-convention, their names should be in lower case and start with a dot.
+The script can define additional top-level variables and functions, but,
+by convention, their names should be in lower case and start with a dot.
 
 See the files in this folder for numerous examples.
 
@@ -68,13 +69,15 @@ Here is how to perform some basic testing of a new registration file:
      defined in the script will get defined in your session (you should see
      them with ls()).
 
-  2. Check the values of the 4 mandatory variables: GENOME, ORGANISM,
+  2. Check that sourcing the file didn't alter the search() path.
+
+  3. Check the values of the 4 mandatory variables: GENOME, ORGANISM,
      ASSEMBLED_MOLECULES, and CIRC_SEQS.
 
-  3. Call FETCH_ORDERED_CHROM_SIZES() and make sure it behaves has expected.
+  4. Call FETCH_ORDERED_CHROM_SIZES() and make sure it behaves has expected.
      Does the returned data frame has its rows in the expected order?
 
-  4. Install GenomeInfoDb (with the new registration file in it), start R,
+  5. Install GenomeInfoDb (with the new registration file in it), start R,
      load the package, and try to call registered_UCSC_genomes(). The
      returned data frame should now have an entry for the new genome.
      Make sure that all the fields in the new entry look as expected.
@@ -82,9 +85,9 @@ Here is how to perform some basic testing of a new registration file:
      and "circular" columns look as expected? Try with and without
      setting the 'assembled.molecules.only' argument to TRUE.
 
-  5. If you've defined NCBI_LINKER in the registration file: try to call
+  6. If you've defined NCBI_LINKER in the registration file: try to call
      getChromInfoFromUCSC() with 'map.NCBI' set to TRUE.
 
-  6. If you've defined ENSEMBL_LINKER in the registration file: try to call
+  7. If you've defined ENSEMBL_LINKER in the registration file: try to call
      getChromInfoFromUCSC() with 'add.ensembl.col' set to TRUE.
 

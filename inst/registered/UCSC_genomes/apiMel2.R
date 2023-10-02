@@ -3,8 +3,6 @@ ORGANISM <- "Apis mellifera"
 ASSEMBLED_MOLECULES <- paste0("Group", 1:16)
 CIRC_SEQS <- character(0)
 
-library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
-
 .order_seqlevels <- function(seqlevels)
 {
     ordered_seqlevels <- c(ASSEMBLED_MOLECULES, "GroupUn")

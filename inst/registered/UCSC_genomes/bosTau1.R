@@ -3,8 +3,6 @@ ORGANISM <- "Bos taurus"
 ASSEMBLED_MOLECULES <- character(0)
 CIRC_SEQS <- character(0)
 
-library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
-
 .order_seqlevels <- function(seqlevels)
 {
     ordered_seqlevels <- paste0("SCAFFOLD", 1:449727)

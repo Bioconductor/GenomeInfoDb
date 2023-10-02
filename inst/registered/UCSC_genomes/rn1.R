@@ -3,8 +3,6 @@ ORGANISM <- "Rattus norvegicus"
 ASSEMBLED_MOLECULES <- paste0("chr", c(1:20, "X"))
 CIRC_SEQS <- character(0)
 
-library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
-
 .order_seqlevels <- function(seqlevels)
 {
     random <- paste0("chr", c(1:20, "X", "Un"), "_random")

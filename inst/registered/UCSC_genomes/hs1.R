@@ -3,8 +3,6 @@ ORGANISM <- "Homo sapiens"
 ASSEMBLED_MOLECULES <- paste0("chr", c(1:22, "X", "Y", "M"))
 CIRC_SEQS <- "chrM"
 
-library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
-
 .order_seqlevels <- function(seqlevels)
 {
     oo <- match(ASSEMBLED_MOLECULES, seqlevels)

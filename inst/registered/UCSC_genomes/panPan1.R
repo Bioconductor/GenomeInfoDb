@@ -3,8 +3,6 @@ ORGANISM <- "Pan paniscus"
 ASSEMBLED_MOLECULES <- "chrM"
 CIRC_SEQS <- "chrM"
 
-library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
-
 .order_seqlevels <- function(seqlevels)
 {
     idx1 <- which(seqlevels == "chrM")

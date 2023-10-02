@@ -3,12 +3,9 @@ ORGANISM <- "Apis mellifera"
 ASSEMBLED_MOLECULES <- character(0)
 CIRC_SEQS <- character(0)
 
-library(IRanges)       # for CharacterList()
-library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
-
 .order_seqlevels <- function(seqlevels)
 {
-    tmp <- CharacterList(strsplit(seqlevels, ".", fixed=TRUE))
+    tmp <- IRanges::CharacterList(strsplit(seqlevels, ".", fixed=TRUE))
     npart <- lengths(tmp)
     stopifnot(all(npart == 2L))
 

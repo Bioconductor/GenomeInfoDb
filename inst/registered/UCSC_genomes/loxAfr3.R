@@ -3,8 +3,6 @@ ORGANISM <- "Loxodonta africana"
 ASSEMBLED_MOLECULES <- "chrM"
 CIRC_SEQS <- "chrM"
 
-library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
-
 .order_seqlevels <- function(seqlevels)
 {
     scaffolds <- paste0("scaffold_", 0:2351)

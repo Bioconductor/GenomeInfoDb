@@ -3,8 +3,6 @@ ORGANISM <- "Pan troglodytes"
 ASSEMBLED_MOLECULES <- paste0("chr", c(1:23, "X", "Y", "M"))
 CIRC_SEQS <- "chrM"
 
-library(GenomeInfoDb)  # for fetch_chrom_sizes_from_UCSC()
-
 .order_seqlevels <- function(seqlevels)
 {
     random <- paste0("chr", c(1:23, "X", "Y", "Un"), "_random")
