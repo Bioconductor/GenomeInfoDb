@@ -1,3 +1,20 @@
+CHANGES IN VERSION 1.38.0
+-------------------------
+
+NEW FEATURES
+
+    o Register the following NCBI assemblies:
+      - bStrHab1.2.pri (Kakapo)
+      - a few Salmo salar (Atlantic salmon) assemblies
+      - a few African elephant (Loxodonta africana) assemblies
+
+BUG FIXES
+
+    o Switch from HTTP to HTTPS for requests to *.ucsc.edu
+
+    o Remove library() calls from inst/registered/UCSC_genomes/*.R  files
+
+
 CHANGES IN VERSION 1.36.0
 -------------------------
 
@@ -213,10 +230,6 @@ SIGNIFICANT USER-VISIBLE CHANGES
 
 CHANGES IN VERSION 1.14.0
 -------------------------
-
-NEW FEATURES
-
-SIGNIFICANT USER-VISIBLE CHANGES
 
 DEPRECATED AND DEFUNCT
 
