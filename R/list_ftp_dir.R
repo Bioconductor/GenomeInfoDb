@@ -98,7 +98,7 @@ list_ftp_dir <- function(ftp_dir, subdirs.only=FALSE, long.listing=FALSE,
 
     listing <- .cached_ftp_dir_listing[[ftp_dir]]
     if (is.null(listing) || recache) {
-        doc <- .getURL2(ftp_dir)
+        doc <- .getURL2(paste0("ftp://", ftp_dir))
         listing <- strsplit(doc, "\n", fixed=TRUE)[[1L]]
         .cached_ftp_dir_listing[[ftp_dir]] <- listing
     }
