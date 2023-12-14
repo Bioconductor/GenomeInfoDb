@@ -199,8 +199,8 @@ simple_read_table <- function(file,
     do.call(read.table, args)
 }
 
-### Used by fetch_assembly_report(), getChromInfoFromNCBI(),
-### getChromInfoFromUCSC(), and more...
+### Used by fetch_assembly_report(), fetch_table_from_Ensembl_FTP(),
+### getChromInfoFromNCBI(), getChromInfoFromUCSC(), and more...
 ### Calling read.table() directly on an URL tends to be unreliable. For
 ### example getChromInfoFromNCBI("CIEA01") was randomly failing for me with
 ### a "line 18564 did not have 10 elements" error (exact line number would
