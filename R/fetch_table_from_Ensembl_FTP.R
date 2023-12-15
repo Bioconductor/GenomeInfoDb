@@ -100,9 +100,6 @@
 ### associated with a particular dataset and Ensembl release (e.g. for
 ### dataset "hsapiens_gene_ensembl" in release "64").
 ###
-### Note that fetching is done with fetch_table_from_url() which uses a
-### 2-step approach (utils::download.file() && utils::read.table()).
-###
 ### TODO: Querying the Ensembl MySQL server (via RMariaDB) would probably
 ### be a better way to do this.
 ### Update (Feb 10, 2020): Some preliminary testing indicates that using
@@ -116,27 +113,87 @@
 ###     MySQL server at ensembldb.ensembl.org.
 ###
 
+.please_install_missing_CRAN_pkgs <- function(pkgs, reader0)
+{
+    fmt <- paste0("Couldn't load %s. The %s needed %s. Please install %s ",
+                  "with 'install.packages(%s)' and try again.")
+    if (length(pkgs) == 1L) {
+        what1 <- paste0("package ", pkgs)
+        what2 <- "package is"
+        what3 <- "it"
+        what4 <- paste0("\"", pkgs, "\"")
+    } else {
+        what1 <- paste0("the following packages: ", paste0(pkgs, collapse=", "))
+        what2 <- "packages are"
+        what3 <- "them"
+        what4 <- paste0("c(", paste0("\"", pkgs, "\"",  collapse=", "), ")")
+    }
+    if (reader0 == "auto") {
+        why <- paste0("to fetch data from Ensembl FTP server ",
+                      "for Ensembl releases older than 99")
+    } else {
+        why <- paste0("when 'reader=\"", reader0, "\"'")
+    }
+    sprintf(fmt, what1, what2, why, what3, what4)
+}
+
 ### 'core_db_url' must be the full URL to a core DB directory located
 ### on the Ensembl FTP server e.g.
 ### "ftp://ftp.ensembl.org/pub/release-99/mysql/mus_musculus_core_99_38/"
 ### The "ftp://" part and trailing slash are mandatory!
 ### Use get_Ensembl_FTP_core_db_url() defined in Ensembl-utils.R to obtain
 ### such URL for a given species/release/division programmatically.
-fetch_table_from_Ensembl_FTP <- function(core_db_url, table,
-                                         full.colnames=FALSE, nrows=-1L)
+fetch_table_from_Ensembl_FTP <-
+    function(core_db_url, table, full.colnames=FALSE, nrows=-1L,
+             reader=c("auto", "read.table", "fread"))
 {
+    reader0 <- reader <- match.arg(reader)
     columns <- .ENSEMBLDB_COLUMNS[[table]]
-    if (is.null(columns)) {
-        warning(wmsg("unknown table: ", table, " (download might fail or ",
-                     "the returned data frame will have automatic colnames)"),
-                immediate.=TRUE)
-    } else if (full.colnames) {
+    if (!is.null(columns) && full.colnames)
         columns <- paste(table, columns, sep=".")
-    }
     url <- paste0(core_db_url, table, ".txt.gz")
-    ans <- fetch_table_from_url(url, colnames=columns, nrows=nrows)
-    if (full.colnames && is.null(columns))
-        colnames(ans) <- paste(table, colnames(ans), sep=".")
+    if (reader == "auto") {
+        ## Table dumps from Ensembl release < 99 can contain inline \r
+        ## characters (carriage returns) which break utils::read.table().
+        ## However data.table::fread() seems to be able to handle them.
+        ## See https://github.com/Bioconductor/GenomeInfoDb/issues/98.
+        release <- sub("_.*$", "", sub("^.*_core_", "", core_db_url))
+        release <- suppressWarnings(as.integer(release))
+        if (is.na(release) || release >= 99) {
+            reader <- "read.table"
+        } else {
+            reader <- "fread"
+        }
+    }
+    if (reader == "read.table") {
+        if (is.null(columns))
+            warning(wmsg("unknown table: ", table, " (download might fail ",
+                         "or the returned data frame will have automatic ",
+                         "colnames)"),
+                    immediate.=TRUE)
+        ## fetch_table_from_url() downloads the full file before reading it.
+        ans <- fetch_table_from_url(url, colnames=columns, nrows=nrows)
+        if (is.null(columns) && full.colnames)
+            colnames(ans) <- paste(table, colnames(ans), sep=".")
+    } else {
+        if (is.null(columns))
+            stop(wmsg("unknown table: ", table))
+        ## data.table::fread() needs R.utils to read compressed files.
+        missing_pkgs <- character(0)
+        if (!requireNamespace("R.utils", quietly=TRUE))
+            missing_pkgs <- c(missing_pkgs, "R.utils")
+        if (!requireNamespace("data.table", quietly=TRUE))
+            missing_pkgs <- c(missing_pkgs, "data.table")
+        if (length(missing_pkgs) != 0L) {
+            errmsg <- .please_install_missing_CRAN_pkgs(missing_pkgs, reader0)
+            stop(wmsg(errmsg))
+        }
+        ## data.table::fread() downloads the full file before reading it.
+        ans <- data.table::fread(url, nrows=nrows, strip.white=FALSE,
+                                      showProgress=FALSE)
+        ans <- as.data.frame(ans)
+        colnames(ans) <- columns
+    }
     ans
 }
 
