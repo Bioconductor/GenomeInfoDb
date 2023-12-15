@@ -9,7 +9,7 @@ biocViews: Genetics, DataRepresentation, Annotation, GenomeAnnotation
 URL: https://bioconductor.org/packages/GenomeInfoDb
 Video: http://youtu.be/wdEjCYSXa7w
 BugReports: https://github.com/Bioconductor/GenomeInfoDb/issues
-Version: 1.39.2
+Version: 1.39.3
 License: Artistic-2.0
 Encoding: UTF-8
 Authors@R: c(
@@ -26,9 +26,9 @@ Authors@R: c(
 Depends: R (>= 4.0.0), methods, BiocGenerics (>= 0.37.0),
 	S4Vectors (>= 0.25.12), IRanges (>= 2.13.12)
 Imports: stats, stats4, utils, RCurl, GenomeInfoDbData
-Suggests: GenomicRanges, Rsamtools, GenomicAlignments, GenomicFeatures,
+Suggests: R.utils, data.table, GenomicRanges, Rsamtools, GenomicAlignments,
+	GenomicFeatures, BSgenome,
 	TxDb.Dmelanogaster.UCSC.dm3.ensGene,
-	BSgenome,
 	BSgenome.Scerevisiae.UCSC.sacCer2,
 	BSgenome.Celegans.UCSC.ce2,
 	BSgenome.Hsapiens.NCBI.GRCh38,
