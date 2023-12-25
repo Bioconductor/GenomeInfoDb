@@ -77,7 +77,7 @@ get_Ensembl_FTP_gtf_url <- function(release=NA, division=NA,
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### list_Ensembl_FTP_releases()
+### get_current_Ensembl_release()
 ###
 
 ### The keys are FTP URLs to Ensembl division top-level directories e.g.
@@ -87,8 +87,8 @@ get_Ensembl_FTP_gtf_url <- function(release=NA, division=NA,
 ### etc...
 .Ensembl_FTP_cached_releases <- new.env(parent=emptyenv())
 
-list_Ensembl_FTP_releases <- function(division=NA, use.grch37=FALSE,
-                                      as.subdirs=FALSE)
+.list_Ensembl_FTP_releases <- function(division=NA, use.grch37=FALSE,
+                                       as.subdirs=FALSE)
 {
     if (!isTRUEorFALSE(as.subdirs))
         stop(wmsg("'as.subdirs' must be TRUE or FALSE"))
@@ -107,6 +107,25 @@ list_Ensembl_FTP_releases <- function(division=NA, use.grch37=FALSE,
     if (as.subdirs)
         releases <- paste0(.ENSEMBL_FTP_RELEASE_PREFIX, releases)
     releases
+}
+
+get_current_Ensembl_release <- function(division=NA, use.grch37=FALSE)
+{
+    releases <- .list_Ensembl_FTP_releases(division=division,
+                                           use.grch37=use.grch37)
+    current_release <- max(as.integer(releases))
+    ## The latest release is not necessarily **officially** released, in
+    ## which case the corresponding FTP dir is incomplete. The following
+    ## code tries to detect this situation by checking the presence of the
+    ## README file.
+    top_url <- .get_Ensembl_FTP_top_url(division=division,
+                                        use.grch37=use.grch37)
+    README_url <- paste0(top_url, .ENSEMBL_FTP_RELEASE_PREFIX,
+                         current_release, "/README")
+    doc <- try(RCurl::getURL(README_url), silent=TRUE)
+    if (inherits(doc, "try-error"))
+        current_release <- current_release - 1L
+    current_release
 }
 
 
@@ -162,13 +181,12 @@ use_species_index_from_Ensembl_FTP <- function(release=NA, division=NA,
                       "\"plants\", or \"protists\"."))
         )
     }
-    if (!is.na(release)) {
-        subdir <- paste0(.ENSEMBL_FTP_RELEASE_PREFIX, release)
-    } else if (is.na(division)) {
-        ## Get latest release.
-        subdir <- tail(list_Ensembl_FTP_releases(as.subdirs=TRUE), n=1L)
-    } else {
+    if (is.na(release) && !is.na(division)) {
         subdir <- "current"
+    } else {
+        if (is.na(release))
+            release <- get_current_Ensembl_release()
+        subdir <- paste0(.ENSEMBL_FTP_RELEASE_PREFIX, release)
     }
     paste0(top_url, subdir, "/", species_file)
 }
@@ -353,7 +371,7 @@ fetch_species_index_from_Ensembl_FTP <- function(release=NA, division=NA)
 {
     stopifnot(is_single_value(release))
     if (is.na(release)) {
-        release <- tail(list_Ensembl_FTP_releases(), n=1L)  # latest
+        release <- get_current_Ensembl_release()
     } else {
         release <- as.integer(release)
     }
@@ -373,7 +391,7 @@ fetch_species_index_from_Ensembl_FTP <- function(release=NA, division=NA)
 {
     stopifnot(is_single_value(release))
     if (is.na(release)) {
-        release <- tail(list_Ensembl_FTP_releases(), n=1L)  # latest
+        release <- get_current_Ensembl_release()
     } else {
         release <- as.integer(release)
     }
@@ -490,7 +508,7 @@ check_species_info <- function(species_info)
                   "\" species at ", mysql_url))
     core_db <- core_dbs[[idx]]
     if (is.na(release)) {
-        release <- tail(list_Ensembl_FTP_releases(), n=1L)  # latest
+        release <- get_current_Ensembl_release()
     } else {
         release <- as.integer(release)
     }
