@@ -139,7 +139,8 @@
 
 ### 'core_db_url' must be the full URL to a core DB directory located
 ### on the Ensembl FTP server e.g.
-### "ftp://ftp.ensembl.org/pub/release-99/mysql/mus_musculus_core_99_38/"
+### ftp://ftp.ensembl.org/pub/release-99/mysql/mus_musculus_core_99_38/ or
+### ftp://ftp.ensembl.org/pub/grch37/release-87/mysql/homo_sapiens_core_87_37/
 ### The "ftp://" part and trailing slash are mandatory!
 ### Use get_Ensembl_FTP_core_db_url() defined in Ensembl-utils.R to obtain
 ### such URL for a given species/release/division programmatically.
