@@ -113,6 +113,55 @@
 ###     MySQL server at ensembldb.ensembl.org.
 ###
 
+### Table dumps from Ensembl release < 99 can contain inline \r characters
+### (carriage returns) which break utils::read.table().
+.table_can_contain_CRs <- function(core_db_url)
+{
+    release <- sub("_.*$", "", sub("^.*_core_", "", core_db_url))
+    release <- suppressWarnings(as.integer(release))
+    !is.na(release) && release < 99L
+}
+
+### 'core_db_url' must be the full URL to a core DB directory located
+### on the Ensembl FTP server e.g.
+### ftp://ftp.ensembl.org/pub/release-99/mysql/mus_musculus_core_99_38/ or
+### ftp://ftp.ensembl.org/pub/grch37/release-87/mysql/homo_sapiens_core_87_37/
+### The "ftp://" part and trailing slash are both mandatory!
+### Use get_Ensembl_FTP_core_db_url() defined in Ensembl-utils.R to obtain
+### such URL for a given species/release/division programmatically.
+fetch_table_from_Ensembl_FTP <-
+    function(core_db_url, table, full.colnames=FALSE, nrows=-1L)
+{
+    columns <- .ENSEMBLDB_COLUMNS[[table]]
+    if (!is.null(columns) && full.colnames)
+        columns <- paste(table, columns, sep=".")
+    url <- paste0(core_db_url, table, ".txt.gz")
+    remove_CRs <- .table_can_contain_CRs(core_db_url)
+    if (is.null(columns))
+        warning(wmsg("unknown table: ", table, " (download might fail ",
+                     "or the returned data frame will have automatic ",
+                     "colnames)"),
+                immediate.=TRUE)
+    ## fetch_table_from_url() downloads the full file before reading it.
+    ans <- fetch_table_from_url(url, colnames=columns, nrows=nrows,
+                                remove_CRs=remove_CRs)
+    if (is.null(columns) && full.colnames)
+        colnames(ans) <- paste(table, colnames(ans), sep=".")
+    ans
+}
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### OLD_fetch_table_from_Ensembl_FTP()
+###
+### Replaced by fetch_table_from_Ensembl_FTP() above that uses
+### fetch_table_from_url()'s newly added argument 'remove_CRs' to handle the
+### carriage return problem found in table dumps from Ensembl release < 99.
+### TODO: Either get rid of this (and of the soft dep on data.table and
+### R.utils), OR add the 'reader' argument to fetch_table_from_Ensembl_FTP()
+### (choices would be reduced to "read.table" or "fread" only, no more "auto",
+### with default being "read.table").
+
 .please_install_missing_CRAN_pkgs <- function(pkgs, reader0)
 {
     fmt <- paste0("Couldn't load %s. The %s needed %s. Please install %s ",
@@ -144,7 +193,7 @@
 ### The "ftp://" part and trailing slash are mandatory!
 ### Use get_Ensembl_FTP_core_db_url() defined in Ensembl-utils.R to obtain
 ### such URL for a given species/release/division programmatically.
-fetch_table_from_Ensembl_FTP <-
+OLD_fetch_table_from_Ensembl_FTP <-
     function(core_db_url, table, full.colnames=FALSE, nrows=-1L,
              reader=c("auto", "read.table", "fread"))
 {
@@ -156,14 +205,13 @@ fetch_table_from_Ensembl_FTP <-
     if (reader == "auto") {
         ## Table dumps from Ensembl release < 99 can contain inline \r
         ## characters (carriage returns) which break utils::read.table().
-        ## However data.table::fread() seems to be able to handle them.
-        ## See https://github.com/Bioconductor/GenomeInfoDb/issues/98.
-        release <- sub("_.*$", "", sub("^.*_core_", "", core_db_url))
-        release <- suppressWarnings(as.integer(release))
-        if (is.na(release) || release >= 99) {
-            reader <- "read.table"
-        } else {
+        ## However data.table::fread() seems to be slightly better at handling
+        ## them. See https://github.com/Bioconductor/GenomeInfoDb/issues/98
+        ## and https://github.com/Bioconductor/GenomeInfoDb/issues/97.
+        if (.table_can_contain_CRs(core_db_url)) {
             reader <- "fread"
+        } else {
+            reader <- "read.table"
         }
     }
     if (reader == "read.table") {
