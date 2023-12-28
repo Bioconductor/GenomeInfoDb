@@ -179,17 +179,73 @@ join_dfs <- function(Ldf, Rdf, Lcolumn, Rcolumn,
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Other stuff
+### simple_read_table() and fetch_table_from_url()
 ###
+
+### Remove occurences of "\r\\\n" or "\r" from a file. This is the kind of
+### stuff that can be found in table dumps from Ensembl release < 99, and
+### that breaks utils::read.table().
+.clean_file <- function(infile, outfile="", n=25000L)
+{
+    stopifnot(isSingleInteger(n), n >= 3L)
+    CR_byte <- charToRaw("\r")
+    BSOL_byte <- charToRaw("\\")
+    EOL_byte <- charToRaw("\n")
+    GZIP_MAGIC_NUMBER <- as.raw(c(0x1F, 0x8B))
+    if (identical(readBin(infile, what=raw(), n=2L), GZIP_MAGIC_NUMBER)) {
+        con1 <- gzfile(infile, "rb")
+    } else {
+        con1 <- file(infile, "rb")
+    }
+    on.exit(close(con1))
+    if (nzchar(outfile)) {
+        con2 <- file(outfile, "wb")
+        on.exit(close(con2), add=TRUE)
+    }
+    carryover <- raw(0)
+    while (TRUE) {
+        bytes <- c(carryover, readBin(con1, what=raw(), n=n))
+        if (length(bytes) == 0L)
+            break
+        idx1 <- which(bytes == CR_byte)
+        if (length(idx1) != 0L) {
+            last_CR_idx <- idx1[[length(idx1)]]
+            if (last_CR_idx > length(bytes) - 2L) {
+                carryover <- bytes[last_CR_idx:length(bytes)]
+                bytes <- bytes[1:(last_CR_idx-1L)]
+                idx1 <- idx1[-length(idx1)]
+            } else {
+                carryover <- raw(0)
+            }
+        }
+        if (length(idx1) != 0L) {
+            idx2 <- which(bytes[idx1 + 1L] == BSOL_byte &
+                          bytes[idx1 + 2L] == EOL_byte)
+            idx1 <- c(idx1, idx1[idx2] + 1L, idx1[idx2] + 2L)
+            bytes <- bytes[-idx1]
+        }
+        if (nzchar(outfile)) {
+            writeBin(bytes, con2)
+        } else {
+            cat(rawToChar(bytes))
+        }
+    }
+}
 
 ### Provides a simpler interface to read.table().
 simple_read_table <- function(file,
                               header=FALSE, colnames=NULL, col2class=NULL,
                               nrows=-1L, skip=0L,
-                              sep="\t", quote="", comment.char="")
+                              sep="\t", quote="", comment.char="",
+                              remove_CRs=FALSE)
 {
     if (is.null(col2class))
         col2class <- NA
+    if (remove_CRs) {
+        outfile <- tempfile()
+        .clean_file(file, outfile)
+        file <- outfile
+    }
     ## Prepare args to pass to read.table().
     args <- list(file, header=header, sep=sep, quote=quote, row.names=NULL,
                  na.strings=c("NA", "na"), colClasses=col2class, nrows=nrows,
@@ -221,6 +277,11 @@ fetch_table_from_url <- function(url, ...)
         stop(wmsg("download failed"))
     simple_read_table(destfile, ...)
 }
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Other stuff
+###
 
 ### Global character vector to hold default names for circular sequences.
 ### This is exported!
