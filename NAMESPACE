@@ -4,8 +4,6 @@ importFrom(utils, data, download.file, read.delim, read.table, read.csv,
 importFrom(stats, setNames, update)
 importFrom(stats4, summary)
 
-importFrom(RCurl, getURL)
-
 import(BiocGenerics)
 import(S4Vectors)
 import(IRanges)  # for CompressedList
