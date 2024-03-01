@@ -26,12 +26,8 @@
 {
     stopifnot(isSingleString(url))
     if (!requireNamespace("RCurl", quietly = TRUE))
-        return(
-            try(
-                stop("Install 'RCurl' to connect to Ensembl", call. = FALSE),
-                silent = TRUE
-            )
-        )
+        stop("Install 'RCurl' to connect to Ensembl")
+
     doc <- try(RCurl::getURL(url), silent=TRUE)
     if (!inherits(doc, "try-error"))
         return(doc)
