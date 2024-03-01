@@ -25,7 +25,10 @@
 .getURL2 <- function(url)
 {
     stopifnot(isSingleString(url))
-    doc <- try(getURL(url), silent=TRUE)
+    if (!requireNamespace("RCurl", quietly = TRUE))
+        stop("Install 'RCurl' to connect to Ensembl")
+
+    doc <- try(RCurl::getURL(url), silent=TRUE)
     if (!inherits(doc, "try-error"))
         return(doc)
     condition <- attr(doc, "condition")
