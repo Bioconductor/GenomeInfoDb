@@ -122,11 +122,8 @@ get_current_Ensembl_release <- function(division=NA, use.grch37=FALSE)
                                         use.grch37=use.grch37)
     README_url <- paste0(top_url, .ENSEMBL_FTP_RELEASE_PREFIX,
                          current_release, "/README")
-    if (!requireNamespace("RCurl", quietly = TRUE))
-        stop("Install 'RCurl' to connect to Ensembl")
-
-    doc <- try(RCurl::getURL(README_url), silent=TRUE)
-    if (inherits(doc, "try-error"))
+    res <- try(suppressWarnings(get_ftp_url(README_url)), silent=TRUE)
+    if (inherits(res, "try-error"))
         current_release <- current_release - 1L
     current_release
 }

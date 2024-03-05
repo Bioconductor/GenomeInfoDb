@@ -27,7 +27,7 @@ Depends: R (>= 4.0.0), methods, BiocGenerics (>= 0.37.0),
 	S4Vectors (>= 0.25.12), IRanges (>= 2.13.12)
 Imports: stats, stats4, utils, GenomeInfoDbData
 Suggests: R.utils, data.table, GenomicRanges, Rsamtools, GenomicAlignments,
-	GenomicFeatures, BSgenome, RCurl,
+	GenomicFeatures, BSgenome,
 	TxDb.Dmelanogaster.UCSC.dm3.ensGene,
 	BSgenome.Scerevisiae.UCSC.sacCer2,
 	BSgenome.Celegans.UCSC.ce2,
