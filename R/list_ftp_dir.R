@@ -19,6 +19,14 @@
     ftp_dir
 }
 
+.list_ftp_dir <- function(ftp_dir, method)
+{
+    url <- paste0("ftp://", ftp_dir)
+    destfile <- tempfile()
+    download.file(url, destfile, method, quiet=TRUE)
+    readLines(destfile)
+}
+
 .make_matrix_data_from_list <- function(x, min_ncol=0L)
 {
     stopifnot(is.list(x))
@@ -73,7 +81,7 @@ list_ftp_dir <- function(ftp_dir, subdirs.only=FALSE, long.listing=FALSE,
 
     listing <- .cached_ftp_dir_listing[[ftp_dir]]
     if (is.null(listing) || recache) {
-        listing <- get_ftp_url(paste0("ftp://", ftp_dir))
+        listing <- .list_ftp_dir(ftp_dir)
         .cached_ftp_dir_listing[[ftp_dir]] <- listing
     }
 

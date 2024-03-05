@@ -179,18 +179,6 @@ join_dfs <- function(Ldf, Rdf, Lcolumn, Rcolumn,
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### get_ftp_url()
-###
-
-get_ftp_url <- function(url, method)
-{
-    destfile <- tempfile()
-    download.file(url, destfile, method, quiet=TRUE)
-    readLines(destfile)
-}
-
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### simple_read_table() and fetch_table_from_url()
 ###
 
