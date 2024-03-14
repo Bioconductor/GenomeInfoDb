@@ -4,6 +4,11 @@ importFrom(utils, data, download.file, read.delim, read.table, read.csv,
 importFrom(stats, setNames, update)
 importFrom(stats4, summary)
 
+importFrom(RCurl, getURL)  # no longer used but we want to keep RCurl in
+                           # Imports (in the RELEASE_3_18 branch), so we
+                           # need to actually import something or 'R CMD check'
+                           # is going to complain
+
 import(BiocGenerics)
 import(S4Vectors)
 import(IRanges)  # for CompressedList
