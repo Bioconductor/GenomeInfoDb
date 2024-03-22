@@ -561,8 +561,7 @@
          ENSEMBL_LINKER=ENSEMBL_LINKER)
 }
 
-### NOT exported but used in txdmaker:::list_UCSC_genomes().
-### Orders first by 'organism' then by 'genome'.
+### Now defined in the UCSCutils package so use that instead and remove this.
 order_organism_genome_pairs <- function(organism, genome)
 {
     regexpr <- "^(.*[^0-9])([0-9]*)$"
