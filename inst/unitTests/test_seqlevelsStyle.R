@@ -182,6 +182,7 @@ test_seqlevelsStyle_Seqinfo <- function()
         list("mm39",     "GRCm39",                       61L,    0L,      0L),
         list("monDom5",  "MonDom5",                      10L,    1L,   5128L),
         list("musFur1",  "MusPutFur1.0",               7741L,    0L,     42L),
+        list("oreNil2",  "Orenil1.1",                  5678L,    0L,      0L),
         list("panPan1",  "panpan1",                   10867L,    0L,      0L),
         list("panPan2",  "panpan1.1",                 10274L,    0L,      0L),
         list("panPan3",  "Mhudiblu_PPA_v0",            4293L,    0L,      0L),
