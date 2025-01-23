@@ -8,6 +8,12 @@ ASSEMBLIES <- list(
          assembly_accession="GCA_000258655.1",  # panPan1
          circ_seqs="MT"),
 
+    ## 10275 sequences in assembly report but getChromInfoFromNCBI() will drop
+    ## 1 sequence: the duplicated MT sequence (GenBankAccn KT153251.1) that
+    ## someone added to this assembly in January 2025. The idea is to keep
+    ## the MT sequence with length 16563 because it matches the length of
+    ## chrM in UCSC genome panPan2. See .get_NCBI_chrom_info_from_accession()
+    ## in R/getChromInfoFromNCBI.R for the details.
     list(assembly="panpan1.1",
          date="2015/08/18",
          extra_info=c(sex="female"),

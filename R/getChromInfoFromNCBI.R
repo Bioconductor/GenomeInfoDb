@@ -302,9 +302,19 @@ find_NCBI_assembly_info_for_accession <- function(accession)
         ## See inst/registered/NCBI_assemblies/Canis_lupus_familiaris.R
         if (accession == "GCF_000002285.5") {
             ## Full sequence report for GCF_000002285.5 has 2 entries for MT.
-            ## Remove the bogus one!
+            ## Drop the bogus one!
             GenBankAccn <- assembly_report[ , "GenBankAccn"]
             keep_idx <- which(!(GenBankAccn %in% "CM023446.1"))
+            assembly_report <-
+                S4Vectors:::extract_data_frame_rows(assembly_report, keep_idx)
+        }
+        ## Hardcoded special treatment of GCF_000258655.2 (panpan1.1).
+        ## See inst/registered/NCBI_assemblies/Pan_paniscus.R
+        if (accession == "GCF_000258655.2") {
+            ## Full sequence report for GCF_000258655.2 has 2 entries for MT.
+            ## Drop the bogus one!
+            GenBankAccn <- assembly_report[ , "GenBankAccn"]
+            keep_idx <- which(!(GenBankAccn %in% "KT153251.1"))
             assembly_report <-
                 S4Vectors:::extract_data_frame_rows(assembly_report, keep_idx)
         }
