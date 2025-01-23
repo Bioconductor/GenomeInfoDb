@@ -1,16 +1,14 @@
-GENOME <- "oreNil2"
-ORGANISM <- "Oreochromis niloticus"
-ASSEMBLED_MOLECULES <- paste0("chr",
-    c(paste0("LG", c(1:7, "8-24", 9:15, "16-21", 17:20, 22:23)), "M"))
-CIRC_SEQS <- "chrM"
+GENOME <- "gadMor1"
+ORGANISM <- "Gadus morhua"
+ASSEMBLED_MOLECULES <- CIRC_SEQS <- "chrM"
 
 .order_seqlevels <- function(seqlevels)
 {
     idx1 <- match(ASSEMBLED_MOLECULES, seqlevels)
     stopifnot(!anyNA(idx1))
 
-    idx2 <- which(substr(seqlevels, 1, 8) == "AERX0107")
-    idx3 <- which(substr(seqlevels, 1, 4) == "GL83")
+    idx2 <- which(substr(seqlevels, 1, 6) == "CAEA01")
+    idx3 <- which(substr(seqlevels, 1, 3) == "HE5")
     stopifnot(length(idx1) + length(idx2) + length(idx3) == length(seqlevels))
 
     oo2 <- order(seqlevels[idx2])
@@ -32,9 +30,9 @@ FETCH_ORDERED_CHROM_SIZES <-
 }
 
 NCBI_LINKER <- list(
-    assembly_accession="GCA_000188235.2",
-    special_mappings=c(chrM="MT")
+    assembly_accession="GCA_000231765.1",
+    unmapped_seqs=list(`assembled-molecule`="chrM")
 )
 
-ENSEMBL_LINKER <- "chromAlias"
+ENSEMBL_LINKER <- "ucscToEnsembl"
 
