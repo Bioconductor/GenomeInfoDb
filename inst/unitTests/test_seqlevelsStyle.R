@@ -65,7 +65,85 @@ test_seqlevelsStyle_character <- function()
 
 }
 
-test_seqlevelsStyle_Seqinfo <- function()
+.UCSC_NCBI_MAPPING_SUMMARY <- list(
+    # Field 1: UCSC_genome
+    # Field 2: NCBI_assembly
+    # Field 3: nb of seqlevels that are mapped between UCSC and NCBI
+    # Field 4: nb of UCSC seqlevels that are not mapped to NCBI
+    # Field 5: nb of NCBI seqlevels that are not mapped to UCSC
+    #     1           2                                  3      4        5
+    list("apiMel2",  "Amel_2.0",                        16L,    1L,   7151L),
+    #list("bosTau6",  "Bos_taurus_UMD_3.1",            3317L,    0L,      0L),
+    list("bosTau7",  "Btau_4.6.1",                   11691L,    1L,      1L),
+    list("bosTau8",  "Bos_taurus_UMD_3.1.1",          3179L,    0L,      0L),
+    list("bosTau9",  "ARS-UCD1.2",                    2211L,    0L,      1L),
+    list("calJac3",  "Callithrix jacchus-3.2",       14205L,    0L,      0L),
+    list("calJac4",  "Callithrix_jacchus_cj1700_1.1",  964L,    0L,      0L),
+    list("canFam3",  "CanFam3.1",                     3268L,    0L,      0L),
+    list("canFam4",  "UU_Cfam_GSD_1.0",               2198L,    0L,      0L),
+    list("canFam5",  "UMICH_Zoey_3.1",                 794L,    0L,      0L),
+    list("canFam6",  "Dog10K_Boxer_Tasha",             147L,    0L,      0L),
+    list("ce6",      "WS190",                            7L,    0L,      0L),
+    list("ce10",     "WBcel215",                         7L,    0L,      0L),
+    list("ce11",     "WBcel235",                         7L,    0L,      0L),
+    list("criGri1",  "C_griseus_v1.0",               52710L,    1L,      0L),
+    list("danRer7",  "Zv9",                           1133L,    0L,      0L),
+    list("danRer10", "GRCz10",                        1061L,    0L,      0L),
+    list("danRer11", "GRCz11",                        1923L,    0L,      0L),
+    list("dm3",      "Release 5",                       14L,    1L,      0L),
+    list("dm6",      "Release 6 plus ISO1 MT",        1870L,    0L,      0L),
+    list("equCab2",  "EquCab2.0",                       33L,    1L,   9604L),
+    list("equCab3",  "EquCab3.0",                     4701L,    0L,      0L),
+    list("felCat9",  "Felis_catus_9.0",               4508L,    0L,      0L),
+    list("gadMor1",  "GadMor_May2010",              427427L,    1L,      0L),
+    list("galGal3",  "Gallus_gallus-2.1",                34L,   23L,  17118L),
+    list("galGal4",  "Gallus_gallus-4.0",            15932L,    0L,      0L),
+    list("galGal5",  "Gallus_gallus-5.0",            23475L,    0L,      0L),
+    list("galGal6",  "GRCg6a",                         464L,    0L,      0L),
+    #list("gasAcu1",  "ASM18067v1", <--- no such mapping despite UCSC claim),
+    list("gorGor6",  "Kamilah_GGO_v0",                5486L,    0L,      0L),
+    list("hg15",     "NCBI33",                          24L,   20L,    140L),
+    #list("hg16",     "NCBI34",                          24L,   18L,    138L),
+    #list("hg17",     "NCBI35",                          26L,   20L,     86L),
+    #list("hg18",     "NCBI36",                          26L,   23L,     97L),
+    list("hg19",     "GRCh37.p13",                     297L,    1L,      0L),
+    list("hg38",     "GRCh38.p14",                     711L,    0L,     -2L),
+    list("hs1",      "T2T-CHM13v2.0",                   25L,    0L,      0L),
+    list("loxAfr3",  "Loxafr3.0",                     2352L,    1L,      1L),
+    list("macFas5",  "Macaca_fascicularis_5.0",       7601L,    0L,      0L),
+    list("mm8",      "MGSCv36",                         21L,   13L,    360L),
+    list("mm9",      "MGSCv37",                         22L,   13L,    283L),
+    list("mm10",     "GRCm38.p6",                      239L,    0L,      0L),
+    list("mm39",     "GRCm39",                          61L,    0L,      0L),
+    list("monDom5",  "MonDom5",                          10L,    1L,   5128L),
+    list("musFur1",  "MusPutFur1.0",                  7741L,    0L,     42L),
+    list("oreNil2",  "Orenil1.1",                     5678L,    0L,      0L),
+    list("panPan1",  "panpan1",                      10867L,    0L,      0L),
+    list("panPan2",  "panpan1.1",                    10274L,    0L,      0L),
+    list("panPan3",  "Mhudiblu_PPA_v0",               4293L,    0L,      0L),
+    list("panTro2",  "Pan_troglodytes-2.1",             26L,   26L,  29214L),
+    list("panTro3",  "Pan_troglodytes-2.1.3",        24131L,    1L,      0L),
+    list("panTro4",  "Pan_troglodytes-2.1.4",        24129L,    0L,      0L),
+    list("panTro5",  "Pan_tro 3.0",                  44449L,    0L,      0L),
+    list("panTro6",  "Clint_PTRv2",                   4346L,    0L,      0L),
+    list("rheMac2",  "Mmul_051212",                     21L,    1L, 122143L),
+    list("rheMac3",  "CR_1.0",                       34102L,    1L,      0L),
+    list("rheMac8",  "Mmul_8.0.1",                  284728L,    0L,      0L),
+    list("rheMac10", "Mmul_10",                       2939L,    0L,      0L),
+    list("rn5",      "Rnor_5.0",                      2739L,    0L,      0L),
+    list("rn6",      "Rnor_6.0",                       953L,    0L,      2L),
+    list("rn7",      "mRatBN7.2",                      176L,    0L,      0L),
+    list("sacCer3",  "R64",                             17L,    0L,      0L),
+    list("susScr2",  "Sscrofa9.2",                      19L,    1L,      0L),
+    list("susScr3",  "Sscrofa10.2",                   4583L,    0L,      0L),
+    list("susScr11", "Sscrofa11.1",                    613L,    0L,      0L),
+    list("taeGut2",  "Taeniopygia_guttata-3.2.4",    37096L,    0L,      0L),
+    #list("wuhCor1",  "ASM985889v3",                      1L,    0L,      0L),
+    list("xenLae2",  "Xenopus_laevis_v2",           108033L,    0L,      0L),
+    list("xenTro10", "UCB_Xtro_10.0",                  167L,    0L,      0L)
+)
+
+test_switching_Seqinfo_between_UCSC_and_NCBI_styles <- function()
 {
     check_UCSC_NCBI_switch <- function(UCSC_genome, NCBI_assembly,
                                        nmapped, UCSC_nunmapped, NCBI_nunmapped)
@@ -86,7 +164,7 @@ test_seqlevelsStyle_Seqinfo <- function()
         if (UCSC_genome == "hg38") {
             checkIdentical(c("GRCh38.p14", "GRCh38.p13"), ugenomes)
             checkIdentical("NCBI", seqlevelsStyle(si2))
-	} else if (UCSC_nunmapped == 0L) {
+        } else if (UCSC_nunmapped == 0L) {
             checkIdentical(NCBI_assembly, ugenomes)
             checkIdentical("NCBI", seqlevelsStyle(si2))
         } else {
@@ -131,88 +209,33 @@ test_seqlevelsStyle_Seqinfo <- function()
         checkIdentical(si1, si2)
     }
 
-    UCSC_NCBI <- list(
-        # Field 1: UCSC_genome
-        # Field 2: NCBI_assembly
-        # Field 3: nb of seqlevels that are mapped between UCSC and NCBI
-        # Field 4: nb of UCSC seqlevels that are not mapped to NCBI
-        # Field 5: nb of NCBI seqlevels that are not mapped to UCSC
-        #     1           2                               3      4        5
-        list("apiMel2",  "Amel_2.0",                     16L,    1L,   7151L),
-        #list("wuhCor1",  "ASM985889v3",                   1L,    0L,      0L),
-        #list("bosTau6",  "Bos_taurus_UMD_3.1",         3317L,    0L,      0L),
-        list("bosTau7",  "Btau_4.6.1",                11691L,    1L,      1L),
-        list("bosTau8",  "Bos_taurus_UMD_3.1.1",       3179L,    0L,      0L),
-        list("bosTau9",  "ARS-UCD1.2",                 2211L,    0L,      1L),
-        list("calJac3",  "Callithrix jacchus-3.2",    14205L,    0L,      0L),
-        list("calJac4",  "Callithrix_jacchus_cj1700_1.1", 964L,  0L,      0L),
-        list("canFam3",  "CanFam3.1",                  3268L,    0L,      0L),
-        list("canFam4",  "UU_Cfam_GSD_1.0",            2198L,    0L,      0L),
-        list("canFam5",  "UMICH_Zoey_3.1",              794L,    0L,      0L),
-        list("canFam6",  "Dog10K_Boxer_Tasha",          147L,    0L,      0L),
-        list("ce6",      "WS190",                         7L,    0L,      0L),
-        list("ce10",     "WBcel215",                      7L,    0L,      0L),
-        list("ce11",     "WBcel235",                      7L,    0L,      0L),
-        list("criGri1",  "C_griseus_v1.0",            52710L,    1L,      0L),
-        list("danRer7",  "Zv9",                        1133L,    0L,      0L),
-        list("danRer10", "GRCz10",                     1061L,    0L,      0L),
-        list("danRer11", "GRCz11",                     1923L,    0L,      0L),
-        list("dm3",      "Release 5",                    14L,    1L,      0L),
-        list("dm6",      "Release 6 plus ISO1 MT",     1870L,    0L,      0L),
-        list("equCab2",  "EquCab2.0",                    33L,    1L,   9604L),
-        list("equCab3",  "EquCab3.0",                  4701L,    0L,      0L),
-        list("felCat9",  "Felis_catus_9.0",            4508L,    0L,      0L),
-        list("gadMor1",  "GadMor_May2010",           427427L,    1L,      0L),
-        list("galGal3",  "Gallus_gallus-2.1",            34L,   23L,  17118L),
-        list("galGal4",  "Gallus_gallus-4.0",         15932L,    0L,      0L),
-        list("galGal5",  "Gallus_gallus-5.0",         23475L,    0L,      0L),
-        list("galGal6",  "GRCg6a",                      464L,    0L,      0L),
-        list("gorGor6",  "Kamilah_GGO_v0",             5486L,    0L,      0L),
-        list("hg15",     "NCBI33",                       24L,   20L,    140L),
-        #list("hg16",     "NCBI34",                       24L,   18L,    138L),
-        #list("hg17",     "NCBI35",                       26L,   20L,     86L),
-        #list("hg18",     "NCBI36",                       26L,   23L,     97L),
-        list("hg19",     "GRCh37.p13",                  297L,    1L,      0L),
-        list("hg38",     "GRCh38.p14",                  711L,    0L,     -2L),
-        list("hs1",      "T2T-CHM13v2.0",                25L,    0L,      0L),
-        list("loxAfr3",  "Loxafr3.0",                  2352L,    1L,      1L),
-        list("macFas5",  "Macaca_fascicularis_5.0",    7601L,    0L,      0L),
-        list("mm8",      "MGSCv36",                      21L,   13L,    360L),
-        list("mm9",      "MGSCv37",                      22L,   13L,    283L),
-        list("mm10",     "GRCm38.p6",                   239L,    0L,      0L),
-        list("mm39",     "GRCm39",                       61L,    0L,      0L),
-        list("monDom5",  "MonDom5",                      10L,    1L,   5128L),
-        list("musFur1",  "MusPutFur1.0",               7741L,    0L,     42L),
-        list("oreNil2",  "Orenil1.1",                  5678L,    0L,      0L),
-        list("panPan1",  "panpan1",                   10867L,    0L,      0L),
-        list("panPan2",  "panpan1.1",                 10274L,    0L,      0L),
-        list("panPan3",  "Mhudiblu_PPA_v0",            4293L,    0L,      0L),
-        list("panTro2",  "Pan_troglodytes-2.1",          26L,   26L,  29214L),
-        list("panTro3",  "Pan_troglodytes-2.1.3",     24131L,    1L,      0L),
-        list("panTro4",  "Pan_troglodytes-2.1.4",     24129L,    0L,      0L),
-        list("panTro5",  "Pan_tro 3.0",               44449L,    0L,      0L),
-        list("panTro6",  "Clint_PTRv2",                4346L,    0L,      0L),
-        list("rheMac2",  "Mmul_051212",                  21L,    1L, 122143L),
-        list("rheMac3",  "CR_1.0",                    34102L,    1L,      0L),
-        list("rheMac8",  "Mmul_8.0.1",               284728L,    0L,      0L),
-        list("rheMac10", "Mmul_10",                    2939L,    0L,      0L),
-        list("rn5",      "Rnor_5.0",                   2739L,    0L,      0L),
-        list("rn6",      "Rnor_6.0",                    953L,    0L,      2L),
-        list("rn7",      "mRatBN7.2",                   176L,    0L,      0L),
-        list("sacCer3",  "R64",                          17L,    0L,      0L),
-        list("susScr2",  "Sscrofa9.2",                   19L,    1L,      0L),
-        list("susScr3",  "Sscrofa10.2",                4583L,    0L,      0L),
-        list("susScr11", "Sscrofa11.1",                 613L,    0L,      0L),
-        list("taeGut2",  "Taeniopygia_guttata-3.2.4", 37096L,    0L,      0L),
-        list("xenLae2",  "Xenopus_laevis_v2",        108033L,    0L,      0L),
-        list("xenTro10", "UCB_Xtro_10.0",               167L,    0L,      0L)
-    )
-    for (i in seq_along(UCSC_NCBI)) {
-        args <- UCSC_NCBI[[i]]
+    for (i in seq_along(.UCSC_NCBI_MAPPING_SUMMARY)) {
+        args <- .UCSC_NCBI_MAPPING_SUMMARY[[i]]
         do.call(check_UCSC_NCBI_switch, args)
     }
+}
 
-    check_RefSeq_switch <- function(UCSC_genome, NCBI_assembly, UCSC_nunmapped)
+test_switching_Seqinfo_to_RefSeq_style <- function()
+{
+    ## We do our best to guess 'seqlevelsStyle(si3)' based on what seqnames
+    ## have changed when we first switched from UCSC to NCBI style and when
+    ## we switched again from NCBI to RefSeq style.
+    guess_expected_style3 <- function(has_changed_12, has_changed_23)
+    {
+        stopifnot(is.logical(has_changed_12),
+                  is.logical(has_changed_23),
+                  length(has_changed_12) == length(has_changed_23))
+        expected_style <- character(0)
+        if (!all(has_changed_12 | has_changed_23))
+            expected_style <- c(expected_style, "UCSC")
+        if (any(has_changed_12 > has_changed_23))
+            expected_style <- c(expected_style, "NCBI")
+        if (any(has_changed_23))
+            expected_style <- c(expected_style, "RefSeq")
+        expected_style
+    }
+
+    check_RefSeq_switch <- function(UCSC_genome, NCBI_assembly)
     {
         is_RefSeq_accession <- GenomeInfoDb:::.is_RefSeq_accession
 
@@ -246,18 +269,17 @@ test_seqlevelsStyle_Seqinfo <- function()
 
         si2 <- si1
         seqlevelsStyle(si2) <- "NCBI"
+        has_changed_12 <- seqnames(si1) != seqnames(si2)
 
         si3 <- si2
         seqlevelsStyle(si3) <- "RefSeq"
         checkIdentical(unname(genome(si2)), unname(genome(si3)))
-        style <- seqlevelsStyle(si3)
-        if (UCSC_nunmapped == 0L) {
-            checkTrue(identical("RefSeq", style) ||
-                      setequal(c("RefSeq", "NCBI"), style))
-        } else {
-            checkTrue(setequal(c("RefSeq", "UCSC"), style))
-        }
-        has_changed <- seqnames(si3) != seqnames(si2)
+        has_changed_23 <- seqnames(si2) != seqnames(si3)
+
+        current_style3 <- seqlevelsStyle(si3)
+        expected_style3 <- guess_expected_style3(has_changed_12, has_changed_23)
+        checkTrue(setequal(current_style3, expected_style3))
+
         ## UGLY HACK! We need to special-case hg38 because it contains 2
         ## sequences that do NOT belong to GRCh38.p14. But they can be
         ## found in GRCh38.p13!
@@ -266,8 +288,8 @@ test_seqlevelsStyle_Seqinfo <- function()
         } else {
             genome_is_ok <- genome(si2) == NCBI_assembly
         }
-        checkTrue(all(genome_is_ok | !has_changed))
-        checkTrue(all(is_RefSeq_accession(seqnames(si3)[has_changed])))
+        checkTrue(all(genome_is_ok | !has_changed_23))
+        checkTrue(all(is_RefSeq_accession(seqnames(si3)[has_changed_23])))
 
         si4 <- si1
         seqlevelsStyle(si4) <- "RefSeq"
@@ -310,15 +332,19 @@ test_seqlevelsStyle_Seqinfo <- function()
     }
 
     ## Exclude some problematic genomes from the RefSeq switch check:
-    ## - In the case of canFam5 and hs1, it's because chrM is not mapped
-    ##   to a RefSeq accession, that is, RefSeqAccn is NA for chrM in
-    ##   getChromInfoFromNCBI("UMICH_Zoey_3.1"), and for MT in
-    ##   getChromInfoFromNCBI("T2T-CHM13v2.0").
-    ## - For the other genomes (canFam4, rheMac3, panTro3), the reasons
-    ##   causing check_RefSeq_switch() still need to be investigated!
-    skip_RefSeq_switch <- c("canFam4", "canFam5", "hs1", "rheMac3", "panTro3")
-    for (i in seq_along(UCSC_NCBI)) {
-        args <- UCSC_NCBI[[i]][c(1L, 2L, 4L)]
+    ## o In the case of canFam4, canFam5, and hs1, it's because chrM is not
+    ##   mapped to a RefSeq accession, that is, RefSeqAccn is NA:
+    ##   - for chrM in getChromInfoFromNCBI("UU_Cfam_GSD_1.0");
+    ##   - for chrM in getChromInfoFromNCBI("UMICH_Zoey_3.1");
+    ##   - for MT in getChromInfoFromNCBI("T2T-CHM13v2.0").
+    ## o In the case of gadMor1, panTro3, and rheMac3, it's because
+    ##   the sequences in associated NCBI assemblies GadMor_May2010,
+    ##   Pan_troglodytes-2.1.3, and CR_1.0, have no RefSeq accessions
+    ##   assigned to them.
+    skip_RefSeq_switch <- c("canFam4", "canFam5", "gadMor1",
+                            "hs1", "panTro3", "rheMac3")
+    for (i in seq_along(.UCSC_NCBI_MAPPING_SUMMARY)) {
+        args <- .UCSC_NCBI_MAPPING_SUMMARY[[i]][1:2]
         if (args[[1L]] %in% skip_RefSeq_switch)
             next
         do.call(check_RefSeq_switch, args)

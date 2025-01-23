@@ -250,8 +250,8 @@ find_NCBI_assembly_info_for_accession <- function(accession)
     ans <- S4Vectors:::extract_data_frame_rows(ans, oo)
 
     ## Column "AssignedMolecule".
-    idx <- which(ans[ , "SequenceRole"] %in% "assembled-molecule")
-    assembled_molecules <- ans[idx , "SequenceName"]
+    is_assembled <- ans[ , "SequenceRole"] %in% "assembled-molecule"
+    assembled_molecules <- ans[is_assembled, "SequenceName"]
     ans[ , "AssignedMolecule"] <- factor(ans[ , "AssignedMolecule"],
                                          levels=assembled_molecules)
 
@@ -279,9 +279,7 @@ find_NCBI_assembly_info_for_accession <- function(accession)
     ## Add column "circular".
     circular <- make_circ_flags_from_circ_seqs(ans[ , "SequenceName"],
                                                circ_seqs=circ_seqs)
-    stopifnot(all(ans[which(circular), "SequenceRole"] %in%
-                  "assembled-molecule"))
-    ans$circular <- circular
+    ans$circular <- circular & is_assembled
 
     ans
 }
