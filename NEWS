@@ -1,3 +1,29 @@
+CHANGES IN VERSION 1.44.0
+-------------------------
+
+NEW FEATURES
+
+    o Register the following NCBI assemblies:
+      - GAculeatus_UGA_version5 (Stickleback)
+      - GadMor_May2010 and gadMor3.0 (Atlantic cod)
+      - Orenil1.1 and O_niloticus_UMD_NMBU (Nile tilapia)
+      - CriGri_1.0, C_griseus_v1.0, and CriGri-PICRH-1.0 (Chinese hamster)
+
+    o Register the following UCSC genomes:
+      - gadMor1 (Atlantic cod), based on NCBI assembly GadMor_May2010
+      - oreNil2 (Nile tilapia), based on NCBI assembly Orenil1.1
+      - criGri1 (Chinese hamster), based on NCBI assembly C_griseus_v1.0
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o Use slightly better heuristic in getChromInfoFromNCBI() for guessing the
+      circular sequences of non-registered assemblies.
+
+BUG FIXES
+
+    o Fix getChromInfoFromNCBI("panpan1.1"). See commit 3be5818.
+
+
 CHANGES IN VERSION 1.42.0
 -------------------------
 
@@ -13,7 +39,6 @@ CHANGES IN VERSION 1.40.0
 NEW FEATURES
 
     o Register the following NCBI assemblies:
-
       - GRCr8 assembly (Rat)
       - mCavPor4.1 assembly (domestic guinea pig)
       - 21 Escherichia coli assemblies
