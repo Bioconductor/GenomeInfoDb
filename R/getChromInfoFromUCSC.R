@@ -563,6 +563,7 @@
 
 registered_UCSC_genomes <- function(organism=NA)
 {
+    load_package_gracefully("UCSC.utils", "registered_UCSC_genomes()")
     if (!isSingleStringOrNA(organism))
         stop(wmsg("'organism' must be a single string or NA"))
     dir_path <- system.file("registered", "UCSC_genomes",
@@ -968,6 +969,9 @@ get_and_fix_chrom_info_from_UCSC <- function(genome,
     warning_tip1="",
     warning_tip2="")
 {
+    ## We call registered_UCSC_genomes() below which requires UCSC.utils.
+    load_package_gracefully("UCSC.utils", "get_and_fix_chrom_info_from_UCSC()")
+
     if (!isSingleString(genome))
         stop(wmsg("'genome' must be a single string"))
     if (!isTRUEorFALSE(as.Seqinfo))
@@ -977,8 +981,8 @@ get_and_fix_chrom_info_from_UCSC <- function(genome,
     if (!isSingleString(warning_tip2))
         stop(wmsg("'warning_tip2' must be a single string"))
 
-    UCSC_genomes <- registered_UCSC_genomes()[ , "genome"]
-    is_registered <- genome %in% UCSC_genomes
+    UCSC_genomes <- registered_UCSC_genomes()  # requires UCSC.utils
+    is_registered <- genome %in% UCSC_genomes[ , "genome"]
 
     ans <- getChromInfoFromUCSC(genome, ..., as.Seqinfo=FALSE)
     if (!is_registered) {

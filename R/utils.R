@@ -6,6 +6,16 @@
 ###
 
 
+### TODO: Move this to S4Vectors (or BiocBaseUtils).
+load_package_gracefully <- function(package, ...)
+{
+    if (!requireNamespace(package, quietly=TRUE))
+        stop("Could not load package ", package, ". Is it installed?\n\n  ",
+             wmsg("Note that ", ..., " requires the ", package, " package. ",
+                  "Please install it with:"),
+             "\n\n    BiocManager::install(\"", package, "\")")
+}
+
 is_single_value <- function(x)
 {
     is.vector(x) && is.atomic(x) && length(x) == 1L
