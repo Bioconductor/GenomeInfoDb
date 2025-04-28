@@ -17,7 +17,7 @@
     NCBI_assemblies <- registered_NCBI_assemblies()
     if (genome %in% NCBI_assemblies[ , "assembly"])
         return("NCBI")
-    UCSC_genomes <- registered_UCSC_genomes()  # requires UCSC.utils
+    UCSC_genomes <- registered_UCSC_genomes()
     if (genome %in% UCSC_genomes[ , "genome"])
         return("UCSC")
     ## We try getChromInfoFromUCSC(). It will succeed if genome is a valid
@@ -57,7 +57,7 @@
 .map_NCBI_assembly_to_UCSC_genome <- function(assembly)
 {
     stopifnot(isSingleString(assembly))
-    UCSC_genomes <- registered_UCSC_genomes()  # requires UCSC.utils
+    UCSC_genomes <- registered_UCSC_genomes()
     NCBI_assemblies <- UCSC_genomes[ , "NCBI_assembly"]
     idx <- match(assembly, NCBI_assemblies)
     if (!is.na(idx))
@@ -81,7 +81,7 @@
 .map_UCSC_genome_to_NCBI_assembly <- function(genome)
 {
     stopifnot(isSingleString(genome))
-    UCSC_genomes <- registered_UCSC_genomes()  # requires UCSC.utils
+    UCSC_genomes <- registered_UCSC_genomes()
     idx <- match(genome, UCSC_genomes[ , "genome"])
     UCSC_genomes[idx, "NCBI_assembly"]
 }
@@ -349,11 +349,6 @@ setGeneric("seqlevelsStyle<-", signature="x",
 
 .get_Seqinfo_seqlevelsStyle <- function(x)
 {
-    ## At the moment, our implementation of the seqlevelsStyle() setter
-    ## for Seqinfo objects relies on registered_UCSC_genomes() (see the
-    ## various calls to registered_UCSC_genomes() above in this file),
-    ## which requires UCSC.utils.
-    load_package_gracefully("UCSC.utils", "the seqlevelsStyle() getter")
     x_genome <- .get_genome_as_factor(x)
     if (length(x_genome) == 0L)
         stop(wmsg("no seqlevels present in this object"))
@@ -366,11 +361,6 @@ setGeneric("seqlevelsStyle<-", signature="x",
 
 .set_Seqinfo_seqlevelsStyle <- function(x, value)
 {
-    ## At the moment, our implementation of the seqlevelsStyle() setter
-    ## for Seqinfo objects relies on registered_UCSC_genomes() (see the
-    ## various calls to registered_UCSC_genomes() above in this file),
-    ## which requires UCSC.utils.
-    load_package_gracefully("UCSC.utils", "the seqlevelsStyle() setter")
     value <- .normarg_seqlevelsStyle(value)
     x_genome <- .get_genome_as_factor(x)
     if (length(x_genome) == 0L)

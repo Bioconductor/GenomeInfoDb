@@ -7,6 +7,7 @@ importFrom(stats4, summary)
 import(BiocGenerics)
 import(S4Vectors)
 import(IRanges)  # for CompressedList
+import(UCSC.utils)
 import(GenomeInfoDbData)
 
 

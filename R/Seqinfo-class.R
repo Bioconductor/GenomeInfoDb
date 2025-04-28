@@ -137,15 +137,13 @@ setValidity2("Seqinfo", .valid.Seqinfo)
 
 .make_Seqinfo_from_genome <- function(genome)
 {
-    ## We call registered_UCSC_genomes() below which requires UCSC.utils.
-    load_package_gracefully("UCSC.utils", "Seqinfo(genome=\"", genome, "\")")
     if (!isSingleString(genome) || genome == "")
         stop("'genome' must be a single non-empty string")
     NCBI_assemblies <- registered_NCBI_assemblies()
     if (genome %in% NCBI_assemblies[ , "assembly"] ||
         genome %in% NCBI_assemblies[ , "assembly_accession"])
         return(getChromInfoFromNCBI(genome, as.Seqinfo=TRUE))
-    UCSC_genomes <- registered_UCSC_genomes()  # requires UCSC.utils
+    UCSC_genomes <- registered_UCSC_genomes()
     if (genome %in% UCSC_genomes[ , "genome"])
         return(getChromInfoFromUCSC(genome, as.Seqinfo=TRUE))
     stop(wmsg("\"", genome, "\" is not a registered NCBI assembly ",
