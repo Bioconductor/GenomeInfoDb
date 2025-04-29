@@ -12,6 +12,12 @@
 ### TODO: Rename specData dataset -> TAXONOMY_DB in GenomeInfoDbData.
 loadTaxonomyDb <- function()
 {
+    if (!requireNamespace("GenomeInfoDbData", quietly=TRUE))
+        stop("Could not load package GenomeInfoDbData. Is it installed?\n\n  ",
+             wmsg("Note that loadTaxonomyDb() requires the GenomeInfoDbData ",
+                  "package. Please install it with:"),
+             "\n\n    BiocManager::install(\"GenomeInfoDbData\")")
+
     ans <- try(get("TAXONOMY_DB", envir=.TAXONOMY_DB_cache, inherits=FALSE),
                silent=TRUE)
     if (!is(ans, "try-error"))

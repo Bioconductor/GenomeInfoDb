@@ -12,6 +12,8 @@
   with associated genus and species designations. This function returns
   the set of pre-processed values that we use to check that something is
   a valid Taxonomy ID (or organism).
+
+  Requires the \pkg{GenomeInfoDbData} package.
 }
 
 \usage{
@@ -29,6 +31,7 @@
 }
 
 \examples{
+library(GenomeInfoDbData)
 ## get the data
 taxdb <- loadTaxonomyDb()
 tail(taxdb)
