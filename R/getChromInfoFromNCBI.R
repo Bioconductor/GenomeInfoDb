@@ -219,80 +219,81 @@ find_NCBI_assembly_info_for_accession <- function(accession)
 
 .format_NCBI_chrom_info <- function(assembly_report, circ_seqs=NULL)
 {
-    ans <- drop_cols(assembly_report, "AssignedMoleculeLocationOrType")
+    df <- drop_cols(assembly_report, "AssignedMoleculeLocationOrType")
 
     ## Column "GenBankAccn".
-    GenBankAccn <- ans[ , "GenBankAccn"]
+    GenBankAccn <- df[ , "GenBankAccn"]
     if (!is.character(GenBankAccn))
-        ans[ , "GenBankAccn"] <- as.character(GenBankAccn)
+        df[ , "GenBankAccn"] <- as.character(GenBankAccn)
 
     ## Column "SequenceName".
-    sequence_name <- as.character(ans[ , "SequenceName"])
+    sequence_name <- as.character(df[ , "SequenceName"])
     if (all(is.na(sequence_name)))  # this happens for the CIEA01 assembly!
-        sequence_name <- ans[ , "GenBankAccn"]
+        sequence_name <- df[ , "GenBankAccn"]
     stopifnot(is_primary_key(sequence_name))
-    ans[ , "SequenceName"] <- sequence_name
-
-    ## Column "SequenceRole".
-    SequenceRole_levels <- c("assembled-molecule",
-                             "alt-scaffold",
-                             "unlocalized-scaffold",
-                             "unplaced-scaffold",
-                             "pseudo-scaffold",
-                             "fix-patch",
-                             "novel-patch")
-    sequence_role <- factor(ans[ , "SequenceRole"], levels=SequenceRole_levels)
-    stopifnot(identical(is.na(sequence_role), is.na(ans[ , "SequenceRole"])))
-    ans[ , "SequenceRole"] <- sequence_role
-
-    ## Re-order the rows based on SequenceRole.
-    oo <- order(as.integer(sequence_role))
-    ans <- S4Vectors:::extract_data_frame_rows(ans, oo)
+    df[ , "SequenceName"] <- sequence_name
 
     ## Column "AssignedMolecule".
-    is_assembled <- ans[ , "SequenceRole"] %in% "assembled-molecule"
-    assembled_molecules <- ans[is_assembled, "SequenceName"]
-    ans[ , "AssignedMolecule"] <- factor(ans[ , "AssignedMolecule"],
-                                         levels=assembled_molecules)
-
-    ## Column "Relationship".
-    Relationship_levels <- c("=", "<>")
-    ans[ , "Relationship"] <- factor(ans[ , "Relationship"],
-                                     levels=Relationship_levels)
+    AssignedMolecule <- df[ , "AssignedMolecule"]
+    if (!is.character(AssignedMolecule))
+        df[ , "AssignedMolecule"] <- as.character(AssignedMolecule)
 
     ## Column "RefSeqAccn".
-    RefSeqAccn <- ans[ , "RefSeqAccn"]
+    RefSeqAccn <- df[ , "RefSeqAccn"]
     if (!is.character(RefSeqAccn))
-        ans[ , "RefSeqAccn"] <- as.character(RefSeqAccn)
-
-    ## Column "AssemblyUnit".
-    ans[ , "AssemblyUnit"] <- factor(ans[ , "AssemblyUnit"])
+        df[ , "RefSeqAccn"] <- as.character(RefSeqAccn)
 
     ## Column "UCSCStyleName".
-    UCSCStyleName <- ans[ , "UCSCStyleName"]
+    UCSCStyleName <- df[ , "UCSCStyleName"]
     if (!is.character(UCSCStyleName))
-        UCSCStyleName <- as.character(UCSCStyleName)
-    na_idx <- which(UCSCStyleName %in% "na")
-    UCSCStyleName[na_idx] <- NA_character_
-    ans[ , "UCSCStyleName"] <- UCSCStyleName
+        df[ , "UCSCStyleName"] <- as.character(UCSCStyleName)
 
     ## Add column "circular".
-    circular <- make_circ_flags_from_circ_seqs(ans[ , "SequenceName"],
-                                               circ_seqs=circ_seqs)
-    ans$circular <- circular & is_assembled
+    df$circular <- make_circ_flags_from_circ_seqs(df[ , "SequenceName"],
+                                                  circ_seqs=circ_seqs)
+
+    ans <- normalize_NCBI_chrominfo_db_table(df)
+
+    ## Fix column "circular" based on sequence role.
+    is_assembled <- ans[ , "SequenceRole"] %in% "assembled-molecule"
+    ans$circular <- ans$circular & is_assembled
 
     ans
 }
 
 .NCBI_cached_chrom_info <- new.env(parent=emptyenv())
 
-.get_NCBI_chrom_info_from_accession <- function(accession, assembly_name=NA,
-    circ_seqs=NULL,
-    assembled.molecules.only=FALSE,
-    assembly.units=NULL,
-    recache=FALSE)
+.get_chrom_info_from_NCBI_chrominfo_db <- function(accession)
+{
+    filename <- paste0(accession, ".tab")
+    filepath <- system.file("chrominfo_db", "NCBI",
+                            filename, package="GenomeInfoDb")
+    if (identical(filepath, ""))
+        return(NULL)
+    read_NCBI_chrominfo_db_table(filepath)
+}
+
+.warn_that_NCBI_assembly_has_changed <- function(accession, assembly_name=NA)
+{
+    msg <- c("The chromosome info fetched from NCBI for assembly ", accession)
+    if (!is.na(assembly_name))
+        msg <- c(msg, " (", assembly_name, ")")
+    msg <- c(msg, " no longer matches the records ",
+             "stored in the GenomeInfoDb package. ",
+             "Could it be that assembly ", accession, " has changed?")
+    warning(wmsg(msg))
+}
+
+.get_full_NCBI_chrom_info_from_accession <-
+    function(accession, assembly_name=NA, circ_seqs=NULL, recache=FALSE)
 {
     ans <- .NCBI_cached_chrom_info[[accession]]
+
+    ## Try to get chrom info from local chrominfo db.
+    local_chrom_info <- .get_chrom_info_from_NCBI_chrominfo_db(accession)
+    if (!is.null(local_chrom_info) && is.null(ans) && !recache)
+        return(local_chrom_info)
+
     if (is.null(ans) || recache) {
         assembly_report <- fetch_assembly_report(accession,
                                                  assembly_name=assembly_name)
@@ -319,6 +320,25 @@ find_NCBI_assembly_info_for_accession <- function(accession)
         ans <- .format_NCBI_chrom_info(assembly_report, circ_seqs=circ_seqs)
         .NCBI_cached_chrom_info[[accession]] <- ans
     }
+
+    if (!is.null(local_chrom_info)) {
+        ## Compare local chrom info with online info.
+        if (!identical(local_chrom_info, ans))
+            .warn_that_NCBI_assembly_has_changed(accession,
+                                                 assembly_name=assembly_name)
+    }
+    ans
+}
+
+.get_NCBI_chrom_info_from_accession <- function(accession, assembly_name=NA,
+    circ_seqs=NULL,
+    assembled.molecules.only=FALSE,
+    assembly.units=NULL,
+    recache=FALSE)
+{
+    ans <- .get_full_NCBI_chrom_info_from_accession(accession,
+                          assembly_name=assembly_name,
+                          circ_seqs=circ_seqs, recache=recache)
     if (assembled.molecules.only) {
         keep_idx <- which(ans[ , "SequenceRole"] %in% "assembled-molecule")
         ans <- S4Vectors:::extract_data_frame_rows(ans, keep_idx)
@@ -420,5 +440,38 @@ getChromInfoFromNCBI <- function(assembly,
             seqlengths=ans[ , "SequenceLength"],
             isCircular=ans[ , "circular"],
             genome=assembly_name)
+}
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### saveChromInfoFromNCBI()
+###
+### NOT intended for the end user.
+### Use case is to add "chromosomes info" for the specified NCBI assemblies
+### to the GenomeInfoDb package. The assemblies must be **registered**.
+### See README.TXT in
+###     GenomeInfoDb/inst/chrominfo_db/NCBI/
+### for more information.
+
+### Vectorized.
+saveChromInfoFromNCBI <- function(assemblies, dir=".")
+{
+    if (!is.character(assemblies))
+        stop(wmsg("'assemblies' must be a character vector"))
+    if (!isSingleString(dir))
+        stop(wmsg("'dir' must be a single string specifying the path ",
+                  "to the directory where to save the .tab file(s)"))
+    expected_colnames <- names(NCBI_CHROMINFO_DB_COL2CLASS)
+    for (assembly in assemblies) {
+        chrominfo <- getChromInfoFromNCBI(assembly, recache=TRUE)
+        stopifnot(identical(colnames(chrominfo), expected_colnames))
+        NCBI_assembly_info <- attr(chrominfo, "NCBI_assembly_info")
+        assembly_accession <- NCBI_assembly_info$assembly_accession
+        stopifnot(!is.null(assembly_accession))
+        filename <- paste0(assembly_accession, ".tab")
+        filepath <- file.path(dir, filename)
+        write.table(chrominfo, file=filepath,
+                    quote=FALSE, sep="\t", row.names=FALSE)
+    }
 }
 

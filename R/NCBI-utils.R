@@ -109,7 +109,7 @@ fetch_assembly_summary <- function(genbank_or_refseq, quiet=FALSE)
 ### build_and_save_assembly_accessions_table()
 ###
 ### Use this utility to update assembly_accessions dataset located in
-### GenomeInfoDb package (in /inst/extdata/).
+### GenomeInfoDb package (in GenomeInfoDb/inst/extdata/).
 ### It will issue a warning that a small number of assemblies were dropped
 ### (3 on Feb 2017). It's OK to ignore if the number is small.
 ###
@@ -428,5 +428,77 @@ fetch_assembly_report <- function(assembly_accession, assembly_name=NA,
         ans <- ans[idx, , drop=FALSE]
     }
     ans
+}
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### read_NCBI_chrominfo_db_table()
+###
+
+NCBI_CHROMINFO_DB_COL2CLASS <- c(
+    SequenceName="character",
+    SequenceRole="character",
+    AssignedMolecule="character",
+    GenBankAccn="character",
+    Relationship="character",
+    RefSeqAccn="character",
+    AssemblyUnit="character",
+    SequenceLength="integer",
+    UCSCStyleName="character",
+    circular="logical"
+)
+
+.NCBI_SEQUENCE_ROLES <- c(
+    "assembled-molecule",
+    "alt-scaffold",
+    "unlocalized-scaffold",
+    "unplaced-scaffold",
+    "pseudo-scaffold",
+    "fix-patch",
+    "novel-patch"
+)
+
+normalize_NCBI_chrominfo_db_table <- function(df)
+{
+    stopifnot(is.data.frame(df),
+              identical(sapply(df, class), NCBI_CHROMINFO_DB_COL2CLASS))
+
+    ## Normalize column "SequenceRole".
+    sequence_role <- factor(df[ , "SequenceRole"], levels=.NCBI_SEQUENCE_ROLES)
+    stopifnot(identical(is.na(sequence_role), is.na(df[ , "SequenceRole"])))
+    df[ , "SequenceRole"] <- sequence_role
+
+    ## Re-order the rows based on SequenceRole.
+    oo <- order(as.integer(sequence_role))
+    df <- S4Vectors:::extract_data_frame_rows(df, oo)
+
+    ## Normalize column "AssignedMolecule".
+    is_assembled <- df[ , "SequenceRole"] %in% "assembled-molecule"
+    assembled_molecules <- df[is_assembled, "SequenceName"]
+    df[ , "AssignedMolecule"] <- factor(df[ , "AssignedMolecule"],
+                                        levels=assembled_molecules)
+
+    ## Normalize column "Relationship".
+    Relationship_levels <- c("=", "<>")
+    df[ , "Relationship"] <- factor(df[ , "Relationship"],
+                                    levels=Relationship_levels)
+
+    ## Normalize column "AssemblyUnit".
+    df[ , "AssemblyUnit"] <- factor(df[ , "AssemblyUnit"])
+
+    ## Normalize column "UCSCStyleName".
+    UCSCStyleName <- df[ , "UCSCStyleName"]
+    na_idx <- which(UCSCStyleName %in% "na")
+    UCSCStyleName[na_idx] <- NA_character_
+    df[ , "UCSCStyleName"] <- UCSCStyleName
+
+    df
+}
+
+read_NCBI_chrominfo_db_table <- function(file)
+{
+    df <- simple_read_table(file, header=TRUE,
+                            col2class=NCBI_CHROMINFO_DB_COL2CLASS)
+    normalize_NCBI_chrominfo_db_table(df)
 }
 

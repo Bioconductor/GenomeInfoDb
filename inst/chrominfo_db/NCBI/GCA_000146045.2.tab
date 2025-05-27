@@ -1,0 +1,18 @@
+SequenceName	SequenceRole	AssignedMolecule	GenBankAccn	Relationship	RefSeqAccn	AssemblyUnit	SequenceLength	UCSCStyleName	circular
+I	assembled-molecule	I	BK006935.2	=	NC_001133.9	Primary Assembly	230218	chrI	FALSE
+II	assembled-molecule	II	BK006936.2	=	NC_001134.8	Primary Assembly	813184	chrII	FALSE
+III	assembled-molecule	III	BK006937.2	=	NC_001135.5	Primary Assembly	316620	chrIII	FALSE
+IV	assembled-molecule	IV	BK006938.2	=	NC_001136.10	Primary Assembly	1531933	chrIV	FALSE
+V	assembled-molecule	V	BK006939.2	=	NC_001137.3	Primary Assembly	576874	chrV	FALSE
+VI	assembled-molecule	VI	BK006940.2	=	NC_001138.5	Primary Assembly	270161	chrVI	FALSE
+VII	assembled-molecule	VII	BK006941.2	=	NC_001139.9	Primary Assembly	1090940	chrVII	FALSE
+VIII	assembled-molecule	VIII	BK006934.2	=	NC_001140.6	Primary Assembly	562643	chrVIII	FALSE
+IX	assembled-molecule	IX	BK006942.2	=	NC_001141.2	Primary Assembly	439888	chrIX	FALSE
+X	assembled-molecule	X	BK006943.2	=	NC_001142.9	Primary Assembly	745751	chrX	FALSE
+XI	assembled-molecule	XI	BK006944.2	=	NC_001143.9	Primary Assembly	666816	chrXI	FALSE
+XII	assembled-molecule	XII	BK006945.2	=	NC_001144.5	Primary Assembly	1078177	chrXII	FALSE
+XIII	assembled-molecule	XIII	BK006946.2	=	NC_001145.3	Primary Assembly	924431	chrXIII	FALSE
+XIV	assembled-molecule	XIV	BK006947.3	=	NC_001146.8	Primary Assembly	784333	chrXIV	FALSE
+XV	assembled-molecule	XV	BK006948.2	=	NC_001147.6	Primary Assembly	1091291	chrXV	FALSE
+XVI	assembled-molecule	XVI	BK006949.2	=	NC_001148.4	Primary Assembly	948066	chrXVI	FALSE
+MT	assembled-molecule	MT	NA	<>	NC_001224.1	non-nuclear	85779	chrM	TRUE

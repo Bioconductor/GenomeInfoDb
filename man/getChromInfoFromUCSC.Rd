@@ -3,7 +3,7 @@
 \alias{registered_UCSC_genomes}
 \alias{getChromInfoFromUCSC}
 \alias{get_and_fix_chrom_info_from_UCSC}
-\alias{saveAssembledMoleculesInfoFromUCSC}
+\alias{saveChromInfoFromUCSC}
 
 \title{
   Get chromosome information for a UCSC genome
@@ -145,7 +145,7 @@ registered_UCSC_genomes(organism=NA)
   \preformatted{    getChromInfoFromUCSC("hg38", assembled.molecules.only=TRUE)}
   fast and reliable i.e. the call will always work, even when offline!
 
-  See README.TXT in GenomeInfoDb/inst/extdata/assembled_molecules_db/UCSC/
+  See README.TXT in GenomeInfoDb/inst/chrominfo_db/UCSC/assembled_molecules_db/
   for more information.
 
   Note that calling \code{getChromInfoFromUCSC()} with

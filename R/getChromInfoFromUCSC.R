@@ -675,35 +675,60 @@ registered_UCSC_genomes <- function(organism=NA)
     ans
 }
 
-### Return NULL or a "raw" chrom info data.frame, that is, a 4-column
+### Returns a "raw" chrom info data.frame, that is, a 4-column
 ### data.frame with columns "chrom" (character), "size" (integer),
 ### "assembled" (logical), and "circular" (logical).
-### The returned data.frame must have one row per assembled molecule.
-.load_stored_amol_info_for_UCSC_genome <-
+.get_chrom_info_from_UCSC_chrominfo_db <-
     function(GENOME, ASSEMBLED_MOLECULES, CIRC_SEQS)
 {
     filename <- paste0(GENOME, ".tab")
-    filepath <- system.file("extdata", "assembled_molecules_db", "UCSC",
+    filepath <- system.file("chrominfo_db", "UCSC",
+                            filename, package="GenomeInfoDb")
+    if (identical(filepath, ""))
+        return(NULL)
+    ans <- read_UCSC_chrominfo_db_table(filepath)
+    expected_col2class <- c(chrom="character", size="integer",
+                            assembled="logical", circular="logical")
+    stopifnot(identical(sapply(ans, class), expected_col2class))
+
+    nb_assembled <- length(ASSEMBLED_MOLECULES)
+    expected_circular <- make_circ_flags_from_circ_seqs(ans[ , "chrom"],
+                                                        CIRC_SEQS)
+    stopifnot(
+        identical(head(ans[ , "chrom"], n=nb_assembled), ASSEMBLED_MOLECULES),
+        identical(ans[ , "circular"], expected_circular)
+    )
+    ans
+}
+
+### Returns a "raw" chrom info data.frame (i.e. 4 core columns only, see above).
+.get_assmol_info_from_UCSC_chrominfo_db <-
+    function(GENOME, ASSEMBLED_MOLECULES, CIRC_SEQS)
+{
+    filename <- paste0(GENOME, ".tab")
+    filepath <- system.file("chrominfo_db", "UCSC", "assembled_molecules_db",
                             filename, package="GenomeInfoDb")
     if (identical(filepath, ""))
         return(NULL)
     ans <- read_UCSC_assembled_molecules_db_table(filepath)
+    expected_col2class <- c(chrom="character", size="integer",
+                            circular="logical")
+    stopifnot(identical(sapply(ans, class), expected_col2class))
+
     expected_circular <- make_circ_flags_from_circ_seqs(ASSEMBLED_MOLECULES,
                                                         CIRC_SEQS)
     stopifnot(
-        identical(sapply(ans, class),
-                  c(chrom="character", size="integer", circular="logical")),
         identical(ans[ , "chrom"], ASSEMBLED_MOLECULES),
         identical(ans[ , "circular"], expected_circular)
     )
 
-    ## Add "assembled" column.
+    ## Add "assembled" column and move "circular" column to last position.
     cbind(ans[ , c("chrom", "size")],
           assembled=rep.int(TRUE, nrow(ans)),
           circular=ans[ , "circular"])
 }
 
-### Return a "raw" chrom info data.frame (i.e. 4 core columns only, see above).
+### Returns a "raw" chrom info data.frame (i.e. 4 core columns only, see above).
 .fetch_raw_chrom_info_from_UCSC <- function(GENOME,
     ASSEMBLED_MOLECULES,
     CIRC_SEQS,
@@ -742,7 +767,13 @@ registered_UCSC_genomes <- function(organism=NA)
     cbind(chrom_sizes, assembled=assembled, circular=circular)
 }
 
-### Return a "raw" chrom info data.frame (i.e. 4 core columns only, see above).
+.warn_that_UCSC_genome_has_changed <- function(GENOME)
+    warning(wmsg("The chromosome info fetched from UCSC for ",
+                 "genome ", GENOME, " no longer matches the ",
+                 "records stored in the GenomeInfoDb package. ",
+                 "Could it be that ", GENOME, " has changed?"))
+
+### Returns a "raw" chrom info data.frame (i.e. 4 core columns only, see above).
 .get_raw_chrom_info_for_registered_UCSC_genome <- function(GENOME,
     ASSEMBLED_MOLECULES,
     CIRC_SEQS,
@@ -751,27 +782,39 @@ registered_UCSC_genomes <- function(organism=NA)
     goldenPath.url=getOption("UCSC.goldenPath.url"),
     recache=FALSE)
 {
-    stored_amol_info <- .load_stored_amol_info_for_UCSC_genome(GENOME,
-                                          ASSEMBLED_MOLECULES, CIRC_SEQS)
-    if (!is.null(stored_amol_info) && assembled.molecules.only && !recache)
-        return(stored_amol_info)
     ans <- .UCSC_cached_chrom_info[[GENOME]]
+
+    ## Try to get assembled molecules info from local chrominfo db.
+    local_assmol_info <- .get_assmol_info_from_UCSC_chrominfo_db(GENOME,
+                                        ASSEMBLED_MOLECULES, CIRC_SEQS)
+    if (!is.null(local_assmol_info) && assembled.molecules.only &&
+        is.null(ans) && !recache)
+        return(local_assmol_info)
+
+    ## Try to get chrom info from local chrominfo db.
+    local_chrom_info <- .get_chrom_info_from_UCSC_chrominfo_db(GENOME,
+                                        ASSEMBLED_MOLECULES, CIRC_SEQS)
+    if (!is.null(local_chrom_info) && is.null(ans) && !recache)
+        return(local_chrom_info)
+
     if (is.null(ans) || recache) {
         ans <- .fetch_raw_chrom_info_from_UCSC(GENOME, ASSEMBLED_MOLECULES,
-                                      CIRC_SEQS, FETCH_ORDERED_CHROM_SIZES,
-                                      goldenPath.url=goldenPath.url)
-        if (!is.null(stored_amol_info)) {
-            assembled_idx <- seq_along(ASSEMBLED_MOLECULES)
-            latest_amol_info <- S4Vectors:::extract_data_frame_rows(ans,
-                                                         assembled_idx)
-            if (!identical(stored_amol_info, latest_amol_info))
-                warning(wmsg("The chromosome info obtained from UCSC ",
-                             "for genome ", GENOME, " no longer matches ",
-                             "the records stored in the GenomeInfoDb ",
-                             "package. Could it be that ", GENOME, " has ",
-                             "changed?"))
-        }
+                                     CIRC_SEQS, FETCH_ORDERED_CHROM_SIZES,
+                                     goldenPath.url=goldenPath.url)
         .UCSC_cached_chrom_info[[GENOME]] <- ans
+    }
+
+    if (!is.null(local_assmol_info)) {
+        ## Compare local assembled molecules info with online info.
+        assembled_idx <- seq_along(ASSEMBLED_MOLECULES)
+        online_info <- S4Vectors:::extract_data_frame_rows(ans, assembled_idx)
+        if (!identical(local_assmol_info, online_info))
+            .warn_that_UCSC_genome_has_changed(GENOME)
+    }
+    if (!is.null(local_chrom_info)) {
+        ## Compare local chrom info with online info.
+        if (!identical(local_chrom_info, ans))
+            .warn_that_UCSC_genome_has_changed(GENOME)
     }
     ans
 }
@@ -1020,31 +1063,38 @@ get_and_fix_chrom_info_from_UCSC <- function(genome,
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### saveAssembledMoleculesInfoFromUCSC()
+### saveChromInfoFromUCSC()
 ###
-### Not intended for the end user.
-### Use case is to add "assembled molecules info" for the specified UCSC
-### genomes to the GenomeInfoDb package. The genomes must be **registered**.
-### See README.TXT in GenomeInfoDb/inst/extdata/assembled_molecules_db/UCSC/
+### NOT intended for the end user.
+### Use case is to add "chromosomes info" or "assembled molecules info" for
+### the specified UCSC genomes to the GenomeInfoDb package. The genomes must
+### be **registered**. See README.TXT in
+###     GenomeInfoDb/inst/chrominfo_db/UCSC/
+### or
+###     GenomeInfoDb/inst/chrominfo_db/UCSC/assembled_molecules_db/
 ### for more information.
 
 ### Vectorized.
-saveAssembledMoleculesInfoFromUCSC <- function(
-    genomes, dir=".",
+saveChromInfoFromUCSC <- function(
+    genomes, assembled.molecules.only=FALSE, dir=".",
     goldenPath.url=getOption("UCSC.goldenPath.url"))
 {
     if (!is.character(genomes))
         stop(wmsg("'genomes' must be a character vector"))
+    if (!isTRUEorFALSE(assembled.molecules.only))
+        stop(wmsg("'assembled.molecules.only' must be TRUE or FALSE"))
     if (!isSingleString(dir))
         stop(wmsg("'dir' must be a single string specifying the path ",
-                  "to the directory where to save the RDS file"))
+                  "to the directory where to save the .tab file(s)"))
     expected_colnames <- c("chrom", "size", "assembled", "circular")
     for (genome in genomes) {
-        chrominfo <- getChromInfoFromUCSC(genome, assembled.molecules.only=TRUE,
-                                          goldenPath.url=goldenPath.url,
-                                          recache=TRUE)
+        chrominfo <- getChromInfoFromUCSC(genome,
+                             assembled.molecules.only=assembled.molecules.only,
+                             goldenPath.url=goldenPath.url,
+                             recache=TRUE)
         stopifnot(identical(colnames(chrominfo), expected_colnames))
-        chrominfo <- chrominfo[ , -3L]
+        if (assembled.molecules.only)
+            chrominfo <- chrominfo[ , -3L]
         filename <- paste0(genome, ".tab")
         filepath <- file.path(dir, filename)
         write.table(chrominfo, file=filepath,

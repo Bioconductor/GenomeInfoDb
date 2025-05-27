@@ -2,6 +2,7 @@
 
 \alias{registered_NCBI_assemblies}
 \alias{getChromInfoFromNCBI}
+\alias{saveChromInfoFromNCBI}
 
 \title{
   Get chromosome information for an NCBI assembly

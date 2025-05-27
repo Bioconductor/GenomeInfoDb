@@ -91,12 +91,13 @@ export(
     ## getChromInfoFromNCBI.R:
     registered_NCBI_assemblies,
     getChromInfoFromNCBI,
+    saveChromInfoFromNCBI,
 
     ## getChromInfoFromUCSC.R:
     registered_UCSC_genomes,
     getChromInfoFromUCSC,
     get_and_fix_chrom_info_from_UCSC,
-    saveAssembledMoleculesInfoFromUCSC,
+    saveChromInfoFromUCSC,
 
     ## getChromInfoFromEnsembl.R:
     getChromInfoFromEnsembl,

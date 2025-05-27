@@ -1,0 +1,26 @@
+SequenceName	SequenceRole	AssignedMolecule	GenBankAccn	Relationship	RefSeqAccn	AssemblyUnit	SequenceLength	UCSCStyleName	circular
+1	assembled-molecule	1	CP068277.2	=	NC_060925.1	Primary Assembly	248387328	chr1	FALSE
+2	assembled-molecule	2	CP068276.2	=	NC_060926.1	Primary Assembly	242696752	chr2	FALSE
+3	assembled-molecule	3	CP068275.2	=	NC_060927.1	Primary Assembly	201105948	chr3	FALSE
+4	assembled-molecule	4	CP068274.2	=	NC_060928.1	Primary Assembly	193574945	chr4	FALSE
+5	assembled-molecule	5	CP068273.2	=	NC_060929.1	Primary Assembly	182045439	chr5	FALSE
+6	assembled-molecule	6	CP068272.2	=	NC_060930.1	Primary Assembly	172126628	chr6	FALSE
+7	assembled-molecule	7	CP068271.2	=	NC_060931.1	Primary Assembly	160567428	chr7	FALSE
+8	assembled-molecule	8	CP068270.2	=	NC_060932.1	Primary Assembly	146259331	chr8	FALSE
+9	assembled-molecule	9	CP068269.2	=	NC_060933.1	Primary Assembly	150617247	chr9	FALSE
+10	assembled-molecule	10	CP068268.2	=	NC_060934.1	Primary Assembly	134758134	chr10	FALSE
+11	assembled-molecule	11	CP068267.2	=	NC_060935.1	Primary Assembly	135127769	chr11	FALSE
+12	assembled-molecule	12	CP068266.2	=	NC_060936.1	Primary Assembly	133324548	chr12	FALSE
+13	assembled-molecule	13	CP068265.2	=	NC_060937.1	Primary Assembly	113566686	chr13	FALSE
+14	assembled-molecule	14	CP068264.2	=	NC_060938.1	Primary Assembly	101161492	chr14	FALSE
+15	assembled-molecule	15	CP068263.2	=	NC_060939.1	Primary Assembly	99753195	chr15	FALSE
+16	assembled-molecule	16	CP068262.2	=	NC_060940.1	Primary Assembly	96330374	chr16	FALSE
+17	assembled-molecule	17	CP068261.2	=	NC_060941.1	Primary Assembly	84276897	chr17	FALSE
+18	assembled-molecule	18	CP068260.2	=	NC_060942.1	Primary Assembly	80542538	chr18	FALSE
+19	assembled-molecule	19	CP068259.2	=	NC_060943.1	Primary Assembly	61707364	chr19	FALSE
+20	assembled-molecule	20	CP068258.2	=	NC_060944.1	Primary Assembly	66210255	chr20	FALSE
+21	assembled-molecule	21	CP068257.2	=	NC_060945.1	Primary Assembly	45090682	chr21	FALSE
+22	assembled-molecule	22	CP068256.2	=	NC_060946.1	Primary Assembly	51324926	chr22	FALSE
+X	assembled-molecule	X	CP068255.2	=	NC_060947.1	Primary Assembly	154259566	chrX	FALSE
+Y	assembled-molecule	Y	CP086569.2	=	NC_060948.1	Primary Assembly	62460029	chrY	FALSE
+MT	assembled-molecule	MT	CP068254.1	<>	NA	non-nuclear	16569	chrM	TRUE
