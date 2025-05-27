@@ -113,6 +113,7 @@ registered_UCSC_genomes(organism=NA)
 
 \details{
   *** \emph{Registered} vs \emph{unregistered} UCSC genomes ***
+
   \itemize{
     \item For \emph{registered} genomes, the returned data frame contains
           information about which sequences are assembled molecules and which
@@ -137,25 +138,19 @@ registered_UCSC_genomes(organism=NA)
 
   *** Offline mode ***
 
-  \code{getChromInfoFromUCSC()} supports an "offline mode" when called
-  with \code{assembled.molecules.only=TRUE}, but only for a selection of
-  \emph{registered} genomes. The "offline mode" works thanks to a collection
-  of tab-delimited files stored in the package, that contain the "assembled
-  molecules info" for the supported genomes. This makes calls like:
-  \preformatted{    getChromInfoFromUCSC("hg38", assembled.molecules.only=TRUE)}
-  fast and reliable i.e. the call will always work, even when offline!
+  The \pkg{GenomeInfoDb} package includes a small database that contains
+  chromosome information for the most commonly used NCBI and UCSC genome
+  assemblies e.g. GRCh38.p14, GRCh38.p13, GRCm39, hg38, mm39, etc...
+  This makes calls like \code{getChromInfoFromNCBI("GRCh38.p14")} or
+  \code{getChromInfoFromUCSC("hg38")} work offline. Plus now they are fast
+  and reliable.
 
-  See README.TXT in GenomeInfoDb/inst/chrominfo_db/UCSC/assembled_molecules_db/
-  for more information.
-
-  Note that calling \code{getChromInfoFromUCSC()} with
-  \code{assembled.molecules.only=FALSE} (the default), or with
-  \code{recache=TRUE}, will trigger retrieval of the chromosome
-  info from UCSC, and will issue a warning if this info no longer
-  matches the "assembled molecules info" stored in the package.
-
-  Please contact the maintainer of the \pkg{GenomeInfoDb} package to
-  request genome additions to the "offline mode".
+  Note that calling \code{getChromInfoFromUCSC()} with \code{recache=TRUE}
+  will trigger retrieval of the chromosome info from UCSC, and will issue
+  a warning if this info no longer matches the chromosome info stored in
+  the package. Please open an issue on GitHub if you get such warning or
+  want to request adding chromosome information of your favorite NCBI or
+  UCSC genome assembly to \pkg{GenomeInfoDb}'s internal database.
 }
 
 \value{

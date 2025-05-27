@@ -86,7 +86,8 @@ registered_NCBI_assemblies(organism=NA)
 }
 
 \details{
-  \emph{registered} vs \emph{unregistered} NCBI assemblies:
+  *** \emph{registered} vs \emph{unregistered} NCBI assemblies ***
+
   \itemize{
     \item All NCBI assemblies can be looked up by assembly accession
           (GenBank or RefSeq) but only \emph{registered} assemblies
@@ -99,6 +100,22 @@ registered_NCBI_assemblies(organism=NA)
   }
   Please contact the maintainer of the \pkg{GenomeInfoDb} package to
   request registration of additional assemblies.
+
+  *** Offline mode ***
+
+  The \pkg{GenomeInfoDb} package includes a small database that contains
+  chromosome information for the most commonly used NCBI and UCSC genome
+  assemblies e.g. GRCh38.p14, GRCh38.p13, GRCm39, hg38, mm39, etc...
+  This makes calls like \code{getChromInfoFromNCBI("GRCh38.p14")} or
+  \code{getChromInfoFromUCSC("hg38")} work offline. Plus now they are fast
+  and reliable.
+
+  Note that calling \code{getChromInfoFromNCBI()} with \code{recache=TRUE}
+  will trigger retrieval of the chromosome info from NCBI, and will issue
+  a warning if this info no longer matches the chromosome info stored in
+  the package. Please open an issue on GitHub if you get such warning or
+  want to request adding chromosome information of your favorite NCBI or
+  UCSC genome assembly to \pkg{GenomeInfoDb}'s internal database.
 }
 
 \value{
