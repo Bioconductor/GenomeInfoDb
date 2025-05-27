@@ -209,8 +209,6 @@ registered_UCSC_genomes(organism=NA)
 ## A. BASIC EXAMPLES
 ## ---------------------------------------------------------------------
 
-## --- Internet access required! ---
-
 getChromInfoFromUCSC("hg19")
 
 getChromInfoFromUCSC("hg19", as.Seqinfo=TRUE)
@@ -226,14 +224,6 @@ hg19[is.na(hg19$NCBI.SequenceName), ]
 
 ## Map the hg19 sequences to the Ensembl sequence names:
 getChromInfoFromUCSC("hg19", add.ensembl.col=TRUE)
-
-## --- No internet access required! (offline mode) ---
-
-getChromInfoFromUCSC("hg19", assembled.molecules.only=TRUE)
-
-getChromInfoFromUCSC("panTro6", assembled.molecules.only=TRUE)
-
-getChromInfoFromUCSC("bosTau9", assembled.molecules.only=TRUE)
 
 ## --- List of UCSC genomes currently registered in the package ---
 
