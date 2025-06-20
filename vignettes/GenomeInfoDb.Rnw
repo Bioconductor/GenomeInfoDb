@@ -122,27 +122,6 @@ seqnames <- c("chr1", "chr9", "chr2", "chr3", "chr10")
 all(seqnames %in% extractSeqlevels("Homo_sapiens", "UCSC"))
 @
 
-\subsection{orderSeqlevels}
-The \Rfunction{orderSeqlevels} can return the order of a given character vector 
-which contains seqnames.In the following example, we show how you can find the 
-order for a given seqnames character vector.
-<<orderSeqlevels>>=
-seqnames <- c("chr1","chr9", "chr2", "chr3", "chr10")
-orderSeqlevels(seqnames)
-seqnames[orderSeqlevels(seqnames)]
-@
-%%
-
-\subsection{rankSeqlevels}
-The \Rfunction{rankSeqlevels} can return the rank of a given character vector 
-which contains seqnames.In the following example, we show how you can find the 
-rank for a given seqnames character vector.
-<<rankSeqlevels>>=
-seqnames <- c("chr1","chr9", "chr2", "chr3", "chr10")
-rankSeqlevels(seqnames)
-@
-%%
-
 \subsection{mapSeqlevels}
 Returns a matrix with 1 column per supplied sequence name and 1 row per 
 sequence renaming map compatible with the specified style.  If \Rcode{best.only}

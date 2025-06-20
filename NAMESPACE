@@ -7,43 +7,8 @@ importFrom(stats4, summary)
 import(BiocGenerics)
 import(S4Vectors)
 import(IRanges)  # for CompressedList
+import(Seqinfo)
 import(UCSC.utils)
-
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Export S4 classes
-###
-
-exportClasses(
-    Seqinfo,
-    GenomeDescription
-)
-
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Export S3 methods
-###
-
-S3method(as.data.frame, Seqinfo)
-
-S3method(merge, Seqinfo)
-
-S3method(summary, Seqinfo)
-
-S3method(update, Seqinfo)
-
-### We also export them thru the export() directive so that (a) they can be
-### called directly, (b) tab-completion on the name of the generic shows them,
-### and (c) methods() doesn't asterisk them.
-export(
-    as.data.frame.Seqinfo,
-
-    merge.Seqinfo,
-
-    summary.Seqinfo,
-
-    update.Seqinfo
-)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -80,10 +45,6 @@ export(
     ## list_ftp_dir.R:
     list_ftp_dir,
 
-    ## rankSeqlevels.R:
-    orderSeqlevels,
-    rankSeqlevels,
-
     ## NCBI-utils.R:
     find_NCBI_assembly_ftp_dir,
     fetch_assembly_report,
@@ -110,9 +71,6 @@ export(
     genomeBuilds,
     listOrganisms,
 
-    ## Seqinfo-class.R:
-    Seqinfo, checkCompatibleSeqinfo,
-
     ## seqlevelsStyle.R:
     genomeStyles,
     extractSeqlevels,
@@ -122,10 +80,7 @@ export(
 
     ## seqlevels-wrappers.R:
     keepSeqlevels, dropSeqlevels, renameSeqlevels, restoreSeqlevels,
-    standardChromosomes, keepStandardChromosomes,
-
-    ## GenomeDescription-classR:
-    GenomeDescription
+    standardChromosomes, keepStandardChromosomes
 )
 
 
@@ -134,37 +89,11 @@ export(
 ###
 
 export(
-    ## seqinfo.R:
-    seqinfo, "seqinfo<-",
-    seqnames, "seqnames<-",
-    seqlevels, "seqlevels<-",
-    sortSeqlevels,
-    seqlevelsInUse,
-    seqlevels0,
-    seqlengths, "seqlengths<-",
-    isCircular, "isCircular<-",
-    genome, "genome<-",
-
-    ## seqlevelsStyle.R:
-    seqlevelsStyle, "seqlevelsStyle<-",
-
-    ## GenomeDescription-class.R:
-    commonName, provider, providerVersion,
-    releaseDate, bsgenomeName
+    seqlevelsStyle, "seqlevelsStyle<-"
 )
 
 ### Exactly the same list as above.
 exportMethods(
-    seqinfo,
-    seqnames, "seqnames<-",
-    seqlevels, "seqlevels<-",
-    sortSeqlevels,
-    seqlevelsInUse,
-    seqlengths, "seqlengths<-",
-    isCircular, "isCircular<-",
-    genome, "genome<-",
-    seqlevelsStyle, "seqlevelsStyle<-",
-    commonName, provider, providerVersion,
-    releaseDate, bsgenomeName
+    seqlevelsStyle, "seqlevelsStyle<-"
 )
 
