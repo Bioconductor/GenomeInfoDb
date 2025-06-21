@@ -97,3 +97,22 @@ exportMethods(
     seqlevelsStyle, "seqlevelsStyle<-"
 )
 
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### TEMPORARY HACK: Re-export stuff that used to be defined here in
+### GenomeInfoDb but has moved to the Seqinfo package in BioC 3.22.
+### This avoids breaking packages that still **explicitly** import
+### this stuff from GenomeInfoDb.
+### TODO: Fix these packages and get rid of this.
+
+export(
+    orderSeqlevels, rankSeqlevels,
+    Seqinfo, seqinfo, "seqinfo<-",
+    seqnames, "seqnames<-",
+    seqlevels, "seqlevels<-",
+    seqlengths, "seqlengths<-",
+    isCircular, "isCircular<-",
+    genome, "genome<-",
+    sortSeqlevels, seqlevelsInUse, seqlevels0
+)
+
