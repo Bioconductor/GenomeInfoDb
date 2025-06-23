@@ -1,37 +1,13 @@
 import(methods)
 importFrom(utils, data, download.file, read.delim, read.table, read.csv,
                   write.table, as.roman)
-importFrom(stats, setNames, update)
-importFrom(stats4, summary)
+importFrom(stats, setNames)
 
 import(BiocGenerics)
 import(S4Vectors)
 import(IRanges)  # for CompressedList
 import(Seqinfo)
 import(UCSC.utils)
-
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Export S4 methods for generics NOT defined in this package
-###
-
-exportMethods(
-    length,
-    names, "names<-",
-    "[",
-    as.data.frame,
-    show,
-    merge,
-
-    ## Generics defined in the stats package:
-    update,
-
-    ## Generics defined in the stats4 package:
-    summary,
-
-    ## Generics defined in the BiocGenerics package:
-    intersect, organism, species
-)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
