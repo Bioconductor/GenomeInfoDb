@@ -89,6 +89,14 @@ export(
     seqlengths, "seqlengths<-",
     isCircular, "isCircular<-",
     genome, "genome<-",
-    sortSeqlevels, seqlevelsInUse, seqlevels0
+    sortSeqlevels, seqlevelsInUse, seqlevels0,
+
+    ## Note that the SNPlocs packages currently import the GenomeDescription()
+    ## constructor function from GenomeInfoDb, so they need to be modified
+    ## to import it from the Seqinfo package before we can get rid of the
+    ## re-exports below.
+    GenomeDescription,
+    commonName, provider, providerVersion,
+    releaseDate, bsgenomeName
 )
 

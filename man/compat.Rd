@@ -4,6 +4,8 @@
 \alias{orderSeqlevels}
 \alias{rankSeqlevels}
 
+\alias{GenomeDescription}
+
 \title{Functions moved to the Seqinfo package}
 
 \description{
@@ -22,6 +24,7 @@
     \item \code{Seqinfo::\link[Seqinfo]{Seqinfo}}
     \item \code{Seqinfo::\link[Seqinfo]{orderSeqlevels}}
     \item \code{Seqinfo::\link[Seqinfo]{rankSeqlevels}}
+    \item \code{Seqinfo::\link[Seqinfo]{GenomeDescription}}
   }
 }
 
