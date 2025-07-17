@@ -5,7 +5,7 @@ ASSEMBLIES <- list(
     ## Length of sequence Un is set to NA in assembly report!
     list(assembly="Release 5",
          date="2007/10/22",
-         assembly_accession="GCF_000001215.2",  # dm3
+         assembly_accession="GCA_000001215.2",  # dm3
          circ_seqs="MT"),
 
     list(assembly="Release 6 plus MT",
