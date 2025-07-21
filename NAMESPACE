@@ -55,7 +55,7 @@ export(
     seqlevelsInGroup,
 
     ## seqlevels-wrappers.R:
-    keepSeqlevels, dropSeqlevels, renameSeqlevels, restoreSeqlevels,
+    keepSeqlevels, dropSeqlevels, renameSeqlevels,
     standardChromosomes, keepStandardChromosomes
 )
 

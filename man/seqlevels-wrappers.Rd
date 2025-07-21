@@ -6,7 +6,6 @@
 \alias{keepSeqlevels}
 \alias{dropSeqlevels}
 \alias{renameSeqlevels}
-\alias{restoreSeqlevels}
 \alias{standardChromosomes}
 \alias{keepStandardChromosomes}
 
@@ -22,7 +21,6 @@
 keepSeqlevels(x, value, pruning.mode=c("error", "coarse", "fine", "tidy"))
 dropSeqlevels(x, value, pruning.mode=c("error", "coarse", "fine", "tidy"))
 renameSeqlevels(x, value)
-restoreSeqlevels(x)
 standardChromosomes(x, species=NULL)
 keepStandardChromosomes(x, species=NULL,
                         pruning.mode=c("error", "coarse", "fine", "tidy"))
@@ -84,11 +82,6 @@ keepStandardChromosomes(x, species=NULL,
            are used to map the new seqlevels to the old. When \code{value} is
            unnamed, the replacement vector must be the same length and in the
            same order as the original \code{seqlevels(x)}.
-
-    \item  \code{restoreSeqlevels}: Perform 
-           \code{seqlevels(txdb) <- seqlevels0(txdb)}, that is, restore the
-           seqlevels in \code{x} back to the original values.
-           Applicable only when \code{x} is a TxDb object.
 
     \item  \code{standardChromosomes}: Lists the 'standard' chromosomes defined
            as sequences in the assembly that are not scaffolds; also referred
@@ -216,16 +209,6 @@ seqlevels(txdb)
 
 transcripts <- transcripts(txdb)
 identical(seqlevels(txdb), seqlevels(transcripts))
-
-## ---------------------------------------------------------------------
-## restoreSeqlevels 
-## ---------------------------------------------------------------------
-
-## Restore seqlevels in a TxDb to original values.
-\dontrun{
-txdb <- restoreSeqlevels(txdb)
-seqlevels(txdb)
-}
 
 ## ---------------------------------------------------------------------
 ## keepStandardChromosomes

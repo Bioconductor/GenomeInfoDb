@@ -54,13 +54,6 @@ renameSeqlevels <- function(x, value)
     x 
 }
 
-## Currently applies to TxDb only.
-restoreSeqlevels <- function(x)
-{
-    seqlevels(x) <- seqlevels0(x) 
-    x
-}
-
 standardChromosomes <- function(x, species=NULL)
 {
     ori_seqlevels <- seqlevels(x)
