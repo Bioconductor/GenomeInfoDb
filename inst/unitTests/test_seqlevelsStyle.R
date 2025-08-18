@@ -90,7 +90,7 @@ test_seqlevelsStyle_character <- function()
     list("danRer7",  "Zv9",                           1133L,    0L,      0L),
     list("danRer10", "GRCz10",                        1061L,    0L,      0L),
     list("danRer11", "GRCz11",                        1923L,    0L,      0L),
-    list("dm3",      "Release 5",                       14L,    1L,      0L),
+    list("dm3",      "Release 5",                       13L,    2L,   2466L),
     list("dm6",      "Release 6 plus ISO1 MT",        1870L,    0L,      0L),
     list("equCab2",  "EquCab2.0",                       33L,    1L,   9604L),
     list("equCab3",  "EquCab3.0",                     4701L,    0L,      0L),

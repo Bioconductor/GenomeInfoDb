@@ -25,7 +25,7 @@ FETCH_ORDERED_CHROM_SIZES <-
 
 NCBI_LINKER <- list(
     assembly_accession="GCA_000001215.2",
-    special_mappings=c(chrM="MT", chrU="Un"),
-    unmapped_seqs=list(`pseudo-scaffold`="chrUextra")
+    special_mappings=c(chrM="MT"),
+    unmapped_seqs=list(`pseudo-scaffold`=c("chrU", "chrUextra"))
 )
 
