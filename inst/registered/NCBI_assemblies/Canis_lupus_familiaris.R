@@ -44,7 +44,8 @@ ASSEMBLIES <- list(
     ## Anyways, on Jan 2, 2023, in GenomeInfoDb 1.34.6 (release) and 1.35.10
     ## (devel), I modified getChromInfoFromNCBI() so that it removes the bogus
     ## MT entry (which turns out to be the original one), bringing the number
-    ## of entries back to 147. See .get_NCBI_chrom_info_from_accession() in
+    ## of entries back to 147.
+    ## See .get_full_NCBI_chrom_info_from_accession() in
     ## R/getChromInfoFromNCBI.R for the details.
     list(assembly="Dog10K_Boxer_Tasha",
          date="2020/10/06",
