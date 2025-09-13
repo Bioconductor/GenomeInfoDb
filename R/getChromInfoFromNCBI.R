@@ -317,6 +317,16 @@ find_NCBI_assembly_info_for_accession <- function(accession)
             assembly_report <-
                 S4Vectors:::extract_data_frame_rows(assembly_report, keep_idx)
         }
+        ## Hardcoded special treatment of GCF_000001515.5 (Pan_troglodytes-2.1.4).
+        ## See inst/registered/NCBI_assemblies/Pan_troglodytes.R
+        if (accession == "GCF_000001515.5") {
+            ## Full sequence report for GCF_000001515.5 has 2 entries for
+            ## chromosome 21. We keep the one that matches UCSC panTro4 chr21.
+            RefSeqAccn <- assembly_report[ , "RefSeqAccn"]
+            keep_idx <- which(!(RefSeqAccn %in% "NC_006488.2"))
+            assembly_report <-
+                S4Vectors:::extract_data_frame_rows(assembly_report, keep_idx)
+        }
         ans <- .format_NCBI_chrom_info(assembly_report, circ_seqs=circ_seqs)
         .NCBI_cached_chrom_info[[accession]] <- ans
     }

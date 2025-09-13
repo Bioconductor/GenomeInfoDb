@@ -341,8 +341,11 @@ test_switching_Seqinfo_to_RefSeq_style <- function()
     ##   the sequences in associated NCBI assemblies GadMor_May2010,
     ##   Pan_troglodytes-2.1.3, and CR_1.0, have no RefSeq accessions
     ##   assigned to them.
+    ## o In the case of panTro4, it's because someone seriously messed up
+    ##   the NCBI assembly report for Pan_troglodytes-2.1.4 in Sep 2025.
+    ##   See inst/registered/NCBI_assemblies/Pan_troglodytes.R
     skip_RefSeq_switch <- c("canFam4", "canFam5", "gadMor1",
-                            "hs1", "panTro3", "rheMac3")
+                            "hs1", "panTro3", "panTro4", "rheMac3")
     for (i in seq_along(.UCSC_NCBI_MAPPING_SUMMARY)) {
         args <- .UCSC_NCBI_MAPPING_SUMMARY[[i]][1:2]
         if (args[[1L]] %in% skip_RefSeq_switch)
