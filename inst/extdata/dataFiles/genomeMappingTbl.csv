@@ -3,6 +3,7 @@ abingdon island giant tortoise,chelonoidis abingdonii,ASM359739v1,96,Apr.2019,96
 african ostrich,struthio camelus australis,ASM69896v1,99,Jan.2020,99,Jan.2020,NA,NA,NA
 agassiz's desert tortoise,gopherus agassizii,ASM289641v1,95,Jan.2019,95,Jan.2019,NA,NA,NA
 algerian mouse,mus spretus,SPRET_EiJ_v1,86,Oct.2016,86,Oct.2016,NA,NA,NA
+algerian mouse,mus spretus,SPRET_EiJ_v3,114,May.2025,114,May.2025,NA,NA,NA
 alpaca,vicugna pacos,vicPac1,54,May.2009,54,May.2009,vicPac1,Jul.2008,Broad Institute VicPac1.0
 alpaca,vicugna pacos,vicPac1,54,May.2009,71,Apr.2013,vicPac2,Mar.2013,Broad Institute Vicugna_pacos-2.0.1
 alpine marmot,marmota marmota marmota,marMar2.1,96,Apr.2019,96,Apr.2019,NA,NA,NA
@@ -74,6 +75,7 @@ cat,felis catus,Felis_catus_6.2,70,Jan.2013,70,Jan.2013,felcat5,Sep.2011,ICGSC F
 cat,felis catus,Felis_catus_6.2,70,Jan.2013,78,Dec.2014,felCat8,Nov.2014,ICGSC Felis_catus_8.0
 cat,felis catus,Felis_catus_8.0,91,Dec.2017,91,Dec.2017,felCat9,Nov.2017,Genome Sequencing Center (GSC) at Washington University (WashU) School of Medicine Felis_catus_9.0
 cat,felis catus,Felis_catus_9.0,93,Jul.2018,93,Jul.2018,felCat9,Nov.2017,Genome Sequencing Center (GSC) at Washington University (WashU) School of Medicine Felis_catus_9.0
+cat,felis catus,F.catus_Fca126_mat1.0,114,May.2025,114,May.2025,felCat9,Nov.2017,Genome Sequencing Center (GSC) at Washington University (WashU) School of Medicine Felis_catus_9.0
 cave fish,astyanax mexicanus,AstMex102,74,Dec.2013,74,Dec.2013,astMex1,NA,NA
 cave fish,astyanax mexicanus,Astyanax_mexicanus-2.0,94,Oct.2018,94,Oct.2018,astMex1,NA,NA
 central bearded dragon,pogona vitticeps,pvi1.1,96,Apr.2019,96,Apr.2019,NA,NA,NA
@@ -136,6 +138,8 @@ cow,bos taurus,UMD3.1,64,Sep.2011,65,Dec.2011,bosTau7,Oct.2011,Baylor College of
 cow,bos taurus,UMD3.1,64,Sep.2011,76,Aug.2014,bosTau8,Jun.2014,University of Maryland v3.1.1
 cow,bos taurus,UMD3.1,64,Sep.2011,92,Apr.2018,bosTau9,Apr.2018,USDA ARS
 cow,bos taurus,ARS-UCD1.2,95,Jan2019,95,Jan2019,bosTau9,Apr.2018,USDA ARS
+cow,bos taurus,ARS-UCD1.3,111,Jan2024,111,Jan2024,bosTau9,Apr.2018,USDA ARS
+cow,bos taurus,ARS-UCD2.0,114,May2025,114,May2025,bosTau9,Apr.2018,USDA ARS
 crab-eating macaque,macaca fascicularis,Macaca_fascicularis_5.0,91,Dec.2017,91,Dec.2017,macFas5,Jun.2013,Washington University Macaca_fascicularis_5.0
 crab-eating macaque,macaca fascicularis,Macaca_fascicularis_6.0,103,Feb.2021,103,Feb.2021,macFas5,Jun.2013,Washington University Macaca_fascicularis_5.0
 damara mole rat,fukomys damarensis,DMR_v1.0,90,Aug.2017,90,Aug.2017,NA,NA,NA
@@ -186,6 +190,8 @@ fruitfly,drosophila melanogaster,BDGP6,79,Mar.2015,79,Mar.2015,dm6,Aug.2014,BDGP
 fruitfly,drosophila melanogaster,BDGP6.22,96,Apr.2019,96,Apr.2019,dm6,Aug.2014,BDGP Release 6 + ISO1 MT
 fruitfly,drosophila melanogaster,BDGP6.28,99,Jan.2020,99,Jan.2020,dm6,Aug.2014,BDGP Release 6 + ISO1 MT
 fruitfly,drosophila melanogaster,BDGP6.32,103,Feb.2021,103,Feb.2021,dm6,Aug.2014,BDGP Release 6 + ISO1 MT
+fruitfly,drosophila melanogaster,BDGP6.46,110,Jul.2023,110,Jul.2023,dm6,Aug.2014,BDGP Release 6 + ISO1 MT
+fruitfly,drosophila melanogaster,BDGP6.54,114,May.2025,114,May.2025,dm6,Aug.2014,BDGP Release 6 + ISO1 MT
 fugu,takifugu rubripes,FUGU4.0,54,May.2009,54,May.2009,fr2,Oct.2004,JGI v4.0
 fugu,takifugu rubripes,FUGU4.0,54,May.2009,65,Dec.2011,fr3,Oct.2011,JGI v5.0
 fugu,takifugu rubripes,FUGU5,94,Oct.2018,94,Oct.2018,fr3,Oct.2011,JGI v5.0
@@ -387,6 +393,7 @@ rat,rattus norvegicus,Rnor_5.0,70,Jan.2013,76,Aug.2014,rn6,Jul.2014,RGSC Rnor_6.
 rat,rattus norvegicus,Rnor_6.0,80,May.2015,80,May.2015,rn6,Jul.2014,RGSC Rnor_6.0
 rat,rattus norvegicus,Rnor_6.0,80,May.2015,105,Dec.2021,rn7,Nov.2020,Wellcome Sanger Institute mRatBN7.2
 rat,rattus norvegicus,mRatBN7.2,106,Apr.2022,106,Apr.2022,rn7,Nov.2020,Wellcome Sanger Institute mRatBN7.2
+rat,rattus norvegicus,GRCr8,114,May.2025,114,May.2025,rn7,Nov.2020,Wellcome Sanger Institute mRatBN7.2
 red fox,vulpes vulpes,VulVul2.2,95,Jan.2019,95,Jan.2019,NA,NA,NA
 red-bellied piranha,pygocentrus nattereri,Pygocentrus_nattereri-1.0.2,94,Oct.2018,111,Jan.2024,NA,NA,NA
 red-bellied piranha,pygocentrus nattereri,fPygNat1.pri,112,May.2024,112,May.2024,NA,NA,NA
@@ -407,6 +414,7 @@ sailfin molly,poecilia latipinna,P_latipinna-1.0,94,Oct.2018,94,Oct.2018,NA,NA,N
 sheep,ovis aries,Oar_v3.1,74,Dec.2013,100,Apr.2020,oviAri3,Aug.2012,ISGC Oar_v3.1
 sheep,ovis aries,Oar_rambouillet_v1.0,101,Aug.2020,110,Jul.2023,oviAri3,Aug.2012,ISGC Oar_v3.1
 sheep,ovis aries,ARS-UI_Ramb_v2.0,111,Jan.2024,112,May.2024,oviAri3,Aug.2012,ISGC Oar_v3.1
+sheep,ovis aries,ARS-UI_Ramb_v3.0,115,Sep.2025,115,Sep.2025,oviAri3,Aug.2012,ISGC Oar_v3.1
 sheepshead minnow,cyprinodon variegatus,C_variegatus-1.0,94,Oct.2018,94,Oct.2018,NA,NA,NA
 shortfin molly,poecilia mexicana,P_mexicana-1.0,94,Oct.2018,94,Oct.2018,NA,NA,NA
 shrew,sorex araneus,sorAra1,54,May.2009,54,May.2009,sorAra2,Aug.2008,Broad Institute SorAra2.0
