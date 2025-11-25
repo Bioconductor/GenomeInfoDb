@@ -1,7 +1,6 @@
 GENOME <- "criGri1"
 ORGANISM <- "Cricetulus griseus"
-ASSEMBLED_MOLECULES <- "chrM"
-CIRC_SEQS <- "chrM"
+ASSEMBLED_MOLECULES <- CIRC_SEQS <- "chrM"
 
 .order_seqlevels <- function(seqlevels)
 {

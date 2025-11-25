@@ -1,5 +1,5 @@
-GENOME <- "panPan1"
-ORGANISM <- "Pan paniscus"
+GENOME <- "hetGla2"
+ORGANISM <- "Heterocephalus glaber"
 ASSEMBLED_MOLECULES <- CIRC_SEQS <- "chrM"
 
 .order_seqlevels <- function(seqlevels)
@@ -27,7 +27,9 @@ FETCH_ORDERED_CHROM_SIZES <-
 }
 
 NCBI_LINKER <- list(
-    assembly_accession="GCA_000258655.1",
+    assembly_accession="GCF_000247695.1",
     special_mappings=c(chrM="MT")
 )
+
+ENSEMBL_LINKER <- "chromAlias"
 
