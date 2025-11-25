@@ -102,6 +102,8 @@ test_seqlevelsStyle_character <- function()
     list("galGal6",  "GRCg6a",                         464L,    0L,      0L),
     #list("gasAcu1",  "ASM18067v1", <--- no such mapping despite UCSC claim),
     list("gorGor6",  "Kamilah_GGO_v0",                5486L,    0L,      0L),
+    list("hetGla1",  "HetGla_1.0",                   39267L,    0L,      0L),
+    list("hetGla2",  "HetGla_female_1.0",             4229L,    0L,      0L),
     list("hg15",     "NCBI33",                          24L,   20L,    140L),
     #list("hg16",     "NCBI34",                          24L,   18L,    138L),
     #list("hg17",     "NCBI35",                          26L,   20L,     86L),
@@ -332,10 +334,11 @@ test_switching_Seqinfo_to_RefSeq_style <- function()
     }
 
     ## Exclude some problematic genomes from the RefSeq switch check:
-    ## o In the case of canFam4, canFam5, and hs1, it's because chrM is not
-    ##   mapped to a RefSeq accession, that is, RefSeqAccn is NA:
+    ## o In the case of canFam4, canFam5, hetGla1, and hs1, that's because
+    ##   chrM is not mapped to a RefSeq accession, that is, RefSeqAccn is NA:
     ##   - for chrM in getChromInfoFromNCBI("UU_Cfam_GSD_1.0");
     ##   - for chrM in getChromInfoFromNCBI("UMICH_Zoey_3.1");
+    ##   - for MT in getChromInfoFromNCBI("HetGla_1.0")
     ##   - for MT in getChromInfoFromNCBI("T2T-CHM13v2.0").
     ## o In the case of gadMor1, panTro3, and rheMac3, it's because
     ##   the sequences in associated NCBI assemblies GadMor_May2010,
@@ -344,7 +347,7 @@ test_switching_Seqinfo_to_RefSeq_style <- function()
     ## o In the case of panTro4, it's because someone seriously messed up
     ##   the NCBI assembly report for Pan_troglodytes-2.1.4 in Sep 2025.
     ##   See inst/registered/NCBI_assemblies/Pan_troglodytes.R
-    skip_RefSeq_switch <- c("canFam4", "canFam5", "gadMor1",
+    skip_RefSeq_switch <- c("canFam4", "canFam5", "gadMor1", "hetGla1",
                             "hs1", "panTro3", "panTro4", "rheMac3")
     for (i in seq_along(.UCSC_NCBI_MAPPING_SUMMARY)) {
         args <- .UCSC_NCBI_MAPPING_SUMMARY[[i]][1:2]
