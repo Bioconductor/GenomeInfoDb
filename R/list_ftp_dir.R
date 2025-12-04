@@ -23,8 +23,9 @@
 {
     url <- paste0("ftp://", ftp_dir)
     destfile <- tempfile()
+    on.exit(unlink(destfile))
     download.file(url, destfile, method, quiet=TRUE)
-    readLines(destfile)
+    if (file.exists(destfile)) readLines(destfile) else character(0)
 }
 
 .make_matrix_data_from_list <- function(x, min_ncol=0L)
