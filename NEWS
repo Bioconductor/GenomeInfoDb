@@ -1,3 +1,36 @@
+CHANGES IN VERSION 1.48.0
+-------------------------
+
+NEW FEATURES
+
+    o Register the following NCBI assemblies for Heterocephalus glaber (naked
+      mole-rat):
+
+      - HetGla_1.0:
+          https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000230445.1/
+
+      - HetGla_female_1.0:
+          https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000247695.1/
+
+      - Naked mole-rat maternal:
+          https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_944319715.1/
+
+      - Naked mole-rat paternal:
+          https://www.ncbi.nlm.nih.gov/datasets/genome/GCA_944319725.1/
+
+      as well as the following UCSC genomes assemblies:
+
+      - hetGla1 (based on HetGla_1.0):
+          https://genome.ucsc.edu/cgi-bin/hgGateway?db=hetGla1
+
+      - hetGla2 (based on HetGla_female_1.0):
+          https://genome.ucsc.edu/cgi-bin/hgGateway?db=hetGla2
+
+BUG FIXES
+
+    o Make sure list_ftp_dir() works on an empty FTP dir.
+
+
 CHANGES IN VERSION 1.46.0
 -------------------------
 
