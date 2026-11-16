@@ -14,7 +14,8 @@
 }
 
 \description{
-  Keep, drop or rename seqlevels in objects with a \link{Seqinfo} class.
+  Keep, drop or rename seqlevels in objects that have a \link[Seqinfo]{Seqinfo}
+  component.
 }
 
 \usage{
@@ -28,8 +29,8 @@ keepStandardChromosomes(x, species=NULL,
 
 \arguments{
   \item{x}{
-    Any object having a \link{Seqinfo} class in which the seqlevels will
-    be kept, dropped or renamed.
+    Any object having a \link[Seqinfo]{Seqinfo} component in which the
+    seqlevels will be kept, dropped or renamed.
   }
   \item{value}{
     A named or unnamed character vector.
@@ -116,8 +117,8 @@ keepStandardChromosomes(x, species=NULL,
 
 \seealso{
   \itemize{
-    \item \link{seqinfo} ## Accessing sequence information
-    \item \link{Seqinfo} ## The Seqinfo class
+    \item \link[Seqinfo]{seqinfo} ## Accessing sequence information
+    \item \link[Seqinfo]{Seqinfo} ## The Seqinfo class
   }
 }
 

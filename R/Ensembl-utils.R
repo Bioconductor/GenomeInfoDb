@@ -10,9 +10,15 @@
 ### get_Ensembl_FTP_mysql_url() and get_Ensembl_FTP_gtf_url()
 ###
 
-.ENSEMBL_FTP_PUB_URL <- "ftp://ftp.ensembl.org/pub/"
-.ENSEMBL_FTP_PUB_GRCH37_URL <- "ftp://ftp.ensembl.org/pub/grch37/"
-.ENSEMBLGENOMES_FTP_PUB_URL <- "ftp://ftp.ensemblgenomes.org/pub/"
+### As part of the total revamp of the Ensembl website and FTP servers that
+### occurred in Summer 2026, the old (legacy) Ensembl FTP sites were moved
+### to the EMBL-EBI FTP server:
+#.ENSEMBL_FTP_PUB_URL <- "ftp://ftp.ensembl.org/pub/"
+#.ENSEMBL_FTP_PUB_GRCH37_URL <- "ftp://ftp.ensembl.org/pub/grch37/"
+#.ENSEMBLGENOMES_FTP_PUB_URL <- "ftp://ftp.ensemblgenomes.org/pub/"
+.ENSEMBL_FTP_PUB_URL <- "ftp://ftp.ebi.ac.uk/ensemblorg/pub/"
+.ENSEMBL_FTP_PUB_GRCH37_URL <- "ftp://ftp.ebi.ac.uk/ensemblorg/pub/grch37/"
+.ENSEMBLGENOMES_FTP_PUB_URL <- "ftp://ftp.ebi.ac.uk/ensemblgenomes/pub/"
 .ENSEMBL_FTP_RELEASE_PREFIX <- "release-"
 .ENSEMBL_DIVISIONS <- c("bacteria", "fungi", "metazoa", "plants", "protists")
 
@@ -57,8 +63,8 @@ get_Ensembl_FTP_mysql_url <- function(release=NA, division=NA,
     top_url <- .get_Ensembl_FTP_top_url(division, use.grch37)
     if (!is.na(release)) {
         mysql_subdir <- paste0(.ENSEMBL_FTP_RELEASE_PREFIX, release, "/mysql")
-    } else if (is.na(division) && !use.grch37) {
-        mysql_subdir <- "current_mysql"
+    #} else if (is.na(division) && !use.grch37) {
+    #    mysql_subdir <- "current_mysql"
     } else {
         mysql_subdir <- "current/mysql"
     }

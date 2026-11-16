@@ -159,26 +159,28 @@ getChromInfoFromEnsembl(species,
 ## Internet access required!
 
 ## === Worm ===
-## https://uswest.ensembl.org/Caenorhabditis_elegans
+## https://ensembl.org/Caenorhabditis_elegans
 
-celegans <- getChromInfoFromEnsembl("celegans")
+celegans <- getChromInfoFromEnsembl("celegans", division="metazoa")
 attr(celegans, "species_info")
 
-getChromInfoFromEnsembl("celegans", as.Seqinfo=TRUE)
+getChromInfoFromEnsembl("celegans", division="metazoa", as.Seqinfo=TRUE)
 
-celegans <- getChromInfoFromEnsembl("celegans", map.NCBI=TRUE)
+getChromInfoFromEnsembl("celegans", division="metazoa", map.NCBI=TRUE)
 
 ## === Yeast ===
-## https://uswest.ensembl.org/Saccharomyces_cerevisiae
+## https://ensembl.org/Saccharomyces_cerevisiae
 
-scerevisiae <- getChromInfoFromEnsembl("scerevisiae")
+scerevisiae <- getChromInfoFromEnsembl("scerevisiae", division="fungi")
 attr(scerevisiae, "species_info")
 
-getChromInfoFromEnsembl("scerevisiae", as.Seqinfo=TRUE)
+getChromInfoFromEnsembl("scerevisiae", division="fungi", as.Seqinfo=TRUE)
 
-scerevisiae <- getChromInfoFromEnsembl("scerevisiae", map.NCBI=TRUE)
+getChromInfoFromEnsembl("scerevisiae", division="fungi", map.NCBI=TRUE)
 
-## Arabidopsis thaliana:
+## === Arabidopsis thaliana ===
+## https://ensembl.org/Arabidopsis_thaliana
+
 athaliana <- getChromInfoFromEnsembl("athaliana", division="plants",
                                      map.NCBI=TRUE)
 attr(athaliana, "species_info")
